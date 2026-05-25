@@ -194,192 +194,208 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
 
   <script>
-    window.addEventListener("DOMContentLoaded", () => {
-      const detalle = document.getElementById("detalle");
-      const tdTotalDebe = document.getElementById("tdTotalDebe");
-      const tdTotalHaber = document.getElementById("tdTotalHaber");
-      const tdEstado = document.getElementById("tdEstado");
+window.addEventListener("DOMContentLoaded", () => {
+  const detalle = document.getElementById("detalle");
+  const tdTotalDebe = document.getElementById("tdTotalDebe");
+  const tdTotalHaber = document.getElementById("tdTotalHaber");
+  const tdEstado = document.getElementById("tdEstado");
 
-      const btnAgregar = document.getElementById("btnAgregar");
-      const btnPDF = document.getElementById("btnPDF");
-      const btnBold = document.getElementById("btnBold");
-      const btnUnderline = document.getElementById("btnUnderline");
-      const btnLimpiar = document.getElementById("btnLimpiar");
+  const btnAgregar = document.getElementById("btnAgregar");
+  const btnPDF = document.getElementById("btnPDF");
+  const btnBold = document.getElementById("btnBold");
+  const btnUnderline = document.getElementById("btnUnderline");
+  const btnLimpiar = document.getElementById("btnLimpiar");
 
-      const tax15 = document.getElementById("tax15");
-      const tax18 = document.getElementById("tax18");
-      const taxExento = document.getElementById("taxExento");
+  const tax15 = document.getElementById("tax15");
+  const tax18 = document.getElementById("tax18");
+  const taxExento = document.getElementById("taxExento");
 
-      const formatoMoneda = new Intl.NumberFormat('es-HN', {
-        style: 'currency',
-        currency: 'HNL',
-        minimumFractionDigits: 2
-      });
+  const formatoMoneda = new Intl.NumberFormat('es-HN', {
+    style: 'currency',
+    currency: 'HNL',
+    minimumFractionDigits: 2
+  });
 
-      let inputActivo = null;
+  let inputActivo = null;
 
-      // CONFIGURACIÓN DE LOGO E IMPUESTOS
-      const CUENTA_IMP = "-27110";
-      const DESC_IMP = "IMPUESTO S/V";
-      const DESC_IMP_SR = "IMPUESTO S/R";
-      const LOGO_URL = "logo.png"; 
+  // CONFIGURACIÓN DE LOGO E IMPUESTOS
+  const CUENTA_IMP = "-27110";
+  const DESC_IMP = "IMPUESTO S/V";
+  const DESC_IMP_SR = "IMPUESTO S/R";
+  
+  // RECOMENDACIÓN: Convierte tu logo.png a Base64 en una web como base64-image.de y pega el string aquí
+  const LOGO_BASE64 = "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAAAAAA6fptVAAAACklEQVR42mNkFAAAADAAnv999YAAAAAASUVORK5CYII="; 
 
-      function autoGrowTextarea(ta) {
-        ta.style.height = "auto";
-        ta.style.height = (ta.scrollHeight) + "px";
-      }
+  function autoGrowTextarea(ta) {
+    ta.style.height = "auto";
+    ta.style.height = (ta.scrollHeight) + "px";
+  }
 
-      function attachEvents(tr) {
-        tr.querySelectorAll("input, textarea").forEach(inp => {
-          inp.addEventListener("input", () => {
-            if (inp.tagName === "TEXTAREA") autoGrowTextarea(inp);
-            calcular();
-          });
-          inp.addEventListener("focus", () => inputActivo = inp);
-        });
-      }
-
-      function agregarFila() {
-        const tr = document.createElement("tr");
-        tr.innerHTML = `
-          <td><input placeholder="Cuenta"></td>
-          <td><textarea rows="1" placeholder="Descripción"></textarea></td>
-          <td><input type="number" step="0.01" placeholder="0.00"></td>
-          <td><input type="number" step="0.01" placeholder="0.00"></td>
-        `;
-        attachEvents(tr);
-        detalle.appendChild(tr);
-        autoGrowTextarea(tr.cells[1].querySelector("textarea"));
+  function attachEvents(tr) {
+    tr.querySelectorAll("input, textarea").forEach(inp => {
+      inp.addEventListener("input", () => {
+        if (inp.tagName === "TEXTAREA") autoGrowTextarea(inp);
         calcular();
-      }
-
-      function calcular() {
-        // Lógica de impuestos
-        const tasa = tax15.checked ? 0.15 : (tax18.checked ? 0.125 : 0);
-        const row1 = detalle.rows[0];
-        const baseDebe = row1 ? parseFloat(row1.cells[2].querySelector("input").value) || 0 : 0;
-        
-        let rImp = [...detalle.rows].find(r => r.cells[0].querySelector("input").value === CUENTA_IMP);
-        
-        if (tasa > 0 && baseDebe > 0) {
-          if (!rImp) {
-            rImp = document.createElement("tr");
-            rImp.innerHTML = `<td><input readonly></td><td><textarea readonly rows="1"></textarea></td><td><input readonly></td><td><input readonly></td>`;
-            attachEvents(rImp);
-            detalle.appendChild(rImp);
-          }
-          rImp.cells[0].querySelector("input").value = CUENTA_IMP;
-          rImp.cells[1].querySelector("textarea").value = tax15.checked ? DESC_IMP : DESC_IMP_SR;
-          rImp.cells[3].querySelector("input").value = (baseDebe * tasa).toFixed(2);
-          
-          // Estilo automático para la fila de impuesto
-          const txtImp = rImp.cells[1].querySelector("textarea");
-          txtImp.style.fontWeight = "bold";
-          txtImp.style.textDecoration = "underline";
-          txtImp.style.textAlign = "center";
-          autoGrowTextarea(txtImp);
-        } else if (rImp) {
-          rImp.remove();
-        }
-
-        // Cálculo de totales
-        let totalDebe = 0, totalHaber = 0;
-        [...detalle.rows].forEach(row => {
-          totalDebe += parseFloat(row.cells[2].querySelector("input").value) || 0;
-          totalHaber += parseFloat(row.cells[3].querySelector("input").value) || 0;
-        });
-
-        tdTotalDebe.textContent = formatoMoneda.format(totalDebe);
-        tdTotalHaber.textContent = formatoMoneda.format(totalHaber);
-        const bal = (totalDebe.toFixed(2) === totalHaber.toFixed(2) && totalDebe > 0);
-        tdEstado.innerHTML = bal ? `<span class="ok">✔ BALANCEADA</span>` : `<span class="error">✘ DESCUADRADA</span>`;
-      }
-
-      // Manejo de Checkboxes (Solo uno activo)
-      [tax15, tax18, taxExento].forEach(chk => {
-        chk.addEventListener("change", () => {
-          if (chk.checked) [tax15, tax18, taxExento].forEach(x => { if (x !== chk) x.checked = false; });
-          calcular();
-        });
       });
-
-      btnBold.addEventListener("click", () => { if(inputActivo) inputActivo.style.fontWeight = inputActivo.style.fontWeight === "bold" ? "normal" : "bold"; });
-      btnUnderline.addEventListener("click", () => { if(inputActivo) inputActivo.style.textDecoration = inputActivo.style.textDecoration === "underline" ? "none" : "underline"; });
-      btnAgregar.addEventListener("click", agregarFila);
-      btnLimpiar.addEventListener("click", () => { location.reload(); });
-
-      // EXPORTACIÓN PDF
-      btnPDF.addEventListener("click", () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.width;
-        
-        const img = new Image();
-        img.src = LOGO_URL;
-        img.onload = function() {
-          // 1. Logo Centrado
-          const logoWidth = 120;
-          const logoHeight = (img.height / img.width) * logoWidth;
-          const xCentro = (pageWidth - logoWidth) / 2;
-          doc.addImage(img, 'PNG', xCentro, 10, logoWidth, logoHeight);
-
-          // 2. Título dinámico según tamaño del logo
-          const yTitulo = 10 + logoHeight + 10;
-          doc.setFontSize(18);
-          doc.setFont(undefined, 'bold');
-          doc.text("PARTIDA CONTABLE", pageWidth / 2, yTitulo, { align: "center" });
-
-          // 3. Encabezado de información
-          const yInfo = yTitulo + 12;
-          doc.setFontSize(11);
-          doc.setFont(undefined, 'normal');
-          doc.text(`PDA N°: ${document.getElementById("numPartida").value || "________"}`, 14, yInfo);
-          doc.text(`Fecha: ${document.getElementById("fecha").value || "________"}`, 14, yInfo + 7);
-          doc.text(`Descripción: ${document.getElementById("concepto").value || ""}`, 14, yInfo + 14);
-
-          // 4. Tabla
-          const bodyData = [...detalle.rows].map(row => {
-            return [...row.cells].map(td => {
-              const el = td.querySelector("input, textarea");
-              return {
-                content: el.type === "number" ? formatoMoneda.format(el.value || 0) : el.value,
-                styles: { 
-                  fontStyle: el.style.fontWeight === "bold" ? "bold" : "normal",
-                  halign: el.style.textAlign || (el.type === "number" ? "right" : "left")
-                },
-                _underline: el.style.textDecoration === "underline"
-              };
-            });
-          });
-
-          doc.autoTable({
-            startY: yInfo + 22,
-            head: [["Cuenta", "Descripción", "Debe (L)", "Haber (L)"]],
-            body: bodyData,
-            theme: 'grid',
-            headStyles: { fillColor: [44, 62, 80] },
-            didDrawCell: (data) => {
-              if (data.section === 'body' && data.cell.raw._underline) {
-                doc.line(data.cell.x + 2, data.cell.y + data.cell.height - 2, data.cell.x + data.cell.width - 2, data.cell.y + data.cell.height - 2);
-              }
-            }
-          });
-
-          // Firmas al final
-          const finalY = doc.lastAutoTable.finalY + 30;
-          doc.text("__________________________", 20, finalY);
-          doc.text("__________________________", 120, finalY);
-          doc.text("Firma Administrador", 30, finalY + 7);
-          doc.text("Firma Contabilidad", 130, finalY + 7);
-
-          doc.save("Partida_Contable.pdf");
-        };
-        img.onerror = () => alert("Error: No se encontró el archivo logo.png en la carpeta.");
-      });
-
-      // Filas por defecto
-      for(let i=0; i<3; i++) agregarFila();
+      inp.addEventListener("focus", () => inputActivo = inp);
     });
+  }
+
+  function agregarFila() {
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td><input placeholder="Cuenta"></td>
+      <td><textarea rows="1" placeholder="Descripción"></textarea></td>
+      <td><input type="number" step="0.01" placeholder="0.00"></td>
+      <td><input type="number" step="0.01" placeholder="0.00"></td>
+    `;
+    attachEvents(tr);
+    detalle.appendChild(tr);
+    autoGrowTextarea(tr.cells[1].querySelector("textarea"));
+    calcular();
+  }
+
+  function calcular() {
+    const tasa = tax15.checked ? 0.15 : (tax18.checked ? 0.125 : 0);
+    const row1 = detalle.rows[0];
+    const baseDebe = row1 ? parseFloat(row1.cells[2].querySelector("input").value) || 0 : 0;
+    
+    let rImp = [...detalle.rows].find(r => r.cells[0].querySelector("input").value === CUENTA_IMP);
+    
+    if (tasa > 0 && baseDebe > 0) {
+      if (!rImp) {
+        rImp = document.createElement("tr");
+        rImp.innerHTML = `<td><input readonly></td><td><textarea readonly rows="1"></textarea></td><td><input readonly></td><td><input readonly></td>`;
+        attachEvents(rImp);
+        detalle.appendChild(rImp);
+      }
+      rImp.cells[0].querySelector("input").value = CUENTA_IMP;
+      rImp.cells[1].querySelector("textarea").value = tax15.checked ? DESC_IMP : DESC_IMP_SR;
+      rImp.cells[3].querySelector("input").value = (baseDebe * tasa).toFixed(2);
+      
+      const txtImp = rImp.cells[1].querySelector("textarea");
+      txtImp.style.fontWeight = "bold";
+      txtImp.style.textDecoration = "underline";
+      txtImp.style.textAlign = "center";
+      autoGrowTextarea(txtImp);
+    } else if (rImp) {
+      rImp.remove();
+    }
+
+    let totalDebe = 0, totalHaber = 0;
+    [...detalle.rows].forEach(row => {
+      totalDebe += parseFloat(row.cells[2].querySelector("input").value) || 0;
+      totalHaber += parseFloat(row.cells[3].querySelector("input").value) || 0;
+    });
+
+    tdTotalDebe.textContent = formatoMoneda.format(totalDebe);
+    tdTotalHaber.textContent = formatoMoneda.format(totalHaber);
+    const bal = (totalDebe.toFixed(2) === totalHaber.toFixed(2) && totalDebe > 0);
+    tdEstado.innerHTML = bal ? `<span class="ok">✔ BALANCEADA</span>` : `<span class="error">✘ DESCUADRADA</span>`;
+  }
+
+  [tax15, tax18, taxExento].forEach(chk => {
+    chk.addEventListener("change", () => {
+      if (chk.checked) [tax15, tax18, taxExento].forEach(x => { if (x !== chk) x.checked = false; });
+      calcular();
+    });
+  });
+
+  btnBold.addEventListener("click", () => { if(inputActivo) inputActivo.style.fontWeight = inputActivo.style.fontWeight === "bold" ? "normal" : "bold"; });
+  btnUnderline.addEventListener("click", () => { if(inputActivo) inputActivo.style.textDecoration = inputActivo.style.textDecoration === "underline" ? "none" : "underline"; });
+  btnAgregar.addEventListener("click", agregarFila);
+  btnLimpiar.addEventListener("click", () => { location.reload(); });
+
+  // EXPORTACIÓN PDF CORREGIDA
+  btnPDF.addEventListener("click", () => {
+    const { jsPDF } = window.jspdf;
+    const doc = new jsPDF('p', 'mm', 'a4');
+    const pageWidth = doc.internal.pageSize.width;
+    
+    // Al usar Base64 el renderizado es inmediato y no falla en la web
+    const logoWidth = 50;  
+    const logoHeight = 20; // Ajusta dimensiones según la proporción de tu logo real
+    const xCentro = (pageWidth - logoWidth) / 2;
+    
+    try {
+      doc.addImage(LOGO_BASE64, 'PNG', xCentro, 10, logoWidth, logoHeight);
+    } catch (e) {
+      console.warn("No se pudo cargar el logo en el PDF, continuando sin imagen.");
+    }
+
+    // Título e Información General
+    const yTitulo = 15 + logoHeight;
+    doc.setFontSize(16);
+    doc.setFont(undefined, 'bold');
+    doc.text("PARTIDA CONTABLE", pageWidth / 2, yTitulo, { align: "center" });
+
+    const yInfo = yTitulo + 12;
+    doc.setFontSize(10);
+    doc.setFont(undefined, 'normal');
+    doc.text(`PDA N°: ${document.getElementById("numPartida").value || "________"}`, 14, yInfo);
+    doc.text(`Fecha: ${document.getElementById("fecha").value || "________"}`, 14, yInfo + 6);
+    doc.text(`Descripción: ${document.getElementById("concepto").value || ""}`, 14, yInfo + 12);
+
+    // Mapeo del cuerpo de la tabla (Cuentas)
+    const bodyData = [...detalle.rows].map(row => {
+      return [...row.cells].map(td => {
+        const el = td.querySelector("input, textarea");
+        let valor = el.value;
+        if (el.type === "number" && el.value !== "") {
+          valor = formatoMoneda.format(parseFloat(el.value));
+        }
+        return {
+          content: valor,
+          styles: { 
+            fontStyle: el.style.fontWeight === "bold" ? "bold" : "normal",
+            halign: el.style.textAlign || (el.type === "number" ? "right" : "left")
+          },
+          _underline: el.style.textDecoration === "underline"
+        };
+      });
+    });
+
+    // Mapeo del pie de tabla (Totales)
+    const footData = [
+      [
+        { content: '', styles: { halign: 'left' } },
+        { content: 'TOTALES', styles: { halign: 'right', fontStyle: 'bold' } },
+        { content: tdTotalDebe.textContent, styles: { halign: 'right', fontStyle: 'bold' } },
+        { content: tdTotalHaber.textContent, styles: { halign: 'right', fontStyle: 'bold' } }
+      ]
+    ];
+
+    // Renderizado de AutoTable incorporando cabecera, cuerpo y pie
+    doc.autoTable({
+      startY: yInfo + 18,
+      head: [["Cuenta", "Descripción", "Debe (L)", "Haber (L)"]],
+      body: bodyData,
+      foot: footData,
+      theme: 'grid',
+      headStyles: { fillColor: [44, 62, 80], color: [255, 255, 255] },
+      footStyles: { fillColor: [248, 250, 252], color: [0, 0, 0], borderWidth: 1 },
+      didDrawCell: (data) => {
+        if (data.section === 'body' && data.cell.raw._underline) {
+          doc.line(data.cell.x + 2, data.cell.y + data.cell.height - 2, data.cell.x + data.cell.width - 2, data.cell.y + data.cell.height - 2);
+        }
+      }
+    });
+
+    // Firmas al final de la página
+    const finalY = doc.lastAutoTable.finalY + 25;
+    doc.setFontSize(10);
+    doc.text("__________________________", 20, finalY);
+    doc.text("__________________________", 120, finalY);
+    doc.text("Firma Administrador", 30, finalY + 5);
+    doc.text("Firma Contabilidad", 130, finalY + 5);
+
+    // Ejecuta la descarga directa compatible con entornos web
+    doc.save(`Partida_${document.getElementById("numPartida").value || 'Contable'}.pdf`);
+  });
+
+  // Inicializar con 3 filas por defecto
+  for(let i=0; i<3; i++) agregarFila();
+});
   </script>
 </body>
 </html>
