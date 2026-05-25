@@ -364,19 +364,7 @@
         ]);
 
         // Fila extra para el Estado del balance
-        const estadoTexto = tdEstado.textContent.trim();
-        bodyData.push([
-          { 
-            content: estadoTexto, 
-            colSpan: 4, 
-            styles: { 
-              halign: 'right', 
-              fontStyle: 'bold', 
-              textColor: estadoTexto.includes("✔") ? [0, 128, 0] : [255, 0, 0],
-              fillColor: [255, 255, 255]
-            } 
-          }
-        ]);
+      
 
         // 6. RENDERIZADO DE LA TABLA
         doc.autoTable({
