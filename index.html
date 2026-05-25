@@ -288,7 +288,7 @@
         tdTotalDebe.textContent = formatoMoneda.format(totalDebe);
         tdTotalHaber.textContent = formatoMoneda.format(totalHaber);
         const bal = (totalDebe.toFixed(2) === totalHaber.toFixed(2) && totalDebe > 0);
-      
+       tdEstado.innerHTML = bal ? `<span class="ok">✔ BALANCEADA</span>` : `<span class="error">✘ DESCUADRADA</span>`;
       }
 
       [tax15, tax18, taxExento].forEach(chk => {
