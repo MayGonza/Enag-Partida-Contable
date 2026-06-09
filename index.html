@@ -311,7 +311,7 @@
         
         doc.setFontSize(10);
         const labelX = 14;
-        let currentY = 45; // Posición Y inicial para la información
+        let currentY = 40; // Subimos un poco la posición inicial para ganar espacio
 
         // Calcular el ancho máximo de las etiquetas para una alineación limpia de los valores
         doc.setFont('helvetica', 'bold');
@@ -327,14 +327,14 @@
         doc.text(`Fecha:`, labelX, currentY);
         doc.setFont('helvetica', 'normal');
         doc.text(`${fecha}`, valueStartX, currentY);
-        currentY += 5;
+        currentY += 4; // Espacio más reducido entre líneas
 
         // N° de Partida
         doc.setFont('helvetica', 'bold');
         doc.text(`N° de Partida:`, labelX, currentY);
         doc.setFont('helvetica', 'normal');
         doc.text(`${numeroPartida}`, valueStartX, currentY);
-        currentY += 5;
+        currentY += 4; // Espacio más reducido entre líneas
 
         // Concepto
         doc.setFont('helvetica', 'bold');
@@ -345,9 +345,9 @@
         // Justificar el texto del concepto y usar maxWidth
         doc.text(concepto, valueStartX, currentY, { maxWidth: anchoMaximo, align: 'justify' });
 
-        // Calculamos el espacio ocupado de forma más compacta (5.2 por línea + 2 de margen)
+        // Calculamos el espacio ocupado de forma más compacta (4.5 por línea sin margen extra)
         const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximo);
-        currentY += (lineasConcepto.length * 5.2) + 2; 
+        currentY += (lineasConcepto.length * 4.5); 
 
         // Recolectar datos de la tabla
         const filasData = [];
@@ -365,7 +365,7 @@
 
         // Generar Tabla en PDF
         doc.autoTable({
-            startY: currentY + 5, // Reducimos la separación para que no quede tan lejos de la cabecera
+            startY: currentY + 3, // Casi pegado al final del concepto
             head: [['Cuenta', 'Descripción', 'Debe', 'Haber']],
             body: filasData,
             foot: [['', 'TOTALES:', `L. ${tDebe}`, `L. ${tHaber}`]],
