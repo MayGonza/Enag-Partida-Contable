@@ -342,12 +342,12 @@
         doc.setFont('helvetica', 'normal');
         // Calculamos cuánto espacio ocupará el texto según el ancho disponible
         const anchoMaximo = 180 - (valueStartX - labelX);
-        const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximo);
-        doc.text(lineasConcepto, valueStartX, currentY);
+        // Justificar el texto del concepto y usar maxWidth
+        doc.text(concepto, valueStartX, currentY, { maxWidth: anchoMaximo, align: 'justify' });
 
-        // Aumentamos el espacio vertical dinámicamente. 
-        // Usamos 6.5 unidades por línea para evitar que la tabla se monte sobre el texto.
-        currentY += (lineasConcepto.length * 6.5) + 5; 
+        // Calculamos el espacio ocupado de forma más compacta (5.2 por línea + 2 de margen)
+        const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximo);
+        currentY += (lineasConcepto.length * 5.2) + 2; 
 
         // Recolectar datos de la tabla
         const filasData = [];
@@ -365,7 +365,7 @@
 
         // Generar Tabla en PDF
         doc.autoTable({
-            startY: currentY + 10, // Ajustado para dejar espacio después de la información del encabezado
+            startY: currentY + 5, // Reducimos la separación para que no quede tan lejos de la cabecera
             head: [['Cuenta', 'Descripción', 'Debe', 'Haber']],
             body: filasData,
             foot: [['', 'TOTALES:', `L. ${tDebe}`, `L. ${tHaber}`]],
