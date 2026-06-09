@@ -3,8 +3,11 @@ const cors = require("cors");
 const db = require("./db");
 
 const app = express();
-app.use(cors());
+app.use(cors({
+  origin: process.env.FRONTEND_URL || 'http://localhost:8080' // ¡IMPORTANTE! Cambia 'http://localhost:8080' por la URL de tu frontend desplegado
+}));
 app.use(express.json());
+
 
 app.post("/partidas", async (req, res) => {
   const { fecha, concepto, detalles, usuario } = req.body;
@@ -69,6 +72,7 @@ app.post("/partidas", async (req, res) => {
   }
 });
 
-app.listen(3000, () => {
-  console.log("API contable activa en puerto 3000");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`API contable activa en puerto ${PORT}`);
 });
