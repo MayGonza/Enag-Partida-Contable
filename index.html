@@ -251,6 +251,12 @@
     document.getElementById('partidaForm').onsubmit = async (e) => {
         e.preventDefault();
         
+        // Validar si la partida está descuadrada antes de generar el PDF
+        if (document.getElementById('mensaje').innerText === "REVISA VALORES PARTIDA DESCUADRADA") {
+            alert("No se puede generar el PDF. La partida está descuadrada. Por favor, revisa los valores.");
+            return; // Detener la ejecución si la partida no está balanceada
+        }
+
         const { jsPDF } = window.jspdf; // Asegúrate de que jspdf esté cargado
         const doc = new jsPDF();
 
@@ -334,8 +340,12 @@
         doc.setFont('helvetica', 'bold');
         doc.text(`Concepto:`, labelX, currentY);
         doc.setFont('helvetica', 'normal');
-        doc.text(`${concepto}`, valueStartX, currentY, { maxWidth: 180 });
-        currentY += 5;
+        // Calculamos cuánto espacio ocupará el texto según el ancho disponible
+        const anchoMaximo = 180 - (valueStartX - labelX);
+        const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximo);
+        doc.text(lineasConcepto, valueStartX, currentY);
+        // Bajamos currentY según el número de líneas (5 unidades por línea aprox.)
+        currentY += (lineasConcepto.length * 5);
 
         // Recolectar datos de la tabla
         const filasData = [];
