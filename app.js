@@ -7,6 +7,8 @@ app.use(cors({
   origin: process.env.FRONTEND_URL || 'http://localhost:8080' // ¡IMPORTANTE! Cambia 'http://localhost:8080' por la URL de tu frontend desplegado
 }));
 app.use(express.json());
+// Servir archivos estáticos (HTML, JS, Imágenes) para que sean accesibles en la red
+app.use(express.static(__dirname));
 
 
 app.post("/partidas", async (req, res) => {

@@ -142,9 +142,9 @@
             }
         }
     </style>
-    <!-- Librerías para generación de PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <!-- Carga las librerías localmente para evitar bloqueos de firewall empresarial -->
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
 </head>
 <body>
 
@@ -333,12 +333,17 @@
         e.preventDefault();
         
         // Validar si la partida está descuadrada antes de generar el PDF
-        if (document.getElementById('mensaje').innerText === "REVISA VALORES PARTIDA DESCUADRADA") {
+        if (typeof window.jsPDF === 'undefined') { // Usar window.jsPDF (con 'P' mayúscula)
+            alert("Error: La librería jsPDF no se cargó correctamente. Verifica la conexión o el bloqueo del firewall.");
+            return;
+        }
+
+        if (document.getElementById('mensaje').innerText.includes("DESCUADRADA")) { // Usar includes para ser más robusto
             alert("No se puede generar el PDF. La partida está descuadrada. Por favor, revisa los valores.");
             return; // Detener la ejecución si la partida no está balanceada
         }
 
-        const { jsPDF } = window.jspdf; // Asegúrate de que jspdf esté cargado
+        const jsPDF = window.jsPDF; // Acceder directamente a la clase jsPDF del objeto global window
         const doc = new jsPDF();
 
         // Cargar la imagen local y convertirla a Base64
