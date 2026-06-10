@@ -329,7 +329,9 @@
         calcularTotales(); // Recalcular totales para actualizar el monto del impuesto
     }
 
-    document.getElementById('partidaForm').addEventListener('submit', async (e) => {
+    // Usamos onsubmit directamente asegurando que el elemento existe
+    const form = document.getElementById('partidaForm');
+    form.onsubmit = async (e) => {
         e.preventDefault();
         
         if (document.getElementById('mensaje').innerText.includes("DESCUADRADA")) {
@@ -337,8 +339,13 @@
             return;
         }
 
-        // Acceso correcto a jsPDF desde la versión UMD (jspdf.umd.min.js)
-        const { jsPDF } = window.jspdf;
+        // Verificación de la librería
+        if (!window.jspdf) {
+            alert("Error: La librería jsPDF no se ha cargado. Revisa la carpeta /js/");
+            return;
+        }
+
+        const jsPDF = window.jspdf.jsPDF;
         const doc = new jsPDF();
 
         // Cargar la imagen local y convertirla a Base64
@@ -362,9 +369,7 @@
                 reader.readAsDataURL(blobJpeg);
             });
         } catch (error) {
-            console.error("Error al cargar el logo:", error);
-            alert("No se pudo cargar los logos para el PDF. Asegúrate de que 'logo.png' y 'logo.jpeg' estén en la misma carpeta.");
-            return; // Detener la generación del PDF si el logo no carga
+            console.warn("No se pudieron cargar los logos, el PDF se generará sin ellos.", error);
         }
 
         const fecha = document.getElementById('fecha').value;
@@ -373,7 +378,9 @@
 
         // --- Fondo del PDF con logo.jpeg ---
         if (logoBackgroundDataUrl) {
-            doc.setGState(new window.jspdf.GState({opacity: 0.1})); // Opacidad para el fondo
+            const GState = window.jspdf.GState;
+            if (GState) doc.setGState(new GState({opacity: 0.1}));
+            
             const imgWidth = 150; // Ancho del logo de fondo
             const imgHeight = 150; // Alto del logo de fondo (es cuadrado)
             const pageWidth = doc.internal.pageSize.getWidth();
@@ -381,11 +388,13 @@
             const xPos = (pageWidth - imgWidth) / 2;
             const yPos = (pageHeight - imgHeight) / 2;
             doc.addImage(logoBackgroundDataUrl, 'JPEG', xPos, yPos, imgWidth, imgHeight);
-            doc.setGState(new window.jspdf.GState({opacity: 1})); // Restablecer opacidad para el contenido principal
+            if (GState) doc.setGState(new GState({opacity: 1}));
         }
 
         // --- LOGO Y ENCABEZADO ---
-        doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5); // Usar logo.png en el PDF
+        if (logoDataUrl) {
+            doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5);
+        }
 
         doc.setFontSize(16);
         doc.text("COMPROBANTE DE PARTIDA CONTABLE", 105, 35, { align: "center" }); // Título centrado (105 es la mitad de A4)
@@ -484,7 +493,7 @@
         doc.text("AUTORIZADO POR\nADMINISTRACION", centro3, finalY + 5, { align: 'center' });
 
         doc.save(`Partida_${fecha}_${numeroPartida}.pdf`);
-    });
+    };
 
     // Agregar dos filas por defecto
     agregarFila(); // Fila normal 1
