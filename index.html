@@ -143,8 +143,8 @@
         }
     </style>
     <!-- Carga las librerías localmente para evitar bloqueos de firewall empresarial -->
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <script src="./js/jspdf.umd.min.js"></script>
+    <script src="./js/jspdf-autotable.min.js"></script>
 </head>
 <body>
 
@@ -334,12 +334,16 @@
         partidaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
 
-        // Acceso robusto: intenta obtener jsPDF desde el espacio de nombres de la versión UMD
-        const jspdfLib = window.jspdf;
-        const jsPDF = jspdfLib ? jspdfLib.jsPDF : window.jsPDF;
+        // Intenta obtener la clase jsPDF de todas las formas posibles (UMD o Global)
+        let jsPDF;
+        if (window.jspdf && window.jspdf.jsPDF) {
+            jsPDF = window.jspdf.jsPDF;
+        } else {
+            jsPDF = window.jsPDF;
+        }
 
         if (typeof jsPDF === 'undefined') {
-            alert("Error: La librería jsPDF no se cargó correctamente. Verifica la conexión o el bloqueo del firewall.");
+            alert("Error: No se encontró la librería jsPDF. Verifica que los archivos en la carpeta /js/ sean correctos.");
             return;
         }
 
@@ -382,15 +386,15 @@
 
         // --- Fondo del PDF con logo.jpeg ---
         if (logoBackgroundDataUrl) {
-            doc.setGState(new window.jspdf.GState({opacity: 0.1})); // Opacidad para el fondo
+            // Acceso seguro a GState (solo si existe en el namespace)
+            const GState = window.jspdf ? window.jspdf.GState : null;
+            if (GState) doc.setGState(new GState({opacity: 0.1}));
+            
             const imgWidth = 150; // Ancho del logo de fondo
-            const imgHeight = 150; // Alto del logo de fondo (es cuadrado)
             const pageWidth = doc.internal.pageSize.getWidth();
-            const pageHeight = doc.internal.pageSize.getHeight();
             const xPos = (pageWidth - imgWidth) / 2;
-            const yPos = (pageHeight - imgHeight) / 2;
-            doc.addImage(logoBackgroundDataUrl, 'JPEG', xPos, yPos, imgWidth, imgHeight);
-            doc.setGState(new window.jspdf.GState({opacity: 1})); // Restablecer opacidad para el contenido principal
+            doc.addImage(logoBackgroundDataUrl, 'JPEG', xPos, 70, imgWidth, 150);
+            if (GState) doc.setGState(new GState({opacity: 1}));
         }
 
         // --- LOGO Y ENCABEZADO ---
