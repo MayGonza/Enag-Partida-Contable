@@ -142,9 +142,9 @@
             }
         }
     </style>
-    <!-- Carga las librerías localmente para evitar bloqueos de firewall empresarial -->
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <!-- Se usan CDNs para asegurar la carga. Si falla internet, verifica que los archivos existan en /js/ -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf-autotable.min.js"></script>
 </head>
 <body>
 
@@ -339,13 +339,14 @@
             return;
         }
 
-        // Verificación de la librería
-        if (!window.jspdf) {
+        // Acceso robusto a la clase jsPDF
+        const jspdfLib = window.jspdf;
+        if (!jspdfLib) {
             alert("Error: La librería jsPDF no se ha cargado. Revisa la carpeta /js/");
             return;
         }
 
-        const jsPDF = window.jspdf.jsPDF;
+        const jsPDF = jspdfLib.jsPDF;
         const doc = new jsPDF();
 
         // Cargar la imagen local y convertirla a Base64
@@ -378,7 +379,7 @@
 
         // --- Fondo del PDF con logo.jpeg ---
         if (logoBackgroundDataUrl) {
-            const GState = window.jspdf.GState;
+            const GState = jspdfLib.GState;
             if (GState) doc.setGState(new GState({opacity: 0.1}));
             
             const imgWidth = 150; // Ancho del logo de fondo
