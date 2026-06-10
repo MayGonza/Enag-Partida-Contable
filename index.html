@@ -64,8 +64,8 @@
         .tax-row input.descripcion { font-style: italic; } /* Estilo para la descripción de la fila de impuesto */
     </style>
     <!-- Librerías para generación de PDF -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.25/jspdf.plugin.autotable.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
 </head>
 <body>
 
@@ -257,29 +257,36 @@
             return; // Detener la ejecución si la partida no está balanceada
         }
 
-        const { jsPDF } = window.jspdf; // Asegúrate de que jspdf esté cargado
+        // Verificación de que las librerías locales se cargaron
+        if (typeof window.jspdf === 'undefined') {
+            alert("Error: Las librerías de PDF no se cargaron correctamente. Verifica que la carpeta 'js/' contenga los archivos descargados.");
+            return;
+        }
+
+        const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        // Cargar la imagen local y convertirla a Base64
-        let logoDataUrl = '';
-        let logoBackgroundDataUrl = ''; // Nueva variable para el logo de fondo del PDF
-        try {
-            const response = await fetch('logo.png'); // Cargar logo.png para el PDF
-            const blob = await response.blob();
-            logoDataUrl = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
+        // Función para convertir imagen a Base64 sin usar fetch (evita bloqueos de Fortinet)
+        const getBase64FromUrl = (url) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL("image/png"));
+                };
+                img.onerror = () => reject(new Error("No se pudo cargar la imagen: " + url));
+                img.src = url;
             });
+        };
 
-            // Cargar logo.jpeg para el fondo del PDF
-            const responseJpeg = await fetch('logo.jpeg');
-            const blobJpeg = await responseJpeg.blob();
-            logoBackgroundDataUrl = await new Promise(resolve => {
-                const reader = new FileReader();
-                reader.onloadend = () => resolve(reader.result);
-                reader.readAsDataURL(blobJpeg);
-            });
+        let logoDataUrl, logoBackgroundDataUrl;
+        try {
+            logoDataUrl = await getBase64FromUrl('logo.png');
+            logoBackgroundDataUrl = await getBase64FromUrl('logo.jpeg');
         } catch (error) {
             console.error("Error al cargar el logo:", error);
             alert("No se pudo cargar los logos para el PDF. Asegúrate de que 'logo.png' y 'logo.jpeg' estén en la misma carpeta.");

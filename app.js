@@ -22,12 +22,13 @@ app.post("/partidas", async (req, res) => {
     totalHaber += Number(d.haber || 0);
   });
 
-  if (totalDebe !== totalHaber) {
+  // Comparación usando un pequeño margen de error para evitar problemas de precisión decimal
+  if (Math.abs(totalDebe - totalHaber) > 0.01) {
     return res.status(400).json({ error: "Partida descuadrada" });
   }
 
-  const conn = await db.getConnection();
   try {
+    const conn = await db.getConnection();
     await conn.beginTransaction();
 
     const [num] = await conn.query(
@@ -70,7 +71,9 @@ app.post("/partidas", async (req, res) => {
     await conn.rollback();
     res.status(500).json({ error: e.message });
   } finally {
-    conn.release();
+    if (typeof conn !== 'undefined') {
+      conn.release();
+    }
   }
 });
 
