@@ -333,9 +333,10 @@
     if (partidaForm) {
         partidaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
-        
-        // Acceso compatible con la versión UMD de jsPDF
-        const { jsPDF } = window.jspdf || window;
+
+        // Acceso robusto: intenta obtener jsPDF desde el espacio de nombres de la versión UMD
+        const jspdfLib = window.jspdf;
+        const jsPDF = jspdfLib ? jspdfLib.jsPDF : window.jsPDF;
 
         if (typeof jsPDF === 'undefined') {
             alert("Error: La librería jsPDF no se cargó correctamente. Verifica la conexión o el bloqueo del firewall.");
@@ -395,6 +396,7 @@
         // --- LOGO Y ENCABEZADO ---
         doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5); // Usar logo.png en el PDF
 
+        // Usar jspdfLib para el GState si está disponible
         doc.setFontSize(16);
         doc.text("COMPROBANTE DE PARTIDA CONTABLE", 105, 35, { align: "center" }); // Título centrado (105 es la mitad de A4)
         
