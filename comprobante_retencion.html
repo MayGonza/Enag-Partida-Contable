@@ -1,0 +1,384 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Comprobante de Retención de Impuestos</title>
+    <style>
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 40px 20px; 
+            background-color: #e9ecef;
+            min-height: 100vh;
+        }
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 50%;
+            filter: blur(15px) opacity(0.08);
+            z-index: -1;
+        }
+        .container { 
+            max-width: 1000px; 
+            margin: auto; 
+            background: rgba(255, 255, 255, 0.95); 
+            padding: 30px; 
+            border-radius: 12px; 
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
+        }
+        .form-header {
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+        .header-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 20px;
+        }
+        .header-left {
+            text-align: left;
+            font-size: 0.85em;
+            font-weight: bold;
+            color: #333;
+            line-height: 1.4;
+        }
+        .info-box {
+            border: 1px solid #333;
+            padding: 8px;
+            margin-top: 8px;
+            display: inline-block;
+            border-radius: 4px;
+        }
+        .info-box p {
+            margin: 2px 0;
+            font-weight: bold;
+        }
+        .header-right img { max-width: 350px; }
+        .form-header h2 { text-align: center; margin-top: 10px; }
+        h2 { color: #2c3e50; margin: 0; font-size: 1.4em; text-transform: uppercase; }
+        .correlative-container {
+            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; font-weight: bold; font-size: 1.1em;
+        }
+        .correlative-container input { width: 120px; text-align: center; font-size: 1em; padding: 5px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
+        .form-group { display: flex; flex-direction: column; }
+        .form-group.full-width { grid-column: span 2; }
+        label { margin-bottom: 5px; font-weight: bold; font-size: 0.9em; color: #444; }
+        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; }
+        table { width: 100%; border-collapse: collapse; margin-top: 25px; background: white; }
+        th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+        th { background-color: #f8f9fa; font-size: 0.85em; text-transform: uppercase; }
+        .btn-add { background-color: #28a745; color: white; margin-top: 15px; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
+        .btn-submit { background-color: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; }
+        .btn-remove { background-color: #dc3545; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; }
+        .actions { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
+        .totals-row { font-weight: bold; background: #f1f3f5; }
+        .currency-field { display: flex; align-items: center; gap: 4px; }
+        .currency-field span { font-weight: bold; color: #555; }
+        .footer-info { margin-top: 20px; font-size: 0.85em; color: #666; font-style: italic; border-top: 1px solid #eee; padding-top: 10px; }
+    </style>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
+</head>
+<body>
+
+<div class="container">
+    <div class="form-header">
+        <div class="header-top">
+            <div class="header-left">
+                <p>Col. Miraflores Sur, Centro Civico Gubernamental, PBX:2230-6767, 2291-0335-56-70</p>
+                <p>Fax: 2291-0357, 2230-4956, Tegucigalpa M.D.C, Honduras, C.A.</p>
+                <div class="info-box">
+                    <p>C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73</p>
+                    <p>Correo electrónico: gerencia@enag.gob.hn</p>
+                    <p>R.T.N 08019999408325</p>
+                </div>
+            </div>
+            <div class="header-right">
+                <img src="logo.png" alt="Logo">
+            </div>
+        </div>
+        <h2>Comprobante de Retención de Impuestos</h2>
+        <div class="correlative-container">
+            <span>N° 000-001-05-</span>
+            <input type="text" id="correlativo" placeholder="00000000" maxlength="8" required>
+        </div>
+    </div>
+
+    <form id="retencionForm">
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label>Proveedor:</label>
+                <input type="text" id="proveedor" required>
+            </div>
+            <div class="form-group full-width">
+                <label>Dirección:</label>
+                <input type="text" id="direccion" required>
+            </div>
+            <div class="form-group">
+                <label>RTN:</label>
+                <input type="text" id="rtn" required>
+            </div>
+            <div class="form-group">
+                <label>CAI:</label>
+                <input type="text" id="cai" required>
+            </div>
+            <div class="form-group">
+                <label>Fecha:</label>
+                <input type="date" id="fecha" required>
+            </div>
+            <div class="form-group">
+                <label>Orden de Pago:</label>
+                <input type="text" id="ordenPago">
+            </div>
+            <div class="form-group">
+                <label>Teléfono:</label>
+                <input type="text" id="telefono">
+            </div>
+            <div class="form-group">
+                <label>N° de Factura:</label>
+                <input type="text" id="numFactura">
+            </div>
+        </div>
+
+        <table id="tablaRetenciones">
+            <thead>
+                <tr>
+                    <th style="width: 40px;">N°</th>
+                    <th>Descripción del Impuesto</th>
+                    <th style="width: 150px;">Base Imponible</th>
+                    <th style="width: 100px;">% Retención</th>
+                    <th style="width: 150px;">Importe Total</th>
+                    <th style="width: 40px;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                <!-- Filas dinámicas -->
+            </tbody>
+            <tfoot>
+                <tr class="totals-row">
+                    <td colspan="4" style="text-align: right;">TOTAL RETENIDO:</td>
+                    <td colspan="2">L. <span id="granTotal">0.00</span></td>
+                </tr>
+            </tfoot>
+        </table>
+
+        <div class="footer-info">
+            RANGO AUTORIZADO: 000-001-02-00003101 A LA 000-001-05-0003300
+        </div>
+
+        <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Fila</button>
+
+        <div class="actions">
+            <button type="submit" class="btn-submit">Generar Comprobante PDF</button>
+        </div>
+    </form>
+</div>
+
+<script>
+    const tbody = document.querySelector('#tablaRetenciones tbody');
+
+    // Formateador automático para el N° de Factura (3-3-1-8)
+    document.getElementById('numFactura').addEventListener('input', function (e) {
+        let v = e.target.value.replace(/\D/g, '');
+        let m = '';
+        if (v.length > 0) m += v.substring(0, 3);
+        if (v.length > 3) m += '-' + v.substring(3, 6);
+        if (v.length > 6) m += '-' + v.substring(6, 7);
+        if (v.length > 7) m += '-' + v.substring(7, 15);
+        e.target.value = m;
+    });
+
+    // Formateador automático para el CAI (5 grupos de 6 y 1 de 2)
+    document.getElementById('cai').addEventListener('input', function (e) {
+        let value = e.target.value.replace(/[^A-Z0-9]/gi, '').toUpperCase();
+        let formatted = '';
+        for (let i = 0; i < value.length; i++) {
+            if (i > 0) {
+                if (i < 30 && i % 6 === 0) {
+                    formatted += '-';
+                } else if (i === 30) {
+                    formatted += '-';
+                }
+            }
+            formatted += value[i];
+        }
+        e.target.value = formatted.substring(0, 37); // 32 chars + 5 hyphens
+    });
+
+    function agregarFila() {
+        const rowCount = tbody.rows.length + 1;
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+            <td style="text-align:center; font-weight:bold;">${rowCount}</td>
+            <td><input type="text" class="descImpuesto" style="width:95%" required></td>
+            <td><div class="currency-field"><span>L.</span><input type="number" class="base" step="0.01" style="width:90%" oninput="calcularFila(this)" required></div></td>
+            <td><input type="number" class="porcentaje" step="0.01" style="width:85%" oninput="calcularFila(this)" required></td>
+            <td><div class="currency-field"><span>L.</span><input type="number" class="importe" style="width:90%; background:#f9f9f9;" readonly></div></td>
+            <td><button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); actualizarNumeracion(); calcularGranTotal();">x</button></td>
+        `;
+        tbody.appendChild(tr);
+    }
+
+    function calcularFila(input) {
+        const row = input.parentElement.parentElement;
+        const base = parseFloat(row.querySelector('.base').value) || 0;
+        const porcentaje = parseFloat(row.querySelector('.porcentaje').value) || 0;
+        const importeInput = row.querySelector('.importe');
+        
+        const total = base * (porcentaje / 100);
+        importeInput.value = total.toFixed(2);
+        calcularGranTotal();
+    }
+
+    function calcularGranTotal() {
+        let total = 0;
+        document.querySelectorAll('.importe').forEach(input => {
+            total += parseFloat(input.value) || 0;
+        });
+        document.getElementById('granTotal').innerText = new Intl.NumberFormat('en-US', { minimumFractionDigits: 2 }).format(total);
+    }
+
+    function actualizarNumeracion() {
+        Array.from(tbody.rows).forEach((row, index) => {
+            row.cells[0].innerText = index + 1;
+        });
+    }
+
+    // Función para dar formato de moneda en el PDF
+    function formatLempiras(monto) {
+        return "L. " + new Intl.NumberFormat('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }).format(monto);
+    }
+
+    document.getElementById('retencionForm').onsubmit = async (e) => {
+        e.preventDefault();
+        
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // Reutilizamos la función de conversión de imagen a Base64
+        const getBase64FromUrl = (url) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width; canvas.height = img.height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL("image/png"));
+                };
+                img.onerror = () => reject(new Error("No se pudo cargar la imagen: " + url));
+                img.src = url;
+            });
+        };
+
+        let logoDataUrl, logoBackgroundDataUrl;
+        try {
+            logoDataUrl = await getBase64FromUrl('logo.png');
+            logoBackgroundDataUrl = await getBase64FromUrl('logo.jpeg');
+        } catch (error) {
+            console.error(error);
+        }
+
+        // Marca de agua
+        if (logoBackgroundDataUrl) {
+            doc.setGState(new window.jspdf.GState({opacity: 0.08}));
+            doc.addImage(logoBackgroundDataUrl, 'JPEG', 30, 70, 150, 150);
+            doc.setGState(new window.jspdf.GState({opacity: 1}));
+        }
+
+        // --- ENCABEZADO ---
+        // Logo a la derecha
+        doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
+
+        // Texto a la izquierda
+        doc.setFontSize(8);
+        doc.setFont('helvetica', 'normal');
+        doc.text("Col. Miraflores Sur, Centro Civico Gubernamental, PBX:2230-6767, 2291-0335-56-70", 14, 15);
+        doc.text("Fax: 2291-0357, 2230-4956, Tegucigalpa M.D.C, Honduras, C.A.", 14, 19);
+
+        // Cuadro de información legal
+        doc.setFont('helvetica', 'bold');
+        doc.rect(14, 22, 90, 15);
+        doc.text("C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73", 16, 26);
+        doc.text("Correo electrónico: gerencia@enag.gob.hn", 16, 30);
+        doc.text("R.T.N 08019999408325", 16, 34);
+
+        doc.setFontSize(14);
+        doc.text("COMPROBANTE DE RETENCION DE IMPUESTOS", 105, 48, { align: "center" });
+        
+        doc.setFontSize(11);
+        const correlativoUser = document.getElementById('correlativo').value;
+        doc.text(`N° 000-001-05-${correlativoUser}`, 105, 56, { align: "center" });
+
+        // Datos Generales
+        doc.setFontSize(10);
+        let y = 68;
+        const drawField = (label, value, x) => {
+            doc.setFont('helvetica', 'bold');
+            doc.text(label, x, y);
+            doc.setFont('helvetica', 'normal');
+            doc.text(value || '', x + doc.getTextWidth(label) + 2, y);
+        };
+
+        drawField("Proveedor:", document.getElementById('proveedor').value, 14);
+        drawField("RTN:", document.getElementById('rtn').value, 140);
+        y += 7;
+        drawField("Dirección:", document.getElementById('direccion').value, 14);
+        y += 7;
+        drawField("CAI:", document.getElementById('cai').value, 14);
+        y += 7;
+        drawField("Fecha:", document.getElementById('fecha').value, 14);
+        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 80);
+        y += 7;
+        drawField("Teléfono:", document.getElementById('telefono').value, 14);
+        drawField("N° de Factura:", document.getElementById('numFactura').value, 80);
+
+        // Tabla
+        const tableData = [];
+        tbody.querySelectorAll('tr').forEach(row => {
+            tableData.push([
+                row.cells[0].innerText,
+                row.querySelector('.descImpuesto').value,
+                formatLempiras(parseFloat(row.querySelector('.base').value || 0)),
+                `${parseFloat(row.querySelector('.porcentaje').value || 0).toFixed(2)}%`,
+                formatLempiras(parseFloat(row.querySelector('.importe').value || 0))
+            ]);
+        });
+
+        doc.autoTable({
+            startY: y + 10,
+            head: [['N°', 'Descripción del Impuesto', 'Base Imponible', '% Retención', 'Importe Total']],
+            body: tableData,
+            foot: [['', 'TOTAL RETENIDO', '', '', `L. ${document.getElementById('granTotal').innerText}`]],
+            theme: 'grid',
+            headStyles: { fillColor: [44, 62, 80] },
+            footStyles: { fillColor: [240, 240, 240], textColor: [0,0,0], fontStyle: 'bold' }
+        });
+
+        let finalY = doc.lastAutoTable.finalY + 10;
+        
+        doc.setFontSize(8);
+        doc.text("RANGO AUTORIZADO: 000-001-02-00003101 A LA 000-001-05-0003300", 14, finalY);
+
+        // Firma
+        finalY += 40;
+        doc.line(75, finalY, 135, finalY);
+        doc.setFontSize(10);
+        doc.text("ELABORADO POR\nCONTABILIDAD", 105, finalY + 5, { align: 'center' });
+
+        doc.save(`Retencion_${correlativoUser}.pdf`);
+    };
+
+    // Agregar fila inicial
+    agregarFila();
+</script>
+
+</body>
+</html>
