@@ -289,8 +289,8 @@
           totalHaber += parseFloat(row.cells[3].querySelector("input").value) || 0;
         });
 
-        tdTotalDebe.textContent = formatoMoneda.format(totalDebe);
-        tdTotalHaber.textContent = formatoMoneda.format(totalHaber);
+        tdTotalDebe.textContent = "L " + formatoMoneda.format(totalDebe);
+        tdTotalHaber.textContent = "L " + formatoMoneda.format(totalHaber);
         const bal = (totalDebe.toFixed(2) === totalHaber.toFixed(2) && totalDebe > 0);
         tdEstado.innerHTML = bal ? `<span class="ok">✔ BALANCEADA</span>` : `<span class="error">✘ DESCUADRADA</span>`;
       }
@@ -309,10 +309,17 @@
       btnLimpiar.addEventListener("click", () => { location.reload(); });
 
       // EXPORTACIÓN PDF
-      btnPDF.addEventListener("click", () => {
+      form.onsubmit = async (e) => {
+        e.preventDefault();
+
+        if (!window.jspdf) {
+          alert("Error: Librería jsPDF no cargada.");
+          return;
+        }
+
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF('p', 'mm', 'a4');
-        const pageWidth = doc.internal.pageSize.width;
+        const pageWidth = doc.internal.pageSize.getWidth();
         
         const img = new Image();
         img.src = LOGO_URL;
@@ -339,10 +346,11 @@
 
           // 4. Tabla
           const bodyData = [...detalle.rows].map(row => {
-            return [...row.cells].map(td => {
+            return [...row.cells].map((td, index) => {
               const el = td.querySelector("input, textarea");
+              if (!el) return "";
               return {
-                content: el.type === "number" ? formatoMoneda.format(el.value || 0) : el.value,
+                content: (index >= 2 && el.value) ? formatoMoneda.format(el.value) : el.value,
                 styles: { 
                   fontStyle: el.style.fontWeight === "bold" ? "bold" : "normal",
                   halign: el.style.textAlign || (el.type === "number" ? "right" : "left")
@@ -374,11 +382,12 @@
 
           doc.save("Partida_Contable.pdf");
         };
+        
         img.onerror = () => alert("Error: No se encontró el archivo logo.png en la carpeta.");
-      });
+      };
 
       // Filas por defecto
-      for(let i=0; i<3; i++) agregarFila();
+      agregarFila(); agregarFila(); agregarFila();
     });
   </script>
 </body>
