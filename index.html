@@ -329,11 +329,15 @@
         calcularTotales(); // Recalcular totales para actualizar el monto del impuesto
     }
 
-    document.getElementById('partidaForm').onsubmit = async (e) => {
+    const partidaForm = document.getElementById('partidaForm');
+    if (partidaForm) {
+        partidaForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         
-        // Validar si la partida está descuadrada antes de generar el PDF
-        if (typeof window.jsPDF === 'undefined') { // Usar window.jsPDF (con 'P' mayúscula)
+        // Acceso compatible con la versión UMD de jsPDF
+        const { jsPDF } = window.jspdf || window;
+
+        if (typeof jsPDF === 'undefined') {
             alert("Error: La librería jsPDF no se cargó correctamente. Verifica la conexión o el bloqueo del firewall.");
             return;
         }
@@ -343,7 +347,6 @@
             return; // Detener la ejecución si la partida no está balanceada
         }
 
-        const jsPDF = window.jsPDF; // Acceder directamente a la clase jsPDF del objeto global window
         const doc = new jsPDF();
 
         // Cargar la imagen local y convertirla a Base64
@@ -489,7 +492,8 @@
         doc.text("AUTORIZADO POR\nADMINISTRACION", centro3, finalY + 5, { align: 'center' });
 
         doc.save(`Partida_${fecha}_${numeroPartida}.pdf`);
-    };
+        });
+    }
 
     // Agregar dos filas por defecto
     agregarFila(); // Fila normal 1
