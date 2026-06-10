@@ -143,8 +143,8 @@
         }
     </style>
     <!-- Carga las librerías localmente para evitar bloqueos de firewall empresarial -->
-    <script src="./js/jspdf.umd.min.js"></script>
-    <script src="./js/jspdf-autotable.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
 </head>
 <body>
 
@@ -329,21 +329,12 @@
         calcularTotales(); // Recalcular totales para actualizar el monto del impuesto
     }
 
-    const partidaForm = document.getElementById('partidaForm');
-    if (partidaForm) {
-        partidaForm.addEventListener('submit', async (e) => {
+    document.getElementById('partidaForm').onsubmit = async (e) => {
         e.preventDefault();
-
-        // Intenta obtener la clase jsPDF de todas las formas posibles (UMD o Global)
-        let jsPDF;
-        if (window.jspdf && window.jspdf.jsPDF) {
-            jsPDF = window.jspdf.jsPDF;
-        } else {
-            jsPDF = window.jsPDF;
-        }
-
-        if (typeof jsPDF === 'undefined') {
-            alert("Error: No se encontró la librería jsPDF. Verifica que los archivos en la carpeta /js/ sean correctos.");
+        
+        // Validar si la partida está descuadrada antes de generar el PDF
+        if (typeof window.jsPDF === 'undefined') { // Usar window.jsPDF (con 'P' mayúscula)
+            alert("Error: La librería jsPDF no se cargó correctamente. Verifica la conexión o el bloqueo del firewall.");
             return;
         }
 
@@ -352,6 +343,7 @@
             return; // Detener la ejecución si la partida no está balanceada
         }
 
+        const jsPDF = window.jsPDF; // Acceder directamente a la clase jsPDF del objeto global window
         const doc = new jsPDF();
 
         // Cargar la imagen local y convertirla a Base64
@@ -386,21 +378,20 @@
 
         // --- Fondo del PDF con logo.jpeg ---
         if (logoBackgroundDataUrl) {
-            // Acceso seguro a GState (solo si existe en el namespace)
-            const GState = window.jspdf ? window.jspdf.GState : null;
-            if (GState) doc.setGState(new GState({opacity: 0.1}));
-            
+            doc.setGState(new window.jspdf.GState({opacity: 0.1})); // Opacidad para el fondo
             const imgWidth = 150; // Ancho del logo de fondo
+            const imgHeight = 150; // Alto del logo de fondo (es cuadrado)
             const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
             const xPos = (pageWidth - imgWidth) / 2;
-            doc.addImage(logoBackgroundDataUrl, 'JPEG', xPos, 70, imgWidth, 150);
-            if (GState) doc.setGState(new GState({opacity: 1}));
+            const yPos = (pageHeight - imgHeight) / 2;
+            doc.addImage(logoBackgroundDataUrl, 'JPEG', xPos, yPos, imgWidth, imgHeight);
+            doc.setGState(new window.jspdf.GState({opacity: 1})); // Restablecer opacidad para el contenido principal
         }
 
         // --- LOGO Y ENCABEZADO ---
         doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5); // Usar logo.png en el PDF
 
-        // Usar jspdfLib para el GState si está disponible
         doc.setFontSize(16);
         doc.text("COMPROBANTE DE PARTIDA CONTABLE", 105, 35, { align: "center" }); // Título centrado (105 es la mitad de A4)
         
@@ -498,8 +489,7 @@
         doc.text("AUTORIZADO POR\nADMINISTRACION", centro3, finalY + 5, { align: 'center' });
 
         doc.save(`Partida_${fecha}_${numeroPartida}.pdf`);
-        });
-    }
+    };
 
     // Agregar dos filas por defecto
     agregarFila(); // Fila normal 1
