@@ -304,9 +304,9 @@
             getBase64FromUrl('Logo odoo.png')
         ]);
 
-        // Marca de agua
+        // Marca de agua (Logo de fondo)
         if (logoBackgroundDataUrl) {
-            try { doc.addImage(logoBackgroundDataUrl, 'PNG', 130, 10, 65, 8.125); } catch(e){}
+            try { doc.addImage(logoBackgroundDataUrl, 'PNG', 30, 70, 150, 150); } catch(e){}
         }
 
         // --- ENCABEZADO ---
