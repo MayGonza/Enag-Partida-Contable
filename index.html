@@ -2,29 +2,130 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
     <title>Sistema de Gestión ENAG</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 50px; text-align: center; }
-        .grid-container { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; max-width: 900px; margin: auto; }
-        .card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); text-decoration: none; color: #333; transition: transform 0.3s; }
-        .card:hover { transform: translateY(-10px); background: #eef; }
-        h1 { color: #2c3e50; margin-bottom: 40px; }
+        body { 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
+            margin: 0; 
+            padding: 40px 20px; 
+            background-color: #002147; /* Azul Oscuro Institucional */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            color: #333;
+        }
+        /* Fondo difuminado con el logo */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+        .main-container { 
+            max-width: 800px; 
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98); 
+            padding: 40px; 
+            border-radius: 20px; 
+            box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
+            text-align: center;
+            border-top: 8px solid #002147;
+        }
+        .header-logo {
+            max-width: 380px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        h1 { 
+            color: #002147; 
+            margin-bottom: 40px; 
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            padding-bottom: 10px;
+        }
+        h1::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            right: 25%;
+            height: 3px;
+            background: linear-gradient(to right, transparent, #002147, transparent);
+        }
+        .grid-container { 
+            display: grid; 
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
+            gap: 25px; 
+            margin-top: 20px;
+        }
+        .card { 
+            background: white; 
+            padding: 35px 25px; 
+            border-radius: 15px; 
+            border: 1px solid #e0e0e0;
+            text-decoration: none; 
+            color: #333; 
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+        .card:hover { 
+            transform: translateY(-12px); 
+            border-color: #002147;
+            box-shadow: 0 15px 30px rgba(0,33,71,0.2);
+            background-color: #f0f4f8;
+        }
+        .card .icon {
+            font-size: 3.5em;
+            margin-bottom: 5px;
+        }
+        .card h2 { 
+            margin: 0; 
+            color: #002147; 
+            font-size: 1.4em;
+        }
+        .card p {
+            margin: 0;
+            color: #666;
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
+        .footer-text { margin-top: 40px; font-size: 0.85em; color: #888; font-weight: bold; }
     </style>
 </head>
 <body>
 
-    <h1>Bienvenido al Sistema Administrativo</h1>
-    
-    <div class="grid-container">
-        <a href="comprobante_retencion.html" class="card">
-            <h2>📄 Comprobante de Retención</h2>
-            <p>Generación y registro de retenciones contables.</p>
-        </a>
+    <div class="main-container">
+        <img src="logo.png" alt="ENAG Logo" class="header-logo">
+        <h1>Portal Administrativo</h1>
+        
+        <div class="grid-container">
+            <a href="comprobante_retencion.html" class="card">
+                <div class="icon">📄</div>
+                <h2>Retenciones</h2>
+                <p>Generación y registro oficial de comprobantes de retención de impuestos.</p>
+            </a>
 
-        <a href="partidas.html" class="card">
-            <h2>📊 Partidas Contables</h2>
-            <p>Creación de partidas contables</p>
-        </a>
+            <a href="partidas.html" class="card">
+                <div class="icon">📊</div>
+                <h2>Partidas</h2>
+                <p>Creación de partidas contables con validación de balance en tiempo real.</p>
+            </a>
+        </div>
+        
+        <div class="footer-text">
+            EMPRESA NACIONAL DE ARTES GRÁFICAS - ENAG
+        </div>
     </div>
 
 </body>

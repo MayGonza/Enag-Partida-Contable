@@ -61,7 +61,7 @@
         .btn-nav { text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s; }
         .btn-nav-menu { background-color: #6c757d; color: white; }
         .btn-nav-menu:hover { background-color: #5a6268; transform: translateY(-1px); }
-        .btn-nav-active { background-color: #007bff; color: white; cursor: default; }
+        .btn-nav-active { background-color: #002147; color: white; cursor: default; }
         .btn-nav-inactive { background-color: #f1f3f5; color: #333; border: 1px solid #ccc; }
         .btn-nav-inactive:hover { background-color: #e9ecef; }
     </style>
@@ -193,8 +193,8 @@
         row.innerHTML = `
             <td><input type="text" class="cuenta" value="${cuentaVal}" ${isFixed || isTax ? 'readonly' : ''} required></td>
             <td><input type="text" class="descripcion" ${isTax ? 'id="taxDescriptionInput"' : ''} value="${descVal}" ${isFixed || isTax ? 'readonly' : ''} required></td>
-            <td><div class="currency-field"><span>L.</span><input type="number" class="debe" value="${debeVal.toFixed(2)}" step="0.01" onchange="calcularTotales()" ${isFixed || isTax ? 'readonly' : ''}></div></td>
-            <td><div class="currency-field"><span>L.</span><input type="number" class="haber" value="${haberVal.toFixed(2)}" step="0.01" onchange="calcularTotales()" ${isFixed || isTax ? 'readonly' : ''}></div></td>
+            <td><div class="currency-field"><span>L.</span><input type="number" class="debe" value="${debeVal.toFixed(2)}" step="0.01" min="0" oninput="calcularTotales()" ${isFixed || isTax ? 'readonly' : ''}></div></td>
+            <td><div class="currency-field"><span>L.</span><input type="number" class="haber" value="${haberVal.toFixed(2)}" step="0.01" min="0" oninput="calcularTotales()" ${isFixed || isTax ? 'readonly' : ''}></div></td>
             <td>${isFixed || isTax ? '' : '<button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); calcularTotales();">x</button>'}</td>
         `;
     }
