@@ -223,25 +223,23 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
         
-        const getBase64FromUrl = (url) => new Promise((resolve, reject) => {
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
             const img = new Image();
+            img.crossOrigin = "Anonymous";
             img.onload = () => {
                 const canvas = document.createElement("canvas");
                 canvas.width = img.width; canvas.height = img.height;
                 canvas.getContext("2d").drawImage(img, 0, 0);
                 resolve(canvas.toDataURL("image/png"));
             };
-            img.onerror = () => reject(new Error("Error imagen: " + url));
-            img.src = url;
+            img.onerror = () => resolve(null);
+            img.src = url.includes(' ') ? encodeURI(url) : url;
         });
 
-        let logoDataUrl, logoBgUrl;
-        try {
-            logoDataUrl = await getBase64FromUrl('logo.png');
-            logoBgUrl = await getBase64FromUrl('logo odoo.png');
-        } catch (error) {
-            console.error("Error cargando imágenes:", error);
-        }
+        const [logoDataUrl, logoBgUrl] = await Promise.all([
+            getBase64FromUrl('logo.png'),
+            getBase64FromUrl('logo odoo.png')
+        ]);
 
         if (logoBgUrl) doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
         if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5);
