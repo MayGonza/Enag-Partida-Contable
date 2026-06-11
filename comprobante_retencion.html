@@ -82,16 +82,31 @@
         .currency-field { display: flex; align-items: center; gap: 4px; }
         .currency-field span { font-weight: bold; color: #555; }
         .footer-info { margin-top: 20px; font-size: 0.85em; color: #666; font-style: italic; border-top: 1px solid #eee; padding-top: 10px; }
+
+        /* Barra de navegación mejorada */
+        .nav-container { max-width: 1000px; margin: 0 auto 20px auto; display: flex; gap: 10px; align-items: center; }
+        .btn-nav { text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s; }
+        .btn-nav-menu { background-color: #6c757d; color: white; }
+        .btn-nav-menu:hover { background-color: #5a6268; transform: translateY(-1px); }
+        .btn-nav-active { background-color: #007bff; color: white; cursor: default; }
+        .btn-nav-inactive { background-color: #f1f3f5; color: #333; border: 1px solid #ccc; }
+        .btn-nav-inactive:hover { background-color: #e9ecef; }
     </style>
     <script src="js/jspdf.umd.min.js"></script>
     <script src="js/jspdf-autotable.min.js"></script>
 </head>
 <body>
-<div style="margin: 10px;">
-        <a href="menu.html" style="text-decoration: none; padding: 10px; background: #ddd; border-radius: 5px;">
-            ← Volver al Menú Principal
-        </a>
-    </div>
+<div class="nav-container">
+    <a href="menu.html" class="btn-nav btn-nav-menu">
+        ← Ir al Menú
+    </a>
+    <a href="index.html" class="btn-nav btn-nav-inactive">
+        Partidas Contables
+    </a>
+    <a href="comprobante_retencion.html" class="btn-nav btn-nav-active">
+        Comprobante de Retención
+    </a>
+</div>
 <div class="container">
     <div class="form-header">
         <div class="header-top">

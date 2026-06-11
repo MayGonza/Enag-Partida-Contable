@@ -62,23 +62,30 @@
         .tax-options input[type="radio"] { width: 16px; height: 16px; cursor: pointer; vertical-align: middle; } /* Radio botones más pequeños */
         .fixed-row input { font-weight: bold; } /* La fila del banco mantiene su negrita específica */
         .tax-row input.descripcion { font-style: italic; } /* Estilo para la descripción de la fila de impuesto */
+
+        /* Barra de navegación mejorada */
+        .nav-container { max-width: 950px; margin: 0 auto 20px auto; display: flex; gap: 10px; align-items: center; }
+        .btn-nav { text-decoration: none; padding: 10px 20px; border-radius: 6px; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.1); transition: all 0.3s; }
+        .btn-nav-menu { background-color: #6c757d; color: white; }
+        .btn-nav-menu:hover { background-color: #5a6268; transform: translateY(-1px); }
+        .btn-nav-active { background-color: #007bff; color: white; cursor: default; }
+        .btn-nav-inactive { background-color: #f1f3f5; color: #333; border: 1px solid #ccc; }
+        .btn-nav-inactive:hover { background-color: #e9ecef; }
     </style>
     <!-- Librerías para generación de PDF -->
     <script src="js/jspdf.umd.min.js"></script>
     <script src="js/jspdf-autotable.min.js"></script>
 </head>
 <body>
-<div style="margin: 10px;">
-        <a href="menu.html" style="text-decoration: none; padding: 10px; background: #ddd; border-radius: 5px;">
-            ← Volver al Menú Principal
-        </a>
-    </div>
-<!-- Navegación rápida -->
-<div style="max-width: 950px; margin: 0 auto 20px auto; display: flex; gap: 10px;">
-    <a href="index.html" style="text-decoration: none; padding: 10px 20px; background: #007bff; color: white; border-radius: 6px; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+<div class="nav-container">
+    <a href="menu.html" class="btn-nav btn-nav-menu">
+        ← Ir al Menú
+    </a>
+    <!-- Navegación rápida -->
+    <a href="index.html" class="btn-nav btn-nav-active">
         Partidas Contables
     </a>
-    <a href="comprobante_retencion.html" style="text-decoration: none; padding: 10px 20px; background: #6c757d; color: white; border-radius: 6px; font-weight: bold; font-size: 0.9em; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+    <a href="comprobante_retencion.html" class="btn-nav btn-nav-inactive">
         Comprobante de Retención
     </a>
 </div>
