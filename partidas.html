@@ -238,7 +238,7 @@
 
         const [logoDataUrl, logoBgUrl] = await Promise.all([
             getBase64FromUrl('logo.png'),
-            getBase64FromUrl('logo odoo.png')
+            getBase64FromUrl('Logo odoo.png')
         ]);
 
         if (logoBgUrl) doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
