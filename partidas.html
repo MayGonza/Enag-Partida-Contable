@@ -268,7 +268,9 @@
             head: [['Cuenta', 'Descripción', 'Debe', 'Haber']],
             body: filasData,
             foot: [['', 'TOTALES:', `L. ${document.getElementById('totalDebe').innerText}`, `L. ${document.getElementById('totalHaber').innerText}`]],
-            theme: 'grid'
+            theme: 'grid',
+            headStyles: { fillColor: [44, 62, 80] },
+            footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' }
         });
 
         const finalY = doc.lastAutoTable.finalY + 40;
