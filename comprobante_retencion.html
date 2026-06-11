@@ -303,16 +303,14 @@
         let logoDataUrl, logoBackgroundDataUrl;
         try {
             logoDataUrl = await getBase64FromUrl('logo.png');
-            logoBackgroundDataUrl = await getBase64FromUrl('logo.jpeg');
+            logoBackgroundDataUrl = await getBase64FromUrl('logo odoo.png');
         } catch (error) {
             console.error(error);
         }
 
         // Marca de agua
         if (logoBackgroundDataUrl) {
-            doc.setGState(new window.jspdf.GState({opacity: 0.08}));
-            doc.addImage(logoBackgroundDataUrl, 'JPEG', 30, 70, 150, 150);
-            doc.setGState(new window.jspdf.GState({opacity: 1}));
+            doc.addImage(logoBackgroundDataUrl, 'PNG', 30, 70, 150, 150);
         }
 
         // --- ENCABEZADO ---

@@ -234,11 +234,9 @@
         });
 
         const logoDataUrl = await getBase64FromUrl('logo.png');
-        const logoBgUrl = await getBase64FromUrl('logo.jpeg');
+        const logoBgUrl = await getBase64FromUrl('logo odoo.png');
 
-        doc.setGState(new window.jspdf.GState({opacity: 0.1}));
-        doc.addImage(logoBgUrl, 'JPEG', 30, 70, 150, 150);
-        doc.setGState(new window.jspdf.GState({opacity: 1}));
+        doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
         doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5);
 
         doc.setFontSize(16);
