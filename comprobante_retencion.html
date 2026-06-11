@@ -109,6 +109,8 @@
     <a href="index.html" class="btn-nav btn-nav-menu">
         ← Ir al Menú
     </a>
+    <a href="partidas.html" class="btn-nav btn-nav-inactive">Partidas Contables</a>
+    <a href="comprobante_retencion.html" class="btn-nav btn-nav-active">Comprobante de Retención</a>
 </div>
 <div class="container">
     <div class="form-header">
@@ -305,17 +307,16 @@
             logoDataUrl = await getBase64FromUrl('logo.png');
             logoBackgroundDataUrl = await getBase64FromUrl('logo odoo.png');
         } catch (error) {
-            console.error(error);
+            console.error("Error cargando imágenes:", error);
         }
 
         // Marca de agua
         if (logoBackgroundDataUrl) {
-            doc.addImage(logoBackgroundDataUrl, 'PNG', 30, 70, 150, 150);
+            try { doc.addImage(logoBackgroundDataUrl, 'PNG', 30, 70, 150, 150); } catch(e){}
         }
 
         // --- ENCABEZADO ---
-        // Logo a la derecha
-        doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
+        if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
 
         // Texto a la izquierda
         doc.setFontSize(8);

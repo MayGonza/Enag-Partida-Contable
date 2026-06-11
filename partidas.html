@@ -38,12 +38,15 @@
         }
         .form-header {
             text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
+            margin-bottom: 40px;
+            padding-bottom: 10px;
         }
-        .form-header img { max-width: 350px; margin-bottom: 15px; }
-        h2 { color: #2c3e50; margin: 0; font-size: 1.5em; text-transform: uppercase; }
+        .header-logo {
+            max-width: 380px;
+            margin-bottom: 30px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
+        h2 { color: #002147; margin: 0; font-size: 1.6em; text-transform: uppercase; letter-spacing: 1px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
         input, textarea { 
@@ -83,12 +86,14 @@
 <body>
 <div class="nav-container">
     <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+    <a href="partidas.html" class="btn-nav btn-nav-active">Partidas Contables</a>
+    <a href="comprobante_retencion.html" class="btn-nav btn-nav-inactive">Comprobante de Retención</a>
 </div>
 
 <div class="container">
     <div class="form-header">
-        <img src="logo.png" alt="Logo Empresa">
-        <h2>Sistema de Partidas Contables</h2>
+        <img src="logo.png" alt="ENAG Logo" class="header-logo">
+        <h2>Gestión de Partidas Contables</h2>
     </div>
     <form id="partidaForm">
         <div style="display: flex; gap: 20px;">
@@ -233,11 +238,16 @@
             img.src = url;
         });
 
-        const logoDataUrl = await getBase64FromUrl('logo.png');
-        const logoBgUrl = await getBase64FromUrl('logo odoo.png');
+        let logoDataUrl, logoBgUrl;
+        try {
+            logoDataUrl = await getBase64FromUrl('logo.png');
+            logoBgUrl = await getBase64FromUrl('logo odoo.png');
+        } catch (error) {
+            console.error("Error cargando imágenes:", error);
+        }
 
-        doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
-        doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5);
+        if (logoBgUrl) doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
+        if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 55, 10, 100, 12.5);
 
         doc.setFontSize(16);
         doc.text("COMPROBANTE DE PARTIDA CONTABLE", 105, 35, { align: "center" });
