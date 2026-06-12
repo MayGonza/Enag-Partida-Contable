@@ -55,17 +55,22 @@
             line-height: 1.4;
         }
         .info-box {
-            border: 1px solid #333;
-            padding: 8px;
-            margin-top: 8px;
+            border: 1px solid #002147;
+            padding: 10px;
+            margin-top: 10px;
             display: inline-block;
-            border-radius: 4px;
+            border-radius: 8px;
+            background: #f0f4f8;
         }
         .info-box p {
             margin: 2px 0;
             font-weight: bold;
         }
-        .header-right img { max-width: 350px; }
+        .header-logo {
+            max-width: 380px;
+            margin-bottom: 20px;
+            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+        }
         .form-header h2 { text-align: center; margin-top: 10px; }
         h2 { color: #2c3e50; margin: 0; font-size: 1.4em; text-transform: uppercase; }
         .correlative-container {
@@ -112,21 +117,15 @@
 </div>
 <div class="container">
     <div class="form-header">
-        <div class="header-top">
-            <div class="header-left">
-                <p>Col. Miraflores Sur, Centro Civico Gubernamental, PBX:2230-6767, 2291-0335-56-70</p>
-                <p>Fax: 2291-0357, 2230-4956, Tegucigalpa M.D.C, Honduras, C.A.</p>
-                <div class="info-box">
-                    <p>C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73</p>
-                    <p>Correo electrónico: gerencia@enag.gob.hn</p>
-                    <p>R.T.N 08019999408325</p>
-                </div>
-            </div>
-            <div class="header-right">
-                <img src="logo.png" alt="Logo">
+        <div style="text-align: center;">
+            <img src="logo.png" alt="ENAG Logo" class="header-logo">
+            <p>Col. Miraflores Sur, Centro Civico Gubernamental, Tegucigalpa M.D.C, Honduras, C.A.</p>
+            <div class="info-box">
+                <p>C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73</p>
+                <p>R.T.N 08019999408325 | Correo: gerencia@enag.gob.hn</p>
             </div>
         </div>
-        <h2>Comprobante de Retención de Impuestos</h2>
+        <h2 style="margin-top: 20px;">Comprobante de Retención de Impuestos</h2>
         <div class="correlative-container">
             <span>N° 000-001-05-</span>
             <input type="text" id="correlativo" placeholder="00000000" maxlength="8" required>
