@@ -109,8 +109,6 @@
     <a href="index.html" class="btn-nav btn-nav-menu">
         ← Ir al Menú
     </a>
-    <a href="partidas.html" class="btn-nav btn-nav-inactive">Partidas Contables</a>
-    <a href="comprobante_retencion.html" class="btn-nav btn-nav-active">Comprobante de Retención</a>
 </div>
 <div class="container">
     <div class="form-header">
@@ -286,33 +284,40 @@
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF();
 
-        const getBase64FromUrl = (url) => new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                canvas.width = img.width; canvas.height = img.height;
-                canvas.getContext("2d").drawImage(img, 0, 0);
-                resolve(canvas.toDataURL("image/png"));
-            };
-            img.onerror = () => resolve(null);
-            img.src = url.includes(' ') ? encodeURI(url) : url;
-        });
+        // Reutilizamos la función de conversión de imagen a Base64
+        const getBase64FromUrl = (url) => {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width; canvas.height = img.height;
+                    const ctx = canvas.getContext("2d");
+                    ctx.drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL("image/png"));
+                };
+                img.onerror = () => reject(new Error("No se pudo cargar la imagen: " + url));
+                img.src = url;
+            });
+        };
 
-        const [logoDataUrl, logoBackgroundDataUrl] = await Promise.all([
-            getBase64FromUrl('logo.png'),
-            getBase64FromUrl('Logo odoo.png')
-        ]);
+        let logoDataUrl, logoBackgroundDataUrl;
+        try {
+            logoDataUrl = await getBase64FromUrl('logo.png');
+            logoBackgroundDataUrl = await getBase64FromUrl('logo.jpeg');
+        } catch (error) {
+            console.error(error);
+        }
 
-        // Marca de agua (Logo de fondo)
+        // Marca de agua
         if (logoBackgroundDataUrl) {
-            doc.setGState(new window.jspdf.GState({opacity: 0.1}));
-            try { doc.addImage(logoBackgroundDataUrl, 'PNG', 30, 70, 150, 150); } catch(e){}
-            doc.setGState(new window.jspdf.GState({opacity: 1.0}));
+            doc.setGState(new window.jspdf.GState({opacity: 0.08}));
+            doc.addImage(logoBackgroundDataUrl, 'JPEG', 30, 70, 150, 150);
+            doc.setGState(new window.jspdf.GState({opacity: 1}));
         }
 
         // --- ENCABEZADO ---
-        if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
+        // Logo a la derecha
+        doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
 
         // Texto a la izquierda
         doc.setFontSize(8);
