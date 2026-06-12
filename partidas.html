@@ -241,7 +241,11 @@
             getBase64FromUrl('Logo odoo.png')
         ]);
 
-        if (logoBgUrl) doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
+        if (logoBgUrl) {
+            doc.setGState(new window.jspdf.GState({opacity: 0.1}));
+            doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
+            doc.setGState(new window.jspdf.GState({opacity: 1.0}));
+        }
         if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
 
         doc.setFontSize(16);

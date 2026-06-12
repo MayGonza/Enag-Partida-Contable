@@ -306,7 +306,9 @@
 
         // Marca de agua (Logo de fondo)
         if (logoBackgroundDataUrl) {
+            doc.setGState(new window.jspdf.GState({opacity: 0.1}));
             try { doc.addImage(logoBackgroundDataUrl, 'PNG', 30, 70, 150, 150); } catch(e){}
+            doc.setGState(new window.jspdf.GState({opacity: 1.0}));
         }
 
         // --- ENCABEZADO ---
