@@ -321,40 +321,39 @@
         doc.text("R.T.N 08019999408325", 16, 74);
 
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(14);
-        const title = "COMPROBANTE DE RETENCION DE IMPUESTOS";
+        doc.setFontSize(12);
+        const correlativoUser = document.getElementById('correlativo').value;
+        const title = `COMPROBANTE DE RETENCION DE IMPUESTOS N° 000-001-05-${correlativoUser}`;
         doc.text(title, 105, 88, { align: "center" });
         const titleWidth = doc.getTextWidth(title);
         doc.setLineWidth(0.5);
         doc.line(105 - (titleWidth / 2), 89, 105 + (titleWidth / 2), 89);
         
         doc.setFont('helvetica', 'normal');
-        doc.setFontSize(11);
-        const correlativoUser = document.getElementById('correlativo').value;
-        doc.text(`N° 000-001-05-${correlativoUser}`, 105, 96, { align: "center" });
 
         // Datos Generales
         doc.setFontSize(10);
-        let y = 108;
-        const drawField = (label, value, x) => {
+        let y = 98;
+        const drawField = (label, value, x, currentY) => {
             doc.setFont('helvetica', 'bold');
-            doc.text(label, x, y);
+            doc.text(label, x, currentY);
             doc.setFont('helvetica', 'normal');
-            doc.text(value || '', x + doc.getTextWidth(label) + 2, y);
+            doc.text(value || '', x + doc.getTextWidth(label) + 2, currentY);
         };
 
-        drawField("Proveedor:", document.getElementById('proveedor').value, 14);
-        drawField("RTN:", document.getElementById('rtn').value, 140);
-        y += 7;
-        drawField("Dirección:", document.getElementById('direccion').value, 14);
-        y += 7;
-        drawField("CAI:", document.getElementById('cai').value, 14);
-        y += 7;
-        drawField("Fecha:", document.getElementById('fecha').value, 14);
-        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 80);
-        y += 7;
-        drawField("Teléfono:", document.getElementById('telefono').value, 14);
-        drawField("N° de Factura:", document.getElementById('numFactura').value, 80);
+        drawField("Proveedor:", document.getElementById('proveedor').value, 14, y);
+        drawField("Fecha:", document.getElementById('fecha').value, 115, y);
+        
+        drawField("Dirección:", document.getElementById('direccion').value, 14, y + 7);
+        drawField("Teléfono:", document.getElementById('telefono').value, 115, y + 7);
+        
+        drawField("RTN:", document.getElementById('rtn').value, 14, y + 14);
+        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 115, y + 14);
+        
+        drawField("CAI:", document.getElementById('cai').value, 14, y + 21);
+        drawField("N° de Factura:", document.getElementById('numFactura').value, 115, y + 21);
+        
+        y += 21;
 
         // Tabla
         const tableData = [];
