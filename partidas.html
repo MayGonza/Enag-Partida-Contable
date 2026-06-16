@@ -105,8 +105,8 @@
         <table id="tablaDetalles">
             <thead>
                 <tr>
+                    <th>Objeto</th>
                     <th>Cuenta</th>
-                    <th>Descripción</th>
                     <th style="width: 120px;">Debe</th>
                     <th style="width: 120px;">Haber</th>
                     <th></th>
@@ -240,7 +240,7 @@
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
-        const title = "COMPROBANTE DE PARTIDA CONTABLE";
+        const title = "PARTIDA CONTABLE";
         doc.text(title, 105, 75, { align: "center" });
         const titleWidth = doc.getTextWidth(title);
         doc.setLineWidth(0.5);
