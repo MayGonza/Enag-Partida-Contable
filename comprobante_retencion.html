@@ -66,11 +66,6 @@
             margin: 2px 0;
             font-weight: bold;
         }
-        .header-logo {
-            max-width: 380px;
-            margin-bottom: 20px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
         .form-header h2 { text-align: center; margin-top: 10px; }
         h2 { color: #2c3e50; margin: 0; font-size: 1.4em; text-transform: uppercase; }
         .correlative-container {
@@ -118,7 +113,6 @@
 <div class="container">
     <div class="form-header">
         <div style="text-align: center;">
-            <img src="logo.png" alt="ENAG Logo" class="header-logo">
             <p>Col. Miraflores Sur, Centro Civico Gubernamental, Tegucigalpa M.D.C, Honduras, C.A.</p>
             <div class="info-box">
                 <p>C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73</p>
@@ -299,26 +293,19 @@
             });
         };
 
-        let logoDataUrl, logoBackgroundDataUrl;
+        let logoBackgroundDataUrl;
         try {
-            logoDataUrl = await getBase64FromUrl('logo.png');
-            logoBackgroundDataUrl = await getBase64FromUrl('logo.jpeg');
+            logoBackgroundDataUrl = await getBase64FromUrl('Logo odoo.png');
         } catch (error) {
             console.error(error);
         }
 
-        // Marca de agua
+        // Membrete de fondo
         if (logoBackgroundDataUrl) {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            doc.setGState(new window.jspdf.GState({opacity: 0.1}));
-            doc.addImage(logoBackgroundDataUrl, 'JPEG', 0, 0, pageWidth, pageHeight);
-            doc.setGState(new window.jspdf.GState({opacity: 1.0}));
+            doc.addImage(logoBackgroundDataUrl, 'PNG', 0, 0, pageWidth, pageHeight);
         }
-
-        // --- ENCABEZADO ---
-        // Logo a la derecha
-        doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
 
         // Texto a la izquierda
         doc.setFontSize(8);
@@ -333,9 +320,15 @@
         doc.text("Correo electrónico: gerencia@enag.gob.hn", 16, 30);
         doc.text("R.T.N 08019999408325", 16, 34);
 
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
-        doc.text("COMPROBANTE DE RETENCION DE IMPUESTOS", 105, 48, { align: "center" });
+        const title = "COMPROBANTE DE RETENCION DE IMPUESTOS";
+        doc.text(title, 105, 48, { align: "center" });
+        const titleWidth = doc.getTextWidth(title);
+        doc.setLineWidth(0.5);
+        doc.line(105 - (titleWidth / 2), 49, 105 + (titleWidth / 2), 49);
         
+        doc.setFont('helvetica', 'normal');
         doc.setFontSize(11);
         const correlativoUser = document.getElementById('correlativo').value;
         doc.text(`N° 000-001-05-${correlativoUser}`, 105, 56, { align: "center" });

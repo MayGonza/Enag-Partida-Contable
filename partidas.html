@@ -41,11 +41,6 @@
             margin-bottom: 40px;
             padding-bottom: 10px;
         }
-        .header-logo {
-            max-width: 380px;
-            margin-bottom: 30px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
-        }
         h2 { color: #002147; margin: 0; font-size: 1.6em; text-transform: uppercase; letter-spacing: 1px; }
         .form-group { margin-bottom: 15px; }
         label { display: block; margin-bottom: 5px; font-weight: bold; }
@@ -89,7 +84,6 @@
 </div>
 <div class="container">
     <div class="form-header">
-        <img src="logo.png" alt="ENAG Logo" class="header-logo">
         <h2>Gestión de Partidas Contables</h2>
     </div>
     <form id="partidaForm">
@@ -236,22 +230,23 @@
             img.src = url.includes(' ') ? encodeURI(url) : url;
         });
 
-        const [logoDataUrl, logoBgUrl] = await Promise.all([
-            getBase64FromUrl('logo.png'),
-            getBase64FromUrl('Logo odoo.png')
-        ]);
+        const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
 
         if (logoBgUrl) {
             const pageWidth = doc.internal.pageSize.getWidth();
             const pageHeight = doc.internal.pageSize.getHeight();
-            doc.setGState(new window.jspdf.GState({opacity: 0.1}));
             doc.addImage(logoBgUrl, 'PNG', 0, 0, pageWidth, pageHeight);
-            doc.setGState(new window.jspdf.GState({opacity: 1.0}));
         }
-        if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);
 
+        doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
-        doc.text("COMPROBANTE DE PARTIDA CONTABLE", 105, 35, { align: "center" });
+        const title = "COMPROBANTE DE PARTIDA CONTABLE";
+        doc.text(title, 105, 35, { align: "center" });
+        const titleWidth = doc.getTextWidth(title);
+        doc.setLineWidth(0.5);
+        doc.line(105 - (titleWidth / 2), 36, 105 + (titleWidth / 2), 36);
+        
+        doc.setFont('helvetica', 'normal');
         
         const fecha = document.getElementById('fecha').value;
         const concepto = document.getElementById('concepto').value;
