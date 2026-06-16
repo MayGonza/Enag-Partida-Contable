@@ -242,8 +242,10 @@
         ]);
 
         if (logoBgUrl) {
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
             doc.setGState(new window.jspdf.GState({opacity: 0.1}));
-            doc.addImage(logoBgUrl, 'PNG', 30, 70, 150, 150);
+            doc.addImage(logoBgUrl, 'PNG', 0, 0, pageWidth, pageHeight);
             doc.setGState(new window.jspdf.GState({opacity: 1.0}));
         }
         if (logoDataUrl) doc.addImage(logoDataUrl, 'PNG', 130, 10, 65, 8.125);

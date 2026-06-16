@@ -309,9 +309,11 @@
 
         // Marca de agua
         if (logoBackgroundDataUrl) {
-            doc.setGState(new window.jspdf.GState({opacity: 0.08}));
-            doc.addImage(logoBackgroundDataUrl, 'JPEG', 30, 70, 150, 150);
-            doc.setGState(new window.jspdf.GState({opacity: 1}));
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+            doc.setGState(new window.jspdf.GState({opacity: 0.1}));
+            doc.addImage(logoBackgroundDataUrl, 'JPEG', 0, 0, pageWidth, pageHeight);
+            doc.setGState(new window.jspdf.GState({opacity: 1.0}));
         }
 
         // --- ENCABEZADO ---
