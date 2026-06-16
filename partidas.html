@@ -241,10 +241,10 @@
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(16);
         const title = "COMPROBANTE DE PARTIDA CONTABLE";
-        doc.text(title, 105, 35, { align: "center" });
+        doc.text(title, 105, 90, { align: "center" });
         const titleWidth = doc.getTextWidth(title);
         doc.setLineWidth(0.5);
-        doc.line(105 - (titleWidth / 2), 36, 105 + (titleWidth / 2), 36);
+        doc.line(105 - (titleWidth / 2), 91, 105 + (titleWidth / 2), 91);
         
         doc.setFont('helvetica', 'normal');
         
@@ -253,9 +253,9 @@
         const num = document.getElementById('numeroPartida').value;
 
         doc.setFontSize(10);
-        doc.text(`Fecha: ${fecha}`, 14, 45);
-        doc.text(`N° de Partida: ${num}`, 14, 50);
-        doc.text(`Concepto: ${concepto}`, 14, 55, { maxWidth: 180 });
+        doc.text(`Fecha: ${fecha}`, 14, 100);
+        doc.text(`N° de Partida: ${num}`, 14, 105);
+        doc.text(`Concepto: ${concepto}`, 14, 110, { maxWidth: 180 });
 
         const filasData = [];
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
@@ -268,7 +268,7 @@
         });
 
         doc.autoTable({
-            startY: 70,
+            startY: 125,
             head: [['Cuenta', 'Descripción', 'Debe', 'Haber']],
             body: filasData,
             foot: [['', 'TOTALES:', `L. ${document.getElementById('totalDebe').innerText}`, `L. ${document.getElementById('totalHaber').innerText}`]],
