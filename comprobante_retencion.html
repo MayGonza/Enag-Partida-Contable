@@ -310,32 +310,32 @@
         // Texto a la izquierda
         doc.setFontSize(8);
         doc.setFont('helvetica', 'normal');
-        doc.text("Col. Miraflores Sur, Centro Civico Gubernamental, PBX:2230-6767, 2291-0335-56-70", 14, 70);
-        doc.text("Fax: 2291-0357, 2230-4956, Tegucigalpa M.D.C, Honduras, C.A.", 14, 74);
+        doc.text("Col. Miraflores Sur, Centro Civico Gubernamental, PBX:2230-6767, 2291-0335-56-70", 14, 55);
+        doc.text("Fax: 2291-0357, 2230-4956, Tegucigalpa M.D.C, Honduras, C.A.", 14, 59);
 
         // Cuadro de información legal
         doc.setFont('helvetica', 'bold');
-        doc.rect(14, 77, 90, 15);
-        doc.text("C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73", 16, 81);
-        doc.text("Correo electrónico: gerencia@enag.gob.hn", 16, 85);
-        doc.text("R.T.N 08019999408325", 16, 89);
+        doc.rect(14, 62, 90, 15);
+        doc.text("C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73", 16, 66);
+        doc.text("Correo electrónico: gerencia@enag.gob.hn", 16, 70);
+        doc.text("R.T.N 08019999408325", 16, 74);
 
         doc.setFont('helvetica', 'bold');
         doc.setFontSize(14);
         const title = "COMPROBANTE DE RETENCION DE IMPUESTOS";
-        doc.text(title, 105, 103, { align: "center" });
+        doc.text(title, 105, 88, { align: "center" });
         const titleWidth = doc.getTextWidth(title);
         doc.setLineWidth(0.5);
-        doc.line(105 - (titleWidth / 2), 104, 105 + (titleWidth / 2), 104);
+        doc.line(105 - (titleWidth / 2), 89, 105 + (titleWidth / 2), 89);
         
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(11);
         const correlativoUser = document.getElementById('correlativo').value;
-        doc.text(`N° 000-001-05-${correlativoUser}`, 105, 111, { align: "center" });
+        doc.text(`N° 000-001-05-${correlativoUser}`, 105, 96, { align: "center" });
 
         // Datos Generales
         doc.setFontSize(10);
-        let y = 123;
+        let y = 108;
         const drawField = (label, value, x) => {
             doc.setFont('helvetica', 'bold');
             doc.text(label, x, y);
