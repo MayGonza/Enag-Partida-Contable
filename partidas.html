@@ -253,9 +253,22 @@
         const num = document.getElementById('numeroPartida').value;
 
         doc.setFontSize(10);
-        doc.text(`Fecha: ${fecha}`, 14, 85);
-        doc.text(`N° de Partida: ${num}`, 14, 90);
-        doc.text(`Concepto: ${concepto}`, 14, 95, { maxWidth: 180 });
+        
+        doc.setFont('helvetica', 'bold');
+        doc.text("Fecha:", 14, 85);
+        doc.setFont('helvetica', 'normal');
+        doc.text(fecha, 14 + doc.getTextWidth("Fecha: "), 85);
+
+        doc.setFont('helvetica', 'bold');
+        doc.text("N° de Partida:", 14, 90);
+        doc.setFont('helvetica', 'normal');
+        doc.text(num, 14 + doc.getTextWidth("N° de Partida: "), 90);
+
+        doc.setFont('helvetica', 'bold');
+        doc.text("Concepto:", 14, 95);
+        doc.setFont('helvetica', 'normal');
+        const offsetConcepto = doc.getTextWidth("Concepto: ");
+        doc.text(concepto, 14 + offsetConcepto, 95, { maxWidth: 180 - offsetConcepto });
 
         const filasData = [];
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
