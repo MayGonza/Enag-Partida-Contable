@@ -274,28 +274,21 @@
         
         const num = document.getElementById('numeroPartida').value;
         
-        // N° de Partida centrado, más grande y con el número exclusivamente subrayado
         doc.setFontSize(14);
         doc.setFont('helvetica', 'bold');
         const textLabel = "N° de Partida: ";
         const totalNumWidth = doc.getTextWidth(textLabel + num);
         
-        // Calcular inicio del texto completo para centrarlo
         const startX = 105 - (totalNumWidth / 2);
         const labelWidth = doc.getTextWidth(textLabel);
         
-        // Pintar "N° de Partida: "
         doc.text(textLabel, startX, 82);
-        
-        // Pintar el número
         doc.text(num, startX + labelWidth, 82);
         
-        // Subrayar únicamente el número
         const numWidth = doc.getTextWidth(num);
         doc.setLineWidth(0.5);
         doc.line(startX + labelWidth, 83.5, startX + labelWidth + numWidth, 83.5);
 
-        // Resto de los metadatos (Fecha y Concepto)
         doc.setFont('helvetica', 'normal');
         doc.setFontSize(10);
         const fecha = document.getElementById('fecha').value;
@@ -309,8 +302,15 @@
         doc.setFont('helvetica', 'bold');
         doc.text("Concepto:", 14, 98);
         doc.setFont('helvetica', 'normal');
+        
         const offsetConcepto = doc.getTextWidth("Concepto: ");
-        doc.text(concepto, 14 + offsetConcepto, 98, { maxWidth: 180 - offsetConcepto });
+        const anchoMaximoConcepto = 180 - offsetConcepto;
+        
+        const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximoConcepto);
+        doc.text(lineasConcepto, 14 + offsetConcepto, 98, { maxWidth: anchoMaximoConcepto, align: "justify" });
+        
+        const altoLinea = 4.5; 
+        const finalConceptoY = 98 + ((lineasConcepto.length - 1) * altoLinea);
 
         const filasData = [];
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
@@ -323,7 +323,7 @@
         });
 
         doc.autoTable({
-            startY: 110,
+            startY: finalConceptoY + 15,
             head: [['Cuenta', 'Descripción', 'Debe', 'Haber']],
             body: filasData,
             foot: [['', 'TOTALES:', document.getElementById('totalDebe').innerText, document.getElementById('totalHaber').innerText]],
