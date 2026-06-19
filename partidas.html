@@ -174,6 +174,7 @@
         let divisor = (currentTaxType === '15% Impuesto S/V') ? 1.15 : (currentTaxType === '12.5% Impuesto S/R' ? 1.125 : 1);
 
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(row => {
+            if (row.classList.contains('comment-row')) return;
             const debeInput = row.querySelector('.debe');
             const haberInput = row.querySelector('.haber');
             if (row.classList.contains('tax-row')) {
@@ -193,6 +194,7 @@
 
         let totalDebe = 0, totalHaber = 0;
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(row => {
+            if (row.classList.contains('comment-row')) return;
             totalDebe += parseMoneda(row.querySelector('.debe').value);
             totalHaber += parseMoneda(row.querySelector('.haber').value);
         });
@@ -203,7 +205,7 @@
         document.getElementById('mensaje').innerText = (totalDebe.toFixed(2) !== totalHaber.toFixed(2)) ? "REVISA VALORES PARTIDA DESCUADRADA" : "";
     }
 
-    function agregarFila(cuentaVal = '', descVal = '', debeVal = 0, haberVal = 0, isFixed = false, isTax = false) {
+    function agregarFila(cuentaVal = '', descVal = '', debeVal = 0, haberVal = 0, isFixed = false, isTax = false, comentarioVal = '') {
         let index = -1; 
         if (!isFixed && !isTax) {
             for (let i = 0; i < tabla.rows.length; i++) {
@@ -218,6 +220,7 @@
         const row = tabla.insertRow(index);
         if (isFixed) row.classList.add('fixed-row');
         if (isTax) row.classList.add('tax-row');
+        row.classList.add('main-row');
 
         let strDebe = debeVal > 0 ? formatMoneda(debeVal) : (isFixed || isTax ? formatMoneda(0) : '');
         let strHaber = haberVal > 0 ? formatMoneda(haberVal) : (isFixed || isTax ? formatMoneda(0) : '');
@@ -227,8 +230,30 @@
             <td><input type="text" class="descripcion" ${isTax ? 'id="taxDescriptionInput"' : ''} value="${descVal}" ${isFixed || isTax ? 'readonly' : ''} required></td>
             <td><input type="text" class="debe" value="${strDebe}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" ${isFixed || isTax ? 'readonly' : ''}></td>
             <td><input type="text" class="haber" value="${strHaber}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" ${isFixed || isTax ? 'readonly' : ''}></td>
-            <td>${isFixed || isTax ? '' : '<button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); calcularTotales();">x</button>'}</td>
+            <td>${isFixed || isTax ? '' : '<button type="button" class="btn-remove" onclick="eliminarFila(this)">x</button>'}</td>
         `;
+
+        if (!isFixed && !isTax) {
+            let commentIndex = index === -1 ? -1 : index + 1;
+            const commentRow = tabla.insertRow(commentIndex);
+            commentRow.classList.add('comment-row');
+            commentRow.innerHTML = `
+                <td colspan="4">
+                    <input type="text" class="comentario-linea" value="${comentarioVal}" placeholder="Detalle la transacción" style="width: 100%; border: none; border-bottom: 1px dashed #ccc; background: transparent; padding: 4px; box-sizing: border-box;">
+                </td>
+                <td></td>
+            `;
+        }
+    }
+
+    function eliminarFila(button) {
+        const row = button.parentElement.parentElement;
+        const nextRow = row.nextElementSibling;
+        if (nextRow && nextRow.classList.contains('comment-row')) {
+            nextRow.remove();
+        }
+        row.remove();
+        calcularTotales();
     }
 
     function updateTaxRowDescription(description) {
@@ -297,13 +322,13 @@
         doc.setFont('helvetica', 'bold');
         doc.text("Fecha:", 14, 92);
         doc.setFont('helvetica', 'normal');
-        doc.text(fecha, 14 + doc.getTextWidth("Fecha: "), 92);
+        doc.text(fecha, 14 + doc.getTextWidth("Fecha:") + 3, 92);
 
         doc.setFont('helvetica', 'bold');
         doc.text("Concepto:", 14, 98);
         doc.setFont('helvetica', 'normal');
         
-        const offsetConcepto = doc.getTextWidth("Concepto: ");
+        const offsetConcepto = doc.getTextWidth("Concepto:") + 3;
         const anchoMaximoConcepto = 180 - offsetConcepto;
         
         const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximoConcepto);
@@ -315,6 +340,13 @@
         const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
         const filasData = [];
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
+            if (fila.classList.contains('comment-row')) {
+                const commentVal = fila.querySelector('.comentario-linea').value.trim();
+                if (commentVal) {
+                    filasData.push(['', commentVal, '', '']);
+                }
+                return;
+            }
             if (fila.classList.contains('tax-row') && currentTaxType === 'Exento') {
                 return; // Omitir la fila de impuesto si es Exento
             }
