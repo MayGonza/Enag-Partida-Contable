@@ -80,9 +80,24 @@
         input:focus {
             outline: none; border-color: #002147; box-shadow: 0 0 8px rgba(0,33,71,0.2);
         }
+        
+        /* Ocultar flechas de inputs de tipo número */
+        input[type=number]::-webkit-inner-spin-button, 
+        input[type=number]::-webkit-outer-spin-button { 
+            -webkit-appearance: none; 
+            margin: 0; 
+        }
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+        .base, .porcentaje, .importe {
+            text-align: right;
+            font-family: monospace;
+            font-size: 13px;
+        }
         table { width: 100%; border-collapse: collapse; margin-top: 25px; background: white; }
         th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-        th { background-color: #f8f9fa; font-size: 0.85em; text-transform: uppercase; }
+        th { background-color: #f8f9fa; font-size: 0.85em; text-transform: uppercase; text-align: center; }
         .btn-add { background-color: #28a745; color: white; margin-top: 15px; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         .btn-submit { background-color: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; }
         .btn-remove { background-color: #dc3545; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; }
@@ -373,8 +388,23 @@
             body: tableData,
             foot: [['', 'TOTAL RETENIDO', '', '', `L. ${document.getElementById('granTotal').innerText}`]],
             theme: 'grid',
-            headStyles: { fillColor: [44, 62, 80] },
-            footStyles: { fillColor: [240, 240, 240], textColor: [0,0,0], fontStyle: 'bold' }
+            headStyles: { fillColor: [44, 62, 80], halign: 'center' },
+            footStyles: { fillColor: [240, 240, 240], textColor: [0,0,0], fontStyle: 'bold' },
+            styles: { fontSize: 9, cellPadding: 3 },
+            columnStyles: {
+                0: { cellWidth: 15, halign: 'center' }, // N°
+                1: { cellWidth: 'auto' }, // Descripción del Impuesto
+                2: { cellWidth: 40, halign: 'right' }, // Base Imponible
+                3: { cellWidth: 25, halign: 'right' }, // % Retención
+                4: { cellWidth: 40, halign: 'right' }  // Importe Total
+            },
+            didParseCell: function (data) {
+                if (data.section === 'foot') {
+                    if (data.column.index === 4) {
+                        data.cell.styles.halign = 'right';
+                    }
+                }
+            }
         });
 
         let finalY = doc.lastAutoTable.finalY + 10;

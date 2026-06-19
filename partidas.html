@@ -107,6 +107,7 @@
 
         th {
             background-color: #f8f9fa;
+            text-align: center;
         }
 
         .actions {
@@ -214,11 +215,40 @@
         }
 
         /* Alineación derecha para campos monetarios */
+        .Debe,
+        .Haber,
         .debe,
         .haber {
             text-align: right;
             font-family: monospace;
-            font-size: 14px;
+            font-size: 13px;
+            padding: 8px 4px;
+        }
+
+        /* Ocultar flechas de inputs de tipo número */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .destacado-label {
+            font-size: 15px !important;
+            text-transform: uppercase;
+        }
+
+        .destacado-input {
+            font-size: 15px !important;
+            font-weight: bold !important;
+            text-transform: uppercase;
+        }
+
+        .descripcion-input {
+            font-size: 15px !important;
         }
     </style>
     <script src="js/jspdf.umd.min.js"></script>
@@ -236,8 +266,8 @@
         <form id="partidaForm">
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
-                    <label>Fecha:</label>
-                    <input type="date" id="fecha" required>
+                    <label class="destacado-label">Fecha:</label>
+                    <input type="date" id="fecha" class="destacado-input" required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Número de Partida:</label>
@@ -245,8 +275,14 @@
                 </div>
             </div>
             <div class="form-group">
-                <label>Concepto General:</label>
-                <textarea id="concepto" rows="2" required></textarea>
+                <label class="destacado-label">Beneficiario:</label>
+                <input type="text" id="beneficiario" placeholder="NOMBRE DEL BENEFICIARIO" class="destacado-input"
+                    oninput="this.value = this.value.toUpperCase()" required>
+            </div>
+            <div class="form-group">
+                <label class="destacado-label">Descripción:</label>
+                <textarea id="descripcion" rows="2" placeholder="Descripción de la partida contable"
+                    class="descripcion-input" required></textarea>
             </div>
             <h3>Detalle de la Partida</h3>
             <table id="tablaDetalles">
@@ -254,8 +290,8 @@
                     <tr>
                         <th>Objeto</th>
                         <th>Cuenta</th>
-                        <th style="width: 160px; text-align: right;">Debe</th>
-                        <th style="width: 160px; text-align: right;">Haber</th>
+                        <th style="width: 160px; text-align: center;">Debe</th>
+                        <th style="width: 160px; text-align: center;">Haber</th>
                         <th></th>
                     </tr>
                 </thead>
@@ -499,28 +535,29 @@
             doc.setLineWidth(0.5);
             doc.line(startX + labelWidth, 83.5, startX + labelWidth + numWidth, 83.5);
 
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(10);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
             const fecha = document.getElementById('fecha').value;
-            const concepto = document.getElementById('concepto').value;
+            const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
+            const descripcion = document.getElementById('descripcion').value;
 
-            doc.setFont('helvetica', 'bold');
-            doc.text("Fecha:", 14, 92);
+            doc.text("FECHA:", 14, 92);
+            doc.text(fecha, 14 + doc.getTextWidth("FECHA:") + 3, 92);
+
+            doc.text("BENEFICIARIO:", 14, 99);
+            doc.text(beneficiario, 14 + doc.getTextWidth("BENEFICIARIO:") + 3, 99);
+
+            doc.text("DESCRIPCIÓN:", 14, 106);
+
+            const offsetDescripcion = doc.getTextWidth("DESCRIPCIÓN:") + 3;
+            const anchoMaximoDescripcion = 180 - offsetDescripcion;
+
             doc.setFont('helvetica', 'normal');
-            doc.text(fecha, 14 + doc.getTextWidth("Fecha:") + 3, 92);
+            const lineasDescripcion = doc.splitTextToSize(descripcion, anchoMaximoDescripcion);
+            doc.text(lineasDescripcion, 14 + offsetDescripcion, 106, { maxWidth: anchoMaximoDescripcion, align: "justify" });
 
-            doc.setFont('helvetica', 'bold');
-            doc.text("Concepto:", 14, 98);
-            doc.setFont('helvetica', 'normal');
-
-            const offsetConcepto = doc.getTextWidth("Concepto:") + 3;
-            const anchoMaximoConcepto = 180 - offsetConcepto;
-
-            const lineasConcepto = doc.splitTextToSize(concepto, anchoMaximoConcepto);
-            doc.text(lineasConcepto, 14 + offsetConcepto, 98, { maxWidth: anchoMaximoConcepto, align: "justify" });
-
-            const altoLinea = 4.5;
-            const finalConceptoY = 98 + ((lineasConcepto.length - 1) * altoLinea);
+            const altoLinea = 5.0;
+            const finalConceptoY = 106 + ((lineasDescripcion.length - 1) * altoLinea);
 
             const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
             const filasData = [];
@@ -581,14 +618,26 @@
                 body: filasData,
                 foot: [['', 'TOTALES:', document.getElementById('totalDebe').innerText, document.getElementById('totalHaber').innerText]],
                 theme: 'grid',
-                headStyles: { fillColor: [44, 62, 80] },
+                headStyles: { fillColor: [44, 62, 80], halign: 'center' },
                 footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+                styles: { fontSize: 9, cellPadding: 3 },
+                columnStyles: {
+                    0: { cellWidth: 35, halign: 'center' }, // Objeto
+                    1: { cellWidth: 'auto' }, // Cuenta
+                    2: { cellWidth: 40, halign: 'right' }, // Debe
+                    3: { cellWidth: 40, halign: 'right' }  // Haber
+                },
                 didParseCell: function (data) {
                     if (data.section === 'body') {
                         // Es un comentario si la columna 0 y la columna 2 (Debe) están vacías
                         const isComment = data.row.raw[0] === '' && data.row.raw[2] === '';
                         if (!isComment) {
                             data.cell.styles.fontStyle = 'bold';
+                        }
+                    } else if (data.section === 'foot') {
+                        // Alinear pie de página
+                        if (data.column.index === 2 || data.column.index === 3) {
+                            data.cell.styles.halign = 'right';
                         }
                     }
                 }
