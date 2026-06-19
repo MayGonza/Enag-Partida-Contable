@@ -524,43 +524,56 @@
 
             const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
             const filasData = [];
-            const rows = document.querySelectorAll('#tablaDetalles tbody tr');
-
-            for (let i = 0; i < rows.length; i++) {
-                const fila = rows[i];
-                if (fila.classList.contains('main-row') && !fila.classList.contains('fixed-row') && !fila.classList.contains('tax-row')) {
-                    const objeto = fila.querySelector('.Objeto').value.trim();
-                    const cuenta = fila.querySelector('.Cuenta').value.trim();
-                    const debeVal = parseMoneda(fila.querySelector('.Debe').value);
-                    const haberVal = parseMoneda(fila.querySelector('.Haber').value);
-
-                    const estaVacio = !objeto && !cuenta && debeVal === 0 && haberVal === 0;
-                    if (estaVacio) {
-                        // Omitir esta fila y su comentario correspondiente si existe
-                        if (i + 1 < rows.length && rows[i + 1].classList.contains('comment-row')) {
-                            i++;
-                        }
-                        continue;
-                    }
-                }
-
+            let prevMainRowWasEmpty = false;
+            document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
                 if (fila.classList.contains('comment-row')) {
+                    if (prevMainRowWasEmpty) {
+                        prevMainRowWasEmpty = false;
+                        return; // Omitir el comentario si la fila principal estaba vacía
+                    }
                     const commentVal = fila.querySelector('.comentario-linea').value.trim();
                     if (commentVal) {
                         filasData.push(['', commentVal, '', '']);
                     }
-                    continue;
+                    return;
                 }
+                prevMainRowWasEmpty = false;
+
                 if (fila.classList.contains('tax-row') && currentTaxType === 'Exento') {
-                    continue;
+                    return; // Omitir la fila de impuesto si es Exento
                 }
-                filasData.push([
-                    fila.querySelector('.Objeto').value.toUpperCase(),
-                    fila.querySelector('.Cuenta').value.toUpperCase(),
-                    formatMoneda(parseMoneda(fila.querySelector('.Debe').value)),
-                    formatMoneda(parseMoneda(fila.querySelector('.Haber').value))
-                ]);
-            }
+
+                const objetoVal = fila.querySelector('.Objeto').value.trim();
+                const cuentaVal = fila.querySelector('.Cuenta').value.trim();
+                const debeVal = parseMoneda(fila.querySelector('.Debe').value);
+                const haberVal = parseMoneda(fila.querySelector('.Haber').value);
+
+                // Si es una fila editable del usuario y está vacía, ignorarla
+                if (!fila.classList.contains('fixed-row') && !fila.classList.contains('tax-row')) {
+                    const estaVacio = !objetoVal && !cuentaVal && debeVal === 0 && haberVal === 0;
+                    if (estaVacio) {
+                        prevMainRowWasEmpty = true;
+                        return;
+                    }
+                }
+
+                // Si es la fila del banco central
+                if (fila.classList.contains('fixed-row') || objetoVal === '111020100000700') {
+                    filasData.push([
+                        '',
+                        `${objetoVal}\n${cuentaVal}`,
+                        formatMoneda(debeVal),
+                        formatMoneda(haberVal)
+                    ]);
+                } else {
+                    filasData.push([
+                        objetoVal,
+                        cuentaVal,
+                        formatMoneda(debeVal),
+                        formatMoneda(haberVal)
+                    ]);
+                }
+            });
 
             doc.autoTable({
                 startY: finalConceptoY + 15,
@@ -572,8 +585,8 @@
                 footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
                 didParseCell: function (data) {
                     if (data.section === 'body') {
-                        // Si el primer elemento no está vacío, es una fila principal
-                        const isComment = data.row.raw[0] === '';
+                        // Es un comentario si la columna 0 y la columna 2 (Debe) están vacías
+                        const isComment = data.row.raw[0] === '' && data.row.raw[2] === '';
                         if (!isComment) {
                             data.cell.styles.fontStyle = 'bold';
                         }
