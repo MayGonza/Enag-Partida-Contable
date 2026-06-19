@@ -312,8 +312,12 @@
         const altoLinea = 4.5; 
         const finalConceptoY = 98 + ((lineasConcepto.length - 1) * altoLinea);
 
+        const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
         const filasData = [];
         document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
+            if (fila.classList.contains('tax-row') && currentTaxType === 'Exento') {
+                return; // Omitir la fila de impuesto si es Exento
+            }
             filasData.push([
                 fila.querySelector('.cuenta').value,
                 fila.querySelector('.descripcion').value,
