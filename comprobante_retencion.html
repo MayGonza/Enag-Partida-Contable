@@ -100,6 +100,9 @@
         th { background-color: #f8f9fa; font-size: 0.85em; text-transform: uppercase; text-align: center; }
         .btn-add { background-color: #28a745; color: white; margin-top: 15px; border: none; padding: 8px 15px; border-radius: 4px; cursor: pointer; }
         .btn-submit { background-color: #007bff; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; }
+        .btn-clean { background-color: #6c757d; color: white; border: none; padding: 12px 25px; border-radius: 4px; cursor: pointer; font-size: 1em; font-weight: bold; transition: background-color 0.3s; }
+        .btn-clean:hover { background-color: #5a6268; }
+        .required { color: #dc3545; margin-left: 2px; font-weight: bold; }
         .btn-remove { background-color: #dc3545; color: white; border: none; padding: 5px 8px; border-radius: 3px; cursor: pointer; }
         .actions { margin-top: 30px; display: flex; justify-content: space-between; align-items: center; }
         .totals-row { font-weight: bold; background: #f1f3f5; }
@@ -138,29 +141,30 @@
         <div class="correlative-container">
             <span>N° 000-001-05-</span>
             <input type="text" id="correlativo" placeholder="00000000" maxlength="8" required>
+            <span class="required">*</span>
         </div>
     </div>
 
     <form id="retencionForm">
         <div class="form-grid">
             <div class="form-group full-width">
-                <label>Proveedor:</label>
+                <label>Proveedor: <span class="required">*</span></label>
                 <input type="text" id="proveedor" required>
             </div>
             <div class="form-group full-width">
-                <label>Dirección:</label>
+                <label>Dirección: <span class="required">*</span></label>
                 <input type="text" id="direccion" required>
             </div>
             <div class="form-group">
-                <label>RTN:</label>
+                <label>RTN: <span class="required">*</span></label>
                 <input type="text" id="rtn" maxlength="16" required>
             </div>
             <div class="form-group">
-                <label>CAI:</label>
+                <label>CAI: <span class="required">*</span></label>
                 <input type="text" id="cai" maxlength="37" required>
             </div>
             <div class="form-group">
-                <label>Fecha:</label>
+                <label>Fecha: <span class="required">*</span></label>
                 <input type="date" id="fecha" required>
             </div>
             <div class="form-group">
@@ -206,6 +210,7 @@
         <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Fila</button>
 
         <div class="actions">
+            <button type="button" class="btn-clean" onclick="limpiarFormulario()">Limpiar Formulario</button>
             <button type="submit" class="btn-submit">Generar Comprobante PDF</button>
         </div>
     </form>
@@ -474,6 +479,16 @@
 
         doc.save(`Retencion_${correlativoUser}.pdf`);
     };
+
+    // Función para limpiar todo el formulario y reestablecer la tabla de retenciones
+    function limpiarFormulario() {
+        if (confirm('¿Está seguro de que desea limpiar todos los campos del formulario?')) {
+            document.getElementById('retencionForm').reset();
+            tbody.innerHTML = '';
+            agregarFila();
+            calcularGranTotal();
+        }
+    }
 
     // Agregar fila inicial
     agregarFila();
