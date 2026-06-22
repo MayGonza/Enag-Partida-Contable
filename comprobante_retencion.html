@@ -153,11 +153,11 @@
             </div>
             <div class="form-group">
                 <label>RTN:</label>
-                <input type="text" id="rtn" required>
+                <input type="text" id="rtn" maxlength="16" required>
             </div>
             <div class="form-group">
                 <label>CAI:</label>
-                <input type="text" id="cai" required>
+                <input type="text" id="cai" maxlength="37" required>
             </div>
             <div class="form-group">
                 <label>Fecha:</label>
@@ -169,11 +169,11 @@
             </div>
             <div class="form-group">
                 <label>Teléfono:</label>
-                <input type="text" id="telefono">
+                <input type="text" id="telefono" maxlength="9">
             </div>
             <div class="form-group">
                 <label>N° de Factura:</label>
-                <input type="text" id="numFactura">
+                <input type="text" id="numFactura" maxlength="19">
             </div>
         </div>
 
@@ -214,14 +214,28 @@
 <script>
     const tbody = document.querySelector('#tablaRetenciones tbody');
 
-    // Formateador automático para el N° de Factura (3-3-1-8)
-    document.getElementById('numFactura').addEventListener('input', function (e) {
+    // Restringir el Correlativo a números únicamente
+    document.getElementById('correlativo').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/\D/g, '');
+    });
+
+    // Sanitizar Proveedor (letras, números, espacios, puntos, comas, guiones e ampersand)
+    document.getElementById('proveedor').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^A-Za-z0-9áéíóúÁÉÍÓÚñÑüÜ.,\s&-]/g, '');
+    });
+
+    // Sanitizar Dirección (letras, números, espacios, puntos, comas, guiones, barras, # y paréntesis)
+    document.getElementById('direccion').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^A-Za-z0-9áéíóúÁÉÍÓÚñÑüÜ.,\s\-/#()]/g, '');
+    });
+
+    // Formateador automático para el RTN (XXXX-XXXX-XXXXXX)
+    document.getElementById('rtn').addEventListener('input', function (e) {
         let v = e.target.value.replace(/\D/g, '');
         let m = '';
-        if (v.length > 0) m += v.substring(0, 3);
-        if (v.length > 3) m += '-' + v.substring(3, 6);
-        if (v.length > 6) m += '-' + v.substring(6, 7);
-        if (v.length > 7) m += '-' + v.substring(7, 15);
+        if (v.length > 0) m += v.substring(0, 4);
+        if (v.length > 4) m += '-' + v.substring(4, 8);
+        if (v.length > 8) m += '-' + v.substring(8, 14);
         e.target.value = m;
     });
 
@@ -242,14 +256,54 @@
         e.target.value = formatted.substring(0, 37); // 32 chars + 5 hyphens
     });
 
+    // Sanitizar Orden de Pago (caracteres alfanuméricos, guiones y barras)
+    document.getElementById('ordenPago').addEventListener('input', function (e) {
+        e.target.value = e.target.value.replace(/[^A-Za-z0-9\-/]/g, '');
+    });
+
+    // Formateador automático para el Teléfono (XXXX-XXXX)
+    document.getElementById('telefono').addEventListener('input', function (e) {
+        let v = e.target.value.replace(/\D/g, '');
+        let m = '';
+        if (v.length > 0) m += v.substring(0, 4);
+        if (v.length > 4) m += '-' + v.substring(4, 8);
+        e.target.value = m;
+    });
+
+    // Formateador automático para el N° de Factura (3-3-2-8)
+    document.getElementById('numFactura').addEventListener('input', function (e) {
+        let v = e.target.value.replace(/\D/g, '');
+        let m = '';
+        if (v.length > 0) m += v.substring(0, 3);
+        if (v.length > 3) m += '-' + v.substring(3, 6);
+        if (v.length > 6) m += '-' + v.substring(6, 8);
+        if (v.length > 8) m += '-' + v.substring(8, 16);
+        e.target.value = m;
+    });
+
+    // Delegación de eventos para validar campos dinámicos en la tabla
+    tbody.addEventListener('input', function (e) {
+        if (e.target.classList.contains('descImpuesto')) {
+            e.target.value = e.target.value.replace(/[^A-Za-z0-9áéíóúÁÉÍÓÚñÑüÜ.,\s%\/-]/g, '');
+        }
+    });
+
+    tbody.addEventListener('keydown', function (e) {
+        if (e.target.classList.contains('base') || e.target.classList.contains('porcentaje')) {
+            if (['e', 'E', '+', '-'].includes(e.key)) {
+                e.preventDefault();
+            }
+        }
+    });
+
     function agregarFila() {
         const rowCount = tbody.rows.length + 1;
         const tr = document.createElement('tr');
         tr.innerHTML = `
             <td style="text-align:center; font-weight:bold;">${rowCount}</td>
             <td><input type="text" class="descImpuesto" style="width:95%" required></td>
-            <td><div class="currency-field"><span>L.</span><input type="number" class="base" step="0.01" style="width:90%" oninput="calcularFila(this)" required></div></td>
-            <td><input type="number" class="porcentaje" step="0.01" style="width:85%" oninput="calcularFila(this)" required></td>
+            <td><div class="currency-field"><span>L.</span><input type="number" class="base" step="0.01" min="0" style="width:90%" oninput="calcularFila(this)" required></div></td>
+            <td><input type="number" class="porcentaje" step="0.01" min="0" max="100" style="width:85%" oninput="calcularFila(this)" required></td>
             <td><div class="currency-field"><span>L.</span><input type="number" class="importe" style="width:90%; background:#f9f9f9;" readonly></div></td>
             <td><button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); actualizarNumeracion(); calcularGranTotal();">x</button></td>
         `;
