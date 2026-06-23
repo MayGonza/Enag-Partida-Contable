@@ -135,6 +135,24 @@
             font-size: 16px;
         }
 
+        .btn-clean {
+            background-color: #6c757d;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-clean:hover {
+            background-color: #5a6268;
+        }
+
+        .required {
+            color: #dc3545;
+            margin-left: 2px;
+            font-weight: bold;
+        }
+
         .btn-remove {
             background-color: #dc3545;
             color: white;
@@ -266,21 +284,21 @@
         <form id="partidaForm">
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
-                    <label class="destacado-label">Fecha:</label>
+                    <label class="destacado-label">Fecha: <span class="required">*</span></label>
                     <input type="date" id="fecha" class="destacado-input" required>
                 </div>
                 <div class="form-group" style="flex: 1;">
-                    <label>Número de Partida:</label>
+                    <label>Número de Partida: <span class="required">*</span></label>
                     <input type="number" id="numeroPartida" required>
                 </div>
             </div>
             <div class="form-group">
-                <label class="destacado-label">Beneficiario:</label>
+                <label class="destacado-label">Beneficiario: <span class="required">*</span></label>
                 <input type="text" id="beneficiario" placeholder="NOMBRE DEL BENEFICIARIO" class="destacado-input"
                     oninput="this.value = this.value.toUpperCase()" required>
             </div>
             <div class="form-group">
-                <label class="destacado-label">Descripción:</label>
+                <label class="destacado-label">Descripción: <span class="required">*</span></label>
                 <textarea id="descripcion" rows="2" placeholder="Descripción de la partida contable"
                     class="descripcion-input" required></textarea>
             </div>
@@ -320,8 +338,11 @@
                 </div>
             </div>
             <div class="actions">
-                <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Fila</button>
-                <button type="submit" class="btn-submit">Generar PDF de Partida</button>
+                <button type="button" class="btn-clean" onclick="limpiarFormulario()">Limpiar Formulario</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Fila</button>
+                    <button type="submit" class="btn-submit">Generar PDF de Partida</button>
+                </div>
             </div>
             <div id="mensaje" class="error"></div>
         </form>
@@ -653,6 +674,18 @@
 
             doc.save(`Partida_${num}.pdf`);
         };
+
+        function limpiarFormulario() {
+            if (confirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) {
+                document.getElementById('partidaForm').reset();
+                tabla.innerHTML = '';
+                // Restaurar filas iniciales
+                agregarFila(); agregarFila();
+                agregarFila('27115', 'Exento', 0, 0, false, true);
+                agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
+                calcularTotales();
+            }
+        }
 
         agregarFila(); agregarFila();
         agregarFila('27115', 'Exento', 0, 0, false, true);
