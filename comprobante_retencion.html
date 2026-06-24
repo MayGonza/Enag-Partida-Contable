@@ -99,8 +99,8 @@
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 2; }
         label { margin-bottom: 5px; font-weight: bold; font-size: 0.9em; color: #444; }
-        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; transition: all 0.3s ease; }
-        input:focus {
+        input, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; transition: all 0.3s ease; font-family: inherit; resize: vertical; }
+        input:focus, textarea:focus {
             outline: none; border-color: #002147; box-shadow: 0 0 8px rgba(0,33,71,0.2);
         }
         
@@ -176,7 +176,7 @@
             </div>
             <div class="form-group full-width">
                 <label>Dirección: <span class="required">*</span></label>
-                <input type="text" id="direccion" required>
+                <textarea id="direccion" rows="2" required></textarea>
             </div>
             <div class="form-group">
                 <label>RTN: <span class="required">*</span></label>
@@ -474,16 +474,37 @@
         drawField("Proveedor:", document.getElementById('proveedor').value, 14, y);
         drawField("Fecha:", document.getElementById('fecha').value, 115, y);
         
-        drawField("Dirección:", document.getElementById('direccion').value, 14, y + 7);
+        // Campo Dirección con ajuste vertical automático (wrapping)
+        const labelDireccion = "Dirección:";
+        const valueDireccion = document.getElementById('direccion').value || '';
+        const startXDireccion = 14;
+        const labelWidthDireccion = doc.getTextWidth(labelDireccion);
+        const valueStartXDireccion = startXDireccion + labelWidthDireccion + 2;
+        
+        // Ancho máximo disponible antes de topar con la columna del "Teléfono" (en x=115)
+        const maxAddressWidth = 115 - valueStartXDireccion - 5;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.text(labelDireccion, startXDireccion, y + 7);
+        doc.setFont('helvetica', 'normal');
+        
+        const addressLines = doc.splitTextToSize(valueDireccion, maxAddressWidth);
+        doc.text(addressLines, valueStartXDireccion, y + 7);
+        
+        // Teléfono en la misma fila inicial
         drawField("Teléfono:", document.getElementById('telefono').value, 115, y + 7);
         
-        drawField("RTN:", document.getElementById('rtn').value, 14, y + 14);
-        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 115, y + 14);
+        // Altura adicional por envoltura de dirección (5 unidades por cada línea extra)
+        const addressHeight = (addressLines.length - 1) * 5;
         
-        drawField("CAI:", document.getElementById('cai').value, 14, y + 21);
-        drawField("N° de Factura:", document.getElementById('numFactura').value, 115, y + 21);
+        // Empujar hacia abajo las siguientes filas basándose en la altura de la dirección
+        drawField("RTN:", document.getElementById('rtn').value, 14, y + 14 + addressHeight);
+        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 115, y + 14 + addressHeight);
         
-        y += 21;
+        drawField("CAI:", document.getElementById('cai').value, 14, y + 21 + addressHeight);
+        drawField("N° de Factura:", document.getElementById('numFactura').value, 115, y + 21 + addressHeight);
+        
+        y += 21 + addressHeight;
 
         // Tabla
         const tableData = [];
