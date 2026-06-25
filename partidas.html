@@ -680,11 +680,11 @@
 
             const finalY = doc.lastAutoTable.finalY + 40;
             doc.line(15, finalY, 65, finalY);
-            doc.text("AUTORIZADO POR", 40, finalY + 5, { align: 'center' });
+            doc.text("AUTORIZADO POR\nCONTABILIDAD", 40, finalY + 5, { align: 'center' });
             doc.line(80, finalY, 130, finalY);
-            doc.text("REVISADO POR", 105, finalY + 5, { align: 'center' });
+            doc.text("REVISADO POR\nCONTABILIDAD", 105, finalY + 5, { align: 'center' });
             doc.line(145, finalY, 195, finalY);
-            doc.text("ADMINISTRACION", 170, finalY + 5, { align: 'center' });
+            doc.text("AUTORIZADO POR\nADMINISTRACION", 170, finalY + 5, { align: 'center' });
 
             // Exportar datos del formulario embebidos en el PDF
             const formData = {
