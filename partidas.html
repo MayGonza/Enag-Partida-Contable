@@ -280,6 +280,20 @@
     <div class="container">
         <div class="form-header">
             <h2>Gestión de Partidas Contables</h2>
+            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+                <label for="importarPDF" class="btn-clean"
+                    style="cursor: pointer; background-color: #002147; color: white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 8px 15px;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                        <path
+                            d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                    </svg>
+                    Cargar PDF de Partida
+                </label>
+                <input type="file" id="importarPDF" accept="application/pdf" style="display: none;"
+                    onchange="importarPDF(event)">
+            </div>
         </div>
         <form id="partidaForm">
             <div style="display: flex; gap: 20px;">
@@ -534,10 +548,10 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(16);
             const title = "PARTIDA CONTABLE";
-            doc.text(title, 105, 70, { align: "center" });
+            doc.text(title, 105, 52, { align: "center" });
             const titleWidth = doc.getTextWidth(title);
             doc.setLineWidth(0.5);
-            doc.line(105 - (titleWidth / 2), 71, 105 + (titleWidth / 2), 71);
+            doc.line(105 - (titleWidth / 2), 53, 105 + (titleWidth / 2), 53);
 
             const num = document.getElementById('numeroPartida').value;
 
@@ -549,12 +563,12 @@
             const startX = 105 - (totalNumWidth / 2);
             const labelWidth = doc.getTextWidth(textLabel);
 
-            doc.text(textLabel, startX, 82);
-            doc.text(num, startX + labelWidth, 82);
+            doc.text(textLabel, startX, 62);
+            doc.text(num, startX + labelWidth, 62);
 
             const numWidth = doc.getTextWidth(num);
             doc.setLineWidth(0.5);
-            doc.line(startX + labelWidth, 83.5, startX + labelWidth + numWidth, 83.5);
+            doc.line(startX + labelWidth, 63.5, startX + labelWidth + numWidth, 63.5);
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
@@ -562,23 +576,23 @@
             const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
             const descripcion = document.getElementById('descripcion').value;
 
-            doc.text("FECHA:", 14, 92);
-            doc.text(fecha, 14 + doc.getTextWidth("FECHA:") + 3, 92);
+            doc.text("FECHA:", 14, 72);
+            doc.text(fecha, 14 + doc.getTextWidth("FECHA:") + 3, 72);
 
-            doc.text("BENEFICIARIO:", 14, 99);
-            doc.text(beneficiario, 14 + doc.getTextWidth("BENEFICIARIO:") + 3, 99);
+            doc.text("BENEFICIARIO:", 14, 78);
+            doc.text(beneficiario, 14 + doc.getTextWidth("BENEFICIARIO:") + 3, 78);
 
-            doc.text("DESCRIPCIÓN:", 14, 106);
+            doc.text("DESCRIPCIÓN:", 14, 84);
 
             const offsetDescripcion = doc.getTextWidth("DESCRIPCIÓN:") + 3;
             const anchoMaximoDescripcion = 180 - offsetDescripcion;
 
             doc.setFont('helvetica', 'normal');
             const lineasDescripcion = doc.splitTextToSize(descripcion, anchoMaximoDescripcion);
-            doc.text(lineasDescripcion, 14 + offsetDescripcion, 106, { maxWidth: anchoMaximoDescripcion, align: "justify" });
+            doc.text(lineasDescripcion, 14 + offsetDescripcion, 84, { maxWidth: anchoMaximoDescripcion, align: "justify" });
 
             const altoLinea = 5.0;
-            const finalConceptoY = 106 + ((lineasDescripcion.length - 1) * altoLinea);
+            const finalConceptoY = 84 + ((lineasDescripcion.length - 1) * altoLinea);
 
             const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
             const filasData = [];
@@ -634,7 +648,7 @@
             });
 
             doc.autoTable({
-                startY: finalConceptoY + 15,
+                startY: finalConceptoY + 8,
                 head: [['Objeto', 'Cuenta', 'Debe', 'Haber']],
                 body: filasData,
                 foot: [['', 'TOTALES:', document.getElementById('totalDebe').innerText, document.getElementById('totalHaber').innerText]],
@@ -666,14 +680,106 @@
 
             const finalY = doc.lastAutoTable.finalY + 40;
             doc.line(15, finalY, 65, finalY);
-            doc.text("AUTORIZADO POR", 40, finalY + 5, { align: 'center' });
+            doc.text("AUTORIZADO POR\nCONTABILIDAD", 40, finalY + 5, { align: 'center' });
             doc.line(80, finalY, 130, finalY);
-            doc.text("REVISADO POR", 105, finalY + 5, { align: 'center' });
+            doc.text("REVISADO POR\nCONTABILIDAD", 105, finalY + 5, { align: 'center' });
             doc.line(145, finalY, 195, finalY);
-            doc.text("ADMINISTRACION", 170, finalY + 5, { align: 'center' });
+            doc.text("AUTORIZADO POR\nADMINISTRACION", 170, finalY + 5, { align: 'center' });
 
-            doc.save(`Partida_${num}.pdf`);
+            // Exportar datos del formulario embebidos en el PDF
+            const formData = {
+                fecha: fecha,
+                numeroPartida: num,
+                beneficiario: beneficiario,
+                descripcion: descripcion,
+                taxType: currentTaxType,
+                rows: []
+            };
+
+            document.querySelectorAll('#tablaDetalles tbody tr.main-row').forEach(row => {
+                const objeto = row.querySelector('.Objeto').value.trim();
+                const cuenta = row.querySelector('.Cuenta').value.trim();
+                const debe = parseMoneda(row.querySelector('.Debe').value);
+                const haber = parseMoneda(row.querySelector('.Haber').value);
+                const isFixed = row.classList.contains('fixed-row');
+                const isTax = row.classList.contains('tax-row');
+
+                let comentario = '';
+                if (!isFixed && !isTax) {
+                    const nextRow = row.nextElementSibling;
+                    if (nextRow && nextRow.classList.contains('comment-row')) {
+                        comentario = nextRow.querySelector('.comentario-linea').value.trim();
+                    }
+                }
+                formData.rows.push({ objeto, cuenta, debe, haber, isFixed, isTax, comentario });
+            });
+
+            const pdfBlob = doc.output('blob');
+            const dataString = "\n%PARTIDA_DATA:" + btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
+            const finalBlob = new Blob([pdfBlob, dataString], { type: 'application/pdf' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(finalBlob);
+            link.download = `Partida_${num}.pdf`;
+            link.click();
+            URL.revokeObjectURL(link.href);
         };
+
+        function importarPDF(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                const arrayBuffer = e.target.result;
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const decoder = new TextDecoder('utf-8');
+                const text = decoder.decode(uint8Array);
+
+                const marker = "%PARTIDA_DATA:";
+                const index = text.indexOf(marker);
+                if (index !== -1) {
+                    const base64Data = text.substring(index + marker.length).trim().split('\n')[0].split('\r')[0].trim();
+                    try {
+                        const jsonData = decodeURIComponent(escape(atob(base64Data)));
+                        const data = JSON.parse(jsonData);
+                        cargarDatosEnFormulario(data);
+                    } catch (err) {
+                        alert("Error al decodificar los datos del PDF: " + err.message);
+                    }
+                } else {
+                    alert("Este PDF no contiene datos de partida contable editables o fue modificado.");
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        function cargarDatosEnFormulario(data) {
+            document.getElementById('fecha').value = data.fecha || '';
+            document.getElementById('numeroPartida').value = data.numeroPartida || '';
+            document.getElementById('beneficiario').value = (data.beneficiario || '').toUpperCase();
+            document.getElementById('descripcion').value = data.descripcion || '';
+
+            const taxValue = data.taxType || 'Exento';
+            const radio = document.querySelector(`input[name="taxType"][value="${taxValue}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+
+            tabla.innerHTML = '';
+
+            if (data.rows && data.rows.length > 0) {
+                data.rows.forEach(r => {
+                    agregarFila(r.objeto, r.cuenta, r.debe, r.haber, r.isFixed, r.isTax, r.comentario);
+                });
+            } else {
+                agregarFila(); agregarFila();
+                agregarFila('27115', 'Exento', 0, 0, false, true);
+                agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
+            }
+            calcularTotales();
+        }
 
         function limpiarFormulario() {
             if (confirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) {

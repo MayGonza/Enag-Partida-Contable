@@ -143,6 +143,16 @@
             <input type="text" id="correlativo" placeholder="00000000" maxlength="8" required>
             <span class="required">*</span>
         </div>
+        <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+            <label for="importarPDF" class="btn-clean" style="cursor: pointer; background-color: #002147; color: white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 8px 15px;">
+                <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                    <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                    <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+                </svg>
+                Cargar PDF de Retención
+            </label>
+            <input type="file" id="importarPDF" accept="application/pdf" style="display: none;" onchange="importarPDF(event)">
+        </div>
     </div>
 
     <form id="retencionForm">
@@ -477,8 +487,102 @@
         doc.setFontSize(10);
         doc.text("ELABORADO POR\nCONTABILIDAD", 105, finalY + 5, { align: 'center' });
 
-        doc.save(`Retencion_${correlativoUser}.pdf`);
+        // Guardar datos en el PDF como comentario al final del archivo
+        const formData = {
+            correlativo: correlativoUser,
+            proveedor: document.getElementById('proveedor').value,
+            direccion: document.getElementById('direccion').value,
+            rtn: document.getElementById('rtn').value,
+            cai: document.getElementById('cai').value,
+            fecha: document.getElementById('fecha').value,
+            ordenPago: document.getElementById('ordenPago').value,
+            telefono: document.getElementById('telefono').value,
+            numFactura: document.getElementById('numFactura').value,
+            rows: []
+        };
+
+        tbody.querySelectorAll('tr').forEach(row => {
+            formData.rows.push({
+                num: row.cells[0].innerText,
+                descImpuesto: row.querySelector('.descImpuesto').value,
+                base: parseFloat(row.querySelector('.base').value) || 0,
+                porcentaje: parseFloat(row.querySelector('.porcentaje').value) || 0,
+                importe: parseFloat(row.querySelector('.importe').value) || 0
+            });
+        });
+
+        const pdfBlob = doc.output('blob');
+        const dataString = "\n%RETENCION_DATA:" + btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
+        const finalBlob = new Blob([pdfBlob, dataString], { type: 'application/pdf' });
+
+        const link = document.createElement('a');
+        link.href = URL.createObjectURL(finalBlob);
+        link.download = `Retencion_${correlativoUser}.pdf`;
+        link.click();
+        URL.revokeObjectURL(link.href);
     };
+
+    function importarPDF(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const arrayBuffer = e.target.result;
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const decoder = new TextDecoder('utf-8');
+            const text = decoder.decode(uint8Array);
+
+            const marker = "%RETENCION_DATA:";
+            const index = text.indexOf(marker);
+            if (index !== -1) {
+                const base64Data = text.substring(index + marker.length).trim().split('\n')[0].split('\r')[0].trim();
+                try {
+                    const jsonData = decodeURIComponent(escape(atob(base64Data)));
+                    const data = JSON.parse(jsonData);
+                    cargarDatosEnFormulario(data);
+                } catch (err) {
+                    alert("Error al decodificar los datos del PDF: " + err.message);
+                }
+            } else {
+                alert("Este PDF no contiene datos de retención editables o fue modificado.");
+            }
+        };
+        reader.readAsArrayBuffer(file);
+        event.target.value = '';
+    }
+
+    function cargarDatosEnFormulario(data) {
+        document.getElementById('correlativo').value = data.correlativo || '';
+        document.getElementById('proveedor').value = data.proveedor || '';
+        document.getElementById('direccion').value = data.direccion || '';
+        document.getElementById('rtn').value = data.rtn || '';
+        document.getElementById('cai').value = data.cai || '';
+        document.getElementById('fecha').value = data.fecha || '';
+        document.getElementById('ordenPago').value = data.ordenPago || '';
+        document.getElementById('telefono').value = data.telefono || '';
+        document.getElementById('numFactura').value = data.numFactura || '';
+
+        tbody.innerHTML = '';
+
+        if (data.rows && data.rows.length > 0) {
+            data.rows.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="text-align:center; font-weight:bold;">${r.num}</td>
+                    <td><input type="text" class="descImpuesto" style="width:95%" value="${r.descImpuesto}" required></td>
+                    <td><div class="currency-field"><span>L.</span><input type="number" class="base" step="0.01" min="0" style="width:90%" value="${r.base}" oninput="calcularFila(this)" required></div></td>
+                    <td><input type="number" class="porcentaje" step="0.01" min="0" max="100" style="width:85%" value="${r.porcentaje}" oninput="calcularFila(this)" required></td>
+                    <td><div class="currency-field"><span>L.</span><input type="number" class="importe" style="width:90%; background:#f9f9f9;" value="${r.importe}" readonly></div></td>
+                    <td><button type="button" class="btn-remove" onclick="this.parentElement.parentElement.remove(); actualizarNumeracion(); calcularGranTotal();">x</button></td>
+                `;
+                tbody.appendChild(tr);
+            });
+        } else {
+            agregarFila();
+        }
+        calcularGranTotal();
+    }
 
     // Función para limpiar todo el formulario y reestablecer la tabla de retenciones
     function limpiarFormulario() {
