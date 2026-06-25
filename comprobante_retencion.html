@@ -55,12 +55,14 @@
             line-height: 1.4;
         }
         .info-box {
-            border: 1px solid #002147;
-            padding: 10px;
-            margin-top: 10px;
+            border: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            margin-top: 15px;
             display: inline-block;
-            border-radius: 8px;
-            background: #f0f4f8;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.08);
+            border-left: 5px solid #002147;
         }
         .info-box p {
             margin: 2px 0;
@@ -69,15 +71,36 @@
         .form-header h2 { text-align: center; margin-top: 10px; }
         h2 { color: #2c3e50; margin: 0; font-size: 1.4em; text-transform: uppercase; }
         .correlative-container {
-            display: flex; align-items: center; justify-content: center; gap: 10px; margin-top: 10px; font-weight: bold; font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin: 15px auto 0 auto;
+            font-weight: bold;
+            font-size: 1.1em;
+            border: 1px solid #e2e8f0;
+            padding: 12px 20px;
+            border-radius: 12px;
+            background: #ffffff;
+            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.08);
+            border-left: 5px solid #002147;
+            width: fit-content;
         }
-        .correlative-container input { width: 120px; text-align: center; font-size: 1em; padding: 5px; }
+        .correlative-container input {
+            width: 120px;
+            text-align: center;
+            font-size: 1em;
+            padding: 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            transition: all 0.3s ease;
+        }
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-top: 20px; }
         .form-group { display: flex; flex-direction: column; }
         .form-group.full-width { grid-column: span 2; }
         label { margin-bottom: 5px; font-weight: bold; font-size: 0.9em; color: #444; }
-        input { padding: 8px; border: 1px solid #ccc; border-radius: 4px; transition: all 0.3s ease; }
-        input:focus {
+        input, textarea { padding: 8px; border: 1px solid #ccc; border-radius: 4px; transition: all 0.3s ease; font-family: inherit; resize: vertical; }
+        input:focus, textarea:focus {
             outline: none; border-color: #002147; box-shadow: 0 0 8px rgba(0,33,71,0.2);
         }
         
@@ -163,7 +186,7 @@
             </div>
             <div class="form-group full-width">
                 <label>Dirección: <span class="required">*</span></label>
-                <input type="text" id="direccion" required>
+                <textarea id="direccion" rows="2" required></textarea>
             </div>
             <div class="form-group">
                 <label>RTN: <span class="required">*</span></label>
@@ -397,21 +420,54 @@
         doc.text("Col. Miraflores Sur, Centro Civico Gubernamental, PBX:2230-6767, 2291-0335-56-70", 14, 55);
         doc.text("Fax: 2291-0357, 2230-4956, Tegucigalpa M.D.C, Honduras, C.A.", 14, 59);
 
-        // Cuadro de información legal
-        doc.setFont('helvetica', 'bold');
-        doc.rect(14, 62, 90, 15);
-        doc.text("C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73", 16, 66);
-        doc.text("Correo electrónico: gerencia@enag.gob.hn", 16, 70);
-        doc.text("R.T.N 08019999408325", 16, 74);
+        // Cuadro de información legal con esquinas redondeadas y pequeña sombra
+        doc.setFillColor(230, 230, 230); // Color gris para la sombra
+        doc.roundedRect(15, 63, 90, 17, 3, 3, 'F'); // Rectángulo de sombra
+        
+        doc.setFillColor(248, 249, 250); // Color de fondo claro
+        doc.setDrawColor(0, 33, 71); // Azul oscuro institucional
+        doc.setLineWidth(0.4);
+        doc.roundedRect(14, 62, 90, 17, 3, 3, 'FD'); // Rectángulo principal con fondo y borde
 
         doc.setFont('helvetica', 'bold');
-        doc.setFontSize(12);
+        doc.text("C.A.I: 3E15C2-3CB3FF-B368E0-63BE03-090958-73", 16, 67);
+        doc.text("Correo electrónico: gerencia@enag.gob.hn", 16, 71.5);
+        doc.text("R.T.N 08019999408325", 16, 76);
+
+        // Restaurar estilos por defecto
+        doc.setDrawColor(0, 0, 0);
+        doc.setFillColor(255, 255, 255);
+        doc.setLineWidth(0.5);
+
+        doc.setFont('helvetica', 'bold');
+        doc.setFontSize(11);
         const correlativoUser = document.getElementById('correlativo').value;
         const title = `COMPROBANTE DE RETENCION DE IMPUESTOS N° 000-001-05-${correlativoUser}`;
-        doc.text(title, 105, 88, { align: "center" });
         const titleWidth = doc.getTextWidth(title);
+        
+        const boxWidth = titleWidth + 12;
+        const boxHeight = 10;
+        const boxX = 105 - (boxWidth / 2);
+        const boxY = 81;
+
+        // Dibujar sombra
+        doc.setFillColor(230, 230, 230);
+        doc.roundedRect(boxX + 1, boxY + 1, boxWidth, boxHeight, 2, 2, 'F');
+
+        // Dibujar caja principal
+        doc.setFillColor(248, 249, 250);
+        doc.setDrawColor(0, 33, 71);
+        doc.setLineWidth(0.4);
+        doc.roundedRect(boxX, boxY, boxWidth, boxHeight, 2, 2, 'FD');
+
+        // Texto
+        doc.setFont('helvetica', 'bold');
+        doc.text(title, 105, boxY + 6.8, { align: "center" });
+
+        // Restaurar estilos por defecto
+        doc.setDrawColor(0, 0, 0);
+        doc.setFillColor(255, 255, 255);
         doc.setLineWidth(0.5);
-        doc.line(105 - (titleWidth / 2), 89, 105 + (titleWidth / 2), 89);
         
         doc.setFont('helvetica', 'normal');
 
@@ -428,16 +484,37 @@
         drawField("Proveedor:", document.getElementById('proveedor').value, 14, y);
         drawField("Fecha:", document.getElementById('fecha').value, 115, y);
         
-        drawField("Dirección:", document.getElementById('direccion').value, 14, y + 7);
+        // Campo Dirección con ajuste vertical automático (wrapping)
+        const labelDireccion = "Dirección:";
+        const valueDireccion = document.getElementById('direccion').value || '';
+        const startXDireccion = 14;
+        const labelWidthDireccion = doc.getTextWidth(labelDireccion);
+        const valueStartXDireccion = startXDireccion + labelWidthDireccion + 2;
+        
+        // Ancho máximo disponible antes de topar con la columna del "Teléfono" (en x=115)
+        const maxAddressWidth = 115 - valueStartXDireccion - 5;
+        
+        doc.setFont('helvetica', 'bold');
+        doc.text(labelDireccion, startXDireccion, y + 7);
+        doc.setFont('helvetica', 'normal');
+        
+        const addressLines = doc.splitTextToSize(valueDireccion, maxAddressWidth);
+        doc.text(addressLines, valueStartXDireccion, y + 7);
+        
+        // Teléfono en la misma fila inicial
         drawField("Teléfono:", document.getElementById('telefono').value, 115, y + 7);
         
-        drawField("RTN:", document.getElementById('rtn').value, 14, y + 14);
-        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 115, y + 14);
+        // Altura adicional por envoltura de dirección (5 unidades por cada línea extra)
+        const addressHeight = (addressLines.length - 1) * 5;
         
-        drawField("CAI:", document.getElementById('cai').value, 14, y + 21);
-        drawField("N° de Factura:", document.getElementById('numFactura').value, 115, y + 21);
+        // Empujar hacia abajo las siguientes filas basándose en la altura de la dirección
+        drawField("RTN:", document.getElementById('rtn').value, 14, y + 14 + addressHeight);
+        drawField("Orden de Pago:", document.getElementById('ordenPago').value, 115, y + 14 + addressHeight);
         
-        y += 21;
+        drawField("CAI:", document.getElementById('cai').value, 14, y + 21 + addressHeight);
+        drawField("N° de Factura:", document.getElementById('numFactura').value, 115, y + 21 + addressHeight);
+        
+        y += 21 + addressHeight;
 
         // Tabla
         const tableData = [];
