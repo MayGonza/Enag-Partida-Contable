@@ -76,6 +76,7 @@
         }
 
         input,
+        select,
         textarea {
             width: 100%;
             padding: 8px;
@@ -86,6 +87,7 @@
         }
 
         input:focus,
+        select:focus,
         textarea:focus {
             outline: none;
             border-color: #002147;
@@ -170,6 +172,7 @@
         }
 
         input.Objeto,
+        select.Objeto,
         input.Cuenta {
             font-weight: bold;
             text-transform: uppercase;
@@ -365,6 +368,21 @@
     <script>
         const tabla = document.getElementById('tablaDetalles').getElementsByTagName('tbody')[0];
 
+        const OBJETOS_PREDEFINIDOS = {
+            "11100": "SUELDOS BASICOS ACUERDO",
+            "12100": "SUELDOS BASICOS POR CONTRATO",
+            "11510": "DECIMOTERCER MES DE SALARIO",
+            "11520": "DECIMOCUARTO MES DE SALARIO",
+            "11600": "COMPLEMENTOS/VACACIONES",
+            "21110": "ENERGIA ELECTRICA",
+            "21200": "AGUA",
+            "21420": "TELEFONIA FIJA",
+            "26110": "PASAJES NACIONALES",
+            "23100": "MANTENIMIENTO Y REPARACION DE EDIFICIOS Y LOCALES",
+            "25100": "SERVICIO DE TRANSPORTE",
+            "26110": "MANTENIMIENTO Y REPARACION DE EDIFICIOS"
+        };
+
         function parseMoneda(valor) {
             if (!valor) return 0;
             let limpio = valor.replace(/L\.\s?/g, '').replace(/,/g, '');
@@ -425,6 +443,18 @@
             document.getElementById('mensaje').innerText = (totalDebe.toFixed(2) !== totalHaber.toFixed(2)) ? "REVISA VALORES PARTIDA DESCUADRADA" : "";
         }
 
+        function actualizarCuenta(selectElement) {
+            const row = selectElement.closest('tr');
+            const cuentaInput = row.querySelector('.Cuenta');
+            const valorSeleccionado = selectElement.value;
+
+            if (OBJETOS_PREDEFINIDOS[valorSeleccionado]) {
+                cuentaInput.value = OBJETOS_PREDEFINIDOS[valorSeleccionado];
+            } else if (valorSeleccionado === "") {
+                cuentaInput.value = "";
+            }
+        }
+
         function agregarFila(cuentaVal = '', descVal = '', debeVal = 0, haberVal = 0, isFixed = false, isTax = false, comentarioVal = '') {
             let index = -1;
             if (!isFixed && !isTax) {
@@ -445,8 +475,24 @@
             let strDebe = debeVal > 0 ? formatMoneda(debeVal) : (isFixed || isTax ? formatMoneda(0) : '');
             let strHaber = haberVal > 0 ? formatMoneda(haberVal) : (isFixed || isTax ? formatMoneda(0) : '');
 
+            let selectHTML = '';
+            if (isFixed || isTax) {
+                selectHTML = `<input type="text" class="Objeto" value="${cuentaVal}" readonly>`;
+            } else {
+                selectHTML = `<select class="Objeto" onchange="actualizarCuenta(this)">
+                    <option value="">SELECCIONE OBJETO...</option>`;
+                for (const [code, description] of Object.entries(OBJETOS_PREDEFINIDOS)) {
+                    const selected = (cuentaVal === code) ? 'selected' : '';
+                    selectHTML += `<option value="${code}" ${selected}>${code} - ${description}</option>`;
+                }
+                if (cuentaVal && !OBJETOS_PREDEFINIDOS[cuentaVal]) {
+                    selectHTML += `<option value="${cuentaVal}" selected>${cuentaVal}</option>`;
+                }
+                selectHTML += `</select>`;
+            }
+
             row.innerHTML = `
-            <td><input type="text" class="Objeto" value="${cuentaVal}" ${isFixed || isTax ? 'readonly' : ''} oninput="this.value = this.value.replace(/[^0-9]/g, '')"></td>
+            <td>${selectHTML}</td>
             <td><input type="text" class="Cuenta" ${isTax ? 'id="taxDescriptionInput"' : ''} value="${descVal}" ${isFixed || isTax ? 'readonly' : ''}></td>
             <td><input type="text" class="Debe" value="${strDebe}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" ${isFixed || isTax ? 'readonly' : ''}></td>
             <td><input type="text" class="Haber" value="${strHaber}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" ${isFixed || isTax ? 'readonly' : ''}></td>
