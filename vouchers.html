@@ -662,7 +662,7 @@
                 headers.forEach((header, index) => {
                     const norm = normalize(header);
                     if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
-                    if (norm.includes("cargo") || norm.includes("puesto")) {
+                    if ((norm.includes("cargo") || norm.includes("puesto")) && !norm.includes("numero")) {
                         puestoIdx = index;
                     }
                     if (norm.includes("ingreso")) ingresoIdx = index;
@@ -739,10 +739,12 @@
                                             const cleanName = header.toString().replace(/\s+/g, ' ').trim()
                                                 .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                                 .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
-                                            deducciones.push({
-                                                nombre: cleanName,
-                                                monto: val
-                                            });
+                                            if (cleanName && cleanName.trim() !== "") {
+                                                deducciones.push({
+                                                    nombre: cleanName,
+                                                    monto: val
+                                                });
+                                            }
                                         }
                                     }
                                 });
@@ -799,10 +801,12 @@
                                     const cleanName = header.toString().replace(/\s+/g, ' ').trim()
                                         .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                         .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
-                                    deducciones.push({
-                                        nombre: cleanName,
-                                        monto: val
-                                    });
+                                    if (cleanName && cleanName.trim() !== "") {
+                                        deducciones.push({
+                                            nombre: cleanName,
+                                            monto: val
+                                        });
+                                    }
                                 }
                             }
                         });
