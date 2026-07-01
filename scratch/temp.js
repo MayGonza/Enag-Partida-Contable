@@ -1,456 +1,8 @@
-<!DOCTYPE html>
-<html lang="es">
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
-    <title>Generación de Vouchers de Pago</title>
-    <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            margin: 0;
-            padding: 40px 20px;
-            background-color: #002147;
-            min-height: 100vh;
-            color: #333;
-        }
-
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-
-        body::before {
-            content: "";
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
-            background-size: 40%;
-            filter: blur(10px) opacity(0.15);
-            z-index: -1;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: auto;
-            background: rgba(255, 255, 255, 0.98);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-            border-top: 8px solid #002147;
-            animation: fadeIn 0.8s ease-out;
-        }
-
-        .form-header {
-            text-align: center;
-            margin-bottom: 30px;
-            border-bottom: 2px solid #eee;
-            padding-bottom: 20px;
-        }
-
-        h2 {
-            color: #002147;
-            margin: 0;
-            font-size: 1.6em;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-container {
-            max-width: 1000px;
-            margin: 0 auto 20px auto;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-        }
-
-        .btn-nav {
-            text-decoration: none;
-            padding: 10px 20px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.9em;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s;
-        }
-
-        .btn-nav-menu {
-            background-color: #6c757d;
-            color: white;
-        }
-
-        .btn-nav-menu:hover {
-            background-color: #5a6268;
-            transform: translateY(-1px);
-        }
-
-        /* Drag & Drop Area */
-        .upload-container {
-            display: flex;
-            gap: 20px;
-            margin-bottom: 30px;
-            flex-wrap: wrap;
-        }
-
-        .drop-zone {
-            flex: 2;
-            min-width: 300px;
-            border: 3px dashed #cbd5e1;
-            border-radius: 12px;
-            padding: 30px;
-            text-align: center;
-            background: #f8fafc;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .drop-zone.dragover {
-            border-color: #002147;
-            background-color: #f0f4f8;
-        }
-
-        .drop-zone svg {
-            width: 48px;
-            height: 48px;
-            fill: #64748b;
-        }
-
-        .drop-zone p {
-            margin: 0;
-            font-size: 1.1em;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .drop-zone span {
-            font-size: 0.9em;
-            color: #94a3b8;
-        }
-
-        .actions-sidebar {
-            flex: 1;
-            min-width: 250px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            justify-content: center;
-        }
-
-        button {
-            padding: 12px 20px;
-            cursor: pointer;
-            border: none;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 0.95em;
-            transition: all 0.3s;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-        }
-
-        .btn-template {
-            background-color: #0284c7;
-            color: white;
-        }
-
-        .btn-template:hover {
-            background-color: #0369a1;
-        }
-
-        .btn-generate {
-            background-color: #22c55e;
-            color: white;
-            font-size: 1.05em;
-        }
-
-        .btn-generate:hover {
-            background-color: #16a34a;
-        }
-
-        .btn-generate:disabled {
-            background-color: #cbd5e1;
-            cursor: not-allowed;
-            color: #64748b;
-        }
-
-        .btn-clear {
-            background-color: #ef4444;
-            color: white;
-        }
-
-        .btn-clear:hover {
-            background-color: #dc2626;
-        }
-
-        /* Filter & Search */
-        .filter-container {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            gap: 15px;
-        }
-
-        .search-input {
-            padding: 10px 15px;
-            border: 1px solid #cbd5e1;
-            border-radius: 6px;
-            width: 100%;
-            max-width: 350px;
-            font-size: 0.95em;
-            box-sizing: border-box;
-        }
-
-        /* Table */
-        .table-responsive {
-            overflow-x: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 12px;
-            background: white;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
-            margin-top: 10px;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
-
-        th,
-        td {
-            padding: 14px 16px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.95em;
-        }
-
-        th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-        }
-
-        tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .checkbox-cell {
-            text-align: center;
-            width: 40px;
-        }
-
-        .checkbox-cell input {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-
-        .badge {
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
-            font-weight: bold;
-        }
-
-        .badge-acuerdo {
-            background-color: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .badge-contrato {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
-
-        .btn-action-small {
-            padding: 6px 10px;
-            font-size: 0.85em;
-            background-color: #f1f5f9;
-            color: #475569;
-            border: 1px solid #e2e8f0;
-            box-shadow: none;
-        }
-
-        .btn-action-small:hover {
-            background-color: #002147;
-            color: white;
-            border-color: #002147;
-        }
-
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #94a3b8;
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 10px;
-            fill: #cbd5e1;
-        }
-
-        .summary-info {
-            font-size: 0.95em;
-            font-weight: bold;
-            color: #475569;
-        }
-    </style>
-    <!-- Import libraries -->
-    <script src="js/xlsx.full.min.js"></script>
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
-</head>
-
-<body>
-    <div class="nav-container">
-        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
-    </div>
-
-    <div class="container">
-
-        <div class="form-header">
-            <h2>Generador de Vouchers de Pago</h2>
-            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de salarios desde un archivo de Excel para
-                procesar e imprimir los comprobantes.</p>
-        </div>
-
-        <!-- Selector de Hoja de Excel (oculto por defecto) -->
-        <div id="sheetSelectorContainer" style="display: none; margin-bottom: 25px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fef3c7;">
-            <label style="font-weight: bold; color: #b45309; margin-bottom: 6px; display: block; font-size: 0.95em;">Este archivo contiene múltiples hojas. Selecciona la hoja con los datos:</label>
-            <select id="sheetSelect" onchange="cambiarHoja()" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; max-width: 450px; font-size: 1em; box-sizing: border-box; background: white; font-weight: bold; color: #333;">
-            </select>
-        </div>
-
-        <!-- Month and Date Selectors -->
-        <div
-            style="display: flex; gap: 20px; align-items: center; margin-bottom: 25px; flex-wrap: wrap; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <div style="flex: 1; min-width: 200px;">
-                <label
-                    style="font-weight: bold; color: #002147; margin-bottom: 6px; display: block; font-size: 0.95em;">Mes
-                    Correspondiente:</label>
-                <input type="text" id="mesVoucher" placeholder="ej. marzo 2026"
-                    style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; font-size: 1em; box-sizing: border-box;">
-            </div>
-            <div style="flex: 1; min-width: 200px;">
-                <label
-                    style="font-weight: bold; color: #002147; margin-bottom: 6px; display: block; font-size: 0.95em;">Fecha
-                    de Emisión (Opcional):</label>
-                <input type="text" id="fechaEmision" placeholder="ej. 30 de marzo del 2026"
-                    style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; font-size: 1em; box-sizing: border-box;">
-            </div>
-        </div>
-
-        <div class="upload-container">
-            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
-                <svg viewBox="0 0 24 24">
-                    <path
-                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                </svg>
-                <p>Arrastra tu archivo Excel aquí o haz clic para buscar</p>
-                <span>Soporta archivos .xlsx, .xls y .csv</span>
-                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;"
-                    onchange="handleFileSelect(event)">
-            </div>
-
-            <div class="actions-sidebar">
-                <button type="button" class="btn-template" onclick="descargarPlantilla()">
-                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path
-                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                        <path
-                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
-                    </svg>
-                    Descargar Plantilla Excel
-                </button>
-                <button type="button" class="btn-generate" id="btnGenerateBulk" onclick="generarPDFsSeleccionados()"
-                    disabled>
-                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z" />
-                        <path
-                            d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z" />
-                    </svg>
-                    Generar PDFs Seleccionados (<span id="selectedCount">0</span>)
-                </button>
-                <button type="button" class="btn-clear" id="btnClearList" onclick="limpiarLista()" disabled>
-                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path
-                            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-                        <path fill-rule="evenodd"
-                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.05 4H4.118zM2.5 3V2h11v1h-11z" />
-                    </svg>
-                    Limpiar Datos cargados
-                </button>
-            </div>
-        </div>
-
-        <div id="dataSection" style="display: none;">
-            <div class="filter-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar empleado o cargo..."
-                    oninput="filtrarTabla()">
-                <div class="summary-info">
-                    Total Importados: <span id="totalImportados">0</span>
-                </div>
-            </div>
-
-            <div class="table-responsive">
-                <table id="planillaTable">
-                    <thead>
-                        <tr>
-                            <th class="checkbox-cell"><input type="checkbox" id="selectAll"
-                                    onchange="toggleSelectAll(this)"></th>
-                            <th>Nombre del Empleado</th>
-                            <th>Cargo</th>
-                            <th style="text-align: center;">Tipo</th>
-                            <th style="text-align: center;">N° Puesto</th>
-                            <th>Fecha Ingreso</th>
-                            <th style="text-align: right;">Sueldo Devengado</th>
-                            <th style="text-align: right;">Deducciones</th>
-                            <th style="text-align: right;">Neto a Pagar</th>
-                            <th style="text-align: center;">Acciones</th>
-                        </tr>
-                    </thead>
-                    <tbody id="planillaBody">
-                        <!-- Cargar dinámicamente -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <div class="empty-state" id="emptyState">
-            <svg viewBox="0 0 24 24">
-                <path
-                    d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
-            </svg>
-            <p>Aún no has cargado ningún archivo Excel</p>
-            <span>Usa el botón "Descargar Plantilla Excel" para ver el formato requerido.</span>
-        </div>
-    </div>
-
-    <script>
         let empleados = [];
         const dropZone = document.getElementById('drop-zone');
 
-        // Inicializar mes y fecha e intentar cargar planilla.xls
+        // Inicializar mes y fecha
         window.addEventListener('DOMContentLoaded', () => {
             const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
             const fechaActual = new Date();
@@ -462,38 +14,6 @@
             const mesLetras = meses[fechaActual.getMonth()];
             const anio = fechaActual.getFullYear();
             document.getElementById('fechaEmision').value = `${dia} de ${mesLetras} del ${anio}`;
-
-            // Auto-cargar planilla.xls si existe en el servidor
-            fetch('planilla.xls')
-                .then(res => {
-                    if (res.ok) return res.arrayBuffer();
-                    throw new Error("No default planilla.xls found on server");
-                })
-                .then(arrayBuffer => {
-                    const data = new Uint8Array(arrayBuffer);
-                    currentWorkbook = XLSX.read(data, { type: 'array' });
-                    construirMapaEmpleados(currentWorkbook);
-                    
-                    const sheetSelect = document.getElementById('sheetSelect');
-                    sheetSelect.innerHTML = '';
-                    currentWorkbook.SheetNames.forEach(name => {
-                        const opt = document.createElement('option');
-                        opt.value = name;
-                        opt.innerText = name;
-                        sheetSelect.appendChild(opt);
-                    });
-                    
-                    if (currentWorkbook.SheetNames.length > 1) {
-                        document.getElementById('sheetSelectorContainer').style.display = 'block';
-                    } else {
-                        document.getElementById('sheetSelectorContainer').style.display = 'none';
-                    }
-                    
-                    cargarHoja(currentWorkbook.SheetNames[0]);
-                })
-                .catch(err => {
-                    console.log("Auto-carga omitida o fallida:", err.message);
-                });
         });
 
         // Drag and drop event handlers
@@ -624,7 +144,7 @@
                     headers.forEach((header, index) => {
                         const norm = normalize(header);
                         if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
-                        if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) puestoIdx = index;
+                        if ((norm.includes("cargo") || norm.includes("puesto")) && !norm.includes("numero")) puestoIdx = index;
                         if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
                         if (norm.includes("ingreso")) ingresoIdx = index;
                     });
@@ -636,20 +156,12 @@
                     for (let k = headerRowIndex + 2; k < Math.min(rowsData.length, headerRowIndex + 14); k++) {
                         const rowVal = rowsData[k] || [];
                         const nextRowVal = rowsData[k + 1] || [];
-                        
-                        let foundNumberCol = -1;
-                        for (let c = 0; c < 3; c++) {
-                            const str = rowVal[c] ? rowVal[c].toString().trim() : "";
-                            if (str && /^\d+$/.test(str)) {
-                                foundNumberCol = c;
-                                break;
-                            }
-                        }
-                        
-                        if (foundNumberCol !== -1) {
-                            const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
-                            const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
-                            if (nextColVal === "" && hasNextData) {
+                        const numStr = rowVal[0] ? rowVal[0].toString().trim() : "";
+                        if (/^\d+$/.test(numStr)) {
+                            const nextCol0 = nextRowVal[0] ? nextRowVal[0].toString().trim() : "";
+                            const nextCol1 = nextRowVal[1] ? nextRowVal[1].toString().trim() : "";
+                            const nextCol2 = nextRowVal[2] ? nextRowVal[2].toString().trim() : "";
+                            if (nextCol0 === "" && nextCol2 !== "" && nextCol1 !== "") {
                                 esDobleFila = true;
                                 break;
                             }
@@ -662,17 +174,8 @@
                         while (i < rowsData.length) {
                             const rowA = rowsData[i];
                             if (!rowA) { i++; continue; }
-                            
-                            let isEmployeeRow = false;
-                            for (let c = 0; c < 3; c++) {
-                                const str = rowA[c] ? rowA[c].toString().trim() : "";
-                                if (str && /^\d+$/.test(str)) {
-                                    isEmployeeRow = true;
-                                    break;
-                                }
-                            }
-                            
-                            if (isEmployeeRow) {
+                            const numStr = rowA[0] ? rowA[0].toString().trim() : "";
+                            if (/^\d+$/.test(numStr)) {
                                 const rowB = rowsData[i + 1];
                                 if (rowB) {
                                     const empName = rowA[nombreIdx] ? rowA[nombreIdx].toString().trim().toUpperCase() : "";
@@ -831,7 +334,7 @@
                 headers.forEach((header, index) => {
                     const norm = normalize(header);
                     if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
-                    if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) {
+                    if ((norm.includes("cargo") || norm.includes("puesto")) && !norm.includes("numero")) {
                         puestoIdx = index;
                     }
                     if (norm.includes("ingreso")) ingresoIdx = index;
@@ -868,20 +371,14 @@
                 for (let k = startRow; k < Math.min(rowsData.length, startRow + 12); k++) {
                     const rowVal = rowsData[k] || [];
                     const nextRowVal = rowsData[k + 1] || [];
+                    const numStr = rowVal[0] ? rowVal[0].toString().trim() : "";
                     
-                    let foundNumberCol = -1;
-                    for (let c = 0; c < 3; c++) {
-                        const str = rowVal[c] ? rowVal[c].toString().trim() : "";
-                        if (str && /^\d+$/.test(str)) {
-                            foundNumberCol = c;
-                            break;
-                        }
-                    }
-                    
-                    if (foundNumberCol !== -1) {
-                        const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
-                        const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
-                        if (nextColVal === "" && hasNextData) {
+                    if (/^\d+$/.test(numStr)) {
+                        const nextCol0 = nextRowVal[0] ? nextRowVal[0].toString().trim() : "";
+                        const nextCol1 = nextRowVal[1] ? nextRowVal[1].toString().trim() : "";
+                        const nextCol2 = nextRowVal[2] ? nextRowVal[2].toString().trim() : "";
+                        
+                        if (nextCol0 === "" && nextCol2 !== "" && nextCol1 !== "") {
                             esDobleFila = true;
                             break;
                         }
@@ -895,14 +392,8 @@
                         const rowA = rowsData[i];
                         if (!rowA) { i++; continue; }
 
-                        let isEmployeeRow = false;
-                        for (let c = 0; c < 3; c++) {
-                            const str = rowA[c] ? rowA[c].toString().trim() : "";
-                            if (str && /^\d+$/.test(str)) {
-                                isEmployeeRow = true;
-                                break;
-                            }
-                        }
+                        const numStr = rowA[0] ? rowA[0].toString().trim() : "";
+                        const isEmployeeRow = /^\d+$/.test(numStr);
 
                         if (isEmployeeRow) {
                             const rowB = rowsData[i + 1];
@@ -1423,7 +914,4 @@
 
             doc.save(`Vouchers_Pago_Seleccionados.pdf`);
         }
-    </script>
-</body>
-
-</html>
+    

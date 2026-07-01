@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Excel Inspector</title>
+</head>
+<body style="font-family: monospace; background: #0f172a; color: #f8fafc; padding: 20px;">
+    <h1>Excel Inspector</h1>
+    <div id="result" style="background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #334155; white-space: pre-wrap; font-size: 1.1em;">
+        Loading and reading planilla.xls...
+    </div>
+
+    <!-- Import xlsx -->
+    <script src="../js/xlsx.full.min.js"></script>
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            const resultDiv = document.getElementById('result');
+            try {
+                // Fetch planilla.xls from the server (which serves the directory)
+                const res = await fetch('../planilla.xls');
+                if (!res.ok) throw new Error("Fetch failed: " + res.statusText);
+                const arrayBuffer = await res.arrayBuffer();
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                let out = `HOJAS ENCONTRADAS: ${JSON.stringify(workbook.SheetNames)}\n\n`;
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    out += `=========================================\n`;
+                    out += `HOJA: "${sheetName}"\n`;
+                    out += `=========================================\n`;
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                    out += `Total filas: ${rows.length}\n`;
+                    
+                    rows.slice(0, 15).forEach((row, idx) => {
+                        const rowStr = row.map(cell => cell !== undefined ? cell.toString().trim() : "").join(" | ");
+                        out += `Fila ${idx + 1}: [${rowStr}]\n`;
+                    });
+                    out += `\n\n`;
+                });
+                
+                resultDiv.innerText = out;
+            } catch (err) {
+                resultDiv.innerHTML = `<span style="color: #ef4444; font-weight: bold;">ERROR:</span> ${err.message}`;
+                console.error(err);
+            }
+        });
+    </script>
+</body>
+</html>

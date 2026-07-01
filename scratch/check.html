@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>JS Syntax Validator</title>
+</head>
+<body style="font-family: monospace; background: #0f172a; color: #f8fafc; padding: 40px;">
+    <h1>JS Syntax Validator Result</h1>
+    <div id="result" style="background: #1e293b; padding: 20px; border-radius: 8px; border: 1px solid #334155; white-space: pre-wrap; font-size: 1.2em;">
+        Validating...
+    </div>
+
+    <script>
+        window.addEventListener('error', function(event) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = `<span style="color: #ef4444; font-weight: bold;">SYNTAX ERROR DETECTED:</span>\n\n` +
+                                  `Message: ${event.message}\n` +
+                                  `Source: ${event.filename}\n` +
+                                  `Line: ${event.lineno}\n` +
+                                  `Column: ${event.colno}\n\n` +
+                                  `Error object:\n${event.error ? event.error.stack : 'N/A'}`;
+        });
+
+        // Set a timeout to display success if no error fires
+        setTimeout(function() {
+            const resultDiv = document.getElementById('result');
+            if (resultDiv.innerText === "Validating...") {
+                resultDiv.innerHTML = `<span style="color: #22c55e; font-weight: bold;">SUCCESS:</span> No syntax errors detected!`;
+            }
+        }, 1000);
+    </script>
+    <script src="temp.js"></script>
+</body>
+</html>
