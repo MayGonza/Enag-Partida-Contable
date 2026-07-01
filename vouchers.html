@@ -335,9 +335,13 @@
         </div>
 
         <!-- Selector de Hoja de Excel (oculto por defecto) -->
-        <div id="sheetSelectorContainer" style="display: none; margin-bottom: 25px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fef3c7;">
-            <label style="font-weight: bold; color: #b45309; margin-bottom: 6px; display: block; font-size: 0.95em;">Este archivo contiene múltiples hojas. Selecciona la hoja con los datos:</label>
-            <select id="sheetSelect" onchange="cambiarHoja()" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; max-width: 450px; font-size: 1em; box-sizing: border-box; background: white; font-weight: bold; color: #333;">
+        <div id="sheetSelectorContainer"
+            style="display: none; margin-bottom: 25px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fef3c7;">
+            <label
+                style="font-weight: bold; color: #b45309; margin-bottom: 6px; display: block; font-size: 0.95em;">Este
+                archivo contiene múltiples hojas. Selecciona la hoja con los datos:</label>
+            <select id="sheetSelect" onchange="cambiarHoja()"
+                style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; max-width: 450px; font-size: 1em; box-sizing: border-box; background: white; font-weight: bold; color: #333;">
             </select>
         </div>
 
@@ -463,17 +467,20 @@
             const anio = fechaActual.getFullYear();
             document.getElementById('fechaEmision').value = `${dia} de ${mesLetras} del ${anio}`;
 
-            // Auto-cargar planilla.xls si existe en el servidor
-            fetch('planilla.xls')
+            // Auto-cargar planilla2.xls (o planilla.xls) si existe en el servidor
+            fetch('planilla2.xls')
                 .then(res => {
                     if (res.ok) return res.arrayBuffer();
-                    throw new Error("No default planilla.xls found on server");
+                    return fetch('planilla.xls').then(res2 => {
+                        if (res2.ok) return res2.arrayBuffer();
+                        throw new Error("No default spreadsheet found");
+                    });
                 })
                 .then(arrayBuffer => {
                     const data = new Uint8Array(arrayBuffer);
                     currentWorkbook = XLSX.read(data, { type: 'array' });
                     construirMapaEmpleados(currentWorkbook);
-                    
+
                     const sheetSelect = document.getElementById('sheetSelect');
                     sheetSelect.innerHTML = '';
                     currentWorkbook.SheetNames.forEach(name => {
@@ -482,14 +489,16 @@
                         opt.innerText = name;
                         sheetSelect.appendChild(opt);
                     });
-                    
+
                     if (currentWorkbook.SheetNames.length > 1) {
                         document.getElementById('sheetSelectorContainer').style.display = 'block';
                     } else {
                         document.getElementById('sheetSelectorContainer').style.display = 'none';
                     }
-                    
-                    cargarHoja(currentWorkbook.SheetNames[0]);
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
                 })
                 .catch(err => {
                     console.log("Auto-carga omitida o fallida:", err.message);
@@ -537,6 +546,33 @@
                 .replace(/[^a-z0-9]/g, ""); // conservar solo alfanuméricos
         }
 
+        // Convierte un valor de celda Excel a string de fecha legible en español.
+        // Excel almacena fechas como números seriales (días desde 1900-01-01).
+        function parsearFechaIngreso(val) {
+            if (val === undefined || val === null || val === "") return "";
+            // Si ya es un string con letras, devolver tal cual
+            if (typeof val === 'string' && /[a-zA-Z]/.test(val)) return val.trim();
+            // Si es un objeto Date (cellDates:true)
+            if (val instanceof Date) {
+                const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                return `${val.getDate()} de ${meses[val.getMonth()]} del ${val.getFullYear()}`;
+            }
+            // Si es un número entero positivo probable serial de Excel (entre 1 y 60000)
+            const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
+            if (!isNaN(num) && num > 100 && num < 70000) {
+                // Convertir serial Excel a Date (Excel serial empieza el 1 ene 1900)
+                const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+                if (!isNaN(date.getTime())) {
+                    const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                    return `${date.getUTCDate()} de ${meses[date.getUTCMonth()]} del ${date.getUTCFullYear()}`;
+                }
+            }
+            // Cualquier otro caso: devolver como texto
+            return val.toString().trim();
+        }
+
         function parseCleanFloat(val) {
             if (val === undefined || val === null || val === "") return 0;
             if (typeof val === 'number') return val;
@@ -555,9 +591,9 @@
                 }
                 const arrayBuffer = await response.arrayBuffer();
                 const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                
+
                 let out = "HOJAS ENCONTRADAS EN EL LIBRO:\n" + JSON.stringify(workbook.SheetNames) + "\n\n";
-                
+
                 workbook.SheetNames.forEach(sheetName => {
                     const sheet = workbook.Sheets[sheetName];
                     const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
@@ -570,7 +606,7 @@
                     });
                     out += "\n\n";
                 });
-                
+
                 const dbg = document.getElementById('debugOutput');
                 dbg.innerText = out;
                 dbg.style.display = 'block';
@@ -578,13 +614,30 @@
                 alert("Error al analizar planilla.xls: " + err.message);
             }
         }
+        function obtenerHojaPredeterminada(workbook) {
+            const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            for (const name of workbook.SheetNames) {
+                const lower = name.toLowerCase();
+                if (keywords.some(kw => lower.includes(kw))) {
+                    return name;
+                }
+            }
+            return workbook.SheetNames[0];
+        }
 
         function construirMapaEmpleados(workbook) {
             window.empleadoCargoMap = {};
             window.empleadoNumeroPuestoMap = {};
             window.empleadoIngresoMap = {};
 
-            workbook.SheetNames.forEach(sheetName => {
+            const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            const payrollSheets = workbook.SheetNames.filter(name => {
+                const lower = name.toLowerCase();
+                return keywords.some(kw => lower.includes(kw));
+            });
+            const sheetsToProcess = payrollSheets.length > 0 ? payrollSheets : workbook.SheetNames;
+
+            sheetsToProcess.forEach(sheetName => {
                 try {
                     const sheet = workbook.Sheets[sheetName];
                     const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
@@ -626,7 +679,7 @@
                         if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
                         if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) puestoIdx = index;
                         if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
-                        if (norm.includes("ingreso")) ingresoIdx = index;
+                        if (norm.includes("ingreso") && !norm.includes("reingreso")) ingresoIdx = index;
                     });
 
                     if (nombreIdx === -1) return;
@@ -636,7 +689,7 @@
                     for (let k = headerRowIndex + 2; k < Math.min(rowsData.length, headerRowIndex + 14); k++) {
                         const rowVal = rowsData[k] || [];
                         const nextRowVal = rowsData[k + 1] || [];
-                        
+
                         let foundNumberCol = -1;
                         for (let c = 0; c < 3; c++) {
                             const str = rowVal[c] ? rowVal[c].toString().trim() : "";
@@ -645,7 +698,7 @@
                                 break;
                             }
                         }
-                        
+
                         if (foundNumberCol !== -1) {
                             const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
                             const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
@@ -662,7 +715,7 @@
                         while (i < rowsData.length) {
                             const rowA = rowsData[i];
                             if (!rowA) { i++; continue; }
-                            
+
                             let isEmployeeRow = false;
                             for (let c = 0; c < 3; c++) {
                                 const str = rowA[c] ? rowA[c].toString().trim() : "";
@@ -671,7 +724,7 @@
                                     break;
                                 }
                             }
-                            
+
                             if (isEmployeeRow) {
                                 const rowB = rowsData[i + 1];
                                 if (rowB) {
@@ -679,8 +732,8 @@
                                     if (empName) {
                                         const cargo = puestoIdx !== -1 && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "";
                                         const numPuesto = numeroPuestoIdx !== -1 && rowB[numeroPuestoIdx] ? rowB[numeroPuestoIdx].toString().trim() : "";
-                                        const ingreso = ingresoIdx !== -1 && rowA[ingresoIdx] ? rowA[ingresoIdx].toString().trim() : "";
-                                        
+                                        const ingreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
+
                                         if (cargo) window.empleadoCargoMap[empName] = cargo;
                                         if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
                                         if (ingreso) window.empleadoIngresoMap[empName] = ingreso;
@@ -701,8 +754,8 @@
                             if (empName) {
                                 const cargo = puestoIdx !== -1 && row[puestoIdx] ? row[puestoIdx].toString().trim().toUpperCase() : "";
                                 const numPuesto = numeroPuestoIdx !== -1 && row[numeroPuestoIdx] ? row[numeroPuestoIdx].toString().trim() : "";
-                                const ingreso = ingresoIdx !== -1 && row[ingresoIdx] ? row[ingresoIdx].toString().trim() : "";
-                                
+                                const ingreso = ingresoIdx !== -1 && row[ingresoIdx] !== undefined && row[ingresoIdx] !== "" ? parsearFechaIngreso(row[ingresoIdx]) : "";
+
                                 if (cargo) window.empleadoCargoMap[empName] = cargo;
                                 if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
                                 if (ingreso) window.empleadoIngresoMap[empName] = ingreso;
@@ -724,24 +777,26 @@
                     const data = new Uint8Array(e.target.result);
                     currentWorkbook = XLSX.read(data, { type: 'array' });
                     construirMapaEmpleados(currentWorkbook);
-                    
+
                     const sheetSelect = document.getElementById('sheetSelect');
                     sheetSelect.innerHTML = '';
-                    
+
                     currentWorkbook.SheetNames.forEach(name => {
                         const opt = document.createElement('option');
                         opt.value = name;
                         opt.innerText = name;
                         sheetSelect.appendChild(opt);
                     });
-                    
+
                     if (currentWorkbook.SheetNames.length > 1) {
                         document.getElementById('sheetSelectorContainer').style.display = 'block';
                     } else {
                         document.getElementById('sheetSelectorContainer').style.display = 'none';
                     }
-                    
-                    cargarHoja(currentWorkbook.SheetNames[0]);
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
                 } catch (err) {
                     alert("Error al abrir el archivo Excel: " + err.message);
                     console.error(err);
@@ -772,14 +827,14 @@
                 for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
                     const row = rowsData[i] || [];
                     const normalizedRow = row.map(cell => normalize(cell));
-                    
+
                     // La fila debe contener la palabra nombre/empleado y además tener múltiples columnas ocupadas
                     // para evitar confundirla con banners de sección como "EMPLEADOS POR ACUERDO"
-                    const tieneNombre = normalizedRow.some(cell => 
+                    const tieneNombre = normalizedRow.some(cell =>
                         cell.includes("nombre") || cell.includes("empleado") || cell.includes("colaborador")
                     );
                     const tieneMultiplesColumnas = row.filter(cell => cell !== undefined && cell.toString().trim() !== "").length >= 3;
-                    
+
                     if (tieneNombre && tieneMultiplesColumnas) {
                         headerRowIndex = i;
                         break;
@@ -798,7 +853,7 @@
                 // Detectar si hay una segunda fila de cabecera (celdas combinadas)
                 const rowSiguiente = rowsData[headerRowIndex + 1] || [];
                 const rowSiguienteNorm = rowSiguiente.map(h => normalize(h));
-                const tieneSegundaCabecera = rowSiguienteNorm.some(h => 
+                const tieneSegundaCabecera = rowSiguienteNorm.some(h =>
                     h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato")
                 );
 
@@ -811,7 +866,7 @@
                     for (let c = 0; c < maxCols; c++) {
                         const val1 = h1[c] ? h1[c].toString().trim() : "";
                         const val2 = h2[c] ? h2[c].toString().trim() : "";
-                        
+
                         if (val1 && val2) {
                             headers.push(val1 + " - " + val2);
                         } else if (val1) {
@@ -834,7 +889,7 @@
                     if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) {
                         puestoIdx = index;
                     }
-                    if (norm.includes("ingreso")) ingresoIdx = index;
+                    if (norm.includes("ingreso") && !norm.includes("reingreso")) ingresoIdx = index;
                     if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
                     if (norm.includes("mes") || norm.includes("periodo")) mesIdx = index;
                     if (norm.includes("asignado")) asignadoIdx = index;
@@ -868,7 +923,7 @@
                 for (let k = startRow; k < Math.min(rowsData.length, startRow + 12); k++) {
                     const rowVal = rowsData[k] || [];
                     const nextRowVal = rowsData[k + 1] || [];
-                    
+
                     let foundNumberCol = -1;
                     for (let c = 0; c < 3; c++) {
                         const str = rowVal[c] ? rowVal[c].toString().trim() : "";
@@ -877,7 +932,7 @@
                             break;
                         }
                     }
-                    
+
                     if (foundNumberCol !== -1) {
                         const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
                         const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
@@ -945,7 +1000,7 @@
                                 }
                                 if (!empNumPuesto) empNumPuesto = "N/D";
 
-                                let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] ? rowA[ingresoIdx].toString().trim() : "";
+                                let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
                                 if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
                                     empIngreso = window.empleadoIngresoMap[empName];
                                 }
@@ -1022,7 +1077,7 @@
                         }
                         if (!empNumPuesto) empNumPuesto = "N/D";
 
-                        let empIngreso = ingresoIdx !== -1 && row[ingresoIdx] ? row[ingresoIdx].toString().trim() : "";
+                        let empIngreso = ingresoIdx !== -1 && row[ingresoIdx] !== undefined && row[ingresoIdx] !== "" ? parsearFechaIngreso(row[ingresoIdx]) : "";
                         if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
                             empIngreso = window.empleadoIngresoMap[empName];
                         }
