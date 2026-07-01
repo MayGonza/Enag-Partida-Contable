@@ -1383,14 +1383,16 @@
             });
 
             // Pie de Firma
-            y += 30;
+            y += 12;
             doc.setFont('helvetica', 'bold');
             const fechaEmisionStr = document.getElementById('fechaEmision').value || "";
             if (fechaEmisionStr) {
                 doc.setFontSize(9.5);
                 doc.setFont('helvetica', 'normal');
                 doc.text(`Fecha de emisión: Tegucigalpa M.D.C., ${fechaEmisionStr}`, tableLeft, y);
-                y += 12;
+                y += 30;
+            } else {
+                y += 25;
             }
             doc.setFontSize(10.5);
             doc.setFont('helvetica', 'bold');
