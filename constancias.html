@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Generación de Constancias de Trabajo — ENAG</title>
+    <meta name="description" content="Generador de constancias de trabajo para empleados de la Empresa Nacional de Artes Gráficas (ENAG).">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 18px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-container {
+            max-width: 1050px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Config panel */
+        .config-panel {
+            background: #f0f4f8;
+            border: 1px solid #d1dce8;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+        }
+
+        .config-panel h3 {
+            margin: 0 0 16px 0;
+            color: #002147;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .config-field label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.87em;
+            color: #002147;
+            margin-bottom: 5px;
+        }
+
+        .config-field input, .config-field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.93em;
+            box-sizing: border-box;
+            background: white;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+
+        .config-field input:focus, .config-field select:focus {
+            outline: none;
+            border-color: #002147;
+        }
+
+        /* Drag & Drop */
+        .upload-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+
+        .drop-zone {
+            flex: 2;
+            min-width: 300px;
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 28px 24px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .drop-zone.dragover {
+            border-color: #002147;
+            background-color: #eaf0f8;
+        }
+
+        .drop-zone svg { width: 48px; height: 48px; fill: #64748b; }
+        .drop-zone p  { margin: 0; font-size: 1.05em; color: #475569; font-weight: 500; }
+        .drop-zone span { font-size: 0.88em; color: #94a3b8; }
+
+        .actions-sidebar {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-template  { background-color: #0284c7; color: white; }
+        .btn-template:hover { background-color: #0369a1; }
+
+        .btn-generate  { background-color: #22c55e; color: white; font-size: 1.05em; }
+        .btn-generate:hover { background-color: #16a34a; }
+        .btn-generate:disabled { background-color: #cbd5e1; cursor: not-allowed; color: #64748b; }
+
+        .btn-clear { background-color: #ef4444; color: white; }
+        .btn-clear:hover { background-color: #dc2626; }
+
+        /* Sheet selector */
+        #sheetSelectorContainer {
+            margin-bottom: 20px;
+            background: #fffbeb;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid #fef3c7;
+            display: none;
+        }
+
+        /* Filter */
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 340px;
+            font-size: 0.93em;
+            box-sizing: border-box;
+        }
+
+        .summary-info { font-size: 0.95em; font-weight: bold; color: #475569; }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            margin-top: 8px;
+        }
+
+        table { width: 100%; border-collapse: collapse; text-align: left; }
+
+        th, td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; font-size: 0.92em; }
+
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; }
+
+        tr:hover { background-color: #f8fafc; }
+
+        .checkbox-cell { text-align: center; width: 38px; }
+        .checkbox-cell input { width: 17px; height: 17px; cursor: pointer; }
+
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.78em; font-weight: bold; }
+        .badge-acuerdo { background-color: #e0f2fe; color: #0369a1; }
+        .badge-contrato { background-color: #fef3c7; color: #d97706; }
+
+        .btn-action-small {
+            padding: 5px 10px;
+            font-size: 0.82em;
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            box-shadow: none;
+        }
+
+        .btn-action-small:hover { background-color: #002147; color: white; border-color: #002147; }
+
+        select.inline-select {
+            padding: 4px 6px;
+            border-radius: 4px;
+            border: 1px solid #cbd5e1;
+            font-size: 0.85em;
+            font-weight: 600;
+            background: white;
+            cursor: pointer;
+        }
+
+        .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 10px; fill: #cbd5e1; }
+
+        /* Preview modal */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.55);
+            z-index: 999;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-overlay.active { display: flex; }
+
+        .modal-box {
+            background: white;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 640px;
+            width: 95%;
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
+            animation: fadeIn 0.3s ease-out;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-box h3 {
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            text-decoration: underline;
+            color: #111;
+            font-size: 1.2em;
+            margin-bottom: 18px;
+        }
+
+        .modal-body-text {
+            font-size: 0.92em;
+            line-height: 1.7;
+            color: #222;
+            text-align: justify;
+        }
+
+        .modal-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 16px 0;
+            font-size: 0.88em;
+        }
+
+        .modal-table td {
+            border: 1px solid #333;
+            padding: 5px 10px;
+        }
+
+        .modal-table .section-header td {
+            font-weight: bold;
+            text-align: center;
+            background: #f0f0f0;
+        }
+
+        .modal-table .total-row td {
+            font-weight: bold;
+        }
+
+        .modal-table .amount-col { text-align: right; font-family: monospace; }
+
+        .modal-footer-text {
+            font-size: 0.87em;
+            color: #222;
+            line-height: 1.7;
+            margin-top: 14px;
+            text-align: justify;
+        }
+
+        .modal-signature {
+            margin-top: 40px;
+            text-align: center;
+            font-size: 0.9em;
+            font-weight: bold;
+            color: #111;
+            line-height: 1.8;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 22px;
+            justify-content: flex-end;
+        }
+
+        .btn-close-modal {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-close-modal:hover { background: #5a6268; }
+
+        .btn-download-pdf {
+            background: #002147;
+            color: white;
+        }
+
+        .btn-download-pdf:hover { background: #003470; }
+    </style>
+    <script src="js/xlsx.full.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+    </div>
+
+    <div class="container">
+
+        <div class="form-header">
+            <h2>📋 Generador de Constancias de Trabajo</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de Excel para generar constancias de trabajo individuales o masivas en PDF.</p>
+        </div>
+
+        <!-- Configuración del documento -->
+        <div class="config-panel">
+            <h3>⚙️ Configuración del Documento</h3>
+            <div class="config-grid">
+                <div class="config-field" style="grid-column: span 2;">
+                    <label>Nombre del/la firmante</label>
+                    <input type="text" id="cfgFirmante" value="María José Valverde Bardales">
+                </div>
+                <div class="config-field" style="grid-column: span 2;">
+                    <label>Cargo del/la firmante</label>
+                    <input type="text" id="cfgCargoFirmante" value="Jefe Interina de Recursos Humanos">
+                </div>
+                <div class="config-field">
+                    <label>Ciudad de emisión</label>
+                    <input type="text" id="cfgCiudad" value="Tegucigalpa, Municipio del Distrito Central">
+                </div>
+                <div class="config-field">
+                    <label>Fecha de emisión</label>
+                    <input type="text" id="cfgFecha" placeholder="ej. primer (01) días del mes de julio de 2026">
+                </div>
+            </div>
+        </div>
+
+        <!-- Selector de hoja -->
+        <div id="sheetSelectorContainer">
+            <label style="font-weight:bold; color:#b45309; margin-bottom:6px; display:block; font-size:0.95em;">
+                Este archivo contiene múltiples hojas. Selecciona la hoja con los datos:
+            </label>
+            <select id="sheetSelect" onchange="cambiarHoja()"
+                style="padding:10px; border:1px solid #cbd5e1; border-radius:6px; width:100%; max-width:450px; font-size:1em; box-sizing:border-box; background:white; font-weight:bold; color:#333;">
+            </select>
+        </div>
+
+        <!-- Carga de archivo -->
+        <div class="upload-container">
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+                </svg>
+                <p>Arrastra tu archivo Excel aquí o haz clic para buscar</p>
+                <span>Soporta archivos .xlsx, .xls y .csv</span>
+                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleFileSelect(event)">
+            </div>
+
+            <div class="actions-sidebar">
+                <button type="button" class="btn-template" onclick="descargarPlantilla()">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                    </svg>
+                    Descargar Plantilla Excel
+                </button>
+                <button type="button" class="btn-generate" id="btnGenerateBulk" onclick="generarConstanciasSeleccionadas()" disabled>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+                    </svg>
+                    Generar Constancias (<span id="selectedCount">0</span>)
+                </button>
+                <button type="button" class="btn-clear" id="btnClearList" onclick="limpiarLista()" disabled>
+                    🗑️ Limpiar Datos Cargados
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabla de empleados -->
+        <div id="dataSection" style="display:none;">
+            <div class="filter-container">
+                <input type="text" id="searchInput" class="search-input"
+                    placeholder="Buscar empleado o cargo..." oninput="filtrarTabla()">
+                <div class="summary-info">Total importados: <span id="totalImportados">0</span></div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="planillaTable">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell">
+                                <input type="checkbox" id="selectAll" onchange="toggleSelectAll(this)">
+                            </th>
+                            <th>Nombre del Empleado</th>
+                            <th>Cargo</th>
+                            <th style="text-align:center;">Tipo</th>
+                            <th style="text-align:center;">Género</th>
+                            <th>Fecha Ingreso</th>
+                            <th style="text-align:right;">Sueldo Devengado</th>
+                            <th style="text-align:right;">Total Deducciones</th>
+                            <th style="text-align:right;">Neto a Pagar</th>
+                            <th style="text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="planillaBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
+            </svg>
+            <p>Aún no has cargado ningún archivo Excel</p>
+            <span>Usa el botón "Descargar Plantilla Excel" para ver el formato requerido.</span>
+        </div>
+    </div>
+
+    <!-- Modal de previsualización -->
+    <div class="modal-overlay" id="previewModal">
+        <div class="modal-box" id="previewBox">
+            <h3>C O N S T A N C I A</h3>
+            <div class="modal-body-text" id="previewBodyText"></div>
+            <table class="modal-table" id="previewTable"></table>
+            <div class="modal-footer-text" id="previewFooter"></div>
+            <div class="modal-signature" id="previewSignature"></div>
+            <div class="modal-actions">
+                <button class="btn-close-modal" onclick="cerrarModal()">✕ Cerrar</button>
+                <button class="btn-download-pdf" id="btnDownloadPreview">⬇ Descargar PDF</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ─────────────────────────────────────────────
+        //  ESTADO GLOBAL
+        // ─────────────────────────────────────────────
+        let empleados = [];
+        let currentWorkbook = null;
+        let currentPreviewId = null;
+
+        const dropZone = document.getElementById('drop-zone');
+
+        // ─────────────────────────────────────────────
+        //  INIT
+        // ─────────────────────────────────────────────
+        window.addEventListener('DOMContentLoaded', () => {
+            // Fecha default
+            const meses = ["enero","febrero","marzo","abril","mayo","junio",
+                           "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+            const now = new Date();
+            const dia = now.getDate();
+            const mes = meses[now.getMonth()];
+            const anio = now.getFullYear();
+            const diaOrdinal = diaEnLetras(dia);
+            document.getElementById('cfgFecha').value =
+                `${diaOrdinal} (${String(dia).padStart(2,'0')}) días del mes de ${mes} de ${anio}`;
+
+            // Auto-cargar planilla.xls si existe
+            fetch('planilla.xls')
+                .then(res => { if (res.ok) return res.arrayBuffer(); throw new Error(); })
+                .then(buf => {
+                    currentWorkbook = XLSX.read(new Uint8Array(buf), { type: 'array' });
+                    construirMapaEmpleados(currentWorkbook);
+                    poblarSheetSelect(currentWorkbook);
+                    cargarHoja(currentWorkbook.SheetNames[0]);
+                })
+                .catch(() => console.log("Auto-carga de planilla omitida."));
+        });
+
+        // ─────────────────────────────────────────────
+        //  DRAG & DROP
+        // ─────────────────────────────────────────────
+        ['dragenter','dragover'].forEach(ev => {
+            dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
+        });
+        ['dragleave','drop'].forEach(ev => {
+            dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
+        });
+        dropZone.addEventListener('drop', e => {
+            const files = e.dataTransfer.files;
+            if (files.length > 0) procesarArchivo(files[0]);
+        });
+
+        function handleFileSelect(e) {
+            if (e.target.files.length > 0) procesarArchivo(e.target.files[0]);
+        }
+
+        // ─────────────────────────────────────────────
+        //  EXCEL PROCESSING
+        // ─────────────────────────────────────────────
+        function procesarArchivo(file) {
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+                    construirMapaEmpleados(currentWorkbook);
+                    poblarSheetSelect(currentWorkbook);
+                    cargarHoja(currentWorkbook.SheetNames[0]);
+                } catch(err) {
+                    alert("Error al abrir el archivo Excel: " + err.message);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('excelFile').value = '';
+        }
+
+        function poblarSheetSelect(wb) {
+            const sel = document.getElementById('sheetSelect');
+            sel.innerHTML = '';
+            wb.SheetNames.forEach(name => {
+                const opt = document.createElement('option');
+                opt.value = opt.innerText = name;
+                sel.appendChild(opt);
+            });
+            document.getElementById('sheetSelectorContainer').style.display =
+                wb.SheetNames.length > 1 ? 'block' : 'none';
+        }
+
+        function cambiarHoja() {
+            if (!currentWorkbook) return;
+            cargarHoja(document.getElementById('sheetSelect').value);
+        }
+
+        function normalize(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "");
+        }
+
+        function parseCleanFloat(val) {
+            if (val === undefined || val === null || val === "") return 0;
+            if (typeof val === 'number') return val;
+            const cleaned = val.toString().replace(/L\s*/gi,"").replace(/[^0-9.-]/g,"");
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function construirMapaEmpleados(workbook) {
+            window.empleadoCargoMap = {};
+            window.empleadoNumeroPuestoMap = {};
+            window.empleadoIngresoMap = {};
+
+            workbook.SheetNames.forEach(sheetName => {
+                try {
+                    const sheet = workbook.Sheets[sheetName];
+                    const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                    if (rowsData.length < 5) return;
+
+                    let headerRowIndex = -1;
+                    for (let r = 0; r < Math.min(rowsData.length, 15); r++) {
+                        const row = rowsData[r] || [];
+                        const hasNombre = row.some(c => {
+                            const v = normalize(c);
+                            return v === "nombre" || v === "nombredelempleado";
+                        });
+                        if (hasNombre) { headerRowIndex = r; break; }
+                    }
+                    if (headerRowIndex === -1) return;
+
+                    const h1 = rowsData[headerRowIndex] || [];
+                    const h2 = rowsData[headerRowIndex + 1] || [];
+                    const maxCols = Math.max(h1.length, h2.length);
+                    const headers = [];
+                    for (let c = 0; c < maxCols; c++) {
+                        const v1 = h1[c] ? h1[c].toString().trim() : "";
+                        const v2 = h2[c] ? h2[c].toString().trim() : "";
+                        if (v1 && v2) headers.push(v1 + " - " + v2);
+                        else if (v1) headers.push(v1);
+                        else if (v2) headers.push(v2);
+                        else headers.push("");
+                    }
+
+                    let nombreIdx=-1, puestoIdx=-1, numeroPuestoIdx=-1, ingresoIdx=-1;
+                    headers.forEach((h,i) => {
+                        const n = normalize(h);
+                        if (n.includes("nombre") && nombreIdx===-1) nombreIdx=i;
+                        if ((n.includes("cargo")||(n.includes("puesto")&&!n.includes("impuesto")))&&!n.includes("numero")) puestoIdx=i;
+                        if (n.includes("numerodepuesto")||(n.includes("puesto")&&n.includes("num"))) numeroPuestoIdx=i;
+                        if (n.includes("ingreso")) ingresoIdx=i;
+                    });
+                    if (nombreIdx===-1) return;
+
+                    let esDobleFila = false;
+                    let startRow = headerRowIndex+2;
+                    for (let k = startRow; k < Math.min(rowsData.length, startRow+14); k++) {
+                        const rA = rowsData[k]||[], rB = rowsData[k+1]||[];
+                        for (let c=0;c<3;c++) {
+                            const s = rA[c]?rA[c].toString().trim():"";
+                            if (s && /^\d+$/.test(s)) {
+                                const bn = rB[c]?rB[c].toString().trim():"";
+                                const hasData = rB.some((cell,idx)=>idx!==c&&cell!==undefined&&cell.toString().trim()!=="");
+                                if (bn===""&&hasData) { esDobleFila=true; }
+                                break;
+                            }
+                        }
+                        if (esDobleFila) break;
+                    }
+
+                    const parseRow = (rowA, rowB) => {
+                        const empName = rowA[nombreIdx]?rowA[nombreIdx].toString().trim().toUpperCase():"";
+                        if (!empName) return;
+                        const cargo = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim().toUpperCase():"";
+                        const numPuesto = numeroPuestoIdx!==-1&&rowB&&rowB[numeroPuestoIdx]?rowB[numeroPuestoIdx].toString().trim():"";
+                        const ingreso = ingresoIdx!==-1&&rowA[ingresoIdx]?rowA[ingresoIdx].toString().trim():"";
+                        if (cargo) window.empleadoCargoMap[empName]=cargo;
+                        if (numPuesto) window.empleadoNumeroPuestoMap[empName]=numPuesto;
+                        if (ingreso) window.empleadoIngresoMap[empName]=ingreso;
+                    };
+
+                    if (esDobleFila) {
+                        let i = startRow;
+                        while (i < rowsData.length) {
+                            const rA = rowsData[i];
+                            if (!rA) { i++; continue; }
+                            let isEmp = false;
+                            for (let c=0;c<3;c++) {
+                                const s = rA[c]?rA[c].toString().trim():"";
+                                if (s&&/^\d+$/.test(s)) { isEmp=true; break; }
+                            }
+                            if (isEmp) { parseRow(rA, rowsData[i+1]); i+=2; } else { i++; }
+                        }
+                    } else {
+                        for (let i=startRow;i<rowsData.length;i++) {
+                            const row = rowsData[i]; if (!row) continue;
+                            parseRow(row, row);
+                        }
+                    }
+                } catch(e) { console.error("Error mapa empleados:", e); }
+            });
+        }
+
+        function cargarHoja(sheetName) {
+            try {
+                const sheet = currentWorkbook.Sheets[sheetName];
+                const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                if (rowsData.length < 2) { alert("Hoja sin suficientes datos."); return; }
+
+                let headerRowIndex = -1;
+                for (let i=0;i<Math.min(rowsData.length,15);i++) {
+                    const row = rowsData[i]||[];
+                    const tieneNombre = row.map(c=>normalize(c)).some(c=>c.includes("nombre")||c.includes("empleado")||c.includes("colaborador"));
+                    const tieneMultiples = row.filter(c=>c!==undefined&&c.toString().trim()!=="").length>=3;
+                    if (tieneNombre&&tieneMultiples) { headerRowIndex=i; break; }
+                }
+                if (headerRowIndex===-1) { alert("No se encontró fila de encabezados válida."); return; }
+
+                let startRow = headerRowIndex+1;
+                let headers = rowsData[headerRowIndex];
+
+                const rowSig = rowsData[headerRowIndex+1]||[];
+                const rowSigNorm = rowSig.map(h=>normalize(h));
+                const tieneSegundaCab = rowSigNorm.some(h=>h==="cargo"||h.includes("ihss")||h.includes("seguro")||h.includes("retiro")||h.includes("sindicato"));
+
+                if (tieneSegundaCab) {
+                    startRow = headerRowIndex+2;
+                    const h1=rowsData[headerRowIndex], h2=rowsData[headerRowIndex+1];
+                    headers=[];
+                    const maxC = Math.max(h1.length,h2.length);
+                    for (let c=0;c<maxC;c++) {
+                        const v1=h1[c]?h1[c].toString().trim():"";
+                        const v2=h2[c]?h2[c].toString().trim():"";
+                        if (v1&&v2) headers.push(v1+" - "+v2);
+                        else if (v1) headers.push(v1);
+                        else if (v2) headers.push(v2);
+                        else headers.push("");
+                    }
+                }
+
+                let nombreIdx=-1,puestoIdx=-1,ingresoIdx=-1,tipoIdx=-1,asignadoIdx=-1,devengadoIdx=-1,numeroPuestoIdx=-1,totalDeduccionesIdx=-1;
+                headers.forEach((h,i)=>{
+                    const n=normalize(h);
+                    if (n.includes("nombre")&&nombreIdx===-1) nombreIdx=i;
+                    if ((n.includes("cargo")||(n.includes("puesto")&&!n.includes("impuesto")))&&!n.includes("numero")) puestoIdx=i;
+                    if (n.includes("ingreso")) ingresoIdx=i;
+                    if (n.includes("tipo")||n.includes("acuerdo")||n.includes("contrato")) tipoIdx=i;
+                    if (n.includes("asignado")) asignadoIdx=i;
+                    if (n.includes("devengado")) devengadoIdx=i;
+                    if (n.includes("numerodepuesto")||(n.includes("puesto")&&n.includes("num"))) numeroPuestoIdx=i;
+                    if (n.includes("totaldededucciones")||(n.includes("total")&&n.includes("deduc"))) totalDeduccionesIdx=i;
+                });
+
+                if (nombreIdx===-1) nombreIdx=2;
+                if (puestoIdx===-1) puestoIdx=2;
+                if (numeroPuestoIdx===-1) numeroPuestoIdx=1;
+                if (asignadoIdx===-1) asignadoIdx=3;
+                if (devengadoIdx===-1) devengadoIdx=4;
+
+                if (totalDeduccionesIdx===-1) {
+                    headers.forEach((h,i)=>{
+                        const n=normalize(h);
+                        if (n.includes("neto")||n.includes("liquido")) totalDeduccionesIdx=i-1;
+                    });
+                }
+                if (totalDeduccionesIdx===-1) totalDeduccionesIdx=headers.length-2;
+
+                // Detectar doble fila
+                let esDobleFila=false;
+                for (let k=startRow;k<Math.min(rowsData.length,startRow+12);k++) {
+                    const rA=rowsData[k]||[], rB=rowsData[k+1]||[];
+                    for (let c=0;c<3;c++) {
+                        const s=rA[c]?rA[c].toString().trim():"";
+                        if (s&&/^\d+$/.test(s)) {
+                            const bn=rB[c]?rB[c].toString().trim():"";
+                            const hasData=rB.some((cell,idx)=>idx!==c&&cell!==undefined&&cell.toString().trim()!=="");
+                            if (bn===""&&hasData) esDobleFila=true;
+                            break;
+                        }
+                    }
+                    if (esDobleFila) break;
+                }
+
+                const buildEmp = (rowA, rowB, rowIdx) => {
+                    const empName = rowA[nombreIdx]?rowA[nombreIdx].toString().trim().toUpperCase():"";
+                    if (!empName) return null;
+
+                    const sueldoAsignado = parseCleanFloat(rowA[asignadoIdx]);
+                    const sueldoDevengado = parseCleanFloat(rowA[devengadoIdx]);
+                    const deducciones=[];
+                    headers.forEach((h,i)=>{
+                        if (i>devengadoIdx&&i<totalDeduccionesIdx) {
+                            const val=parseCleanFloat(rowA[i]);
+                            if (val&&!isNaN(val)&&val>0) {
+                                const cleanName=h.toString().replace(/\s+/g,' ').trim()
+                                    .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i,"")
+                                    .replace(/\bI\s+H\s+S\s+S\b/gi,"I.H.S.S.");
+                                if (cleanName.trim()!=="") deducciones.push({nombre:cleanName,monto:val});
+                            }
+                        }
+                    });
+
+                    const totalDeducciones = deducciones.reduce((s,d)=>s+d.monto,0);
+                    const netoPagar = sueldoDevengado - totalDeducciones;
+
+                    let empPuesto = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim().toUpperCase():"";
+                    if (!empPuesto&&window.empleadoCargoMap&&window.empleadoCargoMap[empName]) empPuesto=window.empleadoCargoMap[empName];
+                    if (!empPuesto) empPuesto="EMPLEADO/A";
+
+                    let empNumPuesto = numeroPuestoIdx!==-1&&rowB&&rowB[numeroPuestoIdx]?rowB[numeroPuestoIdx].toString().trim():"";
+                    if (!empNumPuesto&&window.empleadoNumeroPuestoMap&&window.empleadoNumeroPuestoMap[empName]) empNumPuesto=window.empleadoNumeroPuestoMap[empName];
+
+                    let empIngreso = ingresoIdx!==-1&&rowA[ingresoIdx]?rowA[ingresoIdx].toString().trim():"";
+                    if (!empIngreso&&window.empleadoIngresoMap&&window.empleadoIngresoMap[empName]) empIngreso=window.empleadoIngresoMap[empName];
+                    if (!empIngreso) empIngreso="N/D";
+
+                    const empTipo = tipoIdx!==-1&&rowA[tipoIdx]
+                        ? (rowA[tipoIdx].toString().toUpperCase().includes("CONTRATO")?"Contrato":"Acuerdo")
+                        : "Acuerdo";
+
+                    return {
+                        id: rowIdx,
+                        nombre: empName,
+                        puesto: empPuesto,
+                        numeroPuesto: empNumPuesto,
+                        ingreso: empIngreso,
+                        tipo: empTipo,
+                        genero: "F", // default femenino
+                        sueldoAsignado,
+                        sueldoDevengado,
+                        deducciones,
+                        totalDeducciones,
+                        netoPagar,
+                        selected: true
+                    };
+                };
+
+                empleados=[];
+                if (esDobleFila) {
+                    let i=startRow;
+                    while (i<rowsData.length) {
+                        const rA=rowsData[i];
+                        if (!rA) { i++; continue; }
+                        let isEmp=false;
+                        for (let c=0;c<3;c++) {
+                            const s=rA[c]?rA[c].toString().trim():"";
+                            if (s&&/^\d+$/.test(s)) { isEmp=true; break; }
+                        }
+                        if (isEmp) {
+                            const rB=rowsData[i+1];
+                            const emp=buildEmp(rA,rB||rA,i);
+                            if (emp) empleados.push(emp);
+                            i+=2;
+                        } else { i++; }
+                    }
+                } else {
+                    for (let i=startRow;i<rowsData.length;i++) {
+                        const row=rowsData[i];
+                        if (!row||!row[nombreIdx]||row[nombreIdx].toString().trim()==="") continue;
+                        const emp=buildEmp(row,row,i);
+                        if (emp) empleados.push(emp);
+                    }
+                }
+
+                if (empleados.length===0) { alert("No se cargaron registros válidos."); return; }
+                renderPlanilla();
+
+            } catch(err) {
+                alert("Error al procesar hoja: "+err.message);
+                console.error(err);
+            }
+        }
+
+        // ─────────────────────────────────────────────
+        //  RENDER TABLA
+        // ─────────────────────────────────────────────
+        function renderPlanilla() {
+            const body=document.getElementById('planillaBody');
+            body.innerHTML='';
+            empleados.forEach(emp=>{
+                const tr=document.createElement('tr');
+                tr.setAttribute('data-id',emp.id);
+                tr.innerHTML=`
+                    <td class="checkbox-cell"><input type="checkbox" class="emp-checkbox" ${emp.selected?'checked':''} onchange="toggleSelect(${emp.id},this.checked)"></td>
+                    <td><strong>${emp.nombre}</strong></td>
+                    <td style="color:#475569;font-size:0.9em;">${emp.puesto}</td>
+                    <td style="text-align:center;">
+                        <select class="inline-select" onchange="cambiarTipo(${emp.id},this.value)">
+                            <option value="Acuerdo" ${emp.tipo==='Acuerdo'?'selected':''}>Acuerdo</option>
+                            <option value="Contrato" ${emp.tipo==='Contrato'?'selected':''}>Contrato</option>
+                        </select>
+                    </td>
+                    <td style="text-align:center;">
+                        <select class="inline-select" onchange="cambiarGenero(${emp.id},this.value)">
+                            <option value="F" ${emp.genero==='F'?'selected':''}>Femenino</option>
+                            <option value="M" ${emp.genero==='M'?'selected':''}>Masculino</option>
+                        </select>
+                    </td>
+                    <td style="color:#64748b;font-size:0.9em;">${emp.ingreso}</td>
+                    <td style="text-align:right;font-family:monospace;">${formatMoneda(emp.sueldoDevengado)}</td>
+                    <td style="text-align:right;font-family:monospace;color:#ef4444;">${formatMoneda(emp.totalDeducciones)}</td>
+                    <td style="text-align:right;font-family:monospace;font-weight:bold;color:#16a34a;">${formatMoneda(emp.netoPagar)}</td>
+                    <td style="text-align:center;display:flex;gap:5px;justify-content:center;">
+                        <button type="button" class="btn-action-small" onclick="previsualizarConstancia(${emp.id})">👁 Ver</button>
+                        <button type="button" class="btn-action-small" onclick="generarConstanciaIndividual(${emp.id})">PDF</button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+
+            document.getElementById('totalImportados').innerText=empleados.length;
+            document.getElementById('emptyState').style.display='none';
+            document.getElementById('dataSection').style.display='block';
+            document.getElementById('btnGenerateBulk').disabled=false;
+            document.getElementById('btnClearList').disabled=false;
+            actualizarContador();
+        }
+
+        function toggleSelect(id,sel) {
+            const emp=empleados.find(e=>e.id===id);
+            if (emp) emp.selected=sel;
+            actualizarContador();
+        }
+
+        function toggleSelectAll(cb) {
+            document.querySelectorAll('#planillaBody tr').forEach(tr=>{
+                const id=parseInt(tr.getAttribute('data-id'));
+                const emp=empleados.find(e=>e.id===id);
+                if (emp) { emp.selected=cb.checked; tr.querySelector('.emp-checkbox').checked=cb.checked; }
+            });
+            actualizarContador();
+        }
+
+        function actualizarContador() {
+            const count=empleados.filter(e=>e.selected).length;
+            document.getElementById('selectedCount').innerText=count;
+            document.getElementById('btnGenerateBulk').disabled=count===0;
+            const all=document.getElementById('selectAll');
+            if (count===0) { all.checked=false; all.indeterminate=false; }
+            else if (count===empleados.length) { all.checked=true; all.indeterminate=false; }
+            else { all.checked=false; all.indeterminate=true; }
+        }
+
+        function cambiarTipo(id,tipo) { const e=empleados.find(e=>e.id===id); if(e) e.tipo=tipo; }
+        function cambiarGenero(id,g) { const e=empleados.find(e=>e.id===id); if(e) e.genero=g; }
+
+        function filtrarTabla() {
+            const q=normalize(document.getElementById('searchInput').value);
+            document.querySelectorAll('#planillaBody tr').forEach(tr=>{
+                const id=parseInt(tr.getAttribute('data-id'));
+                const emp=empleados.find(e=>e.id===id);
+                if (emp) tr.style.display=(normalize(emp.nombre).includes(q)||normalize(emp.puesto).includes(q))?'':'none';
+            });
+        }
+
+        function limpiarLista() {
+            empleados=[]; currentWorkbook=null;
+            document.getElementById('sheetSelectorContainer').style.display='none';
+            document.getElementById('sheetSelect').innerHTML='';
+            document.getElementById('dataSection').style.display='none';
+            document.getElementById('emptyState').style.display='block';
+            document.getElementById('btnGenerateBulk').disabled=true;
+            document.getElementById('btnClearList').disabled=true;
+            document.getElementById('excelFile').value='';
+        }
+
+        // ─────────────────────────────────────────────
+        //  NÚMERO A LETRAS (Español, Lempiras)
+        // ─────────────────────────────────────────────
+        function numeroALetras(numero) {
+            const unidades = ["","Un","Dos","Tres","Cuatro","Cinco","Seis","Siete","Ocho","Nueve",
+                              "Diez","Once","Doce","Trece","Catorce","Quince","Dieciséis",
+                              "Diecisiete","Dieciocho","Diecinueve","Veinte"];
+            const decenas  = ["","","Veinti","Treinta","Cuarenta","Cincuenta","Sesenta","Setenta","Ochenta","Noventa"];
+            const centenas = ["","Ciento","Doscientos","Trescientos","Cuatrocientos","Quinientos",
+                              "Seiscientos","Setecientos","Ochocientos","Novecientos"];
+
+            function convertirMenos1000(n) {
+                if (n===0) return "";
+                if (n<=20) return unidades[n];
+                if (n<30) return "Veinti" + unidades[n-20].toLowerCase();
+                if (n<100) {
+                    const d = Math.floor(n/10);
+                    const u = n%10;
+                    return decenas[d] + (u ? " y " + unidades[u] : "");
+                }
+                if (n===100) return "Cien";
+                const c = Math.floor(n/100);
+                const resto = n%100;
+                return centenas[c] + (resto ? " " + convertirMenos1000(resto) : "");
+            }
+
+            function convertir(n) {
+                if (n===0) return "Cero";
+                if (n<0) return "Menos " + convertir(-n);
+
+                let resultado = "";
+                const millones = Math.floor(n/1000000);
+                const miles    = Math.floor((n%1000000)/1000);
+                const resto    = n%1000;
+
+                if (millones>0) {
+                    resultado += (millones===1 ? "Un Millón" : convertirMenos1000(millones)+" Millones") + " ";
+                }
+                if (miles>0) {
+                    resultado += (miles===1 ? "Mil" : convertirMenos1000(miles)+" Mil") + " ";
+                }
+                if (resto>0) {
+                    resultado += convertirMenos1000(resto);
+                }
+                return resultado.trim();
+            }
+
+            const entero = Math.floor(numero);
+            const centavos = Math.round((numero - entero) * 100);
+            let texto = convertir(entero) + " Lempiras";
+            if (centavos === 0) texto += " Exactos";
+            else texto += " con " + String(centavos).padStart(2,"0") + "/100 Centavos";
+            return texto;
+        }
+
+        function diaEnLetras(dia) {
+            const ordinal = ["","primero","segundo","tercero","cuarto","quinto","sexto","séptimo",
+                             "octavo","noveno","décimo","undécimo","duodécimo","decimotercer",
+                             "decimocuarto","decimoquinto","decimosexto","decimoséptimo",
+                             "decimoctavo","decimonoveno","vigésimo","vigésimo primer",
+                             "vigésimo segundo","vigésimo tercer","vigésimo cuarto","vigésimo quinto",
+                             "vigésimo sexto","vigésimo séptimo","vigésimo octavo","vigésimo noveno","trigésimo","trigésimo primer"];
+            return ordinal[dia] || String(dia);
+        }
+
+        // ─────────────────────────────────────────────
+        //  TEXTO DE LA CONSTANCIA
+        // ─────────────────────────────────────────────
+        function buildTextoConstancia(emp) {
+            const art = emp.genero === 'M' ? ["El ciudadano", "el cargo", "labora"] : ["La ciudadana", "el cargo", "labora"];
+            const tipoTexto = emp.tipo === 'Contrato' ? 'por contrato' : 'por acuerdo';
+            const firmante  = document.getElementById('cfgFirmante').value || "María José Valverde Bardales";
+            const cargoF    = document.getElementById('cfgCargoFirmante').value || "Jefe Interina de Recursos Humanos";
+            const ciudad    = document.getElementById('cfgCiudad').value || "Tegucigalpa, Municipio del Distrito Central";
+            const fecha     = document.getElementById('cfgFecha').value || "primer (01) días del mes de julio de 2026";
+
+            const sueldoEnLetras = numeroALetras(emp.sueldoDevengado);
+            const sueldoFormato  = formatMoneda(emp.sueldoDevengado);
+            const artSuscritas   = emp.genero === 'M' ? "El Suscrito" : "La Suscrita";
+            const jefaO          = emp.genero === 'M' ? "Jefe" : "Jefe";
+
+            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, ${emp.nombre} ${art[2]} en esta institución ${tipoTexto}, en ${art[1]} nominal de ${emp.puesto}` +
+                (emp.ingreso && emp.ingreso !== 'N/D' ? ` a partir del ${emp.ingreso}` : "") +
+                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele las siguientes deducciones:`;
+
+            const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al ${fecha}.`;
+
+            return { intro, pie, firmante, cargoF };
+        }
+
+        function formatMoneda(v) {
+            return "L. " + Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+        }
+
+        // ─────────────────────────────────────────────
+        //  PREVISUALIZACIÓN (MODAL)
+        // ─────────────────────────────────────────────
+        function previsualizarConstancia(id) {
+            const emp = empleados.find(e=>e.id===id);
+            if (!emp) return;
+            currentPreviewId = id;
+
+            const { intro, pie, firmante, cargoF } = buildTextoConstancia(emp);
+
+            document.getElementById('previewBodyText').innerText = intro;
+
+            // Tabla
+            const table = document.getElementById('previewTable');
+            table.innerHTML = '';
+            const addRow = (label, val, isBold=false) => {
+                const tr = document.createElement('tr');
+                if (isBold) tr.classList.add('total-row');
+                tr.innerHTML = `<td${isBold?' style="font-weight:bold"':''}>${label}</td><td class="amount-col"${isBold?' style="font-weight:bold"':''}>${val}</td>`;
+                table.appendChild(tr);
+            };
+
+            addRow('Sueldo Asignado', formatMoneda(emp.sueldoAsignado));
+            addRow('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
+
+            // Sección Deducciones
+            const trH = document.createElement('tr');
+            trH.classList.add('section-header');
+            trH.innerHTML = '<td colspan="2">Deducciones</td>';
+            table.appendChild(trH);
+
+            emp.deducciones.forEach(d => addRow(d.nombre, formatMoneda(d.monto)));
+            addRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
+            addRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
+
+            document.getElementById('previewFooter').innerText = pie;
+            document.getElementById('previewSignature').innerHTML =
+                `${firmante}<br>${cargoF}<br>ENAG.`;
+
+            document.getElementById('btnDownloadPreview').onclick = () => generarConstanciaIndividual(id);
+            document.getElementById('previewModal').classList.add('active');
+        }
+
+        function cerrarModal() {
+            document.getElementById('previewModal').classList.remove('active');
+        }
+
+        // Cerrar al click fuera del box
+        document.getElementById('previewModal').addEventListener('click', function(e) {
+            if (e.target === this) cerrarModal();
+        });
+
+        // ─────────────────────────────────────────────
+        //  GENERACIÓN PDF
+        // ─────────────────────────────────────────────
+        const getBase64FromUrl = (url) => new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        async function generarPDFConstancia(emp, doc, isBulk=false) {
+            const { jsPDF } = window.jspdf;
+            if (!doc) {
+                doc = new jsPDF('p','mm','a4');
+            } else if (isBulk) {
+                doc.addPage();
+            }
+
+            // Fondo con logo
+            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            if (logoBgUrl) {
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
+                doc.addImage(logoBgUrl,'PNG',0,0,pw,ph);
+            }
+
+            const { intro, pie, firmante, cargoF } = buildTextoConstancia(emp);
+            const pageW = doc.internal.pageSize.getWidth(); // 210mm
+            const margins = { left: 25, right: 25 };
+            const contentW = pageW - margins.left - margins.right; // 160mm
+            let y = 60;
+
+            // ── Título ──
+            doc.setFont('helvetica','bold');
+            doc.setFontSize(13);
+            // Letras espaciadas: C O N S T A N C I A
+            const titulo = "C O N S T A N C I A";
+            doc.text(titulo, pageW/2, y, { align:'center' });
+            // Subrayado manual
+            const tituloW = doc.getTextWidth(titulo);
+            const tituloX = pageW/2 - tituloW/2;
+            doc.setLineWidth(0.4);
+            doc.line(tituloX, y+1, tituloX+tituloW, y+1);
+            y += 14;
+
+            // ── Cuerpo de texto (justificado manual) ──
+            doc.setFont('helvetica','normal');
+            doc.setFontSize(10.5);
+            const lines = doc.splitTextToSize(intro, contentW);
+            doc.text(lines, margins.left, y, { align:'justify', maxWidth: contentW });
+            y += lines.length * 6 + 6;
+
+            // ── Tabla de sueldos y deducciones ──
+            const tLeft  = margins.left;
+            const tRight = pageW - margins.right;   // 185
+            const tMid   = tLeft + contentW * 0.55; // separador ~30% desde la derecha
+            const valX   = tRight - 2;
+            const lblX   = tLeft + 3;
+            const rH     = 6.5;
+
+            doc.setLineWidth(0.3);
+            doc.setDrawColor(0,0,0);
+
+            const drawRow = (label, val, bold=false, isHeader=false) => {
+                doc.rect(tLeft, y, tRight-tLeft, rH);
+                doc.line(tMid, y, tMid, y+rH);
+
+                if (isHeader) {
+                    doc.setFont('helvetica','bold');
+                    doc.text(label, (tLeft+tMid)/2, y+4.5, { align:'center' });
+                } else {
+                    if (bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
+                    if (val !== null) {
+                        // Label alineado a la derecha de la columna izquierda
+                        doc.text(label, tMid-3, y+4.5, { align:'right' });
+                        doc.text(val, valX, y+4.5, { align:'right' });
+                    } else {
+                        doc.text(label, lblX, y+4.5);
+                    }
+                }
+                y += rH;
+            };
+
+            // Filas de sueldo (label a la izquierda, valor a la derecha)
+            const drawRowNormal = (label, val, bold=false) => {
+                doc.rect(tLeft, y, tRight-tLeft, rH);
+                doc.line(tMid, y, tMid, y+rH);
+                if (bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
+                doc.text(label, lblX, y+4.5);
+                doc.text(val, valX, y+4.5, { align:'right' });
+                y += rH;
+            };
+
+            drawRowNormal('Sueldo Asignado',  formatMoneda(emp.sueldoAsignado));
+            drawRowNormal('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
+
+            // Header Deducciones
+            doc.rect(tLeft, y, tRight-tLeft, rH);
+            doc.line(tMid, y, tMid, y+rH);
+            doc.setFont('helvetica','bold');
+            doc.text('Deducciones', (tLeft+tMid)/2, y+4.5, { align:'center' });
+            y += rH;
+
+            // Filas individuales de deducción
+            emp.deducciones.forEach(d => drawRowNormal(d.nombre, formatMoneda(d.monto)));
+
+            // Totales (label alineado derecha de col izquierda)
+            drawRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
+            drawRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
+
+            y += 10;
+
+            // ── Texto pie ──
+            doc.setFont('helvetica','normal');
+            doc.setFontSize(10.5);
+            const pieLines = doc.splitTextToSize(pie, contentW);
+            doc.text(pieLines, margins.left, y, { align:'justify', maxWidth: contentW });
+            y += pieLines.length * 6 + 20;
+
+            // ── Firma ──
+            doc.setFont('helvetica','bold');
+            doc.setFontSize(11);
+            doc.text(firmante, pageW/2, y, { align:'center' });
+            y += 6;
+            doc.text(cargoF, pageW/2, y, { align:'center' });
+            y += 6;
+            doc.setFont('helvetica','normal');
+            doc.text('ENAG.', pageW/2, y, { align:'center' });
+
+            return doc;
+        }
+
+        async function generarConstanciaIndividual(id) {
+            const emp = empleados.find(e=>e.id===id);
+            if (!emp) return;
+            const doc = await generarPDFConstancia(emp, null, false);
+            doc.save(`Constancia_${emp.nombre.replace(/\s+/g,'_')}.pdf`);
+            cerrarModal();
+        }
+
+        async function generarConstanciasSeleccionadas() {
+            const sel = empleados.filter(e=>e.selected);
+            if (sel.length===0) { alert("Por favor, selecciona al menos un empleado."); return; }
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p','mm','a4');
+            for (let i=0;i<sel.length;i++) {
+                doc = await generarPDFConstancia(sel[i], doc, i>0);
+            }
+            doc.save('Constancias_Trabajo_ENAG.pdf');
+        }
+
+        // ─────────────────────────────────────────────
+        //  PLANTILLA EXCEL
+        // ─────────────────────────────────────────────
+        function descargarPlantilla() {
+            const headers = [
+                "No.","Numero de Puesto","Nombre","Cargo","Fecha de Ingreso","Tipo",
+                "Sueldo Asignado","Sueldo Devengado",
+                "I.H.S.S.","Plan de Retiro INJUPEMP 9.5%","Préstamo Personal INJUPEMP",
+                "Sindicato","Deducción de Partido","Cooperativa Elga","Cooperativa Sagrada Familia",
+                "Total de Deducciones","Sueldo Neto"
+            ];
+            const data = [
+                headers,
+                [1,"1024","ASTRID GERALDINA MEMBREÑO GABARRETE","ENCARGADO DEL DEPARTAMENTO DE DESPACHO DE PRODUCTO TERMINADO",
+                 "01 de julio del 2003","Acuerdo",
+                 22343.00,22343.00,
+                 297.58,2122.59,2934.23,223.43,446.86,300.00,4.00,
+                 6724.69,15618.31],
+                [2,"1025","PEDRO ANTONIO GÓMEZ REYES","DISEÑADOR GRÁFICO",
+                 "15 de marzo del 2018","Contrato",
+                 15000.00,15000.00,
+                 247.98,1425.00,0,150.00,0,0,0,
+                 1822.98,13177.02]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Planilla");
+            XLSX.writeFile(wb, "Plantilla_Constancias_ENAG.xlsx");
+        }
+    </script>
+</body>
+
+</html>
