@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
-    <title>Generación de Constancias de Trabajo con Deducciones — ENAG</title>
+    <title>Generación de Constancias de Trabajo — ENAG</title>
     <script>
         (function() {
             const password = prompt("Ingrese la contraseña de acceso:");
@@ -410,8 +410,8 @@
     <div class="container">
 
         <div class="form-header">
-            <h2>📋 Generador de Constancias de Trabajo con Deducciones</h2>
-            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de Excel para generar constancias de trabajo con deducciones individuales o masivas en PDF.</p>
+            <h2>📋 Generador de Constancias de Trabajo</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de Excel para generar constancias de trabajo individuales o masivas en PDF.</p>
         </div>
 
         <!-- Configuración del documento -->
@@ -1131,7 +1131,7 @@
 
             const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${emp.nombre}** ${art[2]} en esta institución ${tipoTexto}, en ${art[1]} nominal de **${emp.puesto}**` +
                 (emp.ingreso && emp.ingreso !== 'N/D' ? ` a partir del **${emp.ingreso}**` : "") +
-                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele las siguientes deducciones:`;
+                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}).`;
 
             const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
@@ -1157,25 +1157,7 @@
             // Tabla
             const table = document.getElementById('previewTable');
             table.innerHTML = '';
-            const addRow = (label, val, isBold=false) => {
-                const tr = document.createElement('tr');
-                if (isBold) tr.classList.add('total-row');
-                tr.innerHTML = `<td${isBold?' style="font-weight:bold"':''}>${label}</td><td class="amount-col"${isBold?' style="font-weight:bold"':''}>${val}</td>`;
-                table.appendChild(tr);
-            };
-
-            addRow('Sueldo Asignado', formatMoneda(emp.sueldoAsignado));
-            addRow('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
-
-            // Sección Deducciones
-            const trH = document.createElement('tr');
-            trH.classList.add('section-header');
-            trH.innerHTML = '<td colspan="2">Deducciones</td>';
-            table.appendChild(trH);
-
-            emp.deducciones.forEach(d => addRow(d.nombre, formatMoneda(d.monto)));
-            addRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
-            addRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
+            table.style.display = 'none';
 
             document.getElementById('previewFooter').innerHTML = pie.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             document.getElementById('previewSignature').innerHTML =
@@ -1330,7 +1312,7 @@
             const pageW = doc.internal.pageSize.getWidth(); // 210mm
             const margins = { left: 25, right: 25 };
             const contentW = pageW - margins.left - margins.right; // 160mm
-            let y = 60;
+            let y = 80;
 
             // ── Título ──
             doc.setFont('helvetica','bold');
@@ -1349,69 +1331,11 @@
             y = drawRichText(doc, intro, margins.left, y, contentW, 6, 10.5, 'justify');
             y += 6;
 
-            // ── Tabla de sueldos y deducciones ──
-            const tLeft  = margins.left;
-            const tRight = pageW - margins.right;   // 185
-            const tMid   = tLeft + contentW * 0.55; // separador ~30% desde la derecha
-            const valX   = tRight - 2;
-            const lblX   = tLeft + 3;
-            const rH     = 6.5;
-
-            doc.setLineWidth(0.3);
-            doc.setDrawColor(0,0,0);
-
-            const drawRow = (label, val, bold=false, isHeader=false) => {
-                doc.rect(tLeft, y, tRight-tLeft, rH);
-                doc.line(tMid, y, tMid, y+rH);
-
-                if (isHeader) {
-                    doc.setFont('helvetica','bold');
-                    doc.text(label, (tLeft+tMid)/2, y+4.5, { align:'center' });
-                } else {
-                    if (bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
-                    if (val !== null) {
-                        // Label alineado a la derecha de la columna izquierda
-                        doc.text(label, tMid-3, y+4.5, { align:'right' });
-                        doc.text(val, valX, y+4.5, { align:'right' });
-                    } else {
-                        doc.text(label, lblX, y+4.5);
-                    }
-                }
-                y += rH;
-            };
-
-            // Filas de sueldo (label a la izquierda, valor a la derecha)
-            const drawRowNormal = (label, val, bold=false) => {
-                doc.rect(tLeft, y, tRight-tLeft, rH);
-                doc.line(tMid, y, tMid, y+rH);
-                if (bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
-                doc.text(label, lblX, y+4.5);
-                doc.text(val, valX, y+4.5, { align:'right' });
-                y += rH;
-            };
-
-            drawRowNormal('Sueldo Asignado',  formatMoneda(emp.sueldoAsignado));
-            drawRowNormal('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
-
-            // Header Deducciones
-            doc.rect(tLeft, y, tRight-tLeft, rH);
-            doc.line(tMid, y, tMid, y+rH);
-            doc.setFont('helvetica','bold');
-            doc.text('Deducciones', (tLeft+tMid)/2, y+4.5, { align:'center' });
-            y += rH;
-
-            // Filas individuales de deducción
-            emp.deducciones.forEach(d => drawRowNormal(d.nombre, formatMoneda(d.monto)));
-
-            // Totales (label alineado derecha de col izquierda)
-            drawRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
-            drawRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
-
-            y += 10;
+            y += 20;
 
             // ── Texto pie (justificado manual con negrita) ──
             y = drawRichText(doc, pie, margins.left, y, contentW, 6, 10.5, 'justify');
-            y += 20;
+            y += 35;
 
             // ── Firma ──
             doc.setFont('helvetica','bold');

@@ -6,6 +6,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
     <title>Generación de Vouchers de Pago</title>
+    <script>
+        (function() {
+            const password = prompt("Ingrese la contraseña de acceso:");
+            if (password !== "1212") {
+                alert("Acceso denegado.");
+                window.location.href = "index.html";
+                document.documentElement.style.display = 'none';
+                throw new Error("Acceso denegado");
+            }
+        })();
+    </script>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
