@@ -607,6 +607,8 @@
             const noOrden = document.getElementById('noOrden').value || "13993";
             doc.text(noOrden, 170, 60);
             doc.setTextColor(0, 0, 0);
+            
+            let lastPageCount = doc.internal.getNumberOfPages();
 
             // General Info and Right side Dates
             currentY = 75;
@@ -688,7 +690,16 @@
                 theme: 'grid',
                 headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
                 bodyStyles: { fontSize: 8, minCellHeight: 8 },
-                margin: { left: marginX, right: marginX }
+                margin: { top: 40, left: marginX, right: marginX },
+                willDrawPage: function(data) {
+                    const currentPage = doc.internal.getNumberOfPages();
+                    if (currentPage > lastPageCount) {
+                        if (logoBgUrl) {
+                            doc.addImage(logoBgUrl, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+                        }
+                        lastPageCount = currentPage;
+                    }
+                }
             });
 
             currentY = doc.lastAutoTable.finalY + 5;
@@ -713,10 +724,30 @@
                 theme: 'grid',
                 headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
                 bodyStyles: { fontSize: 8, minCellHeight: 8 },
-                margin: { left: marginX, right: marginX }
+                margin: { top: 40, left: marginX, right: marginX },
+                willDrawPage: function(data) {
+                    const currentPage = doc.internal.getNumberOfPages();
+                    if (currentPage > lastPageCount) {
+                        if (logoBgUrl) {
+                            doc.addImage(logoBgUrl, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+                        }
+                        lastPageCount = currentPage;
+                    }
+                }
             });
 
             currentY = doc.lastAutoTable.finalY + 5;
+
+            function checkPageBreak(requiredHeight) {
+                if (currentY + requiredHeight > doc.internal.pageSize.getHeight() - 20) {
+                    doc.addPage();
+                    lastPageCount = doc.internal.getNumberOfPages();
+                    if (logoBgUrl) {
+                        doc.addImage(logoBgUrl, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+                    }
+                    currentY = 40; // start drawing lower on new pages
+                }
+            }
 
             // --- CAJAS DE OPCIONES ---
             // Render checkboxes in 3 columns
@@ -747,6 +778,7 @@
                 });
             }
 
+            checkPageBreak(boxH + gap);
             // Col 1
             drawCheckSection("DISEÑO GRÁFICO", marginX, currentY, [
                 { label: "1- Arte sencillo", checked: document.getElementById('dg_sencillo').checked },
@@ -778,6 +810,7 @@
 
             currentY += boxH + gap;
 
+            checkPageBreak(boxH + gap);
             // Row 2 of boxes
             // Col 1 Encuadernacion
             drawCheckSection("ENCUADERNACIÓN", marginX, currentY, [
@@ -810,6 +843,7 @@
 
             currentY += boxH + gap;
 
+            checkPageBreak(60);
             // Observaciones
             doc.setFont("helvetica", "bold");
             doc.text("OBSERVACIONES:", marginX, currentY);
