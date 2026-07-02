@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Generación de Órdenes de Producción — ENAG</title>
+
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 18px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-generate {
+            background-color: #22c55e;
+            color: white;
+            font-size: 1em;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-generate:hover {
+            background-color: #16a34a;
+        }
+
+        /* Form Sections */
+        .section-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-card h3 {
+            margin: 0 0 15px 0;
+            color: #0369a1;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85em;
+            color: #475569;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.95em;
+            background: white;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #002147;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-group:hover {
+            border-color: #94a3b8;
+            background: #f1f5f9;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-group span {
+            font-size: 0.9em;
+            color: #333;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+
+        /* Dynamic Tables */
+        .dynamic-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .dynamic-table th {
+            background-color: #002147;
+            color: white;
+            padding: 10px;
+            font-size: 0.85em;
+            text-align: left;
+        }
+
+        .dynamic-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dynamic-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-add-row {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-add-row:hover {
+            background: #bae6fd;
+        }
+
+        .btn-delete-row {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <button onclick="generarPDF()" class="btn-generate">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path
+                    d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
+                <path
+                    d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a10.954 10.954 0 0 0 .98 1.686 5.753 5.753 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.856.856 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.712 5.712 0 0 1-.911-.95 11.651 11.651 0 0 0-1.997.406 11.307 11.307 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.793.793 0 0 1-.58.029zm1.379-1.901c-.166.076-.32.156-.459.238-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361.01.022.02.036.026.044a.266.266 0 0 0 .035-.012c.137-.056.355-.235.635-.572a8.18 8.18 0 0 0 .45-.606zm1.64-1.33a12.71 12.71 0 0 1 1.01-.193 11.744 11.744 0 0 1-.51-.858 20.801 20.801 0 0 1-.5 1.05zm2.446.45c.15.163.296.3.435.41.24.19.407.253.498.256a.107.107 0 0 0 .07-.015.307.307 0 0 0 .094-.125.436.436 0 0 0 .059-.2.095.095 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a3.876 3.876 0 0 0-.612-.053zM8.078 7.8a6.7 6.7 0 0 0 .2-.828c.031-.188.043-.343.038-.465a.613.613 0 0 0-.032-.198.517.517 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.046.822.024.111.054.227.09.346z" />
+            </svg>
+            Generar PDF de Orden
+        </button>
+    </div>
+
+    <div class="container">
+        <div class="form-header">
+            <h2>🏭 Creación de Orden de Producción</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Completa los datos para generar el documento PDF oficial de la
+                orden de producción.</p>
+        </div>
+
+        <div class="section-card">
+            <h3>Información General y Fechas</h3>
+            <div class="grid-4">
+                <div class="form-group">
+                    <label>No. de Orden</label>
+                    <input type="text" id="noOrden" placeholder="Ej. 13993" style="font-weight: bold; color: #b91c1c;">
+                </div>
+                <div class="form-group">
+                    <label>Máquina</label>
+                    <input type="text" id="maquina" placeholder="Nombre de máquina">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Ingreso COT.</label>
+                    <input type="date" id="fechaIngreso">
+                </div>
+                <div class="form-group">
+                    <label>Producción (Fecha)</label>
+                    <input type="date" id="fechaProduccion">
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Entrega (Fecha)</label>
+                    <input type="date" id="fechaEntrega">
+                </div>
+                <div class="form-group" style="grid-column: span 2;">
+                    <label>Tipo de Impresión</label>
+                    <div class="grid-4">
+                        <label class="checkbox-group"><input type="checkbox" id="tipoOffset">
+                            <span>Offset</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipoDigital">
+                            <span>Digital</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipoPrensa">
+                            <span>Prensa</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipoRotativa">
+                            <span>Rotativa</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <input type="text" id="cliente" placeholder="Nombre del cliente">
+                </div>
+                <div class="form-group">
+                    <label>Teléfono Fijo</label>
+                    <input type="text" id="telFijo" placeholder="Ej. 2233-4455">
+                </div>
+                <div class="form-group">
+                    <label>Celular</label>
+                    <input type="text" id="celular" placeholder="Ej. 9988-7766">
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Detalle del Trabajo</h3>
+            <table class="dynamic-table" id="tablaTrabajo">
+                <thead>
+                    <tr>
+                        <th style="width:10%">Cantidad</th>
+                        <th style="width:40%">Descripción / Trabajo</th>
+                        <th style="width:15%">Tamaño</th>
+                        <th style="width:12%">No. Copias</th>
+                        <th style="width:10%">Juegos</th>
+                        <th style="width:10%">Color</th>
+                        <th style="width:3%"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyTrabajo">
+                    <!-- Filas dinámicas -->
+                </tbody>
+            </table>
+            <button class="btn-add-row" onclick="agregarFilaTrabajo()">+ Añadir Fila de Trabajo</button>
+        </div>
+
+        <div class="section-card">
+            <h3>Materiales a Utilizar</h3>
+            <table class="dynamic-table" id="tablaMateriales">
+                <thead>
+                    <tr>
+                        <th style="width:10%">Cantidad</th>
+                        <th style="width:40%">Materiales a Utilizar</th>
+                        <th style="width:15%">Tamaño</th>
+                        <th style="width:15%">N.C. Material</th>
+                        <th style="width:17%">Pendiente Entrega</th>
+                        <th style="width:3%"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyMateriales">
+                    <!-- Filas dinámicas -->
+                </tbody>
+            </table>
+            <button class="btn-add-row" onclick="agregarFilaMaterial()">+ Añadir Fila de Material</button>
+        </div>
+
+        <div class="section-card">
+            <h3>Especificaciones Técnicas (Opcionales)</h3>
+            <div class="grid-2">
+                <!-- Diseño Grafico -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Diseño Gráfico</h4>
+                    <div class="grid-2">
+                        <label class="checkbox-group"><input type="checkbox" id="dg_sencillo"> <span>1. Arte
+                                sencillo</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="dg_doble"> <span>2. Arte
+                                doble</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="dg_libro"> <span>3. Libro
+                                completo</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="dg_imprimir"> <span>4. Imprimir
+                                trabajo</span></label>
+                    </div>
+                </div>
+
+                <!-- CTP -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">CTP</h4>
+                    <div class="grid-2">
+                        <label class="checkbox-group"><input type="checkbox" id="ctp_gto"> <span>1. Plancha
+                                GTO</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="ctp_kord"> <span>2. Plancha
+                                Kord</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="ctp_sord"> <span>3. Plancha
+                                Sord</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="ctp_cd102"> <span>4.
+                                CD-102</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-2" style="margin-top: 15px;">
+                <!-- Guillotinas -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Guillotinas</h4>
+                    <div class="grid-2">
+                        <label class="checkbox-group"><input type="checkbox" id="gui_carta"> <span>1. Carta
+                                8½x11</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="gui_oficio"> <span>2. Oficio
+                                8½x13</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="gui_legal"> <span>3. Legal
+                                8½x14</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="gui_tabloide"> <span>4. Tabloide
+                                11x17</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="gui_dobleoficio"> <span>5. Doble
+                                Oficio</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="gui_16"> <span>6. Cortar
+                                16</span></label>
+                        <div class="form-group" style="grid-column: span 2;">
+                            <input type="text" id="gui_otros" placeholder="7. Otros cortes">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Offset -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Offset</h4>
+                    <div class="grid-2">
+                        <label class="checkbox-group"><input type="checkbox" id="off_bn"> <span>1. Impresión
+                                B/N</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_fc"> <span>2. Full
+                                Color</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_pantone"> <span>3.
+                                PANTONE</span></label>
+                    </div>
+                    <h5 style="margin: 10px 0 5px 0; color: #555;">Máquina:</h5>
+                    <div class="grid-2">
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_cd102">
+                            <span>CD-102</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_gto"> <span>GTO</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_kord"> <span>KORD</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_sord"> <span>SORD</span></label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 15px;">
+                <!-- Tipografia -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Tipografía / Prensas</h4>
+                    <div class="form-group">
+                        <input type="text" id="tipo_numerado" placeholder="1. Numerado del: al:">
+                        <input type="text" id="tipo_color_num" placeholder="Color del Nº">
+                    </div>
+                    <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_perf_lat"> <span>2. Perf.
+                                lateral</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_perf_arr"> <span>3. Perf.
+                                arriba</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_troquelado"> <span>4.
+                                Troquelado</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_sisado"> <span>5.
+                                Sisado</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_embosado"> <span>6.
+                                Embosado</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_estampado"> <span>7.
+                                Estampado</span></label>
+                    </div>
+                </div>
+
+                <!-- Encuadernacion -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Encuadernación</h4>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label class="checkbox-group"><input type="checkbox" id="enc_peg_arr"> <span>1. Pegado
+                                arriba</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="enc_peg_lat"> <span>2. Pegado lateral
+                                izq.</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="enc_eng_arr"> <span>3. Engrapado
+                                arriba</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="enc_eng_lat"> <span>4. Engrapado
+                                lateral</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="enc_comp"> <span>5.
+                                Compaginar</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="enc_solo_orig"> <span>6. Sólo
+                                original</span></label>
+                    </div>
+                    <div class="form-group" style="margin-top:8px;">
+                        <input type="text" id="enc_copias" placeholder="7. Copias">
+                    </div>
+                </div>
+
+                <!-- Empaste Fino -->
+                <div class="section-card" style="margin: 0; background: white;">
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Empaste Fino</h4>
+                    <div style="display:flex; flex-direction:column; gap:8px;">
+                        <label class="checkbox-group"><input type="checkbox" id="emp_enc"> <span>1.
+                                Encuadernado</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="emp_empast"> <span>2.
+                                Empastado</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="emp_empast_est"> <span>3. Empaste con
+                                estam.</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="emp_engrap"> <span>4.
+                                Engrapado</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="emp_costur"> <span>5.
+                                Costurado</span></label>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Observaciones</h3>
+            <div class="form-group">
+                <input type="text" id="observaciones" placeholder="Escriba aquí las observaciones finales..."
+                    style="padding: 15px;">
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Init rows
+        window.onload = function () {
+            agregarFilaTrabajo();
+            agregarFilaTrabajo();
+            agregarFilaMaterial();
+            agregarFilaMaterial();
+        }
+
+        function agregarFilaTrabajo() {
+            const tbody = document.getElementById('tbodyTrabajo');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="t_cant"></td>
+                <td><input type="text" class="t_desc"></td>
+                <td><input type="text" class="t_tam"></td>
+                <td><input type="text" class="t_copias"></td>
+                <td><input type="text" class="t_juegos"></td>
+                <td><input type="text" class="t_color"></td>
+                <td><button type="button" class="btn-delete-row" onclick="this.closest('tr').remove()">X</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function agregarFilaMaterial() {
+            const tbody = document.getElementById('tbodyMateriales');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="m_cant"></td>
+                <td><input type="text" class="m_mat"></td>
+                <td><input type="text" class="m_tam"></td>
+                <td><input type="text" class="m_nc"></td>
+                <td><input type="text" class="m_pend"></td>
+                <td><button type="button" class="btn-delete-row" onclick="this.closest('tr').remove()">X</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function formateaFechaPDF(fechaISO) {
+            if (!fechaISO) return { d: "", m: "", a: "" };
+            const partes = fechaISO.split('-');
+            return { d: partes[2], m: partes[1], a: partes[0] };
+        }
+
+        function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+
+            // Constantes de diseño
+            const marginX = 15;
+            let currentY = 15;
+
+            // --- HEADER ---
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("ORDEN DE PRODUCCIÓN", 55, 25);
+
+            doc.setFontSize(10);
+            doc.text("ENAG", 20, 20);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(8);
+            doc.text("Artes Gráficas", 18, 24);
+
+            // Numero de orden box
+            doc.rect(155, 18, 45, 10);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("Nº", 158, 25);
+            doc.setTextColor(200, 0, 0);
+            const noOrden = document.getElementById('noOrden').value || "13993";
+            doc.text(noOrden, 170, 25);
+            doc.setTextColor(0, 0, 0);
+
+            // Tipos impresion
+            currentY = 35;
+            doc.setFontSize(10);
+            doc.text("TIPO DE IMPRESIÓN", 90, currentY);
+
+            currentY = 42;
+            const t_offset = document.getElementById('tipoOffset').checked ? "X" : " ";
+            const t_digi = document.getElementById('tipoDigital').checked ? "X" : " ";
+            const t_prensa = document.getElementById('tipoPrensa').checked ? "X" : " ";
+            const t_rotativa = document.getElementById('tipoRotativa').checked ? "X" : " ";
+
+            doc.text(`OFFSET [${t_offset}]     IMPRESIÓN DIGITAL [${t_digi}]     PRENSA [${t_prensa}]     ROTATIVA [${t_rotativa}]`, 40, currentY);
+
+            // General Info and Right side Dates
+            currentY = 55;
+            doc.setFontSize(12);
+            doc.text("INFORMACIÓN GENERAL", 80, currentY);
+
+            // Fechas Right Side
+            const fechaIng = formateaFechaPDF(document.getElementById('fechaIngreso').value);
+            const fechaProd = formateaFechaPDF(document.getElementById('fechaProduccion').value);
+            const fechaEnt = formateaFechaPDF(document.getElementById('fechaEntrega').value);
+
+            function drawDateBox(x, y, label, d, m, a) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7);
+                doc.text(label, x + 5, y - 2);
+                doc.rect(x, y, 30, 10);
+                doc.line(x + 10, y, x + 10, y + 10);
+                doc.line(x + 20, y, x + 20, y + 10);
+                doc.line(x, y + 5, x + 30, y + 5);
+
+                doc.text("DIA", x + 2, y + 4);
+                doc.text("MES", x + 12, y + 4);
+                doc.text("AÑO", x + 22, y + 4);
+
+                doc.setFont("helvetica", "normal");
+                doc.text(d, x + 3, y + 9);
+                doc.text(m, x + 13, y + 9);
+                doc.text(a, x + 22, y + 9);
+            }
+
+            drawDateBox(165, 45, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
+            drawDateBox(165, 60, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
+            drawDateBox(165, 75, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
+
+            // Maquina
+            doc.setFontSize(10);
+            doc.setFont("helvetica", "bold");
+            doc.text("MÁQUINA:", 145, 15);
+            doc.rect(165, 10, 35, 6);
+            doc.setFont("helvetica", "normal");
+            doc.text(document.getElementById('maquina').value, 167, 14.5);
+
+            // Cliente
+            currentY = 65;
+            doc.setFont("helvetica", "bold");
+            doc.text("CLIENTE:", marginX, currentY);
+            doc.setFont("helvetica", "normal");
+            doc.text(document.getElementById('cliente').value, 35, currentY);
+            doc.line(35, currentY + 1, 150, currentY + 1);
+
+            currentY = 75;
+            doc.setFont("helvetica", "bold");
+            doc.text("TELEFONO FIJO:", marginX, currentY);
+            doc.setFont("helvetica", "normal");
+            doc.text(document.getElementById('telFijo').value, 48, currentY);
+            doc.line(48, currentY + 1, 90, currentY + 1);
+
+            doc.setFont("helvetica", "bold");
+            doc.text("CELULAR:", 95, currentY);
+            doc.setFont("helvetica", "normal");
+            doc.text(document.getElementById('celular').value, 115, currentY);
+            doc.line(115, currentY + 1, 150, currentY + 1);
+
+            // --- TABLAS ---
+            currentY = 85;
+
+            // Extract Trabajo
+            let rowTrabajo = [];
+            const trTrab = document.querySelectorAll('#tbodyTrabajo tr');
+            trTrab.forEach(tr => {
+                rowTrabajo.push([
+                    tr.querySelector('.t_cant').value,
+                    tr.querySelector('.t_desc').value,
+                    tr.querySelector('.t_tam').value,
+                    tr.querySelector('.t_copias').value,
+                    tr.querySelector('.t_juegos').value,
+                    tr.querySelector('.t_color').value
+                ]);
+            });
+
+            doc.autoTable({
+                startY: currentY,
+                head: [['CANTIDAD', 'DESCRIPCION / TRABAJO', 'TAMAÑO', 'No. COPIAS', 'JUEGOS', 'COLOR']],
+                body: rowTrabajo,
+                theme: 'grid',
+                headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
+                bodyStyles: { fontSize: 8, minCellHeight: 8 },
+                margin: { left: marginX, right: marginX }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 5;
+
+            // Extract Materiales
+            let rowMat = [];
+            const trMat = document.querySelectorAll('#tbodyMateriales tr');
+            trMat.forEach(tr => {
+                rowMat.push([
+                    tr.querySelector('.m_cant').value,
+                    tr.querySelector('.m_mat').value,
+                    tr.querySelector('.m_tam').value,
+                    tr.querySelector('.m_nc').value,
+                    tr.querySelector('.m_pend').value
+                ]);
+            });
+
+            doc.autoTable({
+                startY: currentY,
+                head: [['CANTIDAD', 'MATERIALES A UTILIZAR', 'TAMAÑO', 'N.C. MATERIAL', 'PENDIENTE DE ENTREGA']],
+                body: rowMat,
+                theme: 'grid',
+                headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
+                bodyStyles: { fontSize: 8, minCellHeight: 8 },
+                margin: { left: marginX, right: marginX }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 5;
+
+            // --- CAJAS DE OPCIONES ---
+            // Render checkboxes in 3 columns
+            doc.setFontSize(8);
+            const boxW = 60;
+            const boxH = 40;
+            const gap = 3;
+
+            function drawCheckSection(title, x, y, options) {
+                doc.setDrawColor(0);
+                doc.rect(x, y, boxW, boxH);
+                doc.setFillColor(0, 33, 71);
+                doc.rect(x, y, boxW, 6, "F");
+                doc.setTextColor(255);
+                doc.setFont("helvetica", "bold");
+                doc.text(title, x + boxW / 2, y + 4.5, { align: 'center' });
+                doc.setTextColor(0);
+                doc.setFont("helvetica", "normal");
+
+                let optY = y + 10;
+                options.forEach(opt => {
+                    doc.text(opt.label, x + 2, optY);
+                    doc.rect(x + boxW - 6, optY - 3, 4, 4);
+                    if (opt.checked) {
+                        doc.text("X", x + boxW - 5, optY);
+                    }
+                    optY += 5;
+                });
+            }
+
+            // Col 1
+            drawCheckSection("DISEÑO GRÁFICO", marginX, currentY, [
+                { label: "1- Arte sencillo", checked: document.getElementById('dg_sencillo').checked },
+                { label: "2- Arte doble", checked: document.getElementById('dg_doble').checked },
+                { label: "3- Libro completo", checked: document.getElementById('dg_libro').checked },
+                { label: "4- Imprimir trabajo", checked: document.getElementById('dg_imprimir').checked }
+            ]);
+
+            // Col 2
+            drawCheckSection("CTP", marginX + boxW + gap, currentY, [
+                { label: "1- Plancha GTO", checked: document.getElementById('ctp_gto').checked },
+                { label: "2- Plancha Kord", checked: document.getElementById('ctp_kord').checked },
+                { label: "3- Plancha Sord", checked: document.getElementById('ctp_sord').checked },
+                { label: "4- SpeedMaster CD-102", checked: document.getElementById('ctp_cd102').checked }
+            ]);
+
+            // Col 3
+            drawCheckSection("GUILLOTINAS", marginX + (boxW + gap) * 2, currentY, [
+                { label: "1- Carta 8½ X 11\"", checked: document.getElementById('gui_carta').checked },
+                { label: "2- Oficio 8½ X 13\"", checked: document.getElementById('gui_oficio').checked },
+                { label: "3- Legal 8½ X 14\"", checked: document.getElementById('gui_legal').checked },
+                { label: "4- Tabloide 11X17\"", checked: document.getElementById('gui_tabloide').checked },
+                { label: "5- Doble Oficio", checked: document.getElementById('gui_dobleoficio').checked },
+                { label: "6- Cortar 16", checked: document.getElementById('gui_16').checked },
+                { label: "7- Otros: " + document.getElementById('gui_otros').value, checked: false }
+            ]);
+
+            currentY += boxH + gap;
+
+            // Row 2 of boxes
+            // Col 1 Offset
+            drawCheckSection("OFFSET", marginX, currentY, [
+                { label: "1- Impresión B/N", checked: document.getElementById('off_bn').checked },
+                { label: "2- Full Color", checked: document.getElementById('off_fc').checked },
+                { label: "3- PANTONE", checked: document.getElementById('off_pantone').checked },
+                { label: "Máquina:", checked: false },
+                { label: "   CD-102: " + (document.getElementById('off_m_cd102').checked ? "X" : "") + "   GTO: " + (document.getElementById('off_m_gto').checked ? "X" : ""), checked: false },
+                { label: "   KORD: " + (document.getElementById('off_m_kord').checked ? "X" : "") + "     SORD: " + (document.getElementById('off_m_sord').checked ? "X" : ""), checked: false }
+            ]);
+
+            // Col 2 Encuadernacion
+            drawCheckSection("ENCUADERNACIÓN", marginX + boxW + gap, currentY, [
+                { label: "1- Pegado arriba", checked: document.getElementById('enc_peg_arr').checked },
+                { label: "2- Pegado lateral izq", checked: document.getElementById('enc_peg_lat').checked },
+                { label: "3- Engrapado arriba", checked: document.getElementById('enc_eng_arr').checked },
+                { label: "4- Engrapado lateral", checked: document.getElementById('enc_eng_lat').checked },
+                { label: "5- Compaginar", checked: document.getElementById('enc_comp').checked },
+                { label: "6- Sólo original", checked: document.getElementById('enc_solo_orig').checked }
+            ]);
+
+            // Col 3 Tipografia
+            drawCheckSection("TIPOGRAFIA / PRENSAS", marginX + (boxW + gap) * 2, currentY, [
+                { label: document.getElementById('tipo_numerado').value || "1- Numerado del: al:", checked: false },
+                { label: "2- Perf. lateral", checked: document.getElementById('tipo_perf_lat').checked },
+                { label: "3- Perf. arriba", checked: document.getElementById('tipo_perf_arr').checked },
+                { label: "4- Troquelado", checked: document.getElementById('tipo_troquelado').checked },
+                { label: "5- Sisado", checked: document.getElementById('tipo_sisado').checked },
+                { label: "6- Embosado / Estam.", checked: (document.getElementById('tipo_embosado').checked || document.getElementById('tipo_estampado').checked) }
+            ]);
+
+            currentY += boxH + gap;
+
+            // Observaciones
+            doc.setFont("helvetica", "bold");
+            doc.text("OBSERVACIONES:", marginX, currentY);
+            doc.setFont("helvetica", "normal");
+            doc.text(document.getElementById('observaciones').value, marginX + 30, currentY);
+            doc.line(marginX + 30, currentY + 1, 200, currentY + 1);
+
+            // Firmas
+            currentY += 25;
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+
+            doc.line(marginX, currentY, marginX + 50, currentY);
+            doc.text("Firma recibido Despacho PT", marginX + 25, currentY + 4, { align: 'center' });
+
+            doc.line(85, currentY, 135, currentY);
+            doc.text("Firma Almacén", 110, currentY + 4, { align: 'center' });
+
+            doc.line(150, currentY, 200, currentY);
+            doc.text("Firma Auditoría", 175, currentY + 4, { align: 'center' });
+
+            currentY += 20;
+            doc.line(80, currentY, 140, currentY);
+            doc.text("Firma Subgerente de Producción", 110, currentY + 4, { align: 'center' });
+
+            // Save PDF
+            doc.save(`Orden_Produccion_${noOrden}.pdf`);
+        }
+    </script>
+</body>
+
+</html>
