@@ -296,14 +296,10 @@
 
         <div class="section-card">
             <h3>Información General y Fechas</h3>
-            <div class="grid-4">
+            <div class="grid-3">
                 <div class="form-group">
                     <label>No. de Orden</label>
                     <input type="text" id="noOrden" placeholder="Ej. 13993" style="font-weight: bold; color: #b91c1c;">
-                </div>
-                <div class="form-group">
-                    <label>Máquina</label>
-                    <input type="text" id="maquina" placeholder="Nombre de máquina">
                 </div>
                 <div class="form-group">
                     <label>Fecha de Ingreso COT.</label>
@@ -321,17 +317,7 @@
                     <input type="date" id="fechaEntrega">
                 </div>
                 <div class="form-group" style="grid-column: span 2;">
-                    <label>Tipo de Impresión</label>
-                    <div class="grid-4">
-                        <label class="checkbox-group"><input type="checkbox" id="tipoOffset">
-                            <span>Offset</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipoDigital">
-                            <span>Digital</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipoPrensa">
-                            <span>Prensa</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipoRotativa">
-                            <span>Rotativa</span></label>
-                    </div>
+                    <!-- Espacio vacio para mantener el grid, Tipo de Impresion eliminado -->
                 </div>
             </div>
 
@@ -410,18 +396,24 @@
                     </div>
                 </div>
 
-                <!-- CTP -->
+                <!-- Offset / CTP -->
                 <div class="section-card" style="margin: 0; background: white;">
-                    <h4 style="margin: 0 0 10px 0; color: #333;">CTP</h4>
+                    <h4 style="margin: 0 0 10px 0; color: #333;">Offset / CTP</h4>
                     <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="ctp_gto"> <span>1. Plancha
-                                GTO</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="ctp_kord"> <span>2. Plancha
-                                Kord</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="ctp_sord"> <span>3. Plancha
-                                Sord</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="ctp_cd102"> <span>4.
-                                CD-102</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_bn"> <span>1. Impresión
+                                B/N</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_fc"> <span>2. Full
+                                Color</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_pantone"> <span>3.
+                                PANTONE</span></label>
+                    </div>
+                    <h5 style="margin: 10px 0 5px 0; color: #555;">Máquina:</h5>
+                    <div class="grid-2">
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_cd102">
+                            <span>CD-102</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_gto"> <span>GTO</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_kord"> <span>KORD</span></label>
+                        <label class="checkbox-group"><input type="checkbox" id="off_m_sord"> <span>SORD</span></label>
                     </div>
                 </div>
             </div>
@@ -446,27 +438,6 @@
                         <div class="form-group" style="grid-column: span 2;">
                             <input type="text" id="gui_otros" placeholder="7. Otros cortes">
                         </div>
-                    </div>
-                </div>
-
-                <!-- Offset -->
-                <div class="section-card" style="margin: 0; background: white;">
-                    <h4 style="margin: 0 0 10px 0; color: #333;">Offset</h4>
-                    <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="off_bn"> <span>1. Impresión
-                                B/N</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_fc"> <span>2. Full
-                                Color</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_pantone"> <span>3.
-                                PANTONE</span></label>
-                    </div>
-                    <h5 style="margin: 10px 0 5px 0; color: #555;">Máquina:</h5>
-                    <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_cd102">
-                            <span>CD-102</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_gto"> <span>GTO</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_kord"> <span>KORD</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_sord"> <span>SORD</span></label>
                     </div>
                 </div>
             </div>
@@ -590,9 +561,31 @@
             return { d: partes[2], m: partes[1], a: partes[0] };
         }
 
-        function generarPDF() {
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL('image/png'));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        async function generarPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'letter');
+            const doc = new jsPDF('p', 'mm', 'legal');
+
+            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            if (logoBgUrl) {
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pw, ph);
+            }
 
             // Constantes de diseño
             const marginX = 15;
@@ -601,39 +594,22 @@
             // --- HEADER ---
             doc.setFont("helvetica", "bold");
             doc.setFontSize(22);
-            doc.text("ORDEN DE PRODUCCIÓN", 55, 25);
+            doc.text("ORDEN DE PRODUCCIÓN", 55, 60);
 
-            doc.setFontSize(10);
-            doc.text("ENAG", 20, 20);
-            doc.setFont("helvetica", "normal");
-            doc.setFontSize(8);
-            doc.text("Artes Gráficas", 18, 24);
+            // Header Text Removed
 
             // Numero de orden box
-            doc.rect(155, 18, 45, 10);
+            doc.rect(155, 53, 45, 10);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.text("Nº", 158, 25);
+            doc.text("Nº", 158, 60);
             doc.setTextColor(200, 0, 0);
             const noOrden = document.getElementById('noOrden').value || "13993";
-            doc.text(noOrden, 170, 25);
+            doc.text(noOrden, 170, 60);
             doc.setTextColor(0, 0, 0);
 
-            // Tipos impresion
-            currentY = 35;
-            doc.setFontSize(10);
-            doc.text("TIPO DE IMPRESIÓN", 90, currentY);
-
-            currentY = 42;
-            const t_offset = document.getElementById('tipoOffset').checked ? "X" : " ";
-            const t_digi = document.getElementById('tipoDigital').checked ? "X" : " ";
-            const t_prensa = document.getElementById('tipoPrensa').checked ? "X" : " ";
-            const t_rotativa = document.getElementById('tipoRotativa').checked ? "X" : " ";
-
-            doc.text(`OFFSET [${t_offset}]     IMPRESIÓN DIGITAL [${t_digi}]     PRENSA [${t_prensa}]     ROTATIVA [${t_rotativa}]`, 40, currentY);
-
             // General Info and Right side Dates
-            currentY = 55;
+            currentY = 75;
             doc.setFontSize(12);
             doc.text("INFORMACIÓN GENERAL", 80, currentY);
 
@@ -661,27 +637,21 @@
                 doc.text(a, x + 22, y + 9);
             }
 
-            drawDateBox(165, 45, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
-            drawDateBox(165, 60, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
-            drawDateBox(165, 75, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
+            drawDateBox(165, 80, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
+            drawDateBox(165, 95, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
+            drawDateBox(165, 110, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
 
-            // Maquina
-            doc.setFontSize(10);
-            doc.setFont("helvetica", "bold");
-            doc.text("MÁQUINA:", 145, 15);
-            doc.rect(165, 10, 35, 6);
-            doc.setFont("helvetica", "normal");
-            doc.text(document.getElementById('maquina').value, 167, 14.5);
+            // Maquina Removed
 
             // Cliente
-            currentY = 65;
+            currentY = 100;
             doc.setFont("helvetica", "bold");
             doc.text("CLIENTE:", marginX, currentY);
             doc.setFont("helvetica", "normal");
             doc.text(document.getElementById('cliente').value, 35, currentY);
             doc.line(35, currentY + 1, 150, currentY + 1);
 
-            currentY = 75;
+            currentY = 110;
             doc.setFont("helvetica", "bold");
             doc.text("TELEFONO FIJO:", marginX, currentY);
             doc.setFont("helvetica", "normal");
@@ -695,7 +665,7 @@
             doc.line(115, currentY + 1, 150, currentY + 1);
 
             // --- TABLAS ---
-            currentY = 85;
+            currentY = 120;
 
             // Extract Trabajo
             let rowTrabajo = [];
@@ -786,11 +756,13 @@
             ]);
 
             // Col 2
-            drawCheckSection("CTP", marginX + boxW + gap, currentY, [
-                { label: "1- Plancha GTO", checked: document.getElementById('ctp_gto').checked },
-                { label: "2- Plancha Kord", checked: document.getElementById('ctp_kord').checked },
-                { label: "3- Plancha Sord", checked: document.getElementById('ctp_sord').checked },
-                { label: "4- SpeedMaster CD-102", checked: document.getElementById('ctp_cd102').checked }
+            drawCheckSection("OFFSET / CTP", marginX + boxW + gap, currentY, [
+                { label: "1- Impresión B/N", checked: document.getElementById('off_bn').checked },
+                { label: "2- Full Color", checked: document.getElementById('off_fc').checked },
+                { label: "3- PANTONE", checked: document.getElementById('off_pantone').checked },
+                { label: "Máquina:", checked: false },
+                { label: "   CD-102: " + (document.getElementById('off_m_cd102').checked ? "X" : "") + "   GTO: " + (document.getElementById('off_m_gto').checked ? "X" : ""), checked: false },
+                { label: "   KORD: " + (document.getElementById('off_m_kord').checked ? "X" : "") + "     SORD: " + (document.getElementById('off_m_sord').checked ? "X" : ""), checked: false }
             ]);
 
             // Col 3
@@ -807,18 +779,8 @@
             currentY += boxH + gap;
 
             // Row 2 of boxes
-            // Col 1 Offset
-            drawCheckSection("OFFSET", marginX, currentY, [
-                { label: "1- Impresión B/N", checked: document.getElementById('off_bn').checked },
-                { label: "2- Full Color", checked: document.getElementById('off_fc').checked },
-                { label: "3- PANTONE", checked: document.getElementById('off_pantone').checked },
-                { label: "Máquina:", checked: false },
-                { label: "   CD-102: " + (document.getElementById('off_m_cd102').checked ? "X" : "") + "   GTO: " + (document.getElementById('off_m_gto').checked ? "X" : ""), checked: false },
-                { label: "   KORD: " + (document.getElementById('off_m_kord').checked ? "X" : "") + "     SORD: " + (document.getElementById('off_m_sord').checked ? "X" : ""), checked: false }
-            ]);
-
-            // Col 2 Encuadernacion
-            drawCheckSection("ENCUADERNACIÓN", marginX + boxW + gap, currentY, [
+            // Col 1 Encuadernacion
+            drawCheckSection("ENCUADERNACIÓN", marginX, currentY, [
                 { label: "1- Pegado arriba", checked: document.getElementById('enc_peg_arr').checked },
                 { label: "2- Pegado lateral izq", checked: document.getElementById('enc_peg_lat').checked },
                 { label: "3- Engrapado arriba", checked: document.getElementById('enc_eng_arr').checked },
@@ -827,14 +789,23 @@
                 { label: "6- Sólo original", checked: document.getElementById('enc_solo_orig').checked }
             ]);
 
-            // Col 3 Tipografia
-            drawCheckSection("TIPOGRAFIA / PRENSAS", marginX + (boxW + gap) * 2, currentY, [
+            // Col 2 Tipografia
+            drawCheckSection("TIPOGRAFIA / PRENSAS", marginX + boxW + gap, currentY, [
                 { label: document.getElementById('tipo_numerado').value || "1- Numerado del: al:", checked: false },
                 { label: "2- Perf. lateral", checked: document.getElementById('tipo_perf_lat').checked },
                 { label: "3- Perf. arriba", checked: document.getElementById('tipo_perf_arr').checked },
                 { label: "4- Troquelado", checked: document.getElementById('tipo_troquelado').checked },
                 { label: "5- Sisado", checked: document.getElementById('tipo_sisado').checked },
                 { label: "6- Embosado / Estam.", checked: (document.getElementById('tipo_embosado').checked || document.getElementById('tipo_estampado').checked) }
+            ]);
+
+            // Col 3 Empaste Fino
+            drawCheckSection("EMPASTE FINO", marginX + (boxW + gap) * 2, currentY, [
+                { label: "1- Encuadernado", checked: document.getElementById('emp_enc').checked },
+                { label: "2- Empastado", checked: document.getElementById('emp_empast').checked },
+                { label: "3- Empaste con estam.", checked: document.getElementById('emp_empast_est').checked },
+                { label: "4- Engrapado", checked: document.getElementById('emp_engrap').checked },
+                { label: "5- Costurado", checked: document.getElementById('emp_costur').checked }
             ]);
 
             currentY += boxH + gap;
@@ -851,18 +822,24 @@
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
 
-            doc.line(marginX, currentY, marginX + 50, currentY);
-            doc.text("Firma recibido Despacho PT", marginX + 25, currentY + 4, { align: 'center' });
+            // Row 1 Signatures
+            doc.line(marginX, currentY, marginX + 45, currentY);
+            doc.text("Firma recibido Despacho PT", marginX + 22.5, currentY + 4, { align: 'center' });
 
-            doc.line(85, currentY, 135, currentY);
-            doc.text("Firma Almacén", 110, currentY + 4, { align: 'center' });
+            doc.line(85, currentY, 130, currentY);
+            doc.text("Firma Almacén", 107.5, currentY + 4, { align: 'center' });
 
-            doc.line(150, currentY, 200, currentY);
-            doc.text("Firma Auditoría", 175, currentY + 4, { align: 'center' });
+            doc.line(155, currentY, 200, currentY);
+            doc.text("Firma Cotización", 177.5, currentY + 4, { align: 'center' });
 
-            currentY += 20;
-            doc.line(80, currentY, 140, currentY);
-            doc.text("Firma Subgerente de Producción", 110, currentY + 4, { align: 'center' });
+            currentY += 22;
+            
+            // Row 2 Signatures
+            doc.line(45, currentY, 95, currentY);
+            doc.text("Firma Control de Calidad", 70, currentY + 4, { align: 'center' });
+
+            doc.line(125, currentY, 175, currentY);
+            doc.text("Firma Subgerente de Producción", 150, currentY + 4, { align: 'center' });
 
             // Save PDF
             doc.save(`Orden_Produccion_${noOrden}.pdf`);
