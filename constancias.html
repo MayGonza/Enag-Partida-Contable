@@ -487,6 +487,14 @@
                     <label>Fecha de emisión</label>
                     <input type="text" id="cfgFecha" placeholder="ej. primer (01) días del mes de julio de 2026">
                 </div>
+                <div class="config-field">
+                    <label>Puesto Nominal</label>
+                    <input type="text" id="cfgPuestoNominal" value="[Excel]" placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
+                </div>
+                <div class="config-field">
+                    <label>Puesto Funcional</label>
+                    <input type="text" id="cfgPuestoFuncional" value="" placeholder="ej. Encargado de Facturación (Opcional)">
+                </div>
             </div>
         </div>
 
@@ -1172,17 +1180,43 @@
         function buildTextoConstancia(emp) {
             const art = emp.genero === 'M' ? ["El ciudadano", "el cargo", "labora"] : ["La ciudadana", "el cargo", "labora"];
             const tipoTexto = emp.tipo === 'Contrato' ? 'por contrato' : 'por acuerdo';
-            const firmante  = document.getElementById('cfgFirmante').value || "María José Valverde Bardales";
-            const cargoF    = document.getElementById('cfgCargoFirmante').value || "Jefe Interina de Recursos Humanos";
-            const ciudad    = document.getElementById('cfgCiudad').value || "Tegucigalpa, Municipio del Distrito Central";
-            const fecha     = document.getElementById('cfgFecha').value || "primer (01) días del mes de julio de 2026";
+            const firmante  = document.getElementById('cfgFirmante').value.trim();
+            const cargoF    = document.getElementById('cfgCargoFirmante').value.trim();
+            const ciudad    = document.getElementById('cfgCiudad').value.trim();
+            const fecha     = document.getElementById('cfgFecha').value.trim();
+
+            const nominalInput = document.getElementById('cfgPuestoNominal').value.trim();
+            const funcionalInput = document.getElementById('cfgPuestoFuncional').value.trim();
+
+            let nominalText = "";
+            if (nominalInput === "[Excel]") {
+                if (emp.puesto && emp.puesto !== "N/D") {
+                    nominalText = emp.puesto;
+                }
+            } else if (nominalInput !== "") {
+                nominalText = nominalInput;
+            }
+
+            let funcionalText = "";
+            if (funcionalInput !== "") {
+                funcionalText = funcionalInput;
+            }
+
+            let puestoTexto = "";
+            if (nominalText && funcionalText) {
+                puestoTexto = `, en ${art[1]} nominal de **${nominalText}** y desempeñando las funciones de **${funcionalText}**`;
+            } else if (nominalText) {
+                puestoTexto = `, en ${art[1]} nominal de **${nominalText}**`;
+            } else if (funcionalText) {
+                puestoTexto = `, desempeñando las funciones de **${funcionalText}**`;
+            }
 
             const sueldoEnLetras = numeroALetras(emp.sueldoDevengado);
             const sueldoFormato  = formatMoneda(emp.sueldoDevengado);
             const artSuscritas   = emp.genero === 'M' ? "El Suscrito" : "La Suscrita";
             const jefaO          = emp.genero === 'M' ? "Jefe" : "Jefe";
 
-            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${emp.nombre}** ${art[2]} en esta institución ${tipoTexto}, en ${art[1]} nominal de **${emp.puesto}**` +
+            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${emp.nombre}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}` +
                 (emp.ingreso && emp.ingreso !== 'N/D' ? ` a partir del **${emp.ingreso}**` : "") +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele las siguientes deducciones:`;
 
@@ -1480,12 +1514,11 @@
         }
 
         function validarConfiguracion() {
-            const firmante = document.getElementById('cfgFirmante').value.trim();
-            const cargo = document.getElementById('cfgCargoFirmante').value.trim();
+            // Se permiten campos de firmante vacíos para que no se muestre nada
             const ciudad = document.getElementById('cfgCiudad').value.trim();
             const fecha = document.getElementById('cfgFecha').value.trim();
-            if (!firmante || !cargo || !ciudad || !fecha) {
-                alert("Por favor, complete todos los campos de 'Configuración del Documento' antes de generar el PDF.");
+            if (!ciudad || !fecha) {
+                alert("Por favor, complete los campos de Ciudad y Fecha de emisión antes de generar el PDF.");
                 return false;
             }
             return true;
