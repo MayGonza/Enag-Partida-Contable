@@ -418,29 +418,7 @@
                 </div>
             </div>
 
-            <div class="grid-2" style="margin-top: 15px;">
-                <!-- Guillotinas -->
-                <div class="section-card" style="margin: 0; background: white;">
-                    <h4 style="margin: 0 0 10px 0; color: #333;">Guillotinas</h4>
-                    <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="gui_carta"> <span>1. Carta
-                                8½x11</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="gui_oficio"> <span>2. Oficio
-                                8½x13</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="gui_legal"> <span>3. Legal
-                                8½x14</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="gui_tabloide"> <span>4. Tabloide
-                                11x17</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="gui_dobleoficio"> <span>5. Doble
-                                Oficio</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="gui_16"> <span>6. Cortar
-                                16</span></label>
-                        <div class="form-group" style="grid-column: span 2;">
-                            <input type="text" id="gui_otros" placeholder="7. Otros cortes">
-                        </div>
-                    </div>
-                </div>
-            </div>
+
 
             <div class="grid-3" style="margin-top: 15px;">
                 <!-- Tipografia -->
@@ -578,13 +556,19 @@
 
         async function generarPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'legal');
+            const doc = new jsPDF('p', 'mm', 'letter');
 
-            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            let logoW = 0, logoH = 0;
+            const logoBgUrl = await getBase64FromUrl('logo.png');
             if (logoBgUrl) {
-                const pw = doc.internal.pageSize.getWidth();
-                const ph = doc.internal.pageSize.getHeight();
-                doc.addImage(logoBgUrl, 'PNG', 0, 0, pw, ph);
+                const props = doc.getImageProperties(logoBgUrl);
+                logoH = 20;
+                logoW = (props.width * logoH) / props.height;
+                if (logoW > 50) {
+                    logoW = 50;
+                    logoH = (props.height * logoW) / props.width;
+                }
+                doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
             }
 
             // Constantes de diseño
@@ -594,24 +578,24 @@
             // --- HEADER ---
             doc.setFont("helvetica", "bold");
             doc.setFontSize(22);
-            doc.text("ORDEN DE PRODUCCIÓN", 55, 60);
+            doc.text("ORDEN DE PRODUCCIÓN", 55, 25);
 
             // Header Text Removed
 
             // Numero de orden box
-            doc.rect(155, 53, 45, 10);
+            doc.rect(155, 18, 45, 10);
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.text("Nº", 158, 60);
+            doc.text("Nº", 158, 25);
             doc.setTextColor(200, 0, 0);
             const noOrden = document.getElementById('noOrden').value || "13993";
-            doc.text(noOrden, 170, 60);
+            doc.text(noOrden, 170, 25);
             doc.setTextColor(0, 0, 0);
-            
+
             let lastPageCount = doc.internal.getNumberOfPages();
 
             // General Info and Right side Dates
-            currentY = 75;
+            currentY = 40;
             doc.setFontSize(12);
             doc.text("INFORMACIÓN GENERAL", 80, currentY);
 
@@ -639,21 +623,21 @@
                 doc.text(a, x + 22, y + 9);
             }
 
-            drawDateBox(165, 80, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
-            drawDateBox(165, 95, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
-            drawDateBox(165, 110, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
+            drawDateBox(165, 45, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
+            drawDateBox(165, 60, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
+            drawDateBox(165, 75, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
 
             // Maquina Removed
 
             // Cliente
-            currentY = 100;
+            currentY = 65;
             doc.setFont("helvetica", "bold");
             doc.text("CLIENTE:", marginX, currentY);
             doc.setFont("helvetica", "normal");
             doc.text(document.getElementById('cliente').value, 35, currentY);
             doc.line(35, currentY + 1, 150, currentY + 1);
 
-            currentY = 110;
+            currentY = 75;
             doc.setFont("helvetica", "bold");
             doc.text("TELEFONO FIJO:", marginX, currentY);
             doc.setFont("helvetica", "normal");
@@ -667,7 +651,7 @@
             doc.line(115, currentY + 1, 150, currentY + 1);
 
             // --- TABLAS ---
-            currentY = 120;
+            currentY = 85;
 
             // Extract Trabajo
             let rowTrabajo = [];
@@ -689,13 +673,13 @@
                 body: rowTrabajo,
                 theme: 'grid',
                 headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
-                bodyStyles: { fontSize: 8, minCellHeight: 8 },
-                margin: { top: 40, left: marginX, right: marginX },
-                willDrawPage: function(data) {
+                bodyStyles: { fontSize: 8, minCellHeight: 6, cellPadding: 1 },
+                margin: { top: 35, left: marginX, right: marginX },
+                willDrawPage: function (data) {
                     const currentPage = doc.internal.getNumberOfPages();
                     if (currentPage > lastPageCount) {
                         if (logoBgUrl) {
-                            doc.addImage(logoBgUrl, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+                            doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
                         }
                         lastPageCount = currentPage;
                     }
@@ -723,13 +707,13 @@
                 body: rowMat,
                 theme: 'grid',
                 headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
-                bodyStyles: { fontSize: 8, minCellHeight: 8 },
-                margin: { top: 40, left: marginX, right: marginX },
-                willDrawPage: function(data) {
+                bodyStyles: { fontSize: 8, minCellHeight: 6, cellPadding: 1 },
+                margin: { top: 35, left: marginX, right: marginX },
+                willDrawPage: function (data) {
                     const currentPage = doc.internal.getNumberOfPages();
                     if (currentPage > lastPageCount) {
                         if (logoBgUrl) {
-                            doc.addImage(logoBgUrl, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+                            doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
                         }
                         lastPageCount = currentPage;
                     }
@@ -743,7 +727,7 @@
                     doc.addPage();
                     lastPageCount = doc.internal.getNumberOfPages();
                     if (logoBgUrl) {
-                        doc.addImage(logoBgUrl, 'PNG', 0, 0, doc.internal.pageSize.getWidth(), doc.internal.pageSize.getHeight());
+                        doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
                     }
                     currentY = 40; // start drawing lower on new pages
                 }
@@ -753,28 +737,28 @@
             // Render checkboxes in 3 columns
             doc.setFontSize(8);
             const boxW = 60;
-            const boxH = 40;
+            const boxH = 32;
             const gap = 3;
 
             function drawCheckSection(title, x, y, options) {
                 doc.setDrawColor(0);
                 doc.rect(x, y, boxW, boxH);
                 doc.setFillColor(0, 33, 71);
-                doc.rect(x, y, boxW, 6, "F");
+                doc.rect(x, y, boxW, 5, "F");
                 doc.setTextColor(255);
                 doc.setFont("helvetica", "bold");
-                doc.text(title, x + boxW / 2, y + 4.5, { align: 'center' });
+                doc.text(title, x + boxW / 2, y + 3.8, { align: 'center' });
                 doc.setTextColor(0);
                 doc.setFont("helvetica", "normal");
 
-                let optY = y + 10;
+                let optY = y + 8.5;
                 options.forEach(opt => {
                     doc.text(opt.label, x + 2, optY);
                     doc.rect(x + boxW - 6, optY - 3, 4, 4);
                     if (opt.checked) {
                         doc.text("X", x + boxW - 5, optY);
                     }
-                    optY += 5;
+                    optY += 4.5;
                 });
             }
 
@@ -797,16 +781,7 @@
                 { label: "   KORD: " + (document.getElementById('off_m_kord').checked ? "X" : "") + "     SORD: " + (document.getElementById('off_m_sord').checked ? "X" : ""), checked: false }
             ]);
 
-            // Col 3
-            drawCheckSection("GUILLOTINAS", marginX + (boxW + gap) * 2, currentY, [
-                { label: "1- Carta 8½ X 11\"", checked: document.getElementById('gui_carta').checked },
-                { label: "2- Oficio 8½ X 13\"", checked: document.getElementById('gui_oficio').checked },
-                { label: "3- Legal 8½ X 14\"", checked: document.getElementById('gui_legal').checked },
-                { label: "4- Tabloide 11X17\"", checked: document.getElementById('gui_tabloide').checked },
-                { label: "5- Doble Oficio", checked: document.getElementById('gui_dobleoficio').checked },
-                { label: "6- Cortar 16", checked: document.getElementById('gui_16').checked },
-                { label: "7- Otros: " + document.getElementById('gui_otros').value, checked: false }
-            ]);
+            // Guillotinas Removed
 
             currentY += boxH + gap;
 
@@ -852,7 +827,7 @@
             doc.line(marginX + 30, currentY + 1, 200, currentY + 1);
 
             // Firmas
-            currentY += 25;
+            currentY += 18;
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
 
@@ -866,8 +841,8 @@
             doc.line(155, currentY, 200, currentY);
             doc.text("Firma Cotización", 177.5, currentY + 4, { align: 'center' });
 
-            currentY += 22;
-            
+            currentY += 15;
+
             // Row 2 Signatures
             doc.line(45, currentY, 95, currentY);
             doc.text("Firma Control de Calidad", 70, currentY + 4, { align: 'center' });
