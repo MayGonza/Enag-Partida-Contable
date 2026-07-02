@@ -6,16 +6,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
     <title>Generación de Constancias de Trabajo con Deducciones — ENAG</title>
+    <style id="gate-style">
+        body > *:not(#password-gate) {
+            display: none !important;
+        }
+    </style>
     <script>
         (function() {
-            const password = prompt("Ingrese la contraseña de acceso:");
-            if (password !== "1212") {
-                alert("Acceso denegado.");
-                window.location.href = "index.html";
-                document.documentElement.style.display = 'none';
-                throw new Error("Acceso denegado");
-            }
+            document.addEventListener("DOMContentLoaded", function() {
+                const gateHtml = `
+                    <div id="password-gate" style="position: fixed; inset: 0; background: #002147; z-index: 999999; display: flex; align-items: center; justify-content: center; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">
+                        <div style="background: white; padding: 30px; border-radius: 12px; width: 90%; max-width: 380px; box-shadow: 0 10px 25px rgba(0,0,0,0.3); text-align: center; border-top: 5px solid #002147; box-sizing: border-box;">
+                            <div style="font-size: 2.5em; margin-bottom: 10px;">🔒</div>
+                            <h3 style="margin: 0 0 15px 0; color: #002147; font-size: 1.3em; font-weight: bold;">Acceso Restringido</h3>
+                            <p style="margin: 0 0 20px 0; font-size: 0.9em; color: #555; line-height: 1.4;">Ingrese la contraseña para acceder a este módulo.</p>
+                            
+                            <div style="position: relative; margin-bottom: 20px; text-align: left;">
+                                <input type="password" id="gate-pass" placeholder="Contraseña" style="width: 100% !important; padding: 12px 40px 12px 12px !important; border: 1px solid #cbd5e1 !important; border-radius: 6px !important; box-sizing: border-box !important; font-size: 16px !important; outline: none !important; height: 42px !important; line-height: normal !important; background: white !important; color: #333 !important;" onkeydown="if(event.key==='Enter') checkGatePass()">
+                                <button type="button" onclick="toggleGatePass()" id="gate-toggle-btn" style="position: absolute !important; right: 10px !important; top: 50% !important; transform: translateY(-50%) !important; background: none !important; border: none !important; cursor: pointer !important; font-size: 1.2em !important; padding: 0 !important; box-shadow: none !important; display: flex !important; align-items: center !important; justify-content: center !important; height: 30px !important; width: 30px !important; color: #64748b !important;">👁️</button>
+                            </div>
+                            
+                            <div style="display: flex; gap: 10px; justify-content: center;">
+                                <button type="button" onclick="cancelGate()" style="flex: 1; padding: 10px 15px; background: #6c757d; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.95em; box-shadow: none; height: 40px;">Cancelar</button>
+                                <button type="button" onclick="checkGatePass()" style="flex: 1; padding: 10px 15px; background: #22c55e; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; font-size: 0.95em; box-shadow: none; height: 40px;">Ingresar</button>
+                            </div>
+                            <p id="gate-error" style="color: #ef4444; font-size: 0.85em; margin: 12px 0 0 0; display: none; font-weight: bold;">Contraseña incorrecta</p>
+                        </div>
+                    </div>
+                `;
+                
+                const div = document.createElement('div');
+                div.innerHTML = gateHtml;
+                document.body.prepend(div.firstElementChild);
+                document.getElementById('gate-pass').focus();
+            });
         })();
+
+        function toggleGatePass() {
+            const input = document.getElementById('gate-pass');
+            const btn = document.getElementById('gate-toggle-btn');
+            if (input.type === 'password') {
+                input.type = 'text';
+                btn.innerText = '🙈';
+            } else {
+                input.type = 'password';
+                btn.innerText = '👁️';
+            }
+        }
+        function cancelGate() {
+            window.location.href = 'index.html';
+        }
+        function checkGatePass() {
+            const input = document.getElementById('gate-pass').value;
+            const error = document.getElementById('gate-error');
+            const correctHash = "1212";
+            if (input === correctHash) {
+                document.getElementById('password-gate').remove();
+                document.getElementById('gate-style').remove();
+            } else {
+                error.style.display = 'block';
+                document.getElementById('gate-pass').value = '';
+                document.getElementById('gate-pass').focus();
+            }
+        }
     </script>
     <meta name="description" content="Generador de constancias de trabajo para empleados de la Empresa Nacional de Artes Gráficas (ENAG).">
     <style>
