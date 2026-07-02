@@ -10,7 +10,7 @@ try {
         $cell = $sheet.Cells.Item(9, $c)
         $text = $cell.Text
         $val = $cell.Value2
-        $type = if ($val -ne $null) { $val.GetType().Name } else { "Null" }
+        $type = if ($null -ne $val) { $val.GetType().Name } else { "Null" }
         Write-Output ("Col " + $c + ": Text='" + $text + "', Value2='" + $val + "', Type='" + $type + "'")
     }
     
@@ -20,7 +20,7 @@ try {
         $cell = $sheet.Cells.Item(12, $c)
         $text = $cell.Text
         $val = $cell.Value2
-        $type = if ($val -ne $null) { $val.GetType().Name } else { "Null" }
+        $type = if ($null -ne $val) { $val.GetType().Name } else { "Null" }
         Write-Output ("Col " + $c + ": Text='" + $text + "', Value2='" + $val + "', Type='" + $type + "'")
     }
     

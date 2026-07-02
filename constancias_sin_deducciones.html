@@ -1192,7 +1192,7 @@
         }
 
         function formatMoneda(v) {
-            return "L. " + Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+            return "L.\u00A0" + Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
         }
 
         // ─────────────────────────────────────────────
@@ -1259,7 +1259,7 @@
                 parts.forEach((part, idx) => {
                     const isBold = idx % 2 === 1;
                     if (part) {
-                        const words = part.split(/(\s+)/);
+                        const words = part.split(/([ \t\r\n]+)/);
                         words.forEach(word => {
                             if (word) {
                                 tokens.push({ text: word, bold: isBold });
@@ -1403,7 +1403,20 @@
             return doc;
         }
 
+        function validarConfiguracion() {
+            const firmante = document.getElementById('cfgFirmante').value.trim();
+            const cargo = document.getElementById('cfgCargoFirmante').value.trim();
+            const ciudad = document.getElementById('cfgCiudad').value.trim();
+            const fecha = document.getElementById('cfgFecha').value.trim();
+            if (!firmante || !cargo || !ciudad || !fecha) {
+                alert("Por favor, complete todos los campos de 'Configuración del Documento' antes de generar el PDF.");
+                return false;
+            }
+            return true;
+        }
+
         async function generarConstanciaIndividual(id) {
+            if (!validarConfiguracion()) return;
             const emp = empleados.find(e=>e.id===id);
             if (!emp) return;
             const doc = await generarPDFConstancia(emp, null, false);
@@ -1412,6 +1425,7 @@
         }
 
         async function generarConstanciasSeleccionadas() {
+            if (!validarConfiguracion()) return;
             const sel = empleados.filter(e=>e.selected);
             if (sel.length===0) { alert("Por favor, selecciona al menos un empleado."); return; }
             const { jsPDF } = window.jspdf;
