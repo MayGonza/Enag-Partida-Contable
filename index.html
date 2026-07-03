@@ -315,6 +315,11 @@
                 <h2>Producción</h2>
                 <p>Generación de órdenes de producción y control de talleres gráficos.</p>
             </div>
+            <div class="card area-card" onclick="solicitarAcceso('comercializacion')">
+                <div class="icon">🎯</div>
+                <h2>Comercialización</h2>
+                <p>Gestión de ventas, marketing y relaciones con clientes.</p>
+            </div>
         </div>
 
         <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
@@ -379,6 +384,7 @@
         </div>
 
         <!-- BOTÓN VOLVER (Oculto al inicio) -->
+        <div id="menuComercializacion" class="grid-container sub-menu" style="display: none;"></div>
         <div id="backButtonContainer" style="display: none; margin-top: 30px;">
             <button onclick="volverAlMenuPrincipal()" class="btn-back">← Volver al Menú Principal</button>
         </div>
@@ -408,7 +414,8 @@
         const contrasenas = {
             contabilidad: "CONTA@2026",
             rrhh: "1212",
-            produccion: "" // No requiere contraseña
+            produccion: "", // No requiere contraseña
+            comercializacion: "" // No requiere contraseña
         };
 
         function solicitarAcceso(area) {
@@ -491,7 +498,11 @@
             } else if (area === 'produccion') {
                 targetId = 'menuProduccion';
                 titulo = "Módulo de Producción";
+            } else if (area === 'comercializacion') {
+                targetId = 'menuComercializacion';
+                titulo = "Módulo de Comercialización";
             }
+
 
             document.getElementById(targetId).style.display = 'grid';
             document.getElementById('menuTitle').innerText = titulo;

@@ -758,7 +758,7 @@
                     const parseRow = (rowA, rowB) => {
                         const empName = rowA[nombreIdx]?rowA[nombreIdx].toString().trim().toUpperCase():"";
                         if (!empName) return;
-                        const cargo = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim().toUpperCase():"";
+                        const cargo = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim():"";
                         const numPuesto = numeroPuestoIdx!==-1&&rowB&&rowB[numeroPuestoIdx]?rowB[numeroPuestoIdx].toString().trim():"";
                         const ingreso = ingresoIdx!==-1&&rowA[ingresoIdx]!==undefined&&rowA[ingresoIdx]!==""?parsearFechaIngreso(rowA[ingresoIdx]):"";
                         if (cargo) window.empleadoCargoMap[empName]=cargo;
@@ -894,9 +894,9 @@
                     const totalDeducciones = deducciones.reduce((s,d)=>s+d.monto,0);
                     const netoPagar = sueldoDevengado - totalDeducciones;
 
-                    let empPuesto = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim().toUpperCase():"";
+                    let empPuesto = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim():"";
                     if (!empPuesto&&window.empleadoCargoMap&&window.empleadoCargoMap[empName]) empPuesto=window.empleadoCargoMap[empName];
-                    if (!empPuesto) empPuesto="EMPLEADO/A";
+                    if (!empPuesto) empPuesto="Empleado/a";
 
                     let empNumPuesto = numeroPuestoIdx!==-1&&rowB&&rowB[numeroPuestoIdx]?rowB[numeroPuestoIdx].toString().trim():"";
                     if (!empNumPuesto&&window.empleadoNumeroPuestoMap&&window.empleadoNumeroPuestoMap[empName]) empNumPuesto=window.empleadoNumeroPuestoMap[empName];
@@ -910,7 +910,7 @@
                     return {
                         id: rowIdx,
                         nombre: empName,
-                        puesto: empPuesto,
+                        puesto: formatNombreOracion(empPuesto),
                         numeroPuesto: empNumPuesto,
                         ingreso: empIngreso,
                         tipo: empTipo,
@@ -1199,8 +1199,8 @@
                 table.appendChild(tr);
             };
 
-            addRow('Sueldo Asignado', formatMoneda(emp.sueldoAsignado));
-            addRow('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
+            addRow('Sueldo Asignado', formatMoneda(emp.sueldoAsignado), true);
+            addRow('Sueldo Devengado', formatMoneda(emp.sueldoDevengado), true);
 
             // Sección Deducciones
             const trH = document.createElement('tr');
