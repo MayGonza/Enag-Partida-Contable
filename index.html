@@ -1,56 +1,66 @@
 <!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
     <title>Sistema de Gestión ENAG</title>
     <style>
-        body { 
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
-            margin: 0; 
-            padding: 40px 20px; 
-            background-color: #002147; /* Azul Oscuro Institucional */
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            /* Azul Oscuro Institucional */
             display: flex;
             align-items: center;
             justify-content: center;
             min-height: 100vh;
             color: #333;
         }
+
         /* Fondo difuminado con el logo */
         body::before {
             content: "";
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: url('logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
         }
-        .main-container { 
-            max-width: 800px; 
+
+        .main-container {
+            max-width: 800px;
             width: 100%;
-            background: rgba(255, 255, 255, 0.98); 
-            padding: 40px; 
-            border-radius: 20px; 
-            box-shadow: 0 20px 50px rgba(0,0,0,0.4); 
+            background: rgba(255, 255, 255, 0.98);
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             text-align: center;
             border-top: 8px solid #002147;
         }
+
         .header-logo {
             max-width: 380px;
             margin-bottom: 30px;
-            filter: drop-shadow(0 2px 4px rgba(0,0,0,0.1));
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.1));
         }
-        h1 { 
-            color: #002147; 
-            margin-bottom: 40px; 
+
+        h1 {
+            color: #002147;
+            margin-bottom: 40px;
             font-size: 1.8em;
             text-transform: uppercase;
             letter-spacing: 1px;
             position: relative;
             padding-bottom: 10px;
         }
+
         h1::after {
             content: "";
             position: absolute;
@@ -60,97 +70,446 @@
             height: 3px;
             background: linear-gradient(to right, transparent, #002147, transparent);
         }
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); 
-            gap: 25px; 
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 25px;
             margin-top: 20px;
         }
-        .card { 
-            background: white; 
-            padding: 35px 25px; 
-            border-radius: 15px; 
+
+        .card {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 15px;
             border: 1px solid #e0e0e0;
-            text-decoration: none; 
-            color: #333; 
+            text-decoration: none;
+            color: #333;
             transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 15px;
         }
-        .card:hover { 
-            transform: translateY(-12px); 
+
+        .card:hover {
+            transform: translateY(-12px);
             border-color: #002147;
-            box-shadow: 0 15px 30px rgba(0,33,71,0.2);
+            box-shadow: 0 15px 30px rgba(0, 33, 71, 0.2);
             background-color: #f0f4f8;
         }
+
         .card .icon {
             font-size: 3.5em;
             margin-bottom: 5px;
         }
-        .card h2 { 
-            margin: 0; 
-            color: #002147; 
+
+        .card h2 {
+            margin: 0;
+            color: #002147;
             font-size: 1.4em;
         }
+
         .card p {
             margin: 0;
             color: #666;
             font-size: 0.95em;
             line-height: 1.5;
         }
-        .footer-text { margin-top: 40px; font-size: 0.85em; color: #888; font-weight: bold; }
+
+        .footer-text {
+            margin-top: 40px;
+            font-size: 0.85em;
+            color: #888;
+            font-weight: bold;
+        }
+
+        /* Estilos del Submenú y animaciones */
+        .sub-menu {
+            animation: slideUp 0.4s ease-out forwards;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .btn-back {
+            background-color: #6c757d;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-back:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .area-card {
+            cursor: pointer;
+        }
+
+        /* Modal de Contraseña */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 33, 71, 0.65);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 90%;
+            text-align: center;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border-top: 5px solid #002147;
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-content h3 {
+            margin-top: 0;
+            color: #002147;
+            font-size: 1.3em;
+        }
+
+        .modal-content input[type="password"] {
+            width: 100%;
+            padding: 12px;
+            margin: 15px 0 5px 0;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 1.1em;
+            text-align: center;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .modal-content input[type="password"]:focus {
+            border-color: #002147;
+        }
+
+        .error-msg {
+            color: #ef4444;
+            font-size: 0.85em;
+            margin: 5px 0 15px 0;
+            min-height: 18px;
+            font-weight: bold;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        .modal-buttons button {
+            padding: 10px 20px;
+            border-radius: 6px;
+            border: none;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-size: 0.95em;
+        }
+
+        .btn-cancel {
+            background: #e2e8f0;
+            color: #4a5568;
+        }
+
+        .btn-cancel:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-confirm {
+            background: #002147;
+            color: white;
+        }
+
+        .btn-confirm:hover {
+            background: #003470;
+        }
+
+        /* Animación para error (shake) */
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-8px);
+            }
+
+            75% {
+                transform: translateX(8px);
+            }
+        }
+
+        .shake {
+            animation: shake 0.3s ease-in-out;
+        }
     </style>
 </head>
+
 <body>
 
     <div class="main-container">
         <img src="logo.png" alt="ENAG Logo" class="header-logo">
-        <h1>Portal Administrativo</h1>
-        
-        <div class="grid-container">
+        <h1 id="menuTitle">Portal Administrativo</h1>
+
+        <!-- VISTA DE ÁREAS PRINCIPALES (Inicial) -->
+        <div id="areasContainer" class="grid-container">
+            <div class="card area-card" onclick="solicitarAcceso('contabilidad')">
+                <div class="icon">💼</div>
+                <h2>Contabilidad</h2>
+                <p>Retenciones de impuestos y registro de partidas contables diarias.</p>
+            </div>
+            <div class="card area-card" onclick="solicitarAcceso('rrhh')">
+                <div class="icon">👥</div>
+                <h2>Recursos Humanos</h2>
+                <p>Planillas, vouchers de pago y generación de constancias laborales (Acuerdo y Contrato).</p>
+            </div>
+            <div class="card area-card" onclick="solicitarAcceso('produccion')">
+                <div class="icon">🏭</div>
+                <h2>Producción</h2>
+                <p>Generación de órdenes de producción y control de talleres gráficos.</p>
+            </div>
+        </div>
+
+        <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
+        <div id="menuContabilidad" class="grid-container sub-menu" style="display: none;">
             <a href="comprobante_retencion.html" class="card">
                 <div class="icon">📄</div>
                 <h2>Retenciones</h2>
                 <p>Generación y registro oficial de comprobantes de retención de impuestos.</p>
             </a>
-
             <a href="partidas.html" class="card">
                 <div class="icon">📊</div>
                 <h2>Partidas</h2>
-                <p>Creación de partidas contables</p>
+                <p>Creación y registro de partidas contables.</p>
             </a>
+        </div>
 
+        <!-- SUB-MENÚ: RECURSOS HUMANOS (Oculto al inicio) -->
+        <div id="menuRRHH" class="grid-container sub-menu" style="display: none;">
             <a href="vouchers.html" class="card">
                 <div class="icon">💵</div>
-                <h2>Vouchers de Pago</h2>
-                <p>Carga de planilla de salarios desde Excel y generación masiva de recibos de pago.</p>
+                <h2>Vouchers (Acuerdo)</h2>
+                <p>Carga de planilla de salarios y generación masiva de recibos de pago para empleados por Acuerdo.</p>
             </a>
-
+            <a href="vouchers_contrato.html" class="card">
+                <div class="icon">💵</div>
+                <h2>Vouchers (Contrato)</h2>
+                <p>Carga de planilla de salarios y generación masiva de recibos de pago para empleados por Contrato.</p>
+            </a>
             <a href="constancias.html" class="card">
                 <div class="icon">📋</div>
-                <h2>Constancia de Trabajo con Deducciones</h2>
-                <p>Generación de constancias laborales oficiales con detalle de sueldo y deducciones.</p>
+                <h2>Constancia con Deducciones (Acuerdo)</h2>
+                <p>Generación de constancias laborales oficiales con detalle de sueldo y deducciones para empleados por
+                    Acuerdo.</p>
             </a>
-
+            <a href="constancias_contrato.html" class="card">
+                <div class="icon">📋</div>
+                <h2>Constancia con Deducciones (Contrato)</h2>
+                <p>Generación de constancias laborales oficiales con detalle de sueldo y deducciones para empleados por
+                    Contrato.</p>
+            </a>
             <a href="constancias_sin_deducciones.html" class="card">
                 <div class="icon">📋</div>
-                <h2>Constancia de Trabajo</h2>
-                <p>Generación de constancias laborales oficiales sin detalle de deducciones.</p>
+                <h2>Constancia sin Deducciones (Acuerdo)</h2>
+                <p>Generación de constancias laborales oficiales sin detalle de deducciones para empleados por Acuerdo.
+                </p>
             </a>
+            <a href="constancias_sin_deducciones_contrato.html" class="card">
+                <div class="icon">📋</div>
+                <h2>Constancia sin Deducciones (Contrato)</h2>
+                <p>Generación de constancias laborales oficiales sin detalle de deducciones para empleados por Contrato.
+                </p>
+            </a>
+        </div>
 
+        <!-- SUB-MENÚ: PRODUCCIÓN (Oculto al inicio) -->
+        <div id="menuProduccion" class="grid-container sub-menu" style="display: none;">
             <a href="orden_produccion.html" class="card">
                 <div class="icon">🏭</div>
                 <h2>Orden de Producción</h2>
-                <p>Formulario para la creación de las órdenes de producción.</p>
+                <p>Formulario para la creación y registro de las órdenes de producción.</p>
             </a>
         </div>
-        
+
+        <!-- BOTÓN VOLVER (Oculto al inicio) -->
+        <div id="backButtonContainer" style="display: none; margin-top: 30px;">
+            <button onclick="volverAlMenuPrincipal()" class="btn-back">← Volver al Menú Principal</button>
+        </div>
+
         <div class="footer-text">
             EMPRESA NACIONAL DE ARTES GRÁFICAS - ENAG 2026
         </div>
     </div>
 
+    <!-- MODAL DE CONTRASEÑA -->
+    <div id="passwordModal" class="modal-overlay">
+        <div class="modal-content">
+            <h3 id="modalTitle">Ingrese la contraseña de acceso</h3>
+            <p id="modalDesc" style="color: #666; font-size: 0.9em; margin-bottom: 15px;"></p>
+            <input type="password" id="modalPasswordInput" placeholder="Contraseña o PIN" onkeydown="checkEnter(event)">
+            <p id="modalErrorMsg" class="error-msg"></p>
+            <div class="modal-buttons">
+                <button onclick="cerrarPasswordModal()" class="btn-cancel">Cancelar</button>
+                <button onclick="verificarPassword()" class="btn-confirm">Ingresar</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let areaSeleccionada = "";
+
+        const contrasenas = {
+            contabilidad: "CONTA@2026",
+            rrhh: "1212",
+            produccion: "" // No requiere contraseña
+        };
+
+        function solicitarAcceso(area) {
+            areaSeleccionada = area;
+            const passRequerida = contrasenas[area];
+
+            if (passRequerida === "") {
+                // Redirigir o mostrar directamente si no requiere contraseña
+                mostrarSubmenu(area);
+                return;
+            }
+
+            // Configurar modal
+            const nombresAreas = {
+                contabilidad: "Área de Contabilidad",
+                rrhh: "Área de Recursos Humanos"
+            };
+            document.getElementById('modalTitle').innerText = "Acceso a " + nombresAreas[area];
+            document.getElementById('modalDesc').innerText = "Ingrese el PIN o contraseña de acceso correspondiente.";
+            document.getElementById('modalPasswordInput').value = "";
+            document.getElementById('modalErrorMsg').innerText = "";
+
+            // Mostrar modal
+            const overlay = document.getElementById('passwordModal');
+            overlay.classList.add('active');
+
+            // Autofocus
+            setTimeout(() => {
+                document.getElementById('modalPasswordInput').focus();
+            }, 100);
+        }
+
+        function cerrarPasswordModal() {
+            document.getElementById('passwordModal').classList.remove('active');
+        }
+
+        function checkEnter(event) {
+            if (event.key === 'Enter') {
+                verificarPassword();
+            }
+        }
+
+        function verificarPassword() {
+            const input = document.getElementById('modalPasswordInput').value;
+            const correctPass = contrasenas[areaSeleccionada];
+            const modalContent = document.querySelector('.modal-content');
+
+            if (input === correctPass) {
+                cerrarPasswordModal();
+                mostrarSubmenu(areaSeleccionada);
+            } else {
+                const errorField = document.getElementById('modalErrorMsg');
+                errorField.innerText = "Contraseña incorrecta. Intente de nuevo.";
+
+                // Efecto shake
+                modalContent.classList.remove('shake');
+                void modalContent.offsetWidth; // Trigger reflow
+                modalContent.classList.add('shake');
+            }
+        }
+
+        function mostrarSubmenu(area) {
+            // Ocultar el contenedor principal
+            document.getElementById('areasContainer').style.display = 'none';
+
+            // Ocultar todos los submenús primero
+            document.getElementById('menuContabilidad').style.display = 'none';
+            document.getElementById('menuRRHH').style.display = 'none';
+            document.getElementById('menuProduccion').style.display = 'none';
+
+            // Mostrar el submenú seleccionado
+            let targetId = "";
+            let titulo = "";
+            if (area === 'contabilidad') {
+                targetId = 'menuContabilidad';
+                titulo = "Módulo de Contabilidad";
+            } else if (area === 'rrhh') {
+                targetId = 'menuRRHH';
+                titulo = "Módulo de Recursos Humanos";
+            } else if (area === 'produccion') {
+                targetId = 'menuProduccion';
+                titulo = "Módulo de Producción";
+            }
+
+            document.getElementById(targetId).style.display = 'grid';
+            document.getElementById('menuTitle').innerText = titulo;
+            document.getElementById('backButtonContainer').style.display = 'block';
+        }
+
+        function volverAlMenuPrincipal() {
+            // Ocultar todos los submenús y el botón volver
+            document.getElementById('menuContabilidad').style.display = 'none';
+            document.getElementById('menuRRHH').style.display = 'none';
+            document.getElementById('menuProduccion').style.display = 'none';
+            document.getElementById('backButtonContainer').style.display = 'none';
+
+            // Restaurar título y mostrar las áreas principales
+            document.getElementById('menuTitle').innerText = "Portal Administrativo";
+            document.getElementById('areasContainer').style.display = 'grid';
+        }
+    </script>
 </body>
+
 </html>

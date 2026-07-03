@@ -330,7 +330,7 @@
     <div class="container">
 
         <div class="form-header">
-            <h2>Generador de Vouchers de Pago</h2>
+            <h2>Generador de Vouchers de Pago por Contrato</h2>
             <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de salarios desde un archivo de Excel para
                 procesar e imprimir los comprobantes.</p>
         </div>
@@ -363,10 +363,14 @@
                 <input type="text" id="fechaEmision" placeholder="ej. 30 de marzo del 2026"
                     style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; font-size: 1em; box-sizing: border-box;">
             </div>
-            <div style="flex: 1; min-width: 200px; display: flex; align-items: center; margin-top: 15px;">
-                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer;">
+            <div style="flex: 1; min-width: 250px; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color: #002147; font-size: 0.95em;">
                     <input type="checkbox" id="showFechaIngreso" style="width: 18px; height: 18px;">
                     Mostrar Fecha de Ingreso en PDF
+                </label>
+                <label style="display:flex; align-items:center; gap:8px; font-weight:bold; cursor:pointer; color: #002147; font-size: 0.95em;">
+                    <input type="checkbox" id="showPeriodoContratacion" style="width: 18px; height: 18px;">
+                    Mostrar Periodo de Contratación en PDF
                 </label>
             </div>
         </div>
@@ -851,7 +855,7 @@
                     }
                 }
 
-                let nombreIdx = -1, puestoIdx = -1, tipoIdx = -1, mesIdx = -1, asignadoIdx = -1, devengadoIdx = -1, ingresoIdx = -1;
+                let nombreIdx = -1, puestoIdx = -1, tipoIdx = -1, mesIdx = -1, asignadoIdx = -1, devengadoIdx = -1, ingresoIdx = -1, periodoIdx = -1;
                 let numeroPuestoIdx = -1, totalDeduccionesIdx = -1;
 
                 // Mapear cabeceras
@@ -862,12 +866,13 @@
                         puestoIdx = index;
                     }
                     if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
-                    if (norm.includes("mes") || norm.includes("periodo")) mesIdx = index;
+                    if ((norm.includes("mes") || norm.includes("periodo")) && !norm.includes("contrat")) mesIdx = index;
                     if (norm.includes("asignado")) asignadoIdx = index;
                     if (norm.includes("devengado")) devengadoIdx = index;
                     if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
                     if (norm.includes("totaldededucciones") || (norm.includes("total") && norm.includes("deduc"))) totalDeduccionesIdx = index;
-                    if ((norm.includes("ingreso") || norm.includes("contrata") || norm.includes("periododecontratacion")) && !norm.includes("reingreso")) ingresoIdx = index;
+                    if (norm.includes("ingreso") && !norm.includes("reingreso")) ingresoIdx = index;
+                    if ((norm.includes("periodo") || norm.includes("contratacion")) && !norm.includes("reingreso") && periodoIdx === -1) periodoIdx = index;
                 });
 
                 // Si no se mapearon adecuadamente por nombre completo, forzar defaults para el formato ENAG
@@ -973,13 +978,19 @@
                                 }
                                 if (!empNumPuesto) empNumPuesto = "N/D";
 
-                                const empTipo = "Acuerdo";
+                                const empTipo = "Contrato";
 
                                 let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
                                 if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
                                     empIngreso = window.empleadoIngresoMap[empName];
                                 }
                                 if (!empIngreso) empIngreso = "N/D";
+
+                                let empPeriodo = periodoIdx !== -1 && rowA[periodoIdx] !== undefined && rowA[periodoIdx] !== "" ? parsearFechaIngreso(rowA[periodoIdx]) : "";
+                                if (!empPeriodo && window.empleadoPeriodoMap && window.empleadoPeriodoMap[empName]) {
+                                    empPeriodo = window.empleadoPeriodoMap[empName];
+                                }
+                                if (!empPeriodo) empPeriodo = "N/D";
 
                                 // Solo agregarlo si el nombre no está vacío
                                 if (empName !== "") {
@@ -989,6 +1000,7 @@
                                         puesto: empPuesto,
                                         numeroPuesto: empNumPuesto,
                                         ingreso: empIngreso,
+                                        periodoContratacion: empPeriodo,
                                         tipo: empTipo,
                                         mes: mesIdx !== -1 && rowA[mesIdx] ? rowA[mesIdx].toString().trim() : "marzo 2026",
                                         sueldoAsignado: sueldoAsignado,
@@ -1051,7 +1063,7 @@
                         }
                         if (!empNumPuesto) empNumPuesto = "N/D";
 
-                        const empTipo = "Acuerdo";
+                        const empTipo = "Contrato";
 
                         let empIngreso = ingresoIdx !== -1 && row[ingresoIdx] !== undefined && row[ingresoIdx] !== "" ? parsearFechaIngreso(row[ingresoIdx]) : "";
                         if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
@@ -1059,12 +1071,19 @@
                         }
                         if (!empIngreso) empIngreso = "N/D";
 
+                        let empPeriodo = periodoIdx !== -1 && row[periodoIdx] !== undefined && row[periodoIdx] !== "" ? parsearFechaIngreso(row[periodoIdx]) : "";
+                        if (!empPeriodo && window.empleadoPeriodoMap && window.empleadoPeriodoMap[empName]) {
+                            empPeriodo = window.empleadoPeriodoMap[empName];
+                        }
+                        if (!empPeriodo) empPeriodo = "N/D";
+
                         empleados.push({
                             id: i,
                             nombre: empName,
                             puesto: empPuesto,
                             numeroPuesto: empNumPuesto,
                             ingreso: empIngreso,
+                            periodoContratacion: empPeriodo,
                             tipo: empTipo,
                             mes: mesIdx !== -1 && row[mesIdx] ? row[mesIdx].toString().trim() : "marzo 2026",
                             sueldoAsignado: sueldoAsignado,
@@ -1334,26 +1353,32 @@
             doc.setFontSize(10.5);
             doc.text(`Nombre del Empleado: ${emp.nombre}`, 25, 66);
             doc.text(`Puesto: ${emp.puesto}`, 25, 72);
+            
+            let currentY = 78;
             if (emp.numeroPuesto && emp.numeroPuesto !== "N/D") {
-                doc.text(`N° de Puesto: ${emp.numeroPuesto}`, 25, 78);
-                if (document.getElementById('showFechaIngreso').checked) {
-                    doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, 84);
-                }
-            } else {
-                if (document.getElementById('showFechaIngreso').checked) {
-                    doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, 78);
-                }
+                doc.text(`N° de Puesto: ${emp.numeroPuesto}`, 25, currentY);
+                currentY += 6;
             }
+            if (document.getElementById('showFechaIngreso').checked) {
+                doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, currentY);
+                currentY += 6;
+            }
+            if (document.getElementById('showPeriodoContratacion') && document.getElementById('showPeriodoContratacion').checked) {
+                doc.text(`Periodo de Contratación: ${emp.periodoContratacion}`, 25, currentY);
+                currentY += 6;
+            }
+
+            let startVoucherY = Math.max(91, currentY + 5);
 
             // Mes del Voucher
             const mesSeleccionado = document.getElementById('mesVoucher').value || "marzo 2026";
             doc.setFontSize(11);
-            doc.text(`Voucher de Pago Correspondiente al Mes de ${mesSeleccionado}`, 105, 91, { align: "center" });
+            doc.text(`Voucher de Pago Correspondiente al Mes de ${mesSeleccionado}`, 105, startVoucherY, { align: "center" });
 
             // Checkboxes Acuerdo/Contrato
             doc.setFontSize(10);
-            doc.text(`Acuerdo (X)`, 55, 97);
-            doc.text(`Contrato ( )`, 125, 97);
+            doc.text(`Acuerdo ( )`, 55, startVoucherY + 6);
+            doc.text(`Contrato (X)`, 125, startVoucherY + 6);
 
             // Tabla de Pagos y Deducciones (Dibujada manualmente para coincidir exactamente con el diseño provisto)
             const tableLeft = 25;
@@ -1362,7 +1387,7 @@
             const labelX = 28;
             const valueX = 182; // Alineado a la derecha
             const rowHeight = 6.5;
-            let y = 103;
+            let y = startVoucherY + 12;
 
             const tableRows = [];
             tableRows.push({ type: 'normal', label: 'Sueldo Asignado', val: emp.sueldoAsignado });

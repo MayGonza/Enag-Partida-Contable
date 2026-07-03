@@ -5,10 +5,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
-    <title>Generación de Constancias de Trabajo (Acuerdo) — ENAG</title>
+    <title>Generación de Constancias de Trabajo con Deducciones (Contrato) — ENAG</title>
 
-    <meta name="description"
-        content="Generador de constancias de trabajo para empleados de la Empresa Nacional de Artes Gráficas (ENAG).">
+    <meta name="description" content="Generador de constancias de trabajo para empleados de la Empresa Nacional de Artes Gráficas (ENAG).">
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -20,24 +19,14 @@
         }
 
         @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(30px);
-            }
-
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            from { opacity: 0; transform: translateY(30px); }
+            to   { opacity: 1; transform: translateY(0); }
         }
 
         body::before {
             content: "";
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; width: 100%; height: 100%;
             background: url('logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
@@ -129,8 +118,7 @@
             margin-bottom: 5px;
         }
 
-        .config-field input,
-        .config-field select {
+        .config-field input, .config-field select {
             width: 100%;
             padding: 9px 12px;
             border: 1px solid #cbd5e1;
@@ -142,8 +130,7 @@
             transition: border-color 0.2s;
         }
 
-        .config-field input:focus,
-        .config-field select:focus {
+        .config-field input:focus, .config-field select:focus {
             outline: none;
             border-color: #002147;
         }
@@ -178,23 +165,9 @@
             background-color: #eaf0f8;
         }
 
-        .drop-zone svg {
-            width: 48px;
-            height: 48px;
-            fill: #64748b;
-        }
-
-        .drop-zone p {
-            margin: 0;
-            font-size: 1.05em;
-            color: #475569;
-            font-weight: 500;
-        }
-
-        .drop-zone span {
-            font-size: 0.88em;
-            color: #94a3b8;
-        }
+        .drop-zone svg { width: 48px; height: 48px; fill: #64748b; }
+        .drop-zone p  { margin: 0; font-size: 1.05em; color: #475569; font-weight: 500; }
+        .drop-zone span { font-size: 0.88em; color: #94a3b8; }
 
         .actions-sidebar {
             flex: 1;
@@ -220,39 +193,15 @@
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
-        .btn-template {
-            background-color: #0284c7;
-            color: white;
-        }
+        .btn-template  { background-color: #0284c7; color: white; }
+        .btn-template:hover { background-color: #0369a1; }
 
-        .btn-template:hover {
-            background-color: #0369a1;
-        }
+        .btn-generate  { background-color: #22c55e; color: white; font-size: 1.05em; }
+        .btn-generate:hover { background-color: #16a34a; }
+        .btn-generate:disabled { background-color: #cbd5e1; cursor: not-allowed; color: #64748b; }
 
-        .btn-generate {
-            background-color: #22c55e;
-            color: white;
-            font-size: 1.05em;
-        }
-
-        .btn-generate:hover {
-            background-color: #16a34a;
-        }
-
-        .btn-generate:disabled {
-            background-color: #cbd5e1;
-            cursor: not-allowed;
-            color: #64748b;
-        }
-
-        .btn-clear {
-            background-color: #ef4444;
-            color: white;
-        }
-
-        .btn-clear:hover {
-            background-color: #dc2626;
-        }
+        .btn-clear { background-color: #ef4444; color: white; }
+        .btn-clear:hover { background-color: #dc2626; }
 
         /* Sheet selector */
         #sheetSelectorContainer {
@@ -284,11 +233,7 @@
             box-sizing: border-box;
         }
 
-        .summary-info {
-            font-size: 0.95em;
-            font-weight: bold;
-            color: #475569;
-        }
+        .summary-info { font-size: 0.95em; font-weight: bold; color: #475569; }
 
         /* Table */
         .table-responsive {
@@ -300,56 +245,20 @@
             margin-top: 8px;
         }
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            text-align: left;
-        }
+        table { width: 100%; border-collapse: collapse; text-align: left; }
 
-        th,
-        td {
-            padding: 12px 14px;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.92em;
-        }
+        th, td { padding: 12px 14px; border-bottom: 1px solid #e2e8f0; font-size: 0.92em; }
 
-        th {
-            background-color: #f8fafc;
-            color: #475569;
-            font-weight: 600;
-        }
+        th { background-color: #f8fafc; color: #475569; font-weight: 600; }
 
-        tr:hover {
-            background-color: #f8fafc;
-        }
+        tr:hover { background-color: #f8fafc; }
 
-        .checkbox-cell {
-            text-align: center;
-            width: 38px;
-        }
+        .checkbox-cell { text-align: center; width: 38px; }
+        .checkbox-cell input { width: 17px; height: 17px; cursor: pointer; }
 
-        .checkbox-cell input {
-            width: 17px;
-            height: 17px;
-            cursor: pointer;
-        }
-
-        .badge {
-            padding: 3px 8px;
-            border-radius: 4px;
-            font-size: 0.78em;
-            font-weight: bold;
-        }
-
-        .badge-acuerdo {
-            background-color: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .badge-contrato {
-            background-color: #fef3c7;
-            color: #d97706;
-        }
+        .badge { padding: 3px 8px; border-radius: 4px; font-size: 0.78em; font-weight: bold; }
+        .badge-acuerdo { background-color: #e0f2fe; color: #0369a1; }
+        .badge-contrato { background-color: #fef3c7; color: #d97706; }
 
         .btn-action-small {
             padding: 5px 10px;
@@ -360,11 +269,7 @@
             box-shadow: none;
         }
 
-        .btn-action-small:hover {
-            background-color: #002147;
-            color: white;
-            border-color: #002147;
-        }
+        .btn-action-small:hover { background-color: #002147; color: white; border-color: #002147; }
 
         select.inline-select {
             padding: 4px 6px;
@@ -376,33 +281,21 @@
             cursor: pointer;
         }
 
-        .empty-state {
-            text-align: center;
-            padding: 40px 20px;
-            color: #94a3b8;
-        }
-
-        .empty-state svg {
-            width: 64px;
-            height: 64px;
-            margin-bottom: 10px;
-            fill: #cbd5e1;
-        }
+        .empty-state { text-align: center; padding: 40px 20px; color: #94a3b8; }
+        .empty-state svg { width: 64px; height: 64px; margin-bottom: 10px; fill: #cbd5e1; }
 
         /* Preview modal */
         .modal-overlay {
             display: none;
             position: fixed;
             inset: 0;
-            background: rgba(0, 0, 0, 0.55);
+            background: rgba(0,0,0,0.55);
             z-index: 999;
             align-items: center;
             justify-content: center;
         }
 
-        .modal-overlay.active {
-            display: flex;
-        }
+        .modal-overlay.active { display: flex; }
 
         .modal-box {
             background: white;
@@ -410,7 +303,7 @@
             padding: 32px;
             max-width: 640px;
             width: 95%;
-            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.4);
+            box-shadow: 0 25px 60px rgba(0,0,0,0.4);
             animation: fadeIn 0.3s ease-out;
             max-height: 90vh;
             overflow-y: auto;
@@ -455,10 +348,7 @@
             font-weight: bold;
         }
 
-        .modal-table .amount-col {
-            text-align: right;
-            font-family: monospace;
-        }
+        .modal-table .amount-col { text-align: right; font-family: monospace; }
 
         .modal-footer-text {
             font-size: 0.87em;
@@ -489,18 +379,14 @@
             color: white;
         }
 
-        .btn-close-modal:hover {
-            background: #5a6268;
-        }
+        .btn-close-modal:hover { background: #5a6268; }
 
         .btn-download-pdf {
             background: #002147;
             color: white;
         }
 
-        .btn-download-pdf:hover {
-            background: #003470;
-        }
+        .btn-download-pdf:hover { background: #003470; }
     </style>
     <script src="js/xlsx.full.min.js"></script>
     <script src="js/jspdf.umd.min.js"></script>
@@ -514,8 +400,8 @@
     <div class="container">
 
         <div class="form-header">
-            <h2>📋 Generador de Constancias de Trabajo (Acuerdo)</h2>
-            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de Excel para generar constancias de trabajo individuales o masivas en PDF para empleados por Acuerdo.</p>
+            <h2>📋 Generador de Constancias de Trabajo con Deducciones (Contrato)</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de Excel para generar constancias de trabajo con deducciones individuales o masivas en PDF para empleados por Contrato.</p>
         </div>
 
         <!-- Configuración del documento -->
@@ -540,18 +426,20 @@
                 </div>
                 <div class="config-field">
                     <label>Puesto Nominal</label>
-                    <input type="text" id="cfgPuestoNominal" value="[Excel]"
-                        placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
+                    <input type="text" id="cfgPuestoNominal" value="[Excel]" placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
                 </div>
                 <div class="config-field">
                     <label>Puesto Funcional</label>
-                    <input type="text" id="cfgPuestoFuncional" value=""
-                        placeholder="ej. Encargado de Facturación (Opcional)">
+                    <input type="text" id="cfgPuestoFuncional" value="" placeholder="ej. Encargado de Facturación (Opcional)">
                 </div>
-                <div class="config-field" style="grid-column: span 2; display: flex; align-items: center; margin-top: 15px;">
+                <div class="config-field" style="grid-column: span 2; display: flex; gap: 20px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
                     <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147;">
                         <input type="checkbox" id="showFechaIngreso" checked style="width: 18px; height: 18px; cursor: pointer;">
                         Incluir Fecha de Ingreso en PDF
+                    </label>
+                    <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147;">
+                        <input type="checkbox" id="showPeriodoContratacion" checked style="width: 18px; height: 18px; cursor: pointer;">
+                        Incluir Periodo de Contratación en PDF
                     </label>
                 </div>
             </div>
@@ -571,32 +459,25 @@
         <div class="upload-container">
             <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
                 <svg viewBox="0 0 24 24">
-                    <path
-                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
                 </svg>
                 <p>Arrastra tu archivo Excel aquí o haz clic para buscar</p>
                 <span>Soporta archivos .xlsx, .xls y .csv</span>
-                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;"
-                    onchange="handleFileSelect(event)">
+                <input type="file" id="excelFile" accept=".xlsx,.xls,.csv" style="display:none;" onchange="handleFileSelect(event)">
             </div>
 
             <div class="actions-sidebar">
                 <button type="button" class="btn-template" onclick="descargarPlantilla()">
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path
-                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                        <path
-                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                        <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                        <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
                     </svg>
                     Descargar Plantilla Excel
                 </button>
-                <button type="button" class="btn-generate" id="btnGenerateBulk"
-                    onclick="generarConstanciasSeleccionadas()" disabled>
+                <button type="button" class="btn-generate" id="btnGenerateBulk" onclick="generarConstanciasSeleccionadas()" disabled>
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path
-                            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
-                        <path fill-rule="evenodd"
-                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z" />
+                        <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
+                        <path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
                     </svg>
                     Generar Constancias (<span id="selectedCount">0</span>)
                 </button>
@@ -609,8 +490,8 @@
         <!-- Tabla de empleados -->
         <div id="dataSection" style="display:none;">
             <div class="filter-container">
-                <input type="text" id="searchInput" class="search-input" placeholder="Buscar empleado o cargo..."
-                    oninput="filtrarTabla()">
+                <input type="text" id="searchInput" class="search-input"
+                    placeholder="Buscar empleado o cargo..." oninput="filtrarTabla()">
                 <div class="summary-info">Total importados: <span id="totalImportados">0</span></div>
             </div>
 
@@ -638,8 +519,7 @@
 
         <div class="empty-state" id="emptyState">
             <svg viewBox="0 0 24 24">
-                <path
-                    d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z"/>
             </svg>
             <p>Aún no has cargado ningún archivo Excel</p>
             <span>Usa el botón "Descargar Plantilla Excel" para ver el formato requerido.</span>
@@ -676,15 +556,15 @@
         // ─────────────────────────────────────────────
         window.addEventListener('DOMContentLoaded', () => {
             // Fecha default
-            const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-                "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+            const meses = ["enero","febrero","marzo","abril","mayo","junio",
+                           "julio","agosto","septiembre","octubre","noviembre","diciembre"];
             const now = new Date();
             const dia = now.getDate();
             const mes = meses[now.getMonth()];
             const anio = now.getFullYear();
             const diaOrdinal = diaEnLetras(dia);
             document.getElementById('cfgFecha').value =
-                `${diaOrdinal} (${String(dia).padStart(2, '0')}) días del mes de ${mes} de ${anio}`;
+                `${diaOrdinal} (${String(dia).padStart(2,'0')}) días del mes de ${mes} de ${anio}`;
 
             // Auto-cargar planilla2.xls (o planilla.xls) si existe
             fetch('planilla2.xls')
@@ -699,7 +579,7 @@
                     currentWorkbook = XLSX.read(new Uint8Array(buf), { type: 'array' });
                     construirMapaEmpleados(currentWorkbook);
                     poblarSheetSelect(currentWorkbook);
-
+                    
                     const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
                     document.getElementById('sheetSelect').value = defaultSheet;
                     cargarHoja(defaultSheet);
@@ -710,10 +590,10 @@
         // ─────────────────────────────────────────────
         //  DRAG & DROP
         // ─────────────────────────────────────────────
-        ['dragenter', 'dragover'].forEach(ev => {
+        ['dragenter','dragover'].forEach(ev => {
             dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.add('dragover'); });
         });
-        ['dragleave', 'drop'].forEach(ev => {
+        ['dragleave','drop'].forEach(ev => {
             dropZone.addEventListener(ev, e => { e.preventDefault(); dropZone.classList.remove('dragover'); });
         });
         dropZone.addEventListener('drop', e => {
@@ -730,17 +610,17 @@
         // ─────────────────────────────────────────────
         function procesarArchivo(file) {
             const reader = new FileReader();
-            reader.onload = function (e) {
+            reader.onload = function(e) {
                 try {
                     const data = new Uint8Array(e.target.result);
                     currentWorkbook = XLSX.read(data, { type: 'array' });
                     construirMapaEmpleados(currentWorkbook);
                     poblarSheetSelect(currentWorkbook);
-
+                    
                     const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
                     document.getElementById('sheetSelect').value = defaultSheet;
                     cargarHoja(defaultSheet);
-                } catch (err) {
+                } catch(err) {
                     alert("Error al abrir el archivo Excel: " + err.message);
                 }
             };
@@ -775,7 +655,7 @@
         function parseCleanFloat(val) {
             if (val === undefined || val === null || val === "") return 0;
             if (typeof val === 'number') return val;
-            const cleaned = val.toString().replace(/L\s*/gi, "").replace(/[^0-9.-]/g, "");
+            const cleaned = val.toString().replace(/L\s*/gi,"").replace(/[^0-9.-]/g,"");
             const num = parseFloat(cleaned);
             return isNaN(num) ? 0 : num;
         }
@@ -795,16 +675,16 @@
             if (val === undefined || val === null || val === "") return "";
             if (typeof val === 'string' && /[a-zA-Z]/.test(val)) return val.trim();
             if (val instanceof Date) {
-                const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-                    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                const meses = ["enero","febrero","marzo","abril","mayo","junio",
+                               "julio","agosto","septiembre","octubre","noviembre","diciembre"];
                 return `${val.getDate()} de ${meses[val.getMonth()]} del ${val.getFullYear()}`;
             }
             const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
             if (!isNaN(num) && num > 100 && num < 70000) {
                 const date = new Date(Math.round((num - 25569) * 86400 * 1000));
                 if (!isNaN(date.getTime())) {
-                    const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
-                        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                    const meses = ["enero","febrero","marzo","abril","mayo","junio",
+                                   "julio","agosto","septiembre","octubre","noviembre","diciembre"];
                     return `${date.getUTCDate()} de ${meses[date.getUTCMonth()]} del ${date.getUTCFullYear()}`;
                 }
             }
@@ -815,6 +695,7 @@
             window.empleadoCargoMap = {};
             window.empleadoNumeroPuestoMap = {};
             window.empleadoIngresoMap = {};
+            window.empleadoPeriodoMap = {};
 
             const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
             const payrollSheets = workbook.SheetNames.filter(name => {
@@ -853,26 +734,27 @@
                         else headers.push("");
                     }
 
-                    let nombreIdx = -1, puestoIdx = -1, numeroPuestoIdx = -1, ingresoIdx = -1;
-                    headers.forEach((h, i) => {
+                    let nombreIdx=-1, puestoIdx=-1, numeroPuestoIdx=-1, ingresoIdx=-1, periodoIdx=-1;
+                    headers.forEach((h,i) => {
                         const n = normalize(h);
-                        if (n.includes("nombre") && nombreIdx === -1) nombreIdx = i;
-                        if ((n.includes("cargo") || (n.includes("puesto") && !n.includes("impuesto"))) && !n.includes("numero")) puestoIdx = i;
-                        if (n.includes("numerodepuesto") || (n.includes("puesto") && n.includes("num"))) numeroPuestoIdx = i;
-                        if (n.includes("ingreso") && !n.includes("reingreso")) ingresoIdx = i;
+                        if (n.includes("nombre") && nombreIdx===-1) nombreIdx=i;
+                        if ((n.includes("cargo")||(n.includes("puesto")&&!n.includes("impuesto")))&&!n.includes("numero")) puestoIdx=i;
+                        if (n.includes("numerodepuesto")||(n.includes("puesto")&&n.includes("num"))) numeroPuestoIdx=i;
+                        if (n.includes("ingreso") && !n.includes("reingreso")) ingresoIdx=i;
+                        if ((n.includes("periodo") || n.includes("contratacion")) && periodoIdx===-1) periodoIdx=i;
                     });
-                    if (nombreIdx === -1) return;
+                    if (nombreIdx===-1) return;
 
                     let esDobleFila = false;
-                    let startRow = headerRowIndex + 2;
-                    for (let k = startRow; k < Math.min(rowsData.length, startRow + 14); k++) {
-                        const rA = rowsData[k] || [], rB = rowsData[k + 1] || [];
-                        for (let c = 0; c < 3; c++) {
-                            const s = rA[c] ? rA[c].toString().trim() : "";
+                    let startRow = headerRowIndex+2;
+                    for (let k = startRow; k < Math.min(rowsData.length, startRow+14); k++) {
+                        const rA = rowsData[k]||[], rB = rowsData[k+1]||[];
+                        for (let c=0;c<3;c++) {
+                            const s = rA[c]?rA[c].toString().trim():"";
                             if (s && /^\d+$/.test(s)) {
-                                const bn = rB[c] ? rB[c].toString().trim() : "";
-                                const hasData = rB.some((cell, idx) => idx !== c && cell !== undefined && cell.toString().trim() !== "");
-                                if (bn === "" && hasData) { esDobleFila = true; }
+                                const bn = rB[c]?rB[c].toString().trim():"";
+                                const hasData = rB.some((cell,idx)=>idx!==c&&cell!==undefined&&cell.toString().trim()!=="");
+                                if (bn===""&&hasData) { esDobleFila=true; }
                                 break;
                             }
                         }
@@ -880,14 +762,16 @@
                     }
 
                     const parseRow = (rowA, rowB) => {
-                        const empName = rowA[nombreIdx] ? rowA[nombreIdx].toString().trim().toUpperCase() : "";
+                        const empName = rowA[nombreIdx]?rowA[nombreIdx].toString().trim().toUpperCase():"";
                         if (!empName) return;
-                        const cargo = puestoIdx !== -1 && rowB && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "";
-                        const numPuesto = numeroPuestoIdx !== -1 && rowB && rowB[numeroPuestoIdx] ? rowB[numeroPuestoIdx].toString().trim() : "";
-                        const ingreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
-                        if (cargo) window.empleadoCargoMap[empName] = cargo;
-                        if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
-                        if (ingreso) window.empleadoIngresoMap[empName] = ingreso;
+                        const cargo = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim().toUpperCase():"";
+                        const numPuesto = numeroPuestoIdx!==-1&&rowB&&rowB[numeroPuestoIdx]?rowB[numeroPuestoIdx].toString().trim():"";
+                        const ingreso = ingresoIdx!==-1&&rowA[ingresoIdx]!==undefined&&rowA[ingresoIdx]!==""?parsearFechaIngreso(rowA[ingresoIdx]):"";
+                        const periodo = periodoIdx!==-1&&rowA[periodoIdx]!==undefined&&rowA[periodoIdx]!==""?parsearFechaIngreso(rowA[periodoIdx]):"";
+                        if (cargo) window.empleadoCargoMap[empName]=cargo;
+                        if (numPuesto) window.empleadoNumeroPuestoMap[empName]=numPuesto;
+                        if (ingreso) window.empleadoIngresoMap[empName]=ingreso;
+                        if (periodo) window.empleadoPeriodoMap[empName]=periodo;
                     };
 
                     if (esDobleFila) {
@@ -896,19 +780,19 @@
                             const rA = rowsData[i];
                             if (!rA) { i++; continue; }
                             let isEmp = false;
-                            for (let c = 0; c < 3; c++) {
-                                const s = rA[c] ? rA[c].toString().trim() : "";
-                                if (s && /^\d+$/.test(s)) { isEmp = true; break; }
+                            for (let c=0;c<3;c++) {
+                                const s = rA[c]?rA[c].toString().trim():"";
+                                if (s&&/^\d+$/.test(s)) { isEmp=true; break; }
                             }
-                            if (isEmp) { parseRow(rA, rowsData[i + 1]); i += 2; } else { i++; }
+                            if (isEmp) { parseRow(rA, rowsData[i+1]); i+=2; } else { i++; }
                         }
                     } else {
-                        for (let i = startRow; i < rowsData.length; i++) {
+                        for (let i=startRow;i<rowsData.length;i++) {
                             const row = rowsData[i]; if (!row) continue;
                             parseRow(row, row);
                         }
                     }
-                } catch (e) { console.error("Error mapa empleados:", e); }
+                } catch(e) { console.error("Error mapa empleados:", e); }
             });
         }
 
@@ -919,73 +803,74 @@
                 if (rowsData.length < 2) { alert("Hoja sin suficientes datos."); return; }
 
                 let headerRowIndex = -1;
-                for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
-                    const row = rowsData[i] || [];
-                    const tieneNombre = row.map(c => normalize(c)).some(c => c.includes("nombre") || c.includes("empleado") || c.includes("colaborador"));
-                    const tieneMultiples = row.filter(c => c !== undefined && c.toString().trim() !== "").length >= 3;
-                    if (tieneNombre && tieneMultiples) { headerRowIndex = i; break; }
+                for (let i=0;i<Math.min(rowsData.length,15);i++) {
+                    const row = rowsData[i]||[];
+                    const tieneNombre = row.map(c=>normalize(c)).some(c=>c.includes("nombre")||c.includes("empleado")||c.includes("colaborador"));
+                    const tieneMultiples = row.filter(c=>c!==undefined&&c.toString().trim()!=="").length>=3;
+                    if (tieneNombre&&tieneMultiples) { headerRowIndex=i; break; }
                 }
-                if (headerRowIndex === -1) { alert("No se encontró fila de encabezados válida."); return; }
+                if (headerRowIndex===-1) { alert("No se encontró fila de encabezados válida."); return; }
 
-                let startRow = headerRowIndex + 1;
+                let startRow = headerRowIndex+1;
                 let headers = rowsData[headerRowIndex];
 
-                const rowSig = rowsData[headerRowIndex + 1] || [];
-                const rowSigNorm = rowSig.map(h => normalize(h));
-                const tieneSegundaCab = rowSigNorm.some(h => h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato"));
+                const rowSig = rowsData[headerRowIndex+1]||[];
+                const rowSigNorm = rowSig.map(h=>normalize(h));
+                const tieneSegundaCab = rowSigNorm.some(h=>h==="cargo"||h.includes("ihss")||h.includes("seguro")||h.includes("retiro")||h.includes("sindicato"));
 
                 if (tieneSegundaCab) {
-                    startRow = headerRowIndex + 2;
-                    const h1 = rowsData[headerRowIndex], h2 = rowsData[headerRowIndex + 1];
-                    headers = [];
-                    const maxC = Math.max(h1.length, h2.length);
-                    for (let c = 0; c < maxC; c++) {
-                        const v1 = h1[c] ? h1[c].toString().trim() : "";
-                        const v2 = h2[c] ? h2[c].toString().trim() : "";
-                        if (v1 && v2) headers.push(v1 + " - " + v2);
+                    startRow = headerRowIndex+2;
+                    const h1=rowsData[headerRowIndex], h2=rowsData[headerRowIndex+1];
+                    headers=[];
+                    const maxC = Math.max(h1.length,h2.length);
+                    for (let c=0;c<maxC;c++) {
+                        const v1=h1[c]?h1[c].toString().trim():"";
+                        const v2=h2[c]?h2[c].toString().trim():"";
+                        if (v1&&v2) headers.push(v1+" - "+v2);
                         else if (v1) headers.push(v1);
                         else if (v2) headers.push(v2);
                         else headers.push("");
                     }
                 }
 
-                let nombreIdx = -1, puestoIdx = -1, ingresoIdx = -1, tipoIdx = -1, asignadoIdx = -1, devengadoIdx = -1, numeroPuestoIdx = -1, totalDeduccionesIdx = -1;
-                headers.forEach((h, i) => {
-                    const n = normalize(h);
-                    if (n.includes("nombre") && nombreIdx === -1) nombreIdx = i;
-                    if ((n.includes("cargo") || (n.includes("puesto") && !n.includes("impuesto"))) && !n.includes("numero")) puestoIdx = i;
-                    if (n.includes("ingreso") && !n.includes("reingreso")) ingresoIdx = i;
-                    if (n.includes("tipo") || n.includes("acuerdo") || n.includes("contrato")) tipoIdx = i;
-                    if (n.includes("asignado")) asignadoIdx = i;
-                    if (n.includes("devengado")) devengadoIdx = i;
-                    if (n.includes("numerodepuesto") || (n.includes("puesto") && n.includes("num"))) numeroPuestoIdx = i;
-                    if (n.includes("totaldededucciones") || (n.includes("total") && n.includes("deduc"))) totalDeduccionesIdx = i;
+                let nombreIdx=-1,puestoIdx=-1,ingresoIdx=-1,periodoIdx=-1,tipoIdx=-1,asignadoIdx=-1,devengadoIdx=-1,numeroPuestoIdx=-1,totalDeduccionesIdx=-1;
+                headers.forEach((h,i)=>{
+                    const n=normalize(h);
+                    if (n.includes("nombre")&&nombreIdx===-1) nombreIdx=i;
+                    if ((n.includes("cargo")||(n.includes("puesto")&&!n.includes("impuesto")))&&!n.includes("numero")) puestoIdx=i;
+                    if (n.includes("ingreso") && !n.includes("reingreso")) ingresoIdx=i;
+                    if ((n.includes("periodo")||n.includes("contratacion")) && periodoIdx===-1) periodoIdx=i;
+                    if (n.includes("tipo")||n.includes("acuerdo")||n.includes("contrato")) tipoIdx=i;
+                    if (n.includes("asignado")) asignadoIdx=i;
+                    if (n.includes("devengado")) devengadoIdx=i;
+                    if (n.includes("numerodepuesto")||(n.includes("puesto")&&n.includes("num"))) numeroPuestoIdx=i;
+                    if (n.includes("totaldededucciones")||(n.includes("total")&&n.includes("deduc"))) totalDeduccionesIdx=i;
                 });
 
-                if (nombreIdx === -1) nombreIdx = 2;
-                if (puestoIdx === -1) puestoIdx = 2;
-                if (numeroPuestoIdx === -1) numeroPuestoIdx = 1;
-                if (asignadoIdx === -1) asignadoIdx = 3;
-                if (devengadoIdx === -1) devengadoIdx = 4;
+                if (nombreIdx===-1) nombreIdx=2;
+                if (puestoIdx===-1) puestoIdx=2;
+                if (numeroPuestoIdx===-1) numeroPuestoIdx=1;
+                if (asignadoIdx===-1) asignadoIdx=3;
+                if (devengadoIdx===-1) devengadoIdx=4;
 
-                if (totalDeduccionesIdx === -1) {
-                    headers.forEach((h, i) => {
-                        const n = normalize(h);
-                        if (n.includes("neto") || n.includes("liquido")) totalDeduccionesIdx = i - 1;
+                if (totalDeduccionesIdx===-1) {
+                    headers.forEach((h,i)=>{
+                        const n=normalize(h);
+                        if (n.includes("neto")||n.includes("liquido")) totalDeduccionesIdx=i-1;
                     });
                 }
-                if (totalDeduccionesIdx === -1) totalDeduccionesIdx = headers.length - 2;
+                if (totalDeduccionesIdx===-1) totalDeduccionesIdx=headers.length-2;
 
                 // Detectar doble fila
-                let esDobleFila = false;
-                for (let k = startRow; k < Math.min(rowsData.length, startRow + 12); k++) {
-                    const rA = rowsData[k] || [], rB = rowsData[k + 1] || [];
-                    for (let c = 0; c < 3; c++) {
-                        const s = rA[c] ? rA[c].toString().trim() : "";
-                        if (s && /^\d+$/.test(s)) {
-                            const bn = rB[c] ? rB[c].toString().trim() : "";
-                            const hasData = rB.some((cell, idx) => idx !== c && cell !== undefined && cell.toString().trim() !== "");
-                            if (bn === "" && hasData) esDobleFila = true;
+                let esDobleFila=false;
+                for (let k=startRow;k<Math.min(rowsData.length,startRow+12);k++) {
+                    const rA=rowsData[k]||[], rB=rowsData[k+1]||[];
+                    for (let c=0;c<3;c++) {
+                        const s=rA[c]?rA[c].toString().trim():"";
+                        if (s&&/^\d+$/.test(s)) {
+                            const bn=rB[c]?rB[c].toString().trim():"";
+                            const hasData=rB.some((cell,idx)=>idx!==c&&cell!==undefined&&cell.toString().trim()!=="");
+                            if (bn===""&&hasData) esDobleFila=true;
                             break;
                         }
                     }
@@ -993,43 +878,47 @@
                 }
 
                 const buildEmp = (rowA, rowB, rowIdx) => {
-                    const empName = rowA[nombreIdx] ? rowA[nombreIdx].toString().trim().toUpperCase() : "";
+                    const empName = rowA[nombreIdx]?rowA[nombreIdx].toString().trim().toUpperCase():"";
                     if (!empName) return null;
 
                     const sueldoAsignado = parseCleanFloat(rowA[asignadoIdx]);
                     const sueldoDevengado = parseCleanFloat(rowA[devengadoIdx]);
-                    const deducciones = [];
-                    headers.forEach((h, i) => {
-                        if (i > devengadoIdx && i < totalDeduccionesIdx) {
+                    const deducciones=[];
+                    headers.forEach((h,i)=>{
+                        if (i>devengadoIdx&&i<totalDeduccionesIdx) {
                             const n = normalize(h);
                             if (n.includes("periodo") || n.includes("contratacion") || n.includes("ingreso") || n.includes("fecha") || n.includes("tipo") || n.includes("nombre") || n.includes("cargo") || n.includes("puesto") || n.includes("numero")) {
                                 return;
                             }
-                            const val = parseCleanFloat(rowA[i]);
-                            if (val && !isNaN(val) && val > 0) {
-                                const cleanName = h.toString().replace(/\s+/g, ' ').trim()
-                                    .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
-                                    .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
-                                if (cleanName.trim() !== "") deducciones.push({ nombre: cleanName, monto: val });
+                            const val=parseCleanFloat(rowA[i]);
+                            if (val&&!isNaN(val)&&val>0) {
+                                const cleanName=h.toString().replace(/\s+/g,' ').trim()
+                                    .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i,"")
+                                    .replace(/\bI\s+H\s+S\s+S\b/gi,"I.H.S.S.");
+                                if (cleanName.trim()!=="") deducciones.push({nombre:cleanName,monto:val});
                             }
                         }
                     });
 
-                    const totalDeducciones = deducciones.reduce((s, d) => s + d.monto, 0);
+                    const totalDeducciones = deducciones.reduce((s,d)=>s+d.monto,0);
                     const netoPagar = sueldoDevengado - totalDeducciones;
 
-                    let empPuesto = puestoIdx !== -1 && rowB && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "";
-                    if (!empPuesto && window.empleadoCargoMap && window.empleadoCargoMap[empName]) empPuesto = window.empleadoCargoMap[empName];
-                    if (!empPuesto) empPuesto = "EMPLEADO/A";
+                    let empPuesto = puestoIdx!==-1&&rowB&&rowB[puestoIdx]?rowB[puestoIdx].toString().trim().toUpperCase():"";
+                    if (!empPuesto&&window.empleadoCargoMap&&window.empleadoCargoMap[empName]) empPuesto=window.empleadoCargoMap[empName];
+                    if (!empPuesto) empPuesto="EMPLEADO/A";
 
-                    let empNumPuesto = numeroPuestoIdx !== -1 && rowB && rowB[numeroPuestoIdx] ? rowB[numeroPuestoIdx].toString().trim() : "";
-                    if (!empNumPuesto && window.empleadoNumeroPuestoMap && window.empleadoNumeroPuestoMap[empName]) empNumPuesto = window.empleadoNumeroPuestoMap[empName];
+                    let empNumPuesto = numeroPuestoIdx!==-1&&rowB&&rowB[numeroPuestoIdx]?rowB[numeroPuestoIdx].toString().trim():"";
+                    if (!empNumPuesto&&window.empleadoNumeroPuestoMap&&window.empleadoNumeroPuestoMap[empName]) empNumPuesto=window.empleadoNumeroPuestoMap[empName];
 
-                    let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
-                    if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) empIngreso = window.empleadoIngresoMap[empName];
-                    if (!empIngreso) empIngreso = "N/D";
+                    let empIngreso = ingresoIdx!==-1&&rowA[ingresoIdx]!==undefined&&rowA[ingresoIdx]!==""?parsearFechaIngreso(rowA[ingresoIdx]):"";
+                    if (!empIngreso&&window.empleadoIngresoMap&&window.empleadoIngresoMap[empName]) empIngreso=window.empleadoIngresoMap[empName];
+                    if (!empIngreso) empIngreso="N/D";
 
-                    const empTipo = "Acuerdo";
+                    let empPeriodo = periodoIdx!==-1&&rowA[periodoIdx]!==undefined&&rowA[periodoIdx]!==""?parsearFechaIngreso(rowA[periodoIdx]):"";
+                    if (!empPeriodo&&window.empleadoPeriodoMap&&window.empleadoPeriodoMap[empName]) empPeriodo=window.empleadoPeriodoMap[empName];
+                    if (!empPeriodo) empPeriodo="N/D";
+
+                    const empTipo = "Contrato";
 
                     return {
                         id: rowIdx,
@@ -1037,6 +926,7 @@
                         puesto: empPuesto,
                         numeroPuesto: empNumPuesto,
                         ingreso: empIngreso,
+                        periodoContratacion: empPeriodo,
                         tipo: empTipo,
                         genero: "F", // default femenino
                         sueldoAsignado,
@@ -1048,38 +938,38 @@
                     };
                 };
 
-                empleados = [];
+                empleados=[];
                 if (esDobleFila) {
-                    let i = startRow;
-                    while (i < rowsData.length) {
-                        const rA = rowsData[i];
+                    let i=startRow;
+                    while (i<rowsData.length) {
+                        const rA=rowsData[i];
                         if (!rA) { i++; continue; }
-                        let isEmp = false;
-                        for (let c = 0; c < 3; c++) {
-                            const s = rA[c] ? rA[c].toString().trim() : "";
-                            if (s && /^\d+$/.test(s)) { isEmp = true; break; }
+                        let isEmp=false;
+                        for (let c=0;c<3;c++) {
+                            const s=rA[c]?rA[c].toString().trim():"";
+                            if (s&&/^\d+$/.test(s)) { isEmp=true; break; }
                         }
                         if (isEmp) {
-                            const rB = rowsData[i + 1];
-                            const emp = buildEmp(rA, rB || rA, i);
+                            const rB=rowsData[i+1];
+                            const emp=buildEmp(rA,rB||rA,i);
                             if (emp) empleados.push(emp);
-                            i += 2;
+                            i+=2;
                         } else { i++; }
                     }
                 } else {
-                    for (let i = startRow; i < rowsData.length; i++) {
-                        const row = rowsData[i];
-                        if (!row || !row[nombreIdx] || row[nombreIdx].toString().trim() === "") continue;
-                        const emp = buildEmp(row, row, i);
+                    for (let i=startRow;i<rowsData.length;i++) {
+                        const row=rowsData[i];
+                        if (!row||!row[nombreIdx]||row[nombreIdx].toString().trim()==="") continue;
+                        const emp=buildEmp(row,row,i);
                         if (emp) empleados.push(emp);
                     }
                 }
 
-                if (empleados.length === 0) { alert("No se cargaron registros válidos."); return; }
+                if (empleados.length===0) { alert("No se cargaron registros válidos."); return; }
                 renderPlanilla();
 
-            } catch (err) {
-                alert("Error al procesar hoja: " + err.message);
+            } catch(err) {
+                alert("Error al procesar hoja: "+err.message);
                 console.error(err);
             }
         }
@@ -1088,22 +978,22 @@
         //  RENDER TABLA
         // ─────────────────────────────────────────────
         function renderPlanilla() {
-            const body = document.getElementById('planillaBody');
-            body.innerHTML = '';
-            empleados.forEach(emp => {
-                const tr = document.createElement('tr');
-                tr.setAttribute('data-id', emp.id);
-                tr.innerHTML = `
-                    <td class="checkbox-cell"><input type="checkbox" class="emp-checkbox" ${emp.selected ? 'checked' : ''} onchange="toggleSelect(${emp.id},this.checked)"></td>
+            const body=document.getElementById('planillaBody');
+            body.innerHTML='';
+            empleados.forEach(emp=>{
+                const tr=document.createElement('tr');
+                tr.setAttribute('data-id',emp.id);
+                tr.innerHTML=`
+                    <td class="checkbox-cell"><input type="checkbox" class="emp-checkbox" ${emp.selected?'checked':''} onchange="toggleSelect(${emp.id},this.checked)"></td>
                     <td><strong>${emp.nombre}</strong></td>
                     <td style="color:#475569;font-size:0.9em;">${emp.puesto}</td>
                     <td style="text-align:center;">
-                        <span class="badge badge-acuerdo">Acuerdo</span>
+                        <span class="badge badge-contrato">Contrato</span>
                     </td>
                     <td style="text-align:center;">
                         <select class="inline-select" onchange="cambiarGenero(${emp.id},this.value)">
-                            <option value="F" ${emp.genero === 'F' ? 'selected' : ''}>Femenino</option>
-                            <option value="M" ${emp.genero === 'M' ? 'selected' : ''}>Masculino</option>
+                            <option value="F" ${emp.genero==='F'?'selected':''}>Femenino</option>
+                            <option value="M" ${emp.genero==='M'?'selected':''}>Masculino</option>
                         </select>
                     </td>
                     <td style="text-align:right;font-family:monospace;">${formatMoneda(emp.sueldoDevengado)}</td>
@@ -1117,104 +1007,104 @@
                 body.appendChild(tr);
             });
 
-            document.getElementById('totalImportados').innerText = empleados.length;
-            document.getElementById('emptyState').style.display = 'none';
-            document.getElementById('dataSection').style.display = 'block';
-            document.getElementById('btnGenerateBulk').disabled = false;
-            document.getElementById('btnClearList').disabled = false;
+            document.getElementById('totalImportados').innerText=empleados.length;
+            document.getElementById('emptyState').style.display='none';
+            document.getElementById('dataSection').style.display='block';
+            document.getElementById('btnGenerateBulk').disabled=false;
+            document.getElementById('btnClearList').disabled=false;
             actualizarContador();
         }
 
-        function toggleSelect(id, sel) {
-            const emp = empleados.find(e => e.id === id);
-            if (emp) emp.selected = sel;
+        function toggleSelect(id,sel) {
+            const emp=empleados.find(e=>e.id===id);
+            if (emp) emp.selected=sel;
             actualizarContador();
         }
 
         function toggleSelectAll(cb) {
-            document.querySelectorAll('#planillaBody tr').forEach(tr => {
-                const id = parseInt(tr.getAttribute('data-id'));
-                const emp = empleados.find(e => e.id === id);
-                if (emp) { emp.selected = cb.checked; tr.querySelector('.emp-checkbox').checked = cb.checked; }
+            document.querySelectorAll('#planillaBody tr').forEach(tr=>{
+                const id=parseInt(tr.getAttribute('data-id'));
+                const emp=empleados.find(e=>e.id===id);
+                if (emp) { emp.selected=cb.checked; tr.querySelector('.emp-checkbox').checked=cb.checked; }
             });
             actualizarContador();
         }
 
         function actualizarContador() {
-            const count = empleados.filter(e => e.selected).length;
-            document.getElementById('selectedCount').innerText = count;
-            document.getElementById('btnGenerateBulk').disabled = count === 0;
-            const all = document.getElementById('selectAll');
-            if (count === 0) { all.checked = false; all.indeterminate = false; }
-            else if (count === empleados.length) { all.checked = true; all.indeterminate = false; }
-            else { all.checked = false; all.indeterminate = true; }
+            const count=empleados.filter(e=>e.selected).length;
+            document.getElementById('selectedCount').innerText=count;
+            document.getElementById('btnGenerateBulk').disabled=count===0;
+            const all=document.getElementById('selectAll');
+            if (count===0) { all.checked=false; all.indeterminate=false; }
+            else if (count===empleados.length) { all.checked=true; all.indeterminate=false; }
+            else { all.checked=false; all.indeterminate=true; }
         }
 
-        function cambiarTipo(id, tipo) { const e = empleados.find(e => e.id === id); if (e) e.tipo = tipo; }
-        function cambiarGenero(id, g) { const e = empleados.find(e => e.id === id); if (e) e.genero = g; }
+        function cambiarTipo(id,tipo) { const e=empleados.find(e=>e.id===id); if(e) e.tipo=tipo; }
+        function cambiarGenero(id,g) { const e=empleados.find(e=>e.id===id); if(e) e.genero=g; }
 
         function filtrarTabla() {
-            const q = normalize(document.getElementById('searchInput').value);
-            document.querySelectorAll('#planillaBody tr').forEach(tr => {
-                const id = parseInt(tr.getAttribute('data-id'));
-                const emp = empleados.find(e => e.id === id);
-                if (emp) tr.style.display = (normalize(emp.nombre).includes(q) || normalize(emp.puesto).includes(q)) ? '' : 'none';
+            const q=normalize(document.getElementById('searchInput').value);
+            document.querySelectorAll('#planillaBody tr').forEach(tr=>{
+                const id=parseInt(tr.getAttribute('data-id'));
+                const emp=empleados.find(e=>e.id===id);
+                if (emp) tr.style.display=(normalize(emp.nombre).includes(q)||normalize(emp.puesto).includes(q))?'':'none';
             });
         }
 
         function limpiarLista() {
-            empleados = []; currentWorkbook = null;
-            document.getElementById('sheetSelectorContainer').style.display = 'none';
-            document.getElementById('sheetSelect').innerHTML = '';
-            document.getElementById('dataSection').style.display = 'none';
-            document.getElementById('emptyState').style.display = 'block';
-            document.getElementById('btnGenerateBulk').disabled = true;
-            document.getElementById('btnClearList').disabled = true;
-            document.getElementById('excelFile').value = '';
+            empleados=[]; currentWorkbook=null;
+            document.getElementById('sheetSelectorContainer').style.display='none';
+            document.getElementById('sheetSelect').innerHTML='';
+            document.getElementById('dataSection').style.display='none';
+            document.getElementById('emptyState').style.display='block';
+            document.getElementById('btnGenerateBulk').disabled=true;
+            document.getElementById('btnClearList').disabled=true;
+            document.getElementById('excelFile').value='';
         }
 
         // ─────────────────────────────────────────────
         //  NÚMERO A LETRAS (Español, Lempiras)
         // ─────────────────────────────────────────────
         function numeroALetras(numero) {
-            const unidades = ["", "Un", "Dos", "Tres", "Cuatro", "Cinco", "Seis", "Siete", "Ocho", "Nueve",
-                "Diez", "Once", "Doce", "Trece", "Catorce", "Quince", "Dieciséis",
-                "Diecisiete", "Dieciocho", "Diecinueve", "Veinte"];
-            const decenas = ["", "", "Veinti", "Treinta", "Cuarenta", "Cincuenta", "Sesenta", "Setenta", "Ochenta", "Noventa"];
-            const centenas = ["", "Ciento", "Doscientos", "Trescientos", "Cuatrocientos", "Quinientos",
-                "Seiscientos", "Setecientos", "Ochocientos", "Novecientos"];
+            const unidades = ["","Un","Dos","Tres","Cuatro","Cinco","Seis","Siete","Ocho","Nueve",
+                              "Diez","Once","Doce","Trece","Catorce","Quince","Dieciséis",
+                              "Diecisiete","Dieciocho","Diecinueve","Veinte"];
+            const decenas  = ["","","Veinti","Treinta","Cuarenta","Cincuenta","Sesenta","Setenta","Ochenta","Noventa"];
+            const centenas = ["","Ciento","Doscientos","Trescientos","Cuatrocientos","Quinientos",
+                              "Seiscientos","Setecientos","Ochocientos","Novecientos"];
 
             function convertirMenos1000(n) {
-                if (n === 0) return "";
-                if (n <= 20) return unidades[n];
-                if (n < 30) return "Veinti" + unidades[n - 20].toLowerCase();
-                if (n < 100) {
-                    const d = Math.floor(n / 10);
-                    const u = n % 10;
+                if (n===0) return "";
+                if (n<=20) return unidades[n];
+                if (n<30) return "Veinti" + unidades[n-20].toLowerCase();
+                if (n<100) {
+                    const d = Math.floor(n/10);
+                    const u = n%10;
                     return decenas[d] + (u ? " y " + unidades[u] : "");
                 }
-                if (n === 100) return "Cien";
-                const c = Math.floor(n / 100);
-                const resto = n % 100;
+                if (n===100) return "Cien";
+                const c = Math.floor(n/100);
+                const resto = n%100;
                 return centenas[c] + (resto ? " " + convertirMenos1000(resto) : "");
             }
 
             function convertir(n) {
-                if (n === 0) return "Cero";
-                if (n < 0) return "Menos " + convertir(-n);
+                if (n===0) return "Cero";
+                if (n<0) return "Menos " + convertir(-n);
 
                 let resultado = "";
-                const millones = Math.floor(n / 1000000);
-                const miles = Math.floor((n % 1000000) / 1000);
-                const resto = n % 1000;
+                const millones = Math.floor(n/1000000);
+                const miles    = Math.floor((n%1000000)/1000);
+                const resto    = n%1000;
 
-                if (millones > 0) {
-                    resultado += (millones === 1 ? "Un Millón" : convertirMenos1000(millones) + " Millones") + " ";
+                if (millones>0) {
+                    resultado += (millones===1 ? "Un Millón" : convertirMenos1000(millones)+" Millones") + " ";
                 }
-                if (miles > 0) {
-                    resultado += (miles === 1 ? "Mil" : convertirMenos1000(miles) + " Mil") + " ";
+                if (miles>0) {
+                    resultado += (miles===1 ? "Mil" : convertirMenos1000(miles)+" Mil") + " ";
                 }
-                if (resto > 0) {
+                if (resto>0) {
                     resultado += convertirMenos1000(resto);
                 }
                 return resultado.trim();
@@ -1224,17 +1114,17 @@
             const centavos = Math.round((numero - entero) * 100);
             let texto = convertir(entero) + " Lempiras";
             if (centavos === 0) texto += " Exactos";
-            else texto += " con " + String(centavos).padStart(2, "0") + "/100 Centavos";
+            else texto += " con " + String(centavos).padStart(2,"0") + "/100 Centavos";
             return texto;
         }
 
         function diaEnLetras(dia) {
-            const ordinal = ["", "primero", "segundo", "tercero", "cuarto", "quinto", "sexto", "séptimo",
-                "octavo", "noveno", "décimo", "undécimo", "duodécimo", "decimotercer",
-                "decimocuarto", "decimoquinto", "decimosexto", "decimoséptimo",
-                "decimoctavo", "decimonoveno", "vigésimo", "vigésimo primer",
-                "vigésimo segundo", "vigésimo tercer", "vigésimo cuarto", "vigésimo quinto",
-                "vigésimo sexto", "vigésimo séptimo", "vigésimo octavo", "vigésimo noveno", "trigésimo", "trigésimo primer"];
+            const ordinal = ["","primero","segundo","tercero","cuarto","quinto","sexto","séptimo",
+                             "octavo","noveno","décimo","undécimo","duodécimo","decimotercer",
+                             "decimocuarto","decimoquinto","decimosexto","decimoséptimo",
+                             "decimoctavo","decimonoveno","vigésimo","vigésimo primer",
+                             "vigésimo segundo","vigésimo tercer","vigésimo cuarto","vigésimo quinto",
+                             "vigésimo sexto","vigésimo séptimo","vigésimo octavo","vigésimo noveno","trigésimo","trigésimo primer"];
             return ordinal[dia] || String(dia);
         }
 
@@ -1243,11 +1133,11 @@
         // ─────────────────────────────────────────────
         function buildTextoConstancia(emp) {
             const art = emp.genero === 'M' ? ["El ciudadano", "el cargo", "labora"] : ["La ciudadana", "el cargo", "labora"];
-            const tipoTexto = emp.genero === 'M' ? 'como empleado con acuerdo' : 'como empleada con acuerdo';
-            const firmante = document.getElementById('cfgFirmante').value.trim();
-            const cargoF = document.getElementById('cfgCargoFirmante').value.trim();
-            const ciudad = document.getElementById('cfgCiudad').value.trim();
-            const fecha = document.getElementById('cfgFecha').value.trim();
+            const tipoTexto = emp.genero === 'M' ? 'como empleado por contrato' : 'como empleada por contrato';
+            const firmante  = document.getElementById('cfgFirmante').value.trim();
+            const cargoF    = document.getElementById('cfgCargoFirmante').value.trim();
+            const ciudad    = document.getElementById('cfgCiudad').value.trim();
+            const fecha     = document.getElementById('cfgFecha').value.trim();
 
             const nominalInput = document.getElementById('cfgPuestoNominal').value.trim();
             const funcionalInput = document.getElementById('cfgPuestoFuncional').value.trim();
@@ -1276,13 +1166,20 @@
             }
 
             const sueldoEnLetras = numeroALetras(emp.sueldoDevengado);
-            const sueldoFormato = formatMoneda(emp.sueldoDevengado);
-            const artSuscritas = emp.genero === 'M' ? "El Suscrito" : "La Suscrita";
-            const jefaO = emp.genero === 'M' ? "Jefe" : "Jefe";
+            const sueldoFormato  = formatMoneda(emp.sueldoDevengado);
+            const artSuscritas   = emp.genero === 'M' ? "El Suscrito" : "La Suscrita";
+            const jefaO          = emp.genero === 'M' ? "Jefe" : "Jefe";
 
-            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${emp.nombre}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}` +
-                ((document.getElementById('showFechaIngreso').checked && emp.ingreso && emp.ingreso !== 'N/D') ? ` a partir del **${emp.ingreso}**` : "") +
-                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}).`;
+            let datesText = "";
+            if (document.getElementById('showFechaIngreso').checked && emp.ingreso && emp.ingreso !== 'N/D') {
+                datesText += ` a partir del **${emp.ingreso}**`;
+            }
+            if (document.getElementById('showPeriodoContratacion').checked && emp.periodoContratacion && emp.periodoContratacion !== 'N/D') {
+                datesText += ` con un periodo de contratación **${emp.periodoContratacion}**`;
+            }
+
+            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${emp.nombre}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
+                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele las siguientes deducciones:`;
 
             const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
@@ -1290,14 +1187,14 @@
         }
 
         function formatMoneda(v) {
-            return "L.\u00A0" + Number(v).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            return "L.\u00A0" + Number(v).toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
         }
 
         // ─────────────────────────────────────────────
         //  PREVISUALIZACIÓN (MODAL)
         // ─────────────────────────────────────────────
         function previsualizarConstancia(id) {
-            const emp = empleados.find(e => e.id === id);
+            const emp = empleados.find(e=>e.id===id);
             if (!emp) return;
             currentPreviewId = id;
 
@@ -1308,7 +1205,25 @@
             // Tabla
             const table = document.getElementById('previewTable');
             table.innerHTML = '';
-            table.style.display = 'none';
+            const addRow = (label, val, isBold=false) => {
+                const tr = document.createElement('tr');
+                if (isBold) tr.classList.add('total-row');
+                tr.innerHTML = `<td${isBold?' style="font-weight:bold"':''}>${label}</td><td class="amount-col"${isBold?' style="font-weight:bold"':''}>${val}</td>`;
+                table.appendChild(tr);
+            };
+
+            addRow('Sueldo Asignado', formatMoneda(emp.sueldoAsignado));
+            addRow('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
+
+            // Sección Deducciones
+            const trH = document.createElement('tr');
+            trH.classList.add('section-header');
+            trH.innerHTML = '<td colspan="2">Deducciones</td>';
+            table.appendChild(trH);
+
+            emp.deducciones.forEach(d => addRow(d.nombre, formatMoneda(d.monto)));
+            addRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
+            addRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
 
             document.getElementById('previewFooter').innerHTML = pie.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
             document.getElementById('previewSignature').innerHTML =
@@ -1323,7 +1238,7 @@
         }
 
         // Cerrar al click fuera del box
-        document.getElementById('previewModal').addEventListener('click', function (e) {
+        document.getElementById('previewModal').addEventListener('click', function(e) {
             if (e.target === this) cerrarModal();
         });
 
@@ -1351,7 +1266,7 @@
                 if (index > 0) {
                     currentY += lineHeight;
                 }
-
+                
                 const parts = para.split('**');
                 const tokens = [];
                 parts.forEach((part, idx) => {
@@ -1378,7 +1293,7 @@
 
                 for (let i = 0; i < tokens.length; i++) {
                     const token = tokens[i];
-
+                    
                     if (currentLine.length === 0 && token.text.trim() === "") {
                         continue;
                     }
@@ -1413,22 +1328,22 @@
                 for (let l = 0; l < lines.length; l++) {
                     const line = lines[l];
                     const isLastLine = (l === lines.length - 1);
-
+                    
                     const spaceTokens = line.tokens.filter(lt => lt.token.text.trim() === "");
                     const numSpaces = spaceTokens.length;
-
+                    
                     let spaceExtra = 0;
                     if (align === 'justify' && !isLastLine && numSpaces > 0) {
                         const extraSpace = maxWidth - line.width;
                         spaceExtra = extraSpace / numSpaces;
                     }
-
+                    
                     let xCursor = x;
                     for (let t = 0; t < line.tokens.length; t++) {
                         const { token, width } = line.tokens[t];
                         doc.setFont('helvetica', token.bold ? 'bold' : 'normal');
                         doc.setFontSize(fontSize);
-
+                        
                         if (token.text.trim() !== "") {
                             doc.text(token.text, xCursor, currentY);
                             xCursor += width;
@@ -1443,10 +1358,10 @@
             return currentY;
         }
 
-        async function generarPDFConstancia(emp, doc, isBulk = false) {
+        async function generarPDFConstancia(emp, doc, isBulk=false) {
             const { jsPDF } = window.jspdf;
             if (!doc) {
-                doc = new jsPDF('p', 'mm', 'a4');
+                doc = new jsPDF('p','mm','a4');
             } else if (isBulk) {
                 doc.addPage();
             }
@@ -1456,47 +1371,105 @@
             if (logoBgUrl) {
                 const pw = doc.internal.pageSize.getWidth();
                 const ph = doc.internal.pageSize.getHeight();
-                doc.addImage(logoBgUrl, 'PNG', 0, 0, pw, ph);
+                doc.addImage(logoBgUrl,'PNG',0,0,pw,ph);
             }
 
             const { intro, pie, firmante, cargoF } = buildTextoConstancia(emp);
             const pageW = doc.internal.pageSize.getWidth(); // 210mm
             const margins = { left: 25, right: 25 };
             const contentW = pageW - margins.left - margins.right; // 160mm
-            let y = 80;
+            let y = 60;
 
             // ── Título ──
-            doc.setFont('helvetica', 'bold');
+            doc.setFont('helvetica','bold');
             doc.setFontSize(13);
             // Letras espaciadas: C O N S T A N C I A
             const titulo = "C O N S T A N C I A";
-            doc.text(titulo, pageW / 2, y, { align: 'center' });
+            doc.text(titulo, pageW/2, y, { align:'center' });
             // Subrayado manual
             const tituloW = doc.getTextWidth(titulo);
-            const tituloX = pageW / 2 - tituloW / 2;
+            const tituloX = pageW/2 - tituloW/2;
             doc.setLineWidth(0.4);
-            doc.line(tituloX, y + 1, tituloX + tituloW, y + 1);
+            doc.line(tituloX, y+1, tituloX+tituloW, y+1);
             y += 14;
 
             // ── Cuerpo de texto (justificado manual con negrita) ──
             y = drawRichText(doc, intro, margins.left, y, contentW, 6, 10.5, 'justify');
             y += 6;
 
-            y += 20;
+            // ── Tabla de sueldos y deducciones ──
+            const tLeft  = margins.left;
+            const tRight = pageW - margins.right;   // 185
+            const tMid   = tLeft + contentW * 0.55; // separador ~30% desde la derecha
+            const valX   = tRight - 2;
+            const lblX   = tLeft + 3;
+            const rH     = 6.5;
+
+            doc.setLineWidth(0.3);
+            doc.setDrawColor(0,0,0);
+
+            const drawRow = (label, val, bold=false, isHeader=false) => {
+                doc.rect(tLeft, y, tRight-tLeft, rH);
+                doc.line(tMid, y, tMid, y+rH);
+
+                if (isHeader) {
+                    doc.setFont('helvetica','bold');
+                    doc.text(label, (tLeft+tMid)/2, y+4.5, { align:'center' });
+                } else {
+                    if (bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
+                    if (val !== null) {
+                        // Label alineado a la derecha de la columna izquierda
+                        doc.text(label, tMid-3, y+4.5, { align:'right' });
+                        doc.text(val, valX, y+4.5, { align:'right' });
+                    } else {
+                        doc.text(label, lblX, y+4.5);
+                    }
+                }
+                y += rH;
+            };
+
+            // Filas de sueldo (label a la izquierda, valor a la derecha)
+            const drawRowNormal = (label, val, bold=false) => {
+                doc.rect(tLeft, y, tRight-tLeft, rH);
+                doc.line(tMid, y, tMid, y+rH);
+                if (bold) doc.setFont('helvetica','bold'); else doc.setFont('helvetica','normal');
+                doc.text(label, lblX, y+4.5);
+                doc.text(val, valX, y+4.5, { align:'right' });
+                y += rH;
+            };
+
+            drawRowNormal('Sueldo Asignado',  formatMoneda(emp.sueldoAsignado));
+            drawRowNormal('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
+
+            // Header Deducciones
+            doc.rect(tLeft, y, tRight-tLeft, rH);
+            doc.line(tMid, y, tMid, y+rH);
+            doc.setFont('helvetica','bold');
+            doc.text('Deducciones', (tLeft+tMid)/2, y+4.5, { align:'center' });
+            y += rH;
+
+            // Filas individuales de deducción
+            emp.deducciones.forEach(d => drawRowNormal(d.nombre, formatMoneda(d.monto)));
+
+            // Totales (label alineado derecha de col izquierda)
+            drawRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
+            drawRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
+
+            y += 10;
 
             // ── Texto pie (justificado manual con negrita) ──
             y = drawRichText(doc, pie, margins.left, y, contentW, 6, 10.5, 'justify');
-            y += 35;
+            y += 20;
 
             // ── Firma ──
-            doc.setFont('helvetica', 'bold');
+            doc.setFont('helvetica','bold');
             doc.setFontSize(11);
-            doc.text(firmante, pageW / 2, y, { align: 'center' });
+            doc.text(firmante, pageW/2, y, { align:'center' });
             y += 6;
-            doc.text(cargoF, pageW / 2, y, { align: 'center' });
+            doc.text(cargoF, pageW/2, y, { align:'center' });
             y += 6;
-            doc.setFont('helvetica', 'bold');
-            doc.text('ENAG.', pageW / 2, y, { align: 'center' });
+            doc.setFont('helvetica','bold');
+            doc.text('ENAG.', pageW/2, y, { align:'center' });
 
             return doc;
         }
@@ -1514,21 +1487,21 @@
 
         async function generarConstanciaIndividual(id) {
             if (!validarConfiguracion()) return;
-            const emp = empleados.find(e => e.id === id);
+            const emp = empleados.find(e=>e.id===id);
             if (!emp) return;
             const doc = await generarPDFConstancia(emp, null, false);
-            doc.save(`Constancia_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
+            doc.save(`Constancia_${emp.nombre.replace(/\s+/g,'_')}.pdf`);
             cerrarModal();
         }
 
         async function generarConstanciasSeleccionadas() {
             if (!validarConfiguracion()) return;
-            const sel = empleados.filter(e => e.selected);
-            if (sel.length === 0) { alert("Por favor, selecciona al menos un empleado."); return; }
+            const sel = empleados.filter(e=>e.selected);
+            if (sel.length===0) { alert("Por favor, selecciona al menos un empleado."); return; }
             const { jsPDF } = window.jspdf;
-            let doc = new jsPDF('p', 'mm', 'a4');
-            for (let i = 0; i < sel.length; i++) {
-                doc = await generarPDFConstancia(sel[i], doc, i > 0);
+            let doc = new jsPDF('p','mm','a4');
+            for (let i=0;i<sel.length;i++) {
+                doc = await generarPDFConstancia(sel[i], doc, i>0);
             }
             doc.save('Constancias_Trabajo_ENAG.pdf');
         }
@@ -1538,24 +1511,24 @@
         // ─────────────────────────────────────────────
         function descargarPlantilla() {
             const headers = [
-                "No.", "Numero de Puesto", "Nombre", "Cargo", "Fecha de Ingreso", "Tipo",
-                "Sueldo Asignado", "Sueldo Devengado",
-                "I.H.S.S.", "Plan de Retiro INJUPEMP 9.5%", "Préstamo Personal INJUPEMP",
-                "Sindicato", "Deducción de Partido", "Cooperativa Elga", "Cooperativa Sagrada Familia",
-                "Total de Deducciones", "Sueldo Neto"
+                "No.","Numero de Puesto","Nombre","Cargo","Fecha de Ingreso","Tipo",
+                "Sueldo Asignado","Sueldo Devengado",
+                "I.H.S.S.","Plan de Retiro INJUPEMP 9.5%","Préstamo Personal INJUPEMP",
+                "Sindicato","Deducción de Partido","Cooperativa Elga","Cooperativa Sagrada Familia",
+                "Total de Deducciones","Sueldo Neto"
             ];
             const data = [
                 headers,
-                [1, "1024", "ASTRID GERALDINA MEMBREÑO GABARRETE", "ENCARGADO DEL DEPARTAMENTO DE DESPACHO DE PRODUCTO TERMINADO",
-                    "01 de julio del 2003", "Acuerdo",
-                    22343.00, 22343.00,
-                    297.58, 2122.59, 2934.23, 223.43, 446.86, 300.00, 4.00,
-                    6724.69, 15618.31],
-                [2, "1025", "PEDRO ANTONIO GÓMEZ REYES", "DISEÑADOR GRÁFICO",
-                    "15 de marzo del 2018", "Contrato",
-                    15000.00, 15000.00,
-                    247.98, 1425.00, 0, 150.00, 0, 0, 0,
-                    1822.98, 13177.02]
+                [1,"1024","ASTRID GERALDINA MEMBREÑO GABARRETE","ENCARGADO DEL DEPARTAMENTO DE DESPACHO DE PRODUCTO TERMINADO",
+                 "01 de julio del 2003","Acuerdo",
+                 22343.00,22343.00,
+                 297.58,2122.59,2934.23,223.43,446.86,300.00,4.00,
+                 6724.69,15618.31],
+                [2,"1025","PEDRO ANTONIO GÓMEZ REYES","DISEÑADOR GRÁFICO",
+                 "15 de marzo del 2018","Contrato",
+                 15000.00,15000.00,
+                 247.98,1425.00,0,150.00,0,0,0,
+                 1822.98,13177.02]
             ];
             const ws = XLSX.utils.aoa_to_sheet(data);
             const wb = XLSX.utils.book_new();
