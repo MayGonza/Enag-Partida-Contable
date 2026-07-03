@@ -1117,6 +1117,14 @@
         // ─────────────────────────────────────────────
         //  TEXTO DE LA CONSTANCIA
         // ─────────────────────────────────────────────
+        function formatNombreOracion(str) {
+            if (!str) return "";
+            return str.toLowerCase().split(' ').map(word => {
+                if (!word) return "";
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
+
         function buildTextoConstancia(emp) {
             const art = emp.genero === 'M' ? ["El ciudadano", "el cargo", "labora"] : ["La ciudadana", "el cargo", "labora"];
             const tipoTexto = emp.genero === 'M' ? 'como empleado con acuerdo' : 'como empleada con acuerdo';
@@ -1156,7 +1164,7 @@
             const artSuscritas   = emp.genero === 'M' ? "El Suscrito" : "La Suscrita";
             const jefaO          = emp.genero === 'M' ? "Jefe" : "Jefe";
 
-            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${emp.nombre}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}` +
+            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}` +
                 ((document.getElementById('showFechaIngreso').checked && emp.ingreso && emp.ingreso !== 'N/D') ? ` a partir del **${emp.ingreso}**` : "") +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele las siguientes deducciones:`;
 
@@ -1417,8 +1425,8 @@
                 y += rH;
             };
 
-            drawRowNormal('Sueldo Asignado',  formatMoneda(emp.sueldoAsignado));
-            drawRowNormal('Sueldo Devengado', formatMoneda(emp.sueldoDevengado));
+            drawRowNormal('Sueldo Asignado',  formatMoneda(emp.sueldoAsignado), true);
+            drawRowNormal('Sueldo Devengado', formatMoneda(emp.sueldoDevengado), true);
 
             // Header Deducciones
             doc.rect(tLeft, y, tRight-tLeft, rH);
