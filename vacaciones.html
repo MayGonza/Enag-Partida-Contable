@@ -1,0 +1,1654 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Control de Vacaciones — ENAG</title>
+    <meta name="description" content="Módulo de control de vacaciones y generación de solicitudes oficiales de la Empresa Nacional de Artes Gráficas (ENAG).">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 18px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Layout Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.3fr 1fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        @media (max-width: 900px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panels styling */
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .panel-title {
+            color: #002147;
+            font-size: 1.25em;
+            margin-top: 0;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Drag & Drop Area */
+        .drop-zone {
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 25px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 20px;
+        }
+
+        .drop-zone.dragover {
+            border-color: #002147;
+            background-color: #f0f4f8;
+        }
+
+        .drop-zone svg {
+            width: 42px;
+            height: 42px;
+            fill: #64748b;
+        }
+
+        .drop-zone p {
+            margin: 0;
+            font-size: 1em;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .drop-zone span {
+            font-size: 0.85em;
+            color: #94a3b8;
+        }
+
+        /* Buttons styles */
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-primary {
+            background-color: #002147;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #003470;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-success:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            color: #64748b;
+            transform: none;
+        }
+
+        .btn-info {
+            background-color: #0284c7;
+            color: white;
+        }
+
+        .btn-info:hover {
+            background-color: #0369a1;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+        }
+
+        .btn-outline:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        .btn-action-small {
+            padding: 6px 12px;
+            font-size: 0.85em;
+            border-radius: 4px;
+            background-color: #f1f5f9;
+            color: #002147;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-action-small:hover {
+            background-color: #e2e8f0;
+        }
+
+        /* Filter container & Search */
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 10px;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 280px;
+            font-size: 0.9em;
+            box-sizing: border-box;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: #002147;
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.1);
+        }
+
+        .summary-info {
+            font-size: 0.85em;
+            color: #64748b;
+            font-weight: 500;
+        }
+
+        /* Tables */
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+            max-height: 400px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.88em;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        /* Form elements */
+        .form-group {
+            margin-bottom: 16px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.9em;
+            font-weight: 600;
+            color: #475569;
+            margin-bottom: 6px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            color: #333;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #002147;
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.1);
+        }
+
+        .form-control:disabled {
+            background-color: #f1f5f9;
+            color: #64748b;
+            cursor: not-allowed;
+        }
+
+        .alert-error {
+            background-color: #fef2f2;
+            border: 1px solid #fee2e2;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.88em;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 500;
+        }
+
+        .alert-success {
+            background-color: #f0fdf4;
+            border: 1px solid #dcfce7;
+            color: #15803d;
+            padding: 12px;
+            border-radius: 6px;
+            font-size: 0.88em;
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #64748b;
+        }
+
+        .empty-state svg {
+            width: 50px;
+            height: 50px;
+            fill: #94a3b8;
+            margin-bottom: 12px;
+        }
+
+        .empty-state p {
+            margin: 0;
+            font-size: 1.05em;
+            font-weight: bold;
+        }
+
+        .empty-state span {
+            font-size: 0.85em;
+            color: #94a3b8;
+            display: block;
+            margin-top: 5px;
+        }
+
+        /* Badge status */
+        .badge {
+            display: inline-block;
+            padding: 2px 6px;
+            font-size: 0.75em;
+            font-weight: bold;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .badge-success {
+            background-color: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-warning {
+            background-color: #fef9c3;
+            color: #854d0e;
+        }
+
+        .badge-danger {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .actions-group {
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        /* Auto-suggest search */
+        .autocomplete-container {
+            position: relative;
+        }
+
+        .autocomplete-list {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            border: 1px solid #cbd5e1;
+            background: white;
+            border-radius: 0 0 6px 6px;
+            max-height: 180px;
+            overflow-y: auto;
+            z-index: 100;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            margin: 0;
+            padding: 0;
+            list-style: none;
+        }
+
+        .autocomplete-list li {
+            padding: 10px 12px;
+            cursor: pointer;
+            font-size: 0.9em;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .autocomplete-list li:hover {
+            background-color: #f1f5f9;
+            color: #002147;
+        }
+
+        .autocomplete-list li.no-results {
+            color: #94a3b8;
+            cursor: default;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-container">
+        <a href="index.html" class="btn-nav btn-nav-menu">← Menú Principal</a>
+    </div>
+
+    <div class="container">
+        <div class="form-header">
+            <h2>Control y Solicitud de Vacaciones (RH)</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b; font-size: 0.95em;">
+                Cargue la hoja de control, valide saldos y genere solicitudes de vacaciones oficiales
+            </p>
+        </div>
+
+        <div class="workspace-grid">
+            <!-- PANEL IZQUIERDO: ARCHIVO Y TABLA DE EMPLEADOS -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>📁</span> Carga de Archivo de Control
+                </div>
+
+                <!-- Drag & Drop Zone -->
+                <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                    </svg>
+                    <p>Arrastre su archivo Excel aquí o haga clic para buscar</p>
+                    <span>Soporta formatos .xlsx, .xls y .csv</span>
+                    <input type="file" id="excelFile" style="display: none;" accept=".xlsx, .xls, .csv" onchange="handleFileSelect(event)">
+                </div>
+
+                <div style="display: flex; gap: 10px; margin-bottom: 20px; justify-content: space-between;">
+                    <button type="button" class="btn-outline" onclick="descargarPlantilla()">
+                        📥 Descargar Plantilla Excel
+                    </button>
+                    <button type="button" class="btn-outline" id="btnExportExcel" onclick="exportarExcelActualizado()" disabled>
+                        📤 Descargar Excel Actualizado
+                    </button>
+                </div>
+
+                <!-- SELECTOR DE HOJA (Oculto al inicio) -->
+                <div id="sheetSelectorContainer" style="display: none; margin-bottom: 15px; background: #f8fafc; padding: 12px; border-radius: 8px; border: 1px solid #e2e8f0;">
+                    <label for="sheetSelect" style="font-size: 0.88em; font-weight: bold; color: #475569; display: block; margin-bottom: 6px;">Seleccione la hoja de vacaciones:</label>
+                    <select id="sheetSelect" class="form-control" onchange="cambiarHoja()"></select>
+                </div>
+
+                <!-- TABLA DE EMPLEADOS -->
+                <div class="panel-title" style="margin-top: 30px; margin-bottom: 10px;">
+                    <span>👥</span> Listado de Empleados
+                </div>
+
+                <div id="tableSection" style="display: none;">
+                    <div class="filter-container">
+                        <input type="text" id="searchInput" class="search-input" placeholder="Buscar empleado o puesto..." oninput="filtrarTabla()">
+                        <div class="summary-info">
+                            Total: <span id="totalImportados">0</span>
+                        </div>
+                    </div>
+
+                    <div class="table-responsive">
+                        <table id="vacacionesTable">
+                            <thead>
+                                <tr>
+                                    <th style="width: 5%; text-align: center;">No.</th>
+                                    <th>Nombre del Empleado</th>
+                                    <th>Cargo / Puesto</th>
+                                    <th style="width: 10%; text-align: center;">Acumulados</th>
+                                    <th style="width: 10%; text-align: center;">Tomados</th>
+                                    <th style="width: 10%; text-align: center;">Disponibles</th>
+                                    <th style="width: 12%; text-align: center;">Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="vacacionesBody">
+                                <!-- Llenado dinámico -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="empty-state" id="emptyState">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                    </svg>
+                    <p>Aún no has cargado datos de vacaciones</p>
+                    <span>Cargue un archivo Excel de control de vacaciones o descargue la plantilla para comenzar.</span>
+                </div>
+            </div>
+
+            <!-- PANEL DERECHO: FORMULARIO DE SOLICITUD -->
+            <div class="panel">
+                <div class="panel-title">
+                    <span>📝</span> Formulario de Solicitud
+                </div>
+
+                <div id="formFeedback"></div>
+
+                <form id="solicitudForm" onsubmit="procesarSolicitud(event)">
+                    <!-- Búsqueda / Autocompletado del Empleado -->
+                    <div class="form-group">
+                        <label for="empleadoBuscador">Nombre del Empleado *</label>
+                        <div class="autocomplete-container">
+                            <input type="text" id="empleadoBuscador" class="form-control" placeholder="Escriba para buscar empleado..." oninput="buscarEmpleadosSug(this.value)" autocomplete="off" required disabled>
+                            <ul class="autocomplete-list" id="autocompleteSuggestions" style="display: none;"></ul>
+                        </div>
+                    </div>
+
+                    <!-- Detalles del empleado seleccionado (Solo lectura) -->
+                    <div style="background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 15px; margin-bottom: 20px; display: none;" id="empleadoDetalleCard">
+                        <div style="font-weight: bold; color: #002147; font-size: 0.95em;" id="detNombre">---</div>
+                        <div style="color: #64748b; font-size: 0.85em; margin-bottom: 8px;" id="detPuesto">---</div>
+                        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; border-top: 1px solid #e2e8f0; padding-top: 8px; text-align: center;">
+                            <div>
+                                <div style="font-size: 0.75em; color: #64748b; font-weight: bold;">ACUMULADOS</div>
+                                <div style="font-size: 1.1em; font-weight: bold;" id="detAcumulados">0</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75em; color: #64748b; font-weight: bold;">TOMADOS</div>
+                                <div style="font-size: 1.1em; font-weight: bold;" id="detTomados">0</div>
+                            </div>
+                            <div>
+                                <div style="font-size: 0.75em; color: #64748b; font-weight: bold;">DISPONIBLES</div>
+                                <div style="font-size: 1.2em; font-weight: bold; color: #10b981;" id="detDisponibles">0</div>
+                            </div>
+                        </div>
+                        <div id="periodosBreakdownList" style="margin-top: 15px; border-top: 1px solid #e2e8f0; padding-top: 10px; text-align: left; max-height: 150px; overflow-y: auto;">
+                            <!-- Detalle dinámico de periodos -->
+                        </div>
+                    </div>
+
+                    <!-- Selector de Periodo a Afectar -->
+                    <div class="form-group" id="periodoSelectContainer" style="display: none;">
+                        <label for="periodoVacaciones">Periodo de Vacaciones a Afectar *</label>
+                        <select id="periodoVacaciones" class="form-control" onchange="actualizarPeriodoDisponible()" required disabled></select>
+                    </div>
+
+                    <!-- Fechas de la solicitud -->
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+                        <div class="form-group">
+                            <label for="fechaInicio">Fecha de Inicio *</label>
+                            <input type="date" id="fechaInicio" class="form-control" onchange="calcularDiasFechas()" required disabled>
+                        </div>
+                        <div class="form-group">
+                            <label for="fechaFin">Fecha de Fin *</label>
+                            <input type="date" id="fechaFin" class="form-control" onchange="calcularDiasFechas()" required disabled>
+                        </div>
+                    </div>
+
+                    <!-- Días Solicitados -->
+                    <div class="form-group">
+                        <label for="diasSolicitados">Días Solicitados *</label>
+                        <input type="number" id="diasSolicitados" class="form-control" min="1" step="1" oninput="validarDiasDisponibles()" required disabled>
+                        <span style="font-size: 0.8em; color: #64748b; display: block; margin-top: 4px;" id="diasReferencia">
+                            Días seleccionados: ingrese rango de fechas.
+                        </span>
+                    </div>
+
+                    <!-- Observaciones -->
+                    <div class="form-group">
+                        <label for="observaciones">Observaciones / Detalles</label>
+                        <textarea id="observaciones" class="form-control" rows="3" placeholder="Comentarios adicionales sobre el trámite..." disabled></textarea>
+                    </div>
+
+                    <!-- Alerta de Validación de Días -->
+                    <div class="alert-error" id="valAlertaDias" style="display: none;">
+                        <span>⚠️</span>
+                        <span id="valAlertaDiasText">El empleado no cuenta con suficientes días disponibles.</span>
+                    </div>
+
+                    <div class="actions-group">
+                        <button type="submit" class="btn-success" id="btnProcesar" style="width: 100%;" disabled>
+                            📋 Registrar y Generar Solicitud (PDF)
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <div style="margin-top: 40px; text-align: center; font-size: 0.85em; color: #888; font-weight: bold; border-top: 1px solid #eee; padding-top: 20px;">
+            EMPRESA NACIONAL DE ARTES GRÁFICAS - ENAG 2026
+        </div>
+    </div>
+
+    <!-- Cargar dependencias locales -->
+    <script src="js/xlsx.full.min.js"></script>
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
+
+    <script>
+        let empleados = [];
+        let currentWorkbook = null;
+        let empleadoSeleccionado = null;
+
+        // Configuración de Drag & Drop
+        const dropZone = document.getElementById('drop-zone');
+
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                procesarArchivo(files[0]);
+            }
+        }, false);
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                procesarArchivo(files[0]);
+            }
+        }
+
+        // Leer Archivo de Excel
+        function procesarArchivo(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+                    
+                    const sheetSelect = document.getElementById('sheetSelect');
+                    sheetSelect.innerHTML = '';
+
+                    currentWorkbook.SheetNames.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.innerText = name;
+                        sheetSelect.appendChild(opt);
+                    });
+
+                    if (currentWorkbook.SheetNames.length > 1) {
+                        document.getElementById('sheetSelectorContainer').style.display = 'block';
+                    } else {
+                        document.getElementById('sheetSelectorContainer').style.display = 'none';
+                    }
+
+                    // Seleccionar la primera hoja de forma predeterminada
+                    const defaultSheet = currentWorkbook.SheetNames[0];
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
+                } catch (err) {
+                    alert("Error al procesar el archivo Excel: " + err.message);
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('excelFile').value = '';
+        }
+
+        function cambiarHoja() {
+            if (!currentWorkbook) return;
+            const sheetName = document.getElementById('sheetSelect').value;
+            cargarHoja(sheetName);
+        }
+
+        // Normalizar textos para búsquedas
+        function normalize(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase()
+                .normalize("NFD")
+                .replace(/[\u0300-\u036f]/g, "")
+                .trim();
+        }
+
+        // Helper para convertir textos de fecha en Date de JS
+        function parseStringToDate(val) {
+            if (val === undefined || val === null || val === "") return null;
+            if (val instanceof Date) return val;
+            
+            // Si es un probable serial de Excel (ej: número entero positivo)
+            const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
+            if (!isNaN(num) && num > 100 && num < 70000 && !val.toString().includes('-') && !val.toString().includes('/')) {
+                const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+                if (!isNaN(date.getTime())) return date;
+            }
+
+            const str = val.toString().trim();
+            
+            // Formato español: "12 de marzo del 2018" o "12 de marzo de 2018"
+            const regexEsp = /(\d+)\s+de\s+([a-zA-Záéíóúñ]+)\s+del?\s+(\d+)/i;
+            const matchEsp = str.match(regexEsp);
+            if (matchEsp) {
+                const dia = parseInt(matchEsp[1]);
+                const mesText = matchEsp[2].toLowerCase();
+                const anio = parseInt(matchEsp[3]);
+                const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                const mesIdx = meses.findIndex(m => m.startsWith(mesText.substring(0, 3)));
+                if (mesIdx !== -1) {
+                    return new Date(anio, mesIdx, dia);
+                }
+            }
+
+            // Formatos estándar con separadores: YYYY-MM-DD o DD/MM/YYYY
+            const parts = str.split(/[-\/]/);
+            if (parts.length === 3) {
+                const p0 = parts[0].trim();
+                const p1 = parts[1].trim();
+                const p2 = parts[2].trim();
+                
+                if (p0.length === 4) { // YYYY-MM-DD
+                    return new Date(parseInt(p0), parseInt(p1) - 1, parseInt(p2));
+                } else if (p2.length === 4) { // DD/MM/YYYY
+                    return new Date(parseInt(p2), parseInt(p1) - 1, parseInt(p0));
+                }
+            }
+
+            const parsed = Date.parse(str);
+            if (!isNaN(parsed)) {
+                return new Date(parsed);
+            }
+
+            return null;
+        }
+
+        // Generar periodos de vacaciones completados según antigüedad
+        function calcularPeriodosVacaciones(ingresoDate, referenciaDate = new Date()) {
+            if (!ingresoDate || isNaN(ingresoDate.getTime())) return [];
+            
+            let periodos = [];
+            let dia = ingresoDate.getDate();
+            let mes = ingresoDate.getMonth();
+            let anio = ingresoDate.getFullYear();
+            
+            let currentStart = new Date(anio, mes, dia);
+            let yearIndex = 1;
+            
+            while (true) {
+                let nextEnd = new Date(anio + yearIndex, mes, dia);
+                
+                // Si la fecha final del periodo está en el futuro, no se ha completado
+                if (nextEnd > referenciaDate) {
+                    break;
+                }
+                
+                // Escala de vacaciones por antigüedad en Honduras (especificada por usuario)
+                let diasAsignados = 12;
+                if (yearIndex === 2) diasAsignados = 15;
+                else if (yearIndex === 3) diasAsignados = 18;
+                else if (yearIndex === 4) diasAsignados = 22;
+                else if (yearIndex === 5) diasAsignados = 26;
+                else if (yearIndex >= 6) diasAsignados = 30;
+                
+                const label = `Periodo ${currentStart.getFullYear()}-${nextEnd.getFullYear()} (Año ${yearIndex})`;
+                
+                periodos.push({
+                    yearIndex: yearIndex,
+                    label: label,
+                    inicioStr: `${currentStart.getDate()}/${currentStart.getMonth()+1}/${currentStart.getFullYear()}`,
+                    finStr: `${nextEnd.getDate()}/${nextEnd.getMonth()+1}/${nextEnd.getFullYear()}`,
+                    acuerdoDias: diasAsignados,
+                    tomados: 0,
+                    disponibles: diasAsignados
+                });
+                
+                currentStart = new Date(nextEnd);
+                yearIndex++;
+            }
+            
+            return periodos;
+        }
+
+        // Distribución FIFO de días ya tomados
+        function distribuirDiasTomados(periodos, totalTomados) {
+            let tomadosRestantes = totalTomados;
+            
+            for (let p of periodos) {
+                if (tomadosRestantes <= 0) {
+                    p.tomados = 0;
+                    p.disponibles = p.acuerdoDias;
+                    continue;
+                }
+                
+                if (tomadosRestantes >= p.acuerdoDias) {
+                    p.tomados = p.acuerdoDias;
+                    p.disponibles = 0;
+                    tomadosRestantes -= p.acuerdoDias;
+                } else {
+                    p.tomados = tomadosRestantes;
+                    p.disponibles = p.acuerdoDias - tomadosRestantes;
+                    tomadosRestantes = 0;
+                }
+            }
+            
+            // Si el total tomados excede el acumulado total
+            if (tomadosRestantes > 0 && periodos.length > 0) {
+                const last = periodos[periodos.length - 1];
+                last.tomados += tomadosRestantes;
+                last.disponibles -= tomadosRestantes;
+            }
+        }
+
+        // Cargar Hoja Seleccionada
+        function cargarHoja(sheetName) {
+            try {
+                const sheet = currentWorkbook.Sheets[sheetName];
+                const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+                if (rowsData.length < 2) {
+                    alert("La hoja seleccionada no tiene suficientes datos.");
+                    return;
+                }
+
+                // Buscar fila de cabecera
+                let headerRowIndex = -1;
+                for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
+                    const row = rowsData[i] || [];
+                    const normalizedRow = row.map(cell => normalize(cell));
+                    const tieneNombre = normalizedRow.some(cell => 
+                        cell.includes("nombre") || cell.includes("empleado") || cell.includes("colaborador") || cell.includes("trabajador")
+                    );
+
+                    if (tieneNombre && row.filter(cell => cell !== "").length >= 3) {
+                        headerRowIndex = i;
+                        break;
+                    }
+                }
+
+                if (headerRowIndex === -1) {
+                    alert("No se pudo encontrar una fila de encabezados válida (debe tener una columna de 'Nombre').");
+                    return;
+                }
+
+                const headers = rowsData[headerRowIndex];
+                let nombreIdx = -1, puestoIdx = -1, ingresoIdx = -1;
+                let acumuladosIdx = -1, tomadosIdx = -1, disponiblesIdx = -1;
+
+                headers.forEach((header, index) => {
+                    const norm = normalize(header);
+                    if (norm.includes("nombre") || norm.includes("empleado") || norm.includes("colaborador") || norm.includes("trabajador")) {
+                        if (nombreIdx === -1) nombreIdx = index;
+                    } else if (norm.includes("puesto") || norm.includes("cargo") || norm.includes("funcion")) {
+                        if (puestoIdx === -1) puestoIdx = index;
+                    } else if (norm.includes("ingreso") || norm.includes("fecha")) {
+                        if (ingresoIdx === -1) ingresoIdx = index;
+                    } else if (norm.includes("acumulad") || norm.includes("total") || norm.includes("ganad")) {
+                        if (acumuladosIdx === -1) acumuladosIdx = index;
+                    } else if (norm.includes("tomad") || norm.includes("gozad") || norm.includes("usad") || norm.includes("utilizad")) {
+                        if (tomadosIdx === -1) tomadosIdx = index;
+                    } else if (norm.includes("disponible") || norm.includes("restant") || norm.includes("saldo")) {
+                        if (disponiblesIdx === -1) disponiblesIdx = index;
+                    }
+                });
+
+                // Asignar defaults si no se mapearon
+                if (nombreIdx === -1) nombreIdx = 1;
+                if (puestoIdx === -1) puestoIdx = 2;
+                if (acumuladosIdx === -1) acumuladosIdx = 3;
+                if (tomadosIdx === -1) tomadosIdx = 4;
+                if (disponiblesIdx === -1) disponiblesIdx = 5;
+
+                empleados = [];
+                const startRow = headerRowIndex + 1;
+
+                for (let i = startRow; i < rowsData.length; i++) {
+                    const row = rowsData[i];
+                    if (!row || !row[nombreIdx] || row[nombreIdx].toString().trim() === "") continue;
+
+                    const nombre = row[nombreIdx].toString().trim().toUpperCase();
+                    const puesto = puestoIdx !== -1 && row[puestoIdx] ? row[puestoIdx].toString().trim().toUpperCase() : "EMPLEADO";
+                    const ingreso = ingresoIdx !== -1 && row[ingresoIdx] ? row[ingresoIdx].toString().trim() : "N/D";
+                    
+                    const acumulados = parseFloat(row[acumuladosIdx]) || 0;
+                    const tomados = parseFloat(row[tomadosIdx]) || 0;
+                    const disponibles = parseFloat(row[disponiblesIdx]) || (acumulados - tomados);
+
+                    // Generar periodos dinámicos en base a la antigüedad
+                    let periodos = [];
+                    let acumuladosCalculados = acumulados;
+                    let tomadosCalculados = tomados;
+                    let disponiblesCalculados = disponibles;
+
+                    const parseResult = parseStringToDate(ingreso);
+                    if (parseResult && !isNaN(parseResult.getTime())) {
+                        periodos = calcularPeriodosVacaciones(parseResult, new Date());
+                        distribuirDiasTomados(periodos, tomados);
+                        acumuladosCalculados = periodos.reduce((acc, p) => acc + p.acuerdoDias, 0);
+                        tomadosCalculados = periodos.reduce((acc, p) => acc + p.tomados, 0);
+                        disponiblesCalculados = periodos.reduce((acc, p) => acc + p.disponibles, 0);
+                    } else {
+                        // Fallback estático si no hay fecha de ingreso válida
+                        periodos.push({
+                            yearIndex: 1,
+                            label: "Periodo Estático (Sin fecha de ingreso)",
+                            inicioStr: "N/D",
+                            finStr: "N/D",
+                            acuerdoDias: acumulados || 30,
+                            tomados: tomados,
+                            disponibles: disponibles !== undefined ? disponibles : (acumulados - tomados)
+                        });
+                        acumuladosCalculados = periodos[0].acuerdoDias;
+                        tomadosCalculados = periodos[0].tomados;
+                        disponiblesCalculados = periodos[0].disponibles;
+                    }
+
+                    empleados.push({
+                        id: i,
+                        nombre: nombre,
+                        puesto: puesto,
+                        ingreso: ingreso,
+                        acumulados: acumuladosCalculados,
+                        tomados: tomadosCalculados,
+                        disponibles: disponiblesCalculados,
+                        periodos: periodos
+                    });
+                }
+
+                if (empleados.length === 0) {
+                    alert("No se encontraron registros de empleados en esta hoja.");
+                    return;
+                }
+
+                // Renderizar y habilitar interfaz
+                renderTabla();
+                habilitarFormulario();
+                document.getElementById('emptyState').style.display = 'none';
+                document.getElementById('tableSection').style.display = 'block';
+                document.getElementById('btnExportExcel').disabled = false;
+            } catch (err) {
+                alert("Error al cargar la hoja: " + err.message);
+                console.error(err);
+            }
+        }
+
+        // Renderizar la tabla de empleados
+        function renderTabla() {
+            const tbody = document.getElementById('vacacionesBody');
+            tbody.innerHTML = '';
+
+            empleados.forEach((emp, index) => {
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', emp.id);
+
+                let badgeClass = 'badge-success';
+                if (emp.disponibles <= 0) {
+                    badgeClass = 'badge-danger';
+                } else if (emp.disponibles <= 5) {
+                    badgeClass = 'badge-warning';
+                }
+
+                tr.innerHTML = `
+                    <td style="text-align: center; font-weight: bold; color: #64748b;">${index + 1}</td>
+                    <td><strong>${emp.nombre}</strong></td>
+                    <td style="color: #475569;">${emp.puesto}</td>
+                    <td style="text-align: center; font-family: monospace;">${emp.acumulados}</td>
+                    <td style="text-align: center; font-family: monospace; color: #b91c1c;">${emp.tomados}</td>
+                    <td style="text-align: center;">
+                        <span class="badge ${badgeClass}" style="font-family: monospace; font-size: 0.9em; min-width: 30px;">
+                            ${emp.disponibles}
+                        </span>
+                    </td>
+                    <td style="text-align: center;">
+                        <button type="button" class="btn-action-small" onclick="seleccionarEmpleadoPorId(${emp.id})">Solicitar</button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('totalImportados').innerText = empleados.length;
+        }
+
+        // Habilitar controles del formulario
+        function habilitarFormulario() {
+            document.getElementById('empleadoBuscador').disabled = false;
+            document.getElementById('fechaInicio').disabled = false;
+            document.getElementById('fechaFin').disabled = false;
+            document.getElementById('diasSolicitados').disabled = false;
+            document.getElementById('observaciones').disabled = false;
+            document.getElementById('periodoVacaciones').disabled = false;
+        }
+
+        // Filtrar tabla en tiempo real
+        function filtrarTabla() {
+            const query = normalize(document.getElementById('searchInput').value);
+            const rows = document.querySelectorAll('#vacacionesBody tr');
+
+            rows.forEach(tr => {
+                const id = parseInt(tr.getAttribute('data-id'));
+                const emp = empleados.find(e => e.id === id);
+                if (emp) {
+                    const match = normalize(emp.nombre).includes(query) || normalize(emp.puesto).includes(query);
+                    tr.style.display = match ? '' : 'none';
+                }
+            });
+        }
+
+        // Autocompletar buscador del formulario
+        function buscarEmpleadosSug(query) {
+            const sugList = document.getElementById('autocompleteSuggestions');
+            sugList.innerHTML = '';
+
+            if (!query.trim()) {
+                sugList.style.display = 'none';
+                return;
+            }
+
+            const queryNorm = normalize(query);
+            const filtrados = empleados.filter(e => normalize(e.nombre).includes(queryNorm));
+
+            if (filtrados.length === 0) {
+                const li = document.createElement('li');
+                li.className = 'no-results';
+                li.innerText = 'No se encontraron resultados';
+                sugList.appendChild(li);
+            } else {
+                filtrados.slice(0, 5).forEach(emp => {
+                    const li = document.createElement('li');
+                    li.innerText = emp.nombre;
+                    li.onclick = () => {
+                        seleccionarEmpleado(emp);
+                        sugList.style.display = 'none';
+                    };
+                    sugList.appendChild(li);
+                });
+            }
+            sugList.style.display = 'block';
+        }
+
+        // Cerrar sugerencias al hacer clic fuera
+        document.addEventListener('click', (e) => {
+            if (!e.target.closest('.autocomplete-container')) {
+                document.getElementById('autocompleteSuggestions').style.display = 'none';
+            }
+        });
+
+        // Seleccionar empleado desde el listado directo
+        function seleccionarEmpleadoPorId(id) {
+            const emp = empleados.find(e => e.id === id);
+            if (emp) {
+                seleccionarEmpleado(emp);
+                document.getElementById('fechaInicio').focus();
+            }
+        }
+
+        // Cargar empleado en formulario y actualizar vista lateral
+        function seleccionarEmpleado(emp) {
+            empleadoSeleccionado = emp;
+            document.getElementById('empleadoBuscador').value = emp.nombre;
+            
+            document.getElementById('detNombre').innerText = emp.nombre;
+            document.getElementById('detPuesto').innerText = emp.puesto;
+            document.getElementById('detAcumulados').innerText = emp.acumulados;
+            document.getElementById('detTomados').innerText = emp.tomados;
+            document.getElementById('detDisponibles').innerText = emp.disponibles;
+            document.getElementById('empleadoDetalleCard').style.display = 'block';
+
+            // Cargar desglose de periodos en el card
+            let listHtml = `<div style="font-weight: bold; font-size: 0.85em; color: #475569; margin-bottom: 5px;">DESGLOSE POR PERIODOS:</div>`;
+            emp.periodos.forEach(p => {
+                listHtml += `
+                    <div style="display: flex; justify-content: space-between; font-size: 0.8em; padding: 4px 0; border-bottom: 1px dashed #e2e8f0;">
+                        <span><strong>${p.label}</strong></span>
+                        <span style="font-family: monospace;">
+                            Acum: ${p.acuerdoDias} | Tom: ${p.tomados} | 
+                            <strong style="color: ${p.disponibles > 0 ? '#10b981' : '#b91c1c'}">Disp: ${p.disponibles}</strong>
+                        </span>
+                    </div>
+                `;
+            });
+            document.getElementById('periodosBreakdownList').innerHTML = listHtml;
+
+            // Popular selector de periodos
+            const selectPeriodo = document.getElementById('periodoVacaciones');
+            selectPeriodo.innerHTML = '';
+            
+            const optFifo = document.createElement('option');
+            optFifo.value = 'FIFO';
+            optFifo.innerText = `Aplicar FIFO (Automático - Consumir más antiguo)`;
+            selectPeriodo.appendChild(optFifo);
+
+            emp.periodos.forEach((p, idx) => {
+                if (p.disponibles > 0) {
+                    const opt = document.createElement('option');
+                    opt.value = idx;
+                    opt.innerText = `${p.label} (Saldo: ${p.disponibles} días)`;
+                    selectPeriodo.appendChild(opt);
+                }
+            });
+
+            document.getElementById('periodoSelectContainer').style.display = 'block';
+
+            actualizarPeriodoDisponible();
+        }
+
+        // Actualiza el número de días disponibles mostrados en base al período seleccionado
+        function actualizarPeriodoDisponible() {
+            if (!empleadoSeleccionado) return;
+            
+            const select = document.getElementById('periodoVacaciones');
+            const val = select.value;
+            const detDisp = document.getElementById('detDisponibles');
+            
+            if (val === 'FIFO') {
+                detDisp.innerText = empleadoSeleccionado.disponibles;
+                detDisp.style.color = '#10b981';
+            } else {
+                const idx = parseInt(val);
+                const p = empleadoSeleccionado.periodos[idx];
+                detDisp.innerText = p.disponibles;
+                detDisp.style.color = p.disponibles > 0 ? '#10b981' : '#b91c1c';
+            }
+            
+            validarDiasDisponibles();
+        }
+
+        // Calcular cantidad de días del rango de fechas
+        function calcularDiasFechas() {
+            const fIni = document.getElementById('fechaInicio').value;
+            const fFin = document.getElementById('fechaFin').value;
+            const refSpan = document.getElementById('diasReferencia');
+
+            if (!fIni || !fFin) {
+                refSpan.innerText = 'Seleccione ambas fechas para calcular.';
+                return;
+            }
+
+            const start = new Date(fIni + 'T00:00:00');
+            const end = new Date(fFin + 'T00:00:00');
+
+            if (start > end) {
+                refSpan.innerText = 'Error: La fecha de inicio es posterior a la fecha de fin.';
+                document.getElementById('diasSolicitados').value = '';
+                return;
+            }
+
+            // Calcular días hábiles (lunes a viernes)
+            let diasHabiles = 0;
+            let diasCalendario = 0;
+            let temp = new Date(start);
+
+            while (temp <= end) {
+                diasCalendario++;
+                const diaSem = temp.getDay();
+                if (diaSem !== 0 && diaSem !== 6) { // Excluir Domingo (0) y Sábado (6)
+                    diasHabiles++;
+                }
+                temp.setDate(temp.getDate() + 1);
+            }
+
+            document.getElementById('diasSolicitados').value = diasHabiles;
+            refSpan.innerText = `Días Hábiles: ${diasHabiles} (Días Calendario totales: ${diasCalendario})`;
+
+            validarDiasDisponibles();
+        }
+
+        // Validación estricta contra disponibilidad de días
+        function validarDiasDisponibles() {
+            const inputDias = document.getElementById('diasSolicitados');
+            const solicitadoVal = parseInt(inputDias.value) || 0;
+            const alerta = document.getElementById('valAlertaDias');
+            const btn = document.getElementById('btnProcesar');
+
+            if (!empleadoSeleccionado) {
+                alerta.style.display = 'none';
+                btn.disabled = true;
+                return;
+            }
+
+            const select = document.getElementById('periodoVacaciones');
+            const val = select.value;
+            let disponibles = 0;
+
+            if (val === 'FIFO') {
+                disponibles = empleadoSeleccionado.disponibles;
+            } else {
+                const idx = parseInt(val);
+                disponibles = empleadoSeleccionado.periodos[idx] ? empleadoSeleccionado.periodos[idx].disponibles : 0;
+            }
+
+            if (solicitadoVal <= 0) {
+                document.getElementById('valAlertaDiasText').innerText = 'Los días solicitados deben ser mayores a 0.';
+                alerta.style.display = 'flex';
+                btn.disabled = true;
+            } else if (solicitadoVal > disponibles) {
+                document.getElementById('valAlertaDiasText').innerText = `El empleado no cuenta con suficientes días disponibles en el periodo seleccionado (Disponibles: ${disponibles}, Solicitados: ${solicitadoVal}).`;
+                alerta.style.display = 'flex';
+                btn.disabled = true;
+            } else {
+                alerta.style.display = 'none';
+                btn.disabled = false;
+            }
+        }
+
+        // Registrar trámite en memoria y generar PDF
+        async function procesarSolicitud(e) {
+            e.preventDefault();
+
+            if (!empleadoSeleccionado) {
+                alert("Por favor seleccione un empleado válido.");
+                return;
+            }
+
+            const select = document.getElementById('periodoVacaciones');
+            const valSelect = select.value;
+            const solicitadoVal = parseInt(document.getElementById('diasSolicitados').value) || 0;
+
+            let disponibles = 0;
+            if (valSelect === 'FIFO') {
+                disponibles = empleadoSeleccionado.disponibles;
+            } else {
+                const idx = parseInt(valSelect);
+                disponibles = empleadoSeleccionado.periodos[idx].disponibles;
+            }
+
+            if (solicitadoVal > disponibles) {
+                alert("Validación fallida: Días solicitados excede la disponibilidad.");
+                return;
+            }
+
+            // Descontar días según FIFO o periodo específico, y registrar cuáles se afectaron
+            let periodosAfectados = [];
+            
+            if (valSelect === 'FIFO') {
+                let rest = solicitadoVal;
+                for (let p of empleadoSeleccionado.periodos) {
+                    if (rest <= 0) break;
+                    if (p.disponibles > 0) {
+                        if (p.disponibles >= rest) {
+                            p.tomados += rest;
+                            p.disponibles -= rest;
+                            periodosAfectados.push({ label: p.label, dias: rest });
+                            rest = 0;
+                        } else {
+                            const desc = p.disponibles;
+                            p.tomados += desc;
+                            p.disponibles = 0;
+                            periodosAfectados.push({ label: p.label, dias: desc });
+                            rest -= desc;
+                        }
+                    }
+                }
+            } else {
+                const idx = parseInt(valSelect);
+                const p = empleadoSeleccionado.periodos[idx];
+                p.tomados += solicitadoVal;
+                p.disponibles -= solicitadoVal;
+                periodosAfectados.push({ label: p.label, dias: solicitadoVal });
+            }
+
+            // Recalcular totales en el empleado
+            empleadoSeleccionado.tomados = empleadoSeleccionado.periodos.reduce((acc, p) => acc + p.tomados, 0);
+            empleadoSeleccionado.disponibles = empleadoSeleccionado.periodos.reduce((acc, p) => acc + p.disponibles, 0);
+
+            // Actualizar interfaz
+            renderTabla();
+            
+            // Generar PDF
+            const fIni = document.getElementById('fechaInicio').value;
+            const fFin = document.getElementById('fechaFin').value;
+            const observaciones = document.getElementById('observaciones').value || "Ninguna";
+
+            await descargarPDFSolicitud(empleadoSeleccionado, fIni, fFin, solicitadoVal, observaciones, periodosAfectados);
+
+            // Mostrar feedback de éxito
+            const feedback = document.getElementById('formFeedback');
+            feedback.innerHTML = `
+                <div class="alert-success">
+                    ✓ ¡Solicitud registrada exitosamente! Se ha descontado del periodo y descargado el PDF.
+                </div>
+            `;
+
+            // Limpiar formulario y reiniciar
+            document.getElementById('solicitudForm').reset();
+            document.getElementById('empleadoDetalleCard').style.display = 'none';
+            document.getElementById('periodoSelectContainer').style.display = 'none';
+            document.getElementById('diasReferencia').innerText = 'Días seleccionados: ingrese rango de fechas.';
+            document.getElementById('btnProcesar').disabled = true;
+            empleadoSeleccionado = null;
+
+            setTimeout(() => {
+                feedback.innerHTML = '';
+            }, 6000);
+        }
+
+        // Helper para convertir imagen URL a base64
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        // Formatear nombres a Oración
+        function formatNombreOracion(str) {
+            if (!str) return "";
+            return str.toLowerCase().split(' ').map(word => {
+                if (!word) return "";
+                return word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
+
+        // Formatear fechas a cadena legible en español
+        function formatFechaEsp(dateStr) {
+            if (!dateStr) return "N/D";
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            return `${parts[2]} de ${meses[parseInt(parts[1]) - 1]} del ${parts[0]}`;
+        }
+
+        // Generación del PDF de Solicitud de Vacaciones Oficial
+        async function descargarPDFSolicitud(emp, fIni, fFin, diasSol, obs, periodosAfectados = []) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            // Cargar imagen de fondo oficial (si existe)
+            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            if (logoBgUrl) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            }
+
+            // Encabezado
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)", 105, 45, { align: "center" });
+            doc.setFontSize(11);
+            doc.text("DEPARTAMENTO DE RECURSOS HUMANOS", 105, 51, { align: "center" });
+            doc.text("SOLICITUD Y REGISTRO OFICIAL DE VACACIONES", 105, 57, { align: "center" });
+
+            // Fecha de emisión
+            const hoy = new Date();
+            const meses = ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"];
+            const fechaEmisionStr = `${hoy.getDate()} de ${meses[hoy.getMonth()]} del ${hoy.getFullYear()}`;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text(`Fecha de Emisión: Tegucigalpa M.D.C., ${fechaEmisionStr}`, 25, 68);
+
+            // Sección 1: Datos del Colaborador
+            doc.setDrawColor(0, 33, 71);
+            doc.setLineWidth(0.5);
+            doc.line(25, 72, 185, 72);
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("1. DATOS DEL COLABORADOR", 25, 78);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Nombre del Empleado:`, 25, 85);
+            doc.setFont('helvetica', 'bold');
+            doc.text(formatNombreOracion(emp.nombre), 68, 85);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Cargo o Puesto:`, 25, 91);
+            doc.setFont('helvetica', 'bold');
+            doc.text(emp.puesto, 68, 91);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Fecha de Ingreso:`, 25, 97);
+            doc.setFont('helvetica', 'bold');
+            doc.text(emp.ingreso, 68, 97);
+
+            // Sección 2: Detalle de la Solicitud
+            doc.line(25, 102, 185, 102);
+            doc.setFont('helvetica', 'bold');
+            doc.text("2. DETALLE DEL PERÍODO SOLICITADO", 25, 108);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Fecha de Inicio:`, 25, 115);
+            doc.setFont('helvetica', 'bold');
+            doc.text(formatFechaEsp(fIni), 68, 115);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Fecha de Fin:`, 25, 121);
+            doc.setFont('helvetica', 'bold');
+            doc.text(formatFechaEsp(fFin), 68, 121);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(`Total de Días Solicitados:`, 25, 127);
+            doc.setFont('helvetica', 'bold');
+            doc.text(`${diasSol} días hábiles`, 68, 127);
+
+            // Sección 3: Balance en Cuenta de Vacaciones
+            doc.line(25, 132, 185, 132);
+            doc.setFont('helvetica', 'bold');
+            doc.text("3. BALANCE DEL CONTROL DE VACACIONES", 25, 138);
+
+            // Dibujar tabla de balance manualmente para darle un diseño oficial premium
+            const tabX = 25;
+            let tabY = 144;
+            const tabW = 160;
+            const rowH = 7;
+
+            const balances = [
+                { k: "Días Acumulados Totales", v: emp.acumulados },
+                { k: "Días Tomados Anteriormente", v: emp.tomados - diasSol },
+                { k: "Días Solicitados en este Trámite (-)", v: diasSol },
+                { k: "Días Disponibles Restantes", v: emp.disponibles }
+            ];
+
+            balances.forEach((item, idx) => {
+                doc.rect(tabX, tabY, tabW, rowH);
+                doc.line(tabX + 110, tabY, tabX + 110, tabY + rowH);
+
+                if (idx === 3) {
+                    doc.setFont('helvetica', 'bold');
+                } else {
+                    doc.setFont('helvetica', 'normal');
+                }
+
+                doc.text(item.k, tabX + 5, tabY + 4.8);
+                doc.text(item.v.toString() + (item.v === 1 ? " día" : " días"), tabX + 115, tabY + 4.8);
+                tabY += rowH;
+            });
+
+            // Períodos afectados
+            if (periodosAfectados && periodosAfectados.length > 0) {
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(8.5);
+                const periodosStr = periodosAfectados.map(af => `${af.label} (${af.dias} d)`).join(', ');
+                doc.text(`Períodos afectados: ${periodosStr}`, tabX + 2, tabY + 4);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                tabY += 8;
+            }
+
+            // Sección 4: Observaciones
+            doc.setFont('helvetica', 'bold');
+            doc.text("4. OBSERVACIONES O NOTAS", 25, 182);
+            doc.setFont('helvetica', 'normal');
+            
+            // Dividir texto largo de observaciones para ajustarse al ancho
+            const splitObs = doc.splitTextToSize(obs, 160);
+            doc.text(splitObs, 25, 188);
+
+            // Sección 5: Firmas Oficiales
+            let firmaY = 228;
+            doc.line(25, firmaY - 10, 185, firmaY - 10);
+            
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+
+            // Líneas de firma
+            doc.line(25, firmaY, 70, firmaY);
+            doc.text("FIRMA DEL COLABORADOR", 47, firmaY + 4, { align: "center" });
+
+            doc.line(82, firmaY, 127, firmaY);
+            doc.text("REVISADO POR RECURSOS HUMANOS", 104, firmaY + 4, { align: "center" });
+
+            doc.line(140, firmaY, 185, firmaY);
+            doc.text("AUTORIZADO / GERENCIA", 162, firmaY + 4, { align: "center" });
+
+            // Descargar
+            const filename = `Solicitud_Vacaciones_${emp.nombre.replace(/\s+/g, '_')}_${fIni}.pdf`;
+            doc.save(filename);
+        }
+
+        // Descargar Plantilla Excel Ejemplo
+        function descargarPlantilla() {
+            const headers = [
+                "No.",
+                "Nombre Completo",
+                "Cargo/Puesto",
+                "Fecha de Ingreso",
+                "Días Totales",
+                "Días Tomados",
+                "Días Disponibles"
+            ];
+
+            const data = [
+                headers,
+                [
+                    1,
+                    "MARÍA ANGÉLICA HERNÁNDEZ PINEDA",
+                    "JEFA DE ARCHIVO Y CORRESPONDENCIA",
+                    "12/03/2018",
+                    30,
+                    15,
+                    15
+                ],
+                [
+                    2,
+                    "CARLOS ALBERTO DÍAZ ZELAYA",
+                    "OPERADOR DE IMPRENTA",
+                    "01/09/2021",
+                    22,
+                    8,
+                    14
+                ],
+                [
+                    3,
+                    "ANA YANCY FLORES RUIZ",
+                    "ANALISTA DE RECURSOS HUMANOS",
+                    "15/05/2022",
+                    15,
+                    0,
+                    15
+                ]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Control Vacaciones");
+            
+            // Dar formato básico de ancho de columna
+            ws['!cols'] = [
+                { wch: 6 },  // No.
+                { wch: 35 }, // Nombre
+                { wch: 35 }, // Puesto
+                { wch: 18 }, // Ingreso
+                { wch: 14 }, // Totales
+                { wch: 14 }, // Tomados
+                { wch: 14 }  // Disponibles
+            ];
+
+            XLSX.writeFile(wb, "Plantilla_Control_Vacaciones_ENAG.xlsx");
+        }
+
+        // Exportar a Excel con los datos modificados
+        function exportarExcelActualizado() {
+            if (empleados.length === 0) return;
+
+            const headers = [
+                "No.",
+                "Nombre Completo",
+                "Cargo/Puesto",
+                "Fecha de Ingreso",
+                "Días Totales",
+                "Días Tomados",
+                "Días Disponibles"
+            ];
+
+            const rowData = empleados.map((emp, idx) => [
+                idx + 1,
+                emp.nombre,
+                emp.puesto,
+                emp.ingreso,
+                emp.acumulados,
+                emp.tomados,
+                emp.disponibles
+            ]);
+
+            const sheetData = [headers, ...rowData];
+            const ws = XLSX.utils.aoa_to_sheet(sheetData);
+            
+            // Establecer anchos de columna
+            ws['!cols'] = [
+                { wch: 6 },
+                { wch: 35 },
+                { wch: 35 },
+                { wch: 18 },
+                { wch: 14 },
+                { wch: 14 },
+                { wch: 14 }
+            ];
+
+            const wb = XLSX.utils.book_new();
+            
+            // Mantener nombre de hoja original o usar uno descriptivo
+            const sheetName = currentWorkbook && currentWorkbook.SheetNames[0] 
+                ? currentWorkbook.SheetNames[0] 
+                : "Control Vacaciones";
+
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, "Control_Vacaciones_Actualizado.xlsx");
+        }
+    </script>
+</body>
+
+</html>

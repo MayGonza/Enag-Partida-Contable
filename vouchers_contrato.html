@@ -1403,7 +1403,11 @@
             tableRows.push({ type: 'header', label: 'Deducciones', val: null });
 
             emp.deducciones.forEach(d => {
-                tableRows.push({ type: 'normal', label: d.nombre, val: d.monto });
+                let labelText = d.nombre;
+                if (labelText.toLowerCase().includes("partido")) {
+                    labelText = "Otras Deducciones";
+                }
+                tableRows.push({ type: 'normal', label: labelText, val: d.monto });
             });
 
             tableRows.push({ type: 'total_deduc', label: 'Total Deducciones', val: emp.totalDeducciones });

@@ -1229,7 +1229,13 @@
             trH.innerHTML = '<td colspan="2">Deducciones</td>';
             table.appendChild(trH);
 
-            emp.deducciones.forEach(d => addRow(d.nombre, formatMoneda(d.monto)));
+            emp.deducciones.forEach(d => {
+                let labelText = d.nombre;
+                if (labelText.toLowerCase().includes("partido")) {
+                    labelText = "Otras Deducciones";
+                }
+                addRow(labelText, formatMoneda(d.monto));
+            });
             addRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
             addRow('Total a Pagar',     formatMoneda(emp.netoPagar), true);
 
@@ -1457,7 +1463,13 @@
             y += rH;
 
             // Filas individuales de deducción
-            emp.deducciones.forEach(d => drawRowNormal(d.nombre, formatMoneda(d.monto)));
+            emp.deducciones.forEach(d => {
+                let labelText = d.nombre;
+                if (labelText.toLowerCase().includes("partido")) {
+                    labelText = "Otras Deducciones";
+                }
+                drawRowNormal(labelText, formatMoneda(d.monto));
+            });
 
             // Totales (label alineado derecha de col izquierda)
             drawRow('Total Deducciones', formatMoneda(emp.totalDeducciones), true);
