@@ -472,10 +472,70 @@
             color: #94a3b8;
             cursor: default;
         }
+        .maintenance-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 33, 71, 0.95);
+            z-index: 99999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+            color: white;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            text-align: center;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .maintenance-box {
+            background: white;
+            color: #1e293b;
+            padding: 40px;
+            border-radius: 16px;
+            max-width: 500px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3);
+            border: 1px solid #cbd5e1;
+        }
+        .maintenance-box h1 {
+            color: #002147;
+            margin-top: 0;
+            font-size: 1.8em;
+            margin-bottom: 10px;
+        }
+        .maintenance-box p {
+            color: #64748b;
+            line-height: 1.6;
+            margin-bottom: 25px;
+        }
+        .btn-back-main {
+            display: inline-block;
+            text-decoration: none;
+            background: #002147;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            transition: all 0.3s;
+        }
+        .btn-back-main:hover {
+            background: #003470;
+            transform: translateY(-1px);
+        }
     </style>
 </head>
 
 <body>
+    <div class="maintenance-overlay">
+        <div class="maintenance-box">
+            <span style="font-size: 4em; display: block; margin-bottom: 20px;">🛠️</span>
+            <h1>Módulo en Mantenimiento</h1>
+            <p>El Módulo de Control de Vacaciones se encuentra temporalmente deshabilitado por mantenimiento y actualizaciones programadas.</p>
+            <a href="index.html" class="btn-back-main">← Volver al Portal</a>
+        </div>
+    </div>
 
     <div class="nav-container">
         <a href="index.html" class="btn-nav btn-nav-menu">← Menú Principal</a>
