@@ -1,0 +1,1036 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Cálculo de Incapacidades y Subsidio IHSS — ENAG</title>
+    <meta name="description" content="Módulo de cálculo de subsidios por incapacidad temporal del IHSS y reintegro institucional para empleados del sector público.">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 18px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-container {
+            max-width: 1250px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Layout Grid */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.1fr 1.4fr;
+            gap: 25px;
+            align-items: start;
+        }
+
+        @media (max-width: 992px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Panels styling */
+        .panel {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 24px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .panel-title {
+            color: #002147;
+            font-size: 1.25em;
+            margin-top: 0;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        /* Form Controls */
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        @media (max-width: 576px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field.full-width {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 576px) {
+            .form-field.full-width {
+                grid-column: span 1;
+            }
+        }
+
+        .form-field label {
+            font-weight: 600;
+            font-size: 0.9em;
+            color: #002147;
+        }
+
+        .form-field input, .form-field select {
+            padding: 10px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.95em;
+            box-sizing: border-box;
+            background: white;
+            color: #333;
+            transition: all 0.2s;
+        }
+
+        .form-field input:focus, .form-field select:focus {
+            outline: none;
+            border-color: #002147;
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.15);
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-top: 10px;
+            cursor: pointer;
+            font-size: 0.9em;
+            font-weight: 500;
+            color: #475569;
+        }
+
+        .checkbox-container input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        /* Results / Dashboard Elements */
+        .summary-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 15px 20px;
+            margin-bottom: 15px;
+        }
+
+        .summary-title {
+            font-size: 0.85em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #64748b;
+            margin-bottom: 4px;
+            font-weight: bold;
+        }
+
+        .summary-value {
+            font-size: 1.8em;
+            font-weight: 700;
+            color: #002147;
+        }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        /* Timeline Visual */
+        .timeline-section {
+            margin: 20px 0;
+        }
+
+        .timeline-title {
+            font-size: 0.95em;
+            font-weight: 600;
+            color: #002147;
+            margin-bottom: 10px;
+        }
+
+        .timeline-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            background: #f1f5f9;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            min-height: 40px;
+        }
+
+        .timeline-day {
+            width: 32px;
+            height: 32px;
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: bold;
+            color: white;
+            position: relative;
+        }
+
+        .day-patrono {
+            background-color: #f97316; /* Naranja para patrono */
+        }
+
+        .day-ihss {
+            background-color: #10b981; /* Verde para IHSS */
+        }
+
+        .timeline-legend {
+            display: flex;
+            gap: 15px;
+            margin-top: 10px;
+            font-size: 0.8em;
+            flex-wrap: wrap;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .legend-color {
+            width: 14px;
+            height: 14px;
+            border-radius: 3px;
+        }
+
+        /* Step-by-Step Breakdown Panel */
+        .step-panel {
+            background: #f0f4f8;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .step-panel h4 {
+            margin-top: 0;
+            margin-bottom: 15px;
+            color: #002147;
+            font-size: 1.1em;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 5px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .step-block {
+            margin-bottom: 15px;
+        }
+
+        .step-block:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-title {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: #002147;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .step-detail {
+            font-size: 0.9em;
+            color: #475569;
+            background: white;
+            padding: 10px 14px;
+            border-radius: 6px;
+            border: 1px solid #cbd5e1;
+            font-family: monospace;
+            line-height: 1.4;
+        }
+
+        /* Detailed Breakdown Table */
+        .breakdown-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            font-size: 0.9em;
+        }
+
+        .breakdown-table th, .breakdown-table td {
+            padding: 10px 12px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .breakdown-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        .breakdown-table tr.highlight-patrono {
+            background-color: #fff7ed;
+            font-weight: bold;
+            color: #c2410c;
+        }
+
+        .breakdown-table tr.highlight-ihss {
+            background-color: #f0fdf4;
+            font-weight: bold;
+            color: #15803d;
+        }
+
+        .breakdown-table tr.highlight-total {
+            background-color: #f8fafc;
+            border-top: 2px solid #cbd5e1;
+            font-weight: bold;
+            font-size: 1.05em;
+        }
+
+        /* Action Buttons */
+        .btn-group {
+            display: flex;
+            gap: 12px;
+            margin-top: 20px;
+        }
+
+        .btn-primary {
+            background-color: #002147;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: #003470;
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background-color: #10b981;
+            color: white;
+        }
+
+        .btn-success:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+        }
+
+        .btn-outline:hover {
+            background-color: #f8fafc;
+            border-color: #94a3b8;
+        }
+
+        /* Info boxes */
+        .info-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 12px 16px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.85em;
+            color: #1e3a8a;
+            line-height: 1.5;
+            margin-top: 20px;
+        }
+
+        .info-box strong {
+            display: block;
+            margin-bottom: 4px;
+        }
+
+        /* Tooltips or alerts */
+        .alert-error {
+            background-color: #fef2f2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 10px 14px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin-bottom: 15px;
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="nav-container">
+        <a href="index.html" class="btn-nav btn-nav-menu">← Volver al Portal</a>
+    </div>
+
+    <div class="container">
+        <div class="form-header">
+            <h2>Cálculo de Incapacidades y Subsidios IHSS (ENAG)</h2>
+            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal y Reintegro Institucional</p>
+        </div>
+
+        <div id="alertError" class="alert-error"></div>
+
+        <div class="workspace-grid">
+            
+            <!-- PANEL DE ENTRADA DE DATOS -->
+            <div class="panel">
+                <h3 class="panel-title">🩺 Datos de la Incapacidad</h3>
+                
+                <div class="form-grid">
+                    <div class="form-field full-width">
+                        <label for="empNombre">Nombre del Empleado</label>
+                        <input type="text" id="empNombre" placeholder="Ej. Juan Pérez" value="MARÍA ANGÉLICA HERNÁNDEZ PINEDA">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="empDni">DNI / Identidad</label>
+                        <input type="text" id="empDni" placeholder="0801-1990-12345" value="0801-1988-02456">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="techoIhss">Techo de Cotización IHSS (L.)</label>
+                        <input type="number" id="techoIhss" min="0" step="0.01" value="11903.13" oninput="calcularTodo()">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="fechaInicio">Fecha de Inicio</label>
+                        <input type="date" id="fechaInicio" value="2026-06-28" onchange="calcularTodo()">
+                    </div>
+
+                    <div class="form-field">
+                        <label for="fechaFin">Fecha de Finalización</label>
+                        <input type="date" id="fechaFin" value="2026-07-07" onchange="calcularTodo()">
+                    </div>
+
+                    <div class="form-field full-width">
+                        <label for="tipoIncapacidad">Tipo de Incapacidad</label>
+                        <select id="tipoIncapacidad" onchange="toggleOpcionesEspeciales(); calcularTodo();">
+                            <option value="enfermedad_comun" selected>Enfermedad Común / Accidente Común</option>
+                            <option value="riesgo_profesional">Riesgo Profesional (Accidente de Trabajo)</option>
+                            <option value="maternidad">Maternidad (Pre y Postnatal)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-field full-width" id="opcionHospitalizado">
+                        <label class="checkbox-container">
+                            <input type="checkbox" id="hospitalizado" onchange="calcularTodo()">
+                            El empleado está hospitalizado y NO tiene dependientes directos (Reduce subsidio al 50%)
+                        </label>
+                    </div>
+                </div>
+
+                <div class="info-box">
+                    <strong>📌 Normativa de Reintegro de la ENAG:</strong>
+                    El cálculo diario del subsidio se realiza con base en los días calendario de los tres meses anteriores a la incapacidad. De acuerdo con el procedimiento institucional, el cálculo se efectúa directamente a partir del **Techo de Cotización del IHSS** (L. 11,903.13).
+                </div>
+            </div>
+
+            <!-- PANEL DE RESULTADOS -->
+            <div class="panel">
+                <h3 class="panel-title">📊 Desglose del Cálculo</h3>
+
+                <div class="summary-grid">
+                    <div class="summary-card">
+                        <div class="summary-title">Días Incapacidad</div>
+                        <div id="resDiasTotales" class="summary-value">0</div>
+                    </div>
+                    <div class="summary-card" style="border-color: #bbf7d0; background-color: #f0fdf4;">
+                        <div class="summary-title" style="color: #15803d;">Monto a Reintegrar (IHSS)</div>
+                        <div id="resMontoReintegro" class="summary-value" style="color: #15803d;">L. 0.00</div>
+                    </div>
+                </div>
+
+                <!-- Línea de tiempo visual -->
+                <div class="timeline-section">
+                    <div class="timeline-title">Distribución Visual de Días:</div>
+                    <div id="timelineBar" class="timeline-bar">
+                        <!-- Generado dinámicamente -->
+                    </div>
+                    <div class="timeline-legend">
+                        <div class="legend-item">
+                            <div class="legend-color day-patrono"></div>
+                            <span>Patrono ENAG (100% salario)</span>
+                        </div>
+                        <div class="legend-item">
+                            <div class="legend-color day-ihss"></div>
+                            <span>Subsidio IHSS (Reintegro)</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Desglose por Pasos oficial ENAG -->
+                <div class="step-panel">
+                    <h4>📋 Cálculos Oficiales de la ENAG (Subsidio.xlsx)</h4>
+                    
+                    <div class="step-block">
+                        <div class="step-title">Paso 1: Historial de Días de los 3 Meses Anteriores</div>
+                        <div id="step1Detail" class="step-detail">
+                            <!-- Generado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <div class="step-block">
+                        <div class="step-title">Paso 2: Sueldo de Referencia Diario</div>
+                        <div id="step2Detail" class="step-detail">
+                            <!-- Generado dinámicamente -->
+                        </div>
+                    </div>
+
+                    <div class="step-block">
+                        <div class="step-title">Paso 3: Distribución del Subsidio Diario y Totales</div>
+                        <div id="step3Detail" class="step-detail">
+                            <!-- Generado dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabla detallada -->
+                <table class="breakdown-table">
+                    <thead>
+                        <tr>
+                            <th>Descripción del Concepto</th>
+                            <th style="text-align: right;">Cálculo / Valores</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Techo de Cotización IHSS</td>
+                            <td id="tdTechoCotizacion" style="text-align: right;">L. 0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Sueldo de Referencia Diario (Base)</td>
+                            <td id="tdReferenciaDiario" style="text-align: right;">L. 0.00</td>
+                        </tr>
+                        <tr>
+                            <td>Días a Cargo de ENAG (Carencia)</td>
+                            <td id="tdDiasCarencia" style="text-align: right;">0 días</td>
+                        </tr>
+                        <tr>
+                            <td>Días Subsidiados por el IHSS</td>
+                            <td id="tdDiasSubsidio" style="text-align: right;">0 días</td>
+                        </tr>
+                        <tr class="highlight-patrono">
+                            <td>Aporte Complementario Patrono (34%)</td>
+                            <td id="tdTotalPatrono" style="text-align: right;">L. 0.00</td>
+                        </tr>
+                        <tr class="highlight-ihss">
+                            <td>Aporte Subsidio IHSS (66% - Reintegro)</td>
+                            <td id="tdTotalIHSS" style="text-align: right;">L. 0.00</td>
+                        </tr>
+                        <tr class="highlight-total">
+                            <td>Subsidio Total Calculado (100%)</td>
+                            <td id="tdTotalSubsidio" style="text-align: right;">L. 0.00</td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="btn-group">
+                    <button class="btn-success" onclick="generarPDFReporte()">
+                        📥 Descargar Reporte PDF
+                    </button>
+                    <button class="btn-outline" onclick="window.print()">
+                        🖨️ Imprimir
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <!-- Carga de librerías locales -->
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
+
+    <script>
+        // Ocultar o mostrar opción de hospitalizado según tipo de incapacidad
+        function toggleOpcionesEspeciales() {
+            const tipo = document.getElementById("tipoIncapacidad").value;
+            const opcHosp = document.getElementById("opcionHospitalizado");
+            if (tipo === "enfermedad_comun") {
+                opcHosp.style.display = "block";
+            } else {
+                opcHosp.style.display = "none";
+                document.getElementById("hospitalizado").checked = false;
+            }
+        }
+
+        // Obtener los nombres y días de los 3 meses anteriores
+        function obtenerMesesPrevios(fechaInicioStr) {
+            const nombresMeses = [
+                'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
+                'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
+            ];
+            
+            const fecha = new Date(fechaInicioStr + "T00:00:00");
+            let mes = fecha.getMonth(); // 0-11
+            let año = fecha.getFullYear();
+            
+            const mesesPrevios = [];
+            
+            for (let i = 1; i <= 3; i++) {
+                let mIdx = mes - i;
+                let a = año;
+                if (mIdx < 0) {
+                    mIdx += 12;
+                    a -= 1;
+                }
+                const dias = new Date(a, mIdx + 1, 0).getDate();
+                mesesPrevios.push({
+                    nombre: nombresMeses[mIdx],
+                    dias: dias,
+                    año: a
+                });
+            }
+            
+            return mesesPrevios;
+        }
+
+        // Convertir imagen URL a Base64 para jsPDF
+        const getBase64FromUrl = (url) => new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        function calcularTodo() {
+            const alertError = document.getElementById("alertError");
+            alertError.style.display = "none";
+            alertError.innerText = "";
+
+            const nombre = document.getElementById("empNombre").value.trim();
+            const fechaIniVal = document.getElementById("fechaInicio").value;
+            const fechaFinVal = document.getElementById("fechaFin").value;
+            const tipo = document.getElementById("tipoIncapacidad").value;
+            const hospitalizado = document.getElementById("hospitalizado").checked;
+            const techo = parseFloat(document.getElementById("techoIhss").value) || 0;
+
+            if (!fechaIniVal || !fechaFinVal) {
+                return;
+            }
+
+            const fInicio = new Date(fechaIniVal + "T00:00:00");
+            const fFin = new Date(fechaFinVal + "T00:00:00");
+
+            if (fFin < fInicio) {
+                alertError.style.display = "block";
+                alertError.innerText = "Error: La fecha de finalización no puede ser anterior a la fecha de inicio.";
+                document.getElementById("resDiasTotales").innerText = "0";
+                document.getElementById("resMontoReintegro").innerText = "L. 0.00";
+                document.getElementById("timelineBar").innerHTML = "";
+                return;
+            }
+
+            // Días totales de incapacidad
+            const diffTime = Math.abs(fFin - fInicio);
+            const totalDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+            document.getElementById("resDiasTotales").innerText = totalDias;
+
+            // Determinar días de carencia y subsidiados
+            let diasCarencia = 0; // Pagados 100% por el patrono
+            let diasSubsidio = 0; // Pagados con subsidio IHSS
+
+            if (tipo === "enfermedad_comun") {
+                diasCarencia = Math.min(3, totalDias);
+                diasSubsidio = Math.max(0, totalDias - 3);
+            } else {
+                diasCarencia = 0;
+                diasSubsidio = totalDias;
+            }
+
+            // Paso 1: Obtener meses previos y días
+            const mesesPrevios = obtenerMesesPrevios(fechaIniVal);
+            const sumaDiasPrevios = mesesPrevios.reduce((sum, m) => sum + m.dias, 0);
+
+            // Rellenar Paso 1 en UI
+            let step1Text = "Meses anteriores a la incapacidad:\n";
+            mesesPrevios.forEach(m => {
+                step1Text += ` - ${m.nombre.toUpperCase()} (${m.año}): ${m.dias} días\n`;
+            });
+            step1Text += `Sumatoria total de días = ${sumaDiasPrevios} días`;
+            document.getElementById("step1Detail").innerText = step1Text;
+
+            // Paso 2: Sueldo Diario de Referencia
+            const sueldoDiarioReferenciaCompleto = (techo * 3) / sumaDiasPrevios;
+            // Redondear a 2 decimales para coincidir con la precisión del Excel de la ENAG
+            const sueldoDiarioReferencia = Math.round(sueldoDiarioReferenciaCompleto * 100) / 100;
+
+            let step2Text = `Techo de cotización mensual de referencia: L. ${techo.toLocaleString('es-HN', { minimumFractionDigits: 2 })}\n`;
+            step2Text += `Fórmula: (Techo IHSS * 3) / Sumatoria de Días\n`;
+            step2Text += `Fórmula: (${techo.toFixed(2)} * 3) / ${sumaDiasPrevios} = L. ${sueldoDiarioReferencia.toFixed(2)} diario`;
+            document.getElementById("step2Detail").innerText = step2Text;
+
+            // Paso 3: Porcentajes y Totales
+            let pctIHSS = 0.66;
+            let pctPatrono = 0.34;
+            if (tipo === "enfermedad_comun" && hospitalizado) {
+                pctIHSS = 0.50;
+                pctPatrono = 0.50;
+            }
+
+            // Cálculos diarios y totales
+            const aporteDiarioIHSS = sueldoDiarioReferencia * pctIHSS;
+            const aporteDiarioPatrono = sueldoDiarioReferencia * pctPatrono;
+
+            const totalIHSS = Math.round(aporteDiarioIHSS * diasSubsidio * 100) / 100;
+            const totalPatrono = Math.round(aporteDiarioPatrono * diasSubsidio * 100) / 100;
+            const totalSubsidio = Math.round(sueldoDiarioReferencia * diasSubsidio * 100) / 100;
+
+            let step3Text = `Distribución diaria para ${diasSubsidio} días subsidiados:\n`;
+            step3Text += ` - Aporte IHSS (${(pctIHSS * 100).toFixed(0)}%): L. ${sueldoDiarioReferencia.toFixed(2)} * ${(pctIHSS * 100).toFixed(0)}% = L. ${aporteDiarioIHSS.toFixed(4)} diario\n`;
+            step3Text += ` - Aporte Patrono (${(pctPatrono * 100).toFixed(0)}%): L. ${sueldoDiarioReferencia.toFixed(2)} * ${(pctPatrono * 100).toFixed(0)}% = L. ${aporteDiarioPatrono.toFixed(4)} diario\n`;
+            step3Text += `\nTotales Calculados:\n`;
+            step3Text += ` - Total IHSS (Reintegro): L. ${aporteDiarioIHSS.toFixed(4)} * ${diasSubsidio} días = L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
+            step3Text += ` - Total Patrono (ENAG): L. ${aporteDiarioPatrono.toFixed(4)} * ${diasSubsidio} días = L. ${totalPatrono.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}\n`;
+            step3Text += ` - Subsidio Total: L. ${totalSubsidio.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById("step3Detail").innerText = step3Text;
+
+            // Mostrar en tabla principal
+            document.getElementById("tdTechoCotizacion").innerText = `L. ${techo.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById("tdReferenciaDiario").innerText = `L. ${sueldoDiarioReferencia.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById("tdDiasCarencia").innerText = `${diasCarencia} día${diasCarencia !== 1 ? 's' : ''}`;
+            document.getElementById("tdDiasSubsidio").innerText = `${diasSubsidio} día${diasSubsidio !== 1 ? 's' : ''}`;
+            
+            document.getElementById("tdTotalPatrono").innerText = `L. ${totalPatrono.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById("tdTotalIHSS").innerText = `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            document.getElementById("tdTotalSubsidio").innerText = `L. ${totalSubsidio.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+            
+            document.getElementById("resMontoReintegro").innerText = `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            // Dibujar la línea de tiempo visual
+            dibujarCronograma(totalDias, diasCarencia, diasSubsidio);
+        }
+
+        function dibujarCronograma(totalDias, diasCarencia, diasSubsidio) {
+            const container = document.getElementById("timelineBar");
+            container.innerHTML = "";
+
+            for (let i = 1; i <= totalDias; i++) {
+                const dayBlock = document.createElement("div");
+                dayBlock.className = "timeline-day";
+                dayBlock.innerText = i;
+
+                if (i <= diasCarencia) {
+                    dayBlock.classList.add("day-patrono");
+                    dayBlock.title = `Día ${i}: Pagado 100% por ENAG`;
+                } else {
+                    dayBlock.classList.add("day-ihss");
+                    dayBlock.title = `Día ${i}: Subsidio IHSS (Reintegro)`;
+                }
+
+                container.appendChild(dayBlock);
+            }
+        }
+
+        // Generar Reporte Oficial PDF con formato ENAG detallado (con membrete de fondo)
+        async function generarPDFReporte() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+
+            const nombre = document.getElementById("empNombre").value.trim() || "N/A";
+            const dni = document.getElementById("empDni").value.trim() || "N/A";
+            const fechaIniVal = document.getElementById("fechaInicio").value;
+            const fechaFinVal = document.getElementById("fechaFin").value;
+            const tipo = document.getElementById("tipoIncapacidad").value;
+            const hospitalizado = document.getElementById("hospitalizado").checked;
+            const techo = parseFloat(document.getElementById("techoIhss").value) || 0;
+
+            const fInicio = new Date(fechaIniVal + "T00:00:00");
+            const fFin = new Date(fechaFinVal + "T00:00:00");
+
+            const diffTime = Math.abs(fFin - fInicio);
+            const totalDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
+
+            let diasCarencia = 0;
+            let diasSubsidio = 0;
+            let tipoTexto = "";
+
+            if (tipo === "enfermedad_comun") {
+                diasCarencia = Math.min(3, totalDias);
+                diasSubsidio = Math.max(0, totalDias - 3);
+                tipoTexto = "Enfermedad Común / Accidente Común" + (hospitalizado ? " (Hospitalizado sin dependientes)" : "");
+            } else if (tipo === "riesgo_profesional") {
+                diasCarencia = 0;
+                diasSubsidio = totalDias;
+                tipoTexto = "Riesgo Profesional";
+            } else {
+                diasCarencia = 0;
+                diasSubsidio = totalDias;
+                tipoTexto = "Maternidad (Pre/Postnatal)";
+            }
+
+            // Historial de 3 meses
+            const mesesPrevios = obtenerMesesPrevios(fechaIniVal);
+            const sumaDiasPrevios = mesesPrevios.reduce((sum, m) => sum + m.dias, 0);
+
+            // Cálculos
+            const sueldoDiarioReferencia = Math.round(((techo * 3) / sumaDiasPrevios) * 100) / 100;
+
+            let pctIHSS = 0.66;
+            let pctPatrono = 0.34;
+            if (tipo === "enfermedad_comun" && hospitalizado) {
+                pctIHSS = 0.50;
+                pctPatrono = 0.50;
+            }
+
+            const totalIHSS = Math.round(sueldoDiarioReferencia * pctIHSS * diasSubsidio * 100) / 100;
+            const totalPatrono = Math.round(sueldoDiarioReferencia * pctPatrono * diasSubsidio * 100) / 100;
+            const totalSubsidio = Math.round(sueldoDiarioReferencia * diasSubsidio * 100) / 100;
+
+            // Cargar Fondo con Membrete Oficial 'Logo odoo.png'
+            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            if (logoBgUrl) {
+                const pw = doc.internal.pageSize.getWidth();
+                const ph = doc.internal.pageSize.getHeight();
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pw, ph);
+            }
+
+            // Encabezado en texto (sobre el membrete)
+            doc.setTextColor(0, 33, 71); // Azul oscuro institucional
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)", 105, 45, { align: 'center' });
+            doc.setFontSize(10.5);
+            doc.text("Departamento de Recursos Humanos", 105, 51, { align: 'center' });
+            doc.setFontSize(11);
+            doc.text("Hoja de Desglose de Incapacidad y Reintegro de Subsidio IHSS", 105, 58, { align: 'center' });
+
+            // Información General
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text("I. DATOS DEL EMPLEADO Y LA LICENCIA", 15, 68);
+            
+            doc.setDrawColor(0, 33, 71);
+            doc.setLineWidth(0.5);
+            doc.line(15, 70, 195, 70);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(51, 51, 51);
+            doc.setFontSize(9.5);
+            
+            // Grid de datos
+            doc.setFont('helvetica', 'bold'); doc.text("Empleado:", 15, 77);
+            doc.setFont('helvetica', 'normal'); doc.text(nombre, 45, 77);
+
+            doc.setFont('helvetica', 'bold'); doc.text("Identidad (DNI):", 15, 83);
+            doc.setFont('helvetica', 'normal'); doc.text(dni, 45, 83);
+
+            doc.setFont('helvetica', 'bold'); doc.text("Techo IHSS Base:", 15, 89);
+            doc.setFont('helvetica', 'normal'); doc.text(`L. ${techo.toLocaleString('es-HN', { minimumFractionDigits: 2 })}`, 45, 89);
+
+            doc.setFont('helvetica', 'bold'); doc.text("Tipo Incapacidad:", 115, 77);
+            doc.setFont('helvetica', 'normal'); doc.text(tipoTexto, 148, 77);
+
+            doc.setFont('helvetica', 'bold'); doc.text("Rango de Fechas:", 115, 83);
+            doc.setFont('helvetica', 'normal'); doc.text(`${fechaIniVal} al ${fechaFinVal}`, 148, 83);
+
+            doc.setFont('helvetica', 'bold'); doc.text("Días Totales:", 115, 89);
+            doc.setFont('helvetica', 'normal'); doc.text(`${totalDias} día${totalDias !== 1 ? 's' : ''}`, 148, 89);
+
+            // Detalle de Pasos (Subsidio.xlsx)
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.text("II. DESGLOSE DEL CÁLCULO (SEGÚN NORMATIVA ENAG)", 15, 101);
+            doc.line(15, 103, 195, 103);
+
+            // Paso 1
+            doc.setFontSize(9.5);
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Paso 1: Historial de Días de los 3 Meses Anteriores", 15, 110);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(51, 51, 51);
+            let p1Str = "";
+            mesesPrevios.forEach((m, idx) => {
+                p1Str += `${m.nombre.toUpperCase()} (${m.año}): ${m.dias} días` + (idx < 2 ? "  |  " : "");
+            });
+            p1Str += `  ==> Suma total = ${sumaDiasPrevios} días`;
+            doc.text(p1Str, 15, 115);
+
+            // Paso 2
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Paso 2: Sueldo de Referencia Diario", 15, 124);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(51, 51, 51);
+            doc.text(`Fórmula: (Techo IHSS * 3) / Sumatoria de Días`, 15, 129);
+            doc.text(`Fórmula: (L. ${techo.toFixed(2)} * 3) / ${sumaDiasPrevios} = L. ${sueldoDiarioReferencia.toFixed(2)} diario`, 15, 134);
+
+            // Paso 3 y Tabla
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Paso 3: Distribución del Subsidio Diario y Totales", 15, 143);
+            doc.line(15, 145, 195, 145);
+
+            const headers = [["Concepto", "Días", "Porcentaje", "Cuota Diaria", "Total Calculado"]];
+            const dataTable = [
+                ["Aporte Complementario Patrono", `${diasSubsidio}`, `${(pctPatrono * 100).toFixed(0)}%`, `L. ${(sueldoDiarioReferencia * pctPatrono).toFixed(2)}`, `L. ${totalPatrono.toLocaleString('es-HN', { minimumFractionDigits: 2 })}`],
+                ["Aporte Subsidio IHSS (A REINTEGRAR)", `${diasSubsidio}`, `${(pctIHSS * 100).toFixed(0)}%`, `L. ${(sueldoDiarioReferencia * pctIHSS).toFixed(2)}`, `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2 })}`],
+                ["Carencia a Cargo de ENAG (100% Salario)", `${diasCarencia}`, "100%", "-", "-"]
+            ];
+
+            doc.autoTable({
+                startY: 148,
+                head: headers,
+                body: dataTable,
+                theme: 'striped',
+                headStyles: { fillColor: [0, 33, 71], textColor: [255, 255, 255] },
+                columnStyles: {
+                    0: { cellWidth: 70 },
+                    1: { cellWidth: 15, halign: 'center' },
+                    2: { cellWidth: 25, halign: 'center' },
+                    3: { cellWidth: 35, halign: 'right' },
+                    4: { cellWidth: 35, halign: 'right' }
+                },
+                styles: { fontSize: 9 }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 10;
+
+            // Cuadro explicativo
+            doc.setFillColor(239, 246, 255); // Azul suave
+            doc.rect(15, finalY, 180, 24, 'F');
+            doc.setDrawColor(59, 130, 246);
+            doc.line(15, finalY, 15, finalY + 24);
+            
+            doc.setFontSize(8.5);
+            doc.setTextColor(30, 58, 138);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Nota de Control Interno (RRHH):", 18, finalY + 5);
+            doc.setFont('helvetica', 'normal');
+            doc.text(`En conformidad con la planilla mensual de la ENAG, el empleado recibe el 100% de su sueldo nominal completo.`, 18, finalY + 10);
+            doc.text(`Por consiguiente, el empleado queda obligado a realizar el reintegro de L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2 })} (monto de subsidio`, 18, finalY + 14);
+            doc.text(`emitido por el IHSS) a favor de la Tesorería de la ENAG en un plazo de 10 días tras recibir la orden de pago.`, 18, finalY + 18);
+
+            // Firmas
+            const firmaY = finalY + 45;
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            doc.setDrawColor(150, 150, 150);
+            doc.setLineWidth(0.5);
+            
+            doc.line(25, firmaY, 85, firmaY);
+            doc.text("Empleado Reintegro", 55, firmaY + 5, { align: 'center' });
+            doc.setFontSize(8);
+            doc.text(nombre, 55, firmaY + 9, { align: 'center' });
+            
+            doc.setFontSize(9.5);
+            doc.line(125, firmaY, 185, firmaY);
+            doc.text("Recursos Humanos (ENAG)", 155, firmaY + 5, { align: 'center' });
+
+            // Guardar PDF
+            const nombreArchivo = `Reintegro_IHSS_${nombre.replace(/\s+/g, '_')}.pdf`;
+            doc.save(nombreArchivo);
+        }
+
+        // Ejecutar cálculo inicial al cargar
+        toggleOpcionesEspeciales();
+        calcularTodo();
+    </script>
+</body>
+
+</html>
