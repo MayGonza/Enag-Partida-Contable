@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
     <title>Cálculo de Incapacidades y Subsidio IHSS — ENAG</title>
-    <meta name="description" content="Módulo de cálculo de subsidios por incapacidad temporal del IHSS y reintegro institucional para empleados del sector público.">
+    <meta name="description"
+        content="Módulo de cálculo de subsidios por incapacidad temporal del IHSS y reintegro institucional para empleados del sector público.">
 
     <style>
         body {
@@ -23,6 +24,7 @@
                 opacity: 0;
                 transform: translateY(30px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -166,7 +168,9 @@
             color: #002147;
         }
 
-        .form-field input, .form-field select, .form-field textarea {
+        .form-field input,
+        .form-field select,
+        .form-field textarea {
             padding: 10px 12px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
@@ -177,7 +181,9 @@
             transition: all 0.2s;
         }
 
-        .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+        .form-field input:focus,
+        .form-field select:focus,
+        .form-field textarea:focus {
             outline: none;
             border-color: #002147;
             box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.15);
@@ -268,11 +274,13 @@
         }
 
         .day-patrono {
-            background-color: #f97316; /* Naranja para patrono */
+            background-color: #f97316;
+            /* Naranja para patrono */
         }
 
         .day-ihss {
-            background-color: #10b981; /* Verde para IHSS */
+            background-color: #10b981;
+            /* Verde para IHSS */
         }
 
         .timeline-legend {
@@ -352,7 +360,8 @@
             font-size: 0.9em;
         }
 
-        .breakdown-table th, .breakdown-table td {
+        .breakdown-table th,
+        .breakdown-table td {
             padding: 10px 12px;
             text-align: left;
             border-bottom: 1px solid #e2e8f0;
@@ -461,21 +470,23 @@
     <div class="container">
         <div class="form-header">
             <h2>Cálculo de Incapacidades y Subsidios IHSS (ENAG)</h2>
-            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal y Reintegro Institucional</p>
+            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal y
+                Reintegro Institucional</p>
         </div>
 
         <div id="alertError" class="alert-error"></div>
 
         <div class="workspace-grid">
-            
+
             <!-- PANEL DE ENTRADA DE DATOS -->
             <div class="panel">
                 <h3 class="panel-title">🩺 Datos de la Incapacidad</h3>
-                
+
                 <div class="form-grid">
                     <div class="form-field full-width">
                         <label for="empNombre">Nombre del Empleado</label>
-                        <input type="text" id="empNombre" placeholder="Ej. Juan Pérez" value="MARÍA ANGÉLICA HERNÁNDEZ PINEDA">
+                        <input type="text" id="empNombre" placeholder="Ej. Juan Pérez"
+                            value="MARÍA ANGÉLICA HERNÁNDEZ PINEDA">
                     </div>
 
                     <div class="form-field">
@@ -485,7 +496,8 @@
 
                     <div class="form-field">
                         <label for="techoIhss">Techo de Cotización IHSS (L.)</label>
-                        <input type="number" id="techoIhss" min="0" step="0.01" value="11903.13" oninput="calcularTodo()">
+                        <input type="number" id="techoIhss" min="0" step="0.01" value="11903.13"
+                            oninput="calcularTodo()">
                     </div>
 
                     <div class="form-field">
@@ -517,15 +529,21 @@
                     <div class="form-field full-width" style="margin-top: 10px;">
                         <div style="display: flex; justify-content: space-between; align-items: center;">
                             <label for="notaControlInterno">Nota de Control Interno (RRHH)</label>
-                            <button type="button" onclick="restablecerNota()" style="background: none; border: none; color: #002147; text-decoration: underline; cursor: pointer; font-size: 0.8em; font-weight: bold; padding: 0;">Restablecer por Defecto</button>
+                            <button type="button" onclick="restablecerNota()"
+                                style="background: none; border: none; color: #002147; text-decoration: underline; cursor: pointer; font-size: 0.8em; font-weight: bold; padding: 0;">Restablecer
+                                por Defecto</button>
                         </div>
-                        <textarea id="notaControlInterno" rows="4" placeholder="Escriba aquí la nota de control interno..." oninput="marcarNotaModificada()" style="resize: vertical; font-family: inherit; line-height: 1.4;"></textarea>
+                        <textarea id="notaControlInterno" rows="4"
+                            placeholder="Escriba aquí la nota de control interno..." oninput="marcarNotaModificada()"
+                            style="resize: vertical; font-family: inherit; line-height: 1.4;"></textarea>
                     </div>
                 </div>
 
                 <div class="info-box">
                     <strong>📌 Normativa de Reintegro de la ENAG:</strong>
-                    El cálculo diario del subsidio se realiza con base en los días calendario de los tres meses anteriores a la incapacidad. De acuerdo con el procedimiento institucional, el cálculo se efectúa directamente a partir del **Techo de Cotización del IHSS** (L. 11,903.13).
+                    El cálculo diario del subsidio se realiza con base en los días calendario de los tres meses
+                    anteriores a la incapacidad. De acuerdo con el procedimiento institucional, el cálculo se efectúa
+                    directamente a partir del **Techo de Cotización del IHSS** (L. 11,903.13).
                 </div>
             </div>
 
@@ -565,7 +583,7 @@
                 <!-- Desglose por Pasos oficial ENAG -->
                 <div class="step-panel">
                     <h4>📋 Cálculos Oficiales de la ENAG (Subsidio.xlsx)</h4>
-                    
+
                     <div class="step-block">
                         <div class="step-title">Paso 1: Historial de Días de los 3 Meses Anteriores</div>
                         <div id="step1Detail" class="step-detail">
@@ -675,13 +693,13 @@
                 'enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio',
                 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
             ];
-            
+
             const fecha = new Date(fechaInicioStr + "T00:00:00");
             let mes = fecha.getMonth(); // 0-11
             let año = fecha.getFullYear();
-            
+
             const mesesPrevios = [];
-            
+
             for (let i = 1; i <= 3; i++) {
                 let mIdx = mes - i;
                 let a = año;
@@ -696,7 +714,7 @@
                     año: a
                 });
             }
-            
+
             return mesesPrevios;
         }
 
@@ -811,11 +829,11 @@
             document.getElementById("tdReferenciaDiario").innerText = `L. ${sueldoDiarioReferencia.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById("tdDiasCarencia").innerText = `${diasCarencia} día${diasCarencia !== 1 ? 's' : ''}`;
             document.getElementById("tdDiasSubsidio").innerText = `${diasSubsidio} día${diasSubsidio !== 1 ? 's' : ''}`;
-            
+
             document.getElementById("tdTotalPatrono").innerText = `L. ${totalPatrono.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById("tdTotalIHSS").innerText = `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             document.getElementById("tdTotalSubsidio").innerText = `L. ${totalSubsidio.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-            
+
             document.getElementById("resMontoReintegro").innerText = `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
             // Actualizar la nota de control interno si el usuario no la ha modificado
@@ -843,7 +861,7 @@
                     dayBlock.title = `Día ${i}: Pagado 100% por ENAG`;
                 } else {
                     dayBlock.classList.add("day-ihss");
-                    dayBlock.title = `Día ${i}: Subsidio IHSS (Reintegro)`;
+                    dayBlock.title = `Día ${i}: Subsidio IHSS `;
                 }
 
                 container.appendChild(dayBlock);
@@ -928,7 +946,7 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
             doc.text("I. DATOS DEL USUARIO", 15, 68);
-            
+
             doc.setDrawColor(0, 33, 71);
             doc.setLineWidth(0.5);
             doc.line(15, 70, 195, 70);
@@ -936,7 +954,7 @@
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(51, 51, 51);
             doc.setFontSize(9.5);
-            
+
             // Grid de datos
             doc.setFont('helvetica', 'bold'); doc.text("Empleado:", 15, 77);
             doc.setFont('helvetica', 'normal'); doc.text(nombre, 45, 77);
@@ -960,7 +978,7 @@
             doc.setTextColor(0, 33, 71);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
-            doc.text("II. DESGLOSE DEL CÁLCULO (SEGÚN NORMATIVA ENAG)", 15, 101);
+            doc.text("II. DESGLOSE DEL CÁLCULO", 15, 101);
             doc.line(15, 103, 195, 103);
 
             // Paso 1
@@ -995,7 +1013,7 @@
             const headers = [["Concepto", "Días", "Porcentaje", "Cuota Diaria", "Total Calculado"]];
             const dataTable = [
                 ["Aporte Complementario Patrono", `${diasSubsidio}`, `${(pctPatrono * 100).toFixed(0)}%`, `L. ${(sueldoDiarioReferencia * pctPatrono).toFixed(2)}`, `L. ${totalPatrono.toLocaleString('es-HN', { minimumFractionDigits: 2 })}`],
-                ["Aporte Subsidio IHSS (A REINTEGRAR)", `${diasSubsidio}`, `${(pctIHSS * 100).toFixed(0)}%`, `L. ${(sueldoDiarioReferencia * pctIHSS).toFixed(2)}`, `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2 })}`],
+                ["Aporte Subsidio IHSS", `${diasSubsidio}`, `${(pctIHSS * 100).toFixed(0)}%`, `L. ${(sueldoDiarioReferencia * pctIHSS).toFixed(2)}`, `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2 })}`],
                 ["Carencia a Cargo de ENAG (100% Salario)", `${diasCarencia}`, "100%", "-", "-"]
             ];
 
@@ -1029,12 +1047,12 @@
             doc.rect(15, finalY, 180, rectHeight, 'F');
             doc.setDrawColor(59, 130, 246);
             doc.line(15, finalY, 15, finalY + rectHeight);
-            
+
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text("Nota de Control Interno (RRHH):", 18, finalY + 5);
             doc.setFont('helvetica', 'normal');
-            
+
             let currentY = finalY + 9.5;
             for (let i = 0; i < lineasNota.length; i++) {
                 doc.text(lineasNota[i], 18, currentY);
@@ -1047,7 +1065,7 @@
             doc.setTextColor(51, 51, 51);
             doc.setDrawColor(150, 150, 150);
             doc.setLineWidth(0.5);
-            
+
             // Única firma centrada
             doc.line(75, firmaY, 135, firmaY);
             doc.text("Recursos Humanos (ENAG)", 105, firmaY + 5, { align: 'center' });
