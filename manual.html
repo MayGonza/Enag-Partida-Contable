@@ -1,0 +1,854 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Manual de Usuario — Sistema ENAG</title>
+    <meta name="description" content="Manual de usuario completo del Sistema de Gestión de la Empresa Nacional de Artes Gráficas (ENAG).">
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        .top-navbar {
+            background-color: #ffffff;
+            border-bottom: 3px solid #002147;
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.25em;
+            font-weight: bold;
+            color: #002147;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .btn-nav-back {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            background-color: #6c757d;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-nav-back:hover {
+            background-color: #5a6268;
+        }
+
+        /* Main Workspace Layout */
+        .manual-layout {
+            display: grid;
+            grid-template-columns: 280px 1fr;
+            max-width: 1400px;
+            width: 100%;
+            margin: 30px auto;
+            padding: 0 20px;
+            gap: 30px;
+            flex-grow: 1;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 992px) {
+            .manual-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            padding: 24px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border-top: 5px solid #002147;
+            position: sticky;
+            top: 100px;
+            max-height: calc(100vh - 140px);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: #002147;
+            font-size: 1.05em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            margin-bottom: 15px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 8px 12px;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.9em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover {
+            background-color: #f1f5f9;
+            color: #002147;
+            padding-left: 16px;
+        }
+
+        .sidebar-link.active {
+            background-color: #002147;
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Content Panel */
+        .content-panel {
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border-top: 5px solid #002147;
+        }
+
+        /* Manual Content Styling */
+        .manual-section {
+            margin-bottom: 40px;
+            scroll-margin-top: 90px;
+        }
+
+        .manual-section:last-child {
+            margin-bottom: 0;
+        }
+
+        .manual-section h1 {
+            color: #002147;
+            font-size: 1.8em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 20px;
+        }
+
+        .manual-section h2 {
+            color: #002147;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        .manual-section h3 {
+            color: #0d9488;
+            font-size: 1.1em;
+            margin-top: 20px;
+            margin-bottom: 8px;
+        }
+
+        .manual-section p {
+            line-height: 1.6;
+            color: #334155;
+            margin-bottom: 16px;
+            font-size: 0.98em;
+        }
+
+        .manual-section ul, .manual-section ol {
+            margin-bottom: 16px;
+            padding-left: 20px;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .manual-section li {
+            margin-bottom: 8px;
+        }
+
+        /* Images and figures */
+        .manual-image-container {
+            text-align: center;
+            margin: 30px 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .manual-image-container img {
+            max-width: 90%;
+            height: auto;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+            border: 1px solid #cbd5e1;
+            transition: transform 0.3s;
+        }
+
+        .manual-image-container img:hover {
+            transform: scale(1.01);
+        }
+
+        .manual-image-caption {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-top: 10px;
+            font-style: italic;
+            font-weight: 500;
+        }
+
+        /* Highlights & Alerts */
+        .manual-note {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.9em;
+            color: #1e3a8a;
+            line-height: 1.5;
+            margin: 20px 0;
+        }
+
+        .manual-note strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #1d4ed8;
+        }
+
+        .manual-warning {
+            background-color: #fff7ed;
+            border-left: 4px solid #f97316;
+            padding: 15px 20px;
+            border-radius: 0 10px 10px 0;
+            font-size: 0.9em;
+            color: #7c2d12;
+            line-height: 1.5;
+            margin: 20px 0;
+        }
+
+        .manual-warning strong {
+            display: block;
+            margin-bottom: 4px;
+            color: #c2410c;
+        }
+
+        /* Action Buttons */
+        .btn-download-pdf {
+            background-color: #10b981;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 25px;
+        }
+
+        .btn-download-pdf:hover {
+            background-color: #059669;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Footer */
+        .manual-footer {
+            text-align: center;
+            padding: 20px;
+            color: #888;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP NAVBAR -->
+    <div class="top-navbar">
+        <div class="navbar-brand">
+            <span>📖 Manual de Usuario</span>
+        </div>
+        <a href="index.html" class="btn-nav-back">← Volver al Portal</a>
+    </div>
+
+    <!-- MAIN WORKSPACE LAYOUT -->
+    <div class="manual-layout">
+        
+        <!-- SIDEBAR NAVIGATION -->
+        <div class="sidebar">
+            <h3>Secciones</h3>
+            <ul class="sidebar-menu">
+                <li><a href="#introduccion" class="sidebar-link active">1. Introducción y Acceso</a></li>
+                <li><a href="#contabilidad" class="sidebar-link">2. Módulo de Contabilidad</a></li>
+                <li><a href="#rrhh-vouchers" class="sidebar-link">3. RRHH — Vouchers de Pago</a></li>
+                <li><a href="#rrhh-constancias" class="sidebar-link">4. RRHH — Constancias Laborales</a></li>
+                <li><a href="#rrhh-incapacidades" class="sidebar-link">5. RRHH — Subsidios IHSS</a></li>
+                <li><a href="#produccion" class="sidebar-link">6. Módulo de Producción</a></li>
+            </ul>
+        </div>
+
+        <!-- CONTENT PANEL -->
+        <div class="content-panel">
+            
+            <button class="btn-download-pdf" onclick="descargarManualPDF()">
+                📥 Descargar Manual Completo en PDF (Ilustrado con 8 Capturas del Sistema)
+            </button>
+
+            <!-- 1. INTRODUCCION -->
+            <div id="introduccion" class="manual-section">
+                <h1>1. Introducción y Control de Acceso</h1>
+                <p>Bienvenido al <strong>Sistema de Gestión Administrativa de la Empresa Nacional de Artes Gráficas (ENAG)</strong>. Este sistema web ha sido diseñado para unificar los procesos diarios de los departamentos de Contabilidad, Recursos Humanos y Producción.</p>
+                
+                <h2>Acceso Protegido por PIN</h2>
+                <p>Para resguardar la confidencialidad de la información, el portal principal restringe el acceso a las áreas sensibles mediante claves de control:</p>
+                <ul>
+                    <li><strong>Módulo de Contabilidad:</strong> Requiere ingresar la contraseña <code>CONTA@2026</code>.</li>
+                    <li><strong>Módulo de Recursos Humanos:</strong> Requiere ingresar la contraseña <code>1212</code>.</li>
+                    <li><strong>Módulo de Producción:</strong> Es de acceso libre y no requiere PIN.</li>
+                </ul>
+
+                <div class="manual-image-container">
+                    <img src="captura_portal.png" alt="Pantalla Principal del Portal Administrativo">
+                    <div class="manual-image-caption">Figura 1: Captura de pantalla de la interfaz principal del Portal Administrativo de la ENAG.</div>
+                </div>
+
+                <div class="manual-warning">
+                    <strong>⚠️ Advertencia de Seguridad:</strong>
+                    Nunca comparta estas contraseñas con personal ajeno a los respectivos departamentos. Cambie las claves anualmente en coordinación con el administrador del sistema.
+                </div>
+            </div>
+
+            <!-- 2. CONTABILIDAD -->
+            <div id="contabilidad" class="manual-section">
+                <h1>2. Módulo de Contabilidad</h1>
+                <p>Este módulo cuenta con dos herramientas principales destinadas al control tributario e ingresos diarios del libro contable diario.</p>
+                
+                <h2>2.1. Retenciones de Impuestos</h2>
+                <p>Permite registrar e imprimir los comprobantes oficiales de retención aplicados a proveedores del Estado.</p>
+                <ol>
+                    <li>Ingrese al formulario e ingrese el Nombre del Proveedor, RTN y el Concepto de la compra.</li>
+                    <li>Indique el Monto Bruto de la factura.</li>
+                    <li>Seleccione el porcentaje de retención a aplicar (ej. 1% o 12.5% según corresponda). El sistema calculará automáticamente el valor del impuesto retenido y el valor neto a pagar.</li>
+                    <li>Presione <strong>"Descargar Comprobante PDF"</strong> para obtener el voucher listo para firma y sello de la institución.</li>
+                </ol>
+
+                <div class="manual-image-container">
+                    <img src="captura_retenciones.png" alt="Pantalla de Comprobantes de Retención">
+                    <div class="manual-image-caption">Figura 2: Captura del formulario de Retenciones de Impuestos.</div>
+                </div>
+
+                <h2>2.2. Registro de Partidas Contables</h2>
+                <p>Utilizado para registrar los asientos de diario y garantizar el equilibrio de cuentas.</p>
+                <ul>
+                    <li>Indique la fecha y el concepto global del asiento contable.</li>
+                    <li>Agregue las cuentas correspondientes (Debe y Haber).</li>
+                    <li><strong>Regla de Cuadre:</strong> El total acumulado del Debe debe ser exactamente igual al total del Haber. Si hay una diferencia (descuadre), el sistema bloqueará el guardado de la partida para evitar inconsistencias en la base de datos contable.</li>
+                </ul>
+
+                <div class="manual-image-container">
+                    <img src="captura_contabilidad.png" alt="Pantalla de Registro de Partidas Contables">
+                    <div class="manual-image-caption">Figura 3: Captura de la interfaz para el registro de Partidas Contables de Diario.</div>
+                </div>
+            </div>
+
+            <!-- 3. RRHH - VOUCHERS -->
+            <div id="rrhh-vouchers" class="manual-section">
+                <h1>3. Recursos Humanos — Vouchers de Pago</h1>
+                <p>Esta sección permite automatizar la generación y distribución de recibos de pago (vouchers) mensuales de los empleados devengados en Acuerdo y Contrato a partir de un archivo Excel de nómina.</p>
+                
+                <h2>3.1. Vouchers de Pago (Acuerdo)</h2>
+                <p>Permite cargar planillas para personal permanente bajo régimen de Acuerdo y emitir sus recibos membretados correspondientes.</p>
+                <div class="manual-image-container">
+                    <img src="captura_vouchers_acuerdo.png" alt="Pantalla de Vouchers Acuerdo">
+                    <div class="manual-image-caption">Figura 4: Interfaz de carga de planilla y generación de vouchers para Acuerdo.</div>
+                </div>
+
+                <h2>3.2. Vouchers de Pago (Contrato)</h2>
+                <p>Permite cargar la planilla exclusiva para el personal bajo contrato temporal y emitir los recibos bajo la misma estructura.</p>
+                <div class="manual-image-container">
+                    <img src="captura_vouchers_contrato.png" alt="Pantalla de Vouchers Contrato">
+                    <div class="manual-image-caption">Figura 5: Interfaz de carga de planilla y generación de vouchers para Contrato.</div>
+                </div>
+
+                <h2>Procedimiento de Carga y Generación:</h2>
+                <ol>
+                    <li>Seleccione el mes y año correspondiente al voucher.</li>
+                    <li>Arrastre o cargue el archivo Excel de la planilla mensual de salarios (ej. <code>planilla.xls</code>) en el recuadro de carga.</li>
+                    <li>El sistema procesará la hoja y listará en pantalla a todos los empleados con sus respectivos salarios brutos, deducciones (IHSS, jubilación, préstamos) y neto a pagar.</li>
+                    <li>Puede buscar empleados mediante el cuadro de texto para verificar individualmente sus deducciones.</li>
+                    <li>Presione <strong>"Generar Vouchers"</strong> para compilar y descargar los recibos membretados individuales listos para entrega.</li>
+                </ol>
+            </div>
+
+            <!-- 4. RRHH - CONSTANCIAS -->
+            <div id="rrhh-constancias" class="manual-section">
+                <h1>4. Recursos Humanos — Constancias Laborales</h1>
+                <p>Permite generar certificaciones oficiales de trabajo de forma masiva o individual, con o sin el desglose de deducciones salariales.</p>
+                
+                <h2>Formatos Disponibles:</h2>
+                <ul>
+                    <li><strong>Con Deducciones (Acuerdo / Contrato):</strong> Detalla el sueldo nominal junto con los valores mensuales deducidos por cooperativas, aportes y deducciones de ley. Es ideal para solicitudes de crédito bancario.</li>
+                    <li><strong>Sin Deducciones (Acuerdo / Contrato):</strong> Certifica únicamente el tiempo de servicio, puesto y el salario nominal bruto devengado.</li>
+                </ul>
+
+                <div class="manual-image-container">
+                    <img src="captura_constancias.png" alt="Pantalla de Constancias Laborales">
+                    <div class="manual-image-caption">Figura 6: Captura de la interfaz para la generación de Constancias de Trabajo.</div>
+                </div>
+
+                <h2>Pasos para la Emisión:</h2>
+                <ol>
+                    <li>Cargue la lista de empleados (mediante archivo XLS) o complete el formulario manual de datos generales (Nombre, Identidad, Fecha de Ingreso, Sueldo).</li>
+                    <li>Seleccione el nombre del firmante autorizado de Recursos Humanos y su cargo para el pie de firma.</li>
+                    <li>Haga clic en <strong>"Generar Constancia"</strong> para descargar el documento oficial membretado con formato formal de carta y firmas.</li>
+                </ol>
+            </div>
+
+            <!-- 5. RRHH - INCAPACIDADES -->
+            <div id="rrhh-incapacidades" class="manual-section">
+                <h1>5. Recursos Humanos — Subsidios por Incapacidad IHSS</h1>
+                <p>Este módulo calcula el subsidio por incapacidad temporal del IHSS y el desglose de reintegro institucional para el sector público (ENAG), alineado con la metodología oficial del archivo <code>Subsidio.xlsx</code>.</p>
+
+                <div class="manual-note">
+                    <strong>📌 Concepto de Reintegro en la ENAG:</strong>
+                    Dado que el empleado percibe el 100% de su sueldo nominal normal por planilla de la ENAG mientras está incapacitado, la ley obliga a que el subsidio en efectivo otorgado por el IHSS (66% de la base) sea reintegrado a la tesorería de la institución.
+                </div>
+
+                <div class="manual-image-container">
+                    <img src="captura_incapacidades.png" alt="Pantalla de Cálculo de Incapacidades IHSS">
+                    <div class="manual-image-caption">Figura 7: Captura de pantalla del módulo interactivo para el cálculo de reintegros de incapacidades.</div>
+                </div>
+
+                <h2>Metodología de Cálculo por Pasos:</h2>
+                <ul>
+                    <li><strong>Paso 1: Sumatoria de Días de 3 Meses Anteriores:</strong> Obtiene la suma de los días calendario reales de los tres meses previos al inicio de la incapacidad.</li>
+                    <li><strong>Paso 2: Sueldo de Referencia Diario:</strong> Se toma el Techo de Cotización vigente del IHSS (actualmente <strong>L. 11,903.13</strong>), se multiplica por 3 y se divide entre la suma de días del Paso 1:
+                        <br><code>Sueldo Diario de Referencia = (Techo IHSS * 3) / Sumatoria de Días</code>
+                    </li>
+                    <li><strong>Paso 3: Distribución del Subsidio Diario:</strong> 
+                        <ul>
+                            <li><strong>Subsidio IHSS (66%):</strong> Corresponde al monto diario que el empleado recibe y debe <strong>reintegrar</strong> a la ENAG.</li>
+                            <li><strong>Aporte Patrono (34%):</strong> Porción complementaria que la institución asume para garantizar el sueldo diario.</li>
+                        </ul>
+                    </li>
+                </ul>
+
+                <div class="manual-image-container" style="margin-top: 15px;">
+                    <img src="diagrama_reintegro.png" alt="Flujo de Reintegro de Subsidio" style="max-width: 60%;">
+                    <div class="manual-image-caption">Figura 8: Diagrama de flujo de fondos y proceso de reintegro de incapacidades en la ENAG.</div>
+                </div>
+
+                <h2>Uso del Formulario:</h2>
+                <ol>
+                    <li>Ingrese el nombre y DNI del empleado.</li>
+                    <li>Introduzca la Fecha de Inicio y Fecha de Fin de la incapacidad (el sistema computará los días totales).</li>
+                    <li>Seleccione el tipo de incapacidad:
+                        <ul>
+                            <li><em>Enfermedad/Accidente Común:</em> Deduce 3 días de carencia a cargo del patrono. El IHSS paga desde el 4.º día.</li>
+                            <li><em>Riesgo Profesional o Maternidad:</em> Cubre el subsidio desde el 1.º día de la licencia sin carencia.</li>
+                        </ul>
+                    </li>
+                    <li>Marque la casilla de "Hospitalizado sin dependientes" si corresponde (reduce la cuota del IHSS del 66% al 50%).</li>
+                    <li>Presione <strong>"Descargar Reporte PDF"</strong> para obtener el desglose firmado de control de caja.</li>
+                </ol>
+            </div>
+
+            <!-- 6. PRODUCCION -->
+            <div id="produccion" class="manual-section">
+                <h1>6. Módulo de Producción</h1>
+                <p>Diseñado para coordinar el trabajo en los talleres de imprenta, encuadernación y diseño de la ENAG.</p>
+                
+                <h2>Órdenes de Producción:</h2>
+                <ol>
+                    <li>Abra la herramienta e ingrese los datos del cliente, la descripción del trabajo (libros, folletos, diarios oficiales La Gaceta).</li>
+                    <li>Especifique la cantidad de tiraje, tipo de papel, tintas y acabados requeridos.</li>
+                    <li>Indique la fecha estimada de entrega y el diseñador u operador de taller asignado.</li>
+                    <li>Guarde la orden de producción. El sistema generará una hoja técnica que viaja físicamente con los materiales en el taller y un archivo PDF de control de producción.</li>
+                </ol>
+
+                <div class="manual-image-container">
+                    <img src="captura_produccion.png" alt="Pantalla de Creación de Orden de Producción">
+                    <div class="manual-image-caption">Figura 9: Captura del formulario de Órdenes de Producción en los Talleres Gráficos.</div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- MANUAL FOOTER -->
+    <div class="manual-footer">
+        EMPRESA NACIONAL DE ARTES GRÁFICAS - ENAG 2026
+    </div>
+
+    <!-- Carga de librerías locales -->
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
+
+    <script>
+        // Efecto scroll activo en la barra lateral
+        const sections = document.querySelectorAll(".manual-section");
+        const navLinks = document.querySelectorAll(".sidebar-link");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 110) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === `#${current}`) {
+                    link.classList.add("active");
+                }
+            });
+        });
+
+        // Cargar y convertir imagen URL a Base64 para jsPDF
+        const getBase64FromUrl = (url) => new Promise(resolve => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        // Generar PDF Multipágina del Manual de Usuario
+        async function descargarManualPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pw = doc.internal.pageSize.getWidth();
+            const ph = doc.internal.pageSize.getHeight();
+            const marginX = 25;
+            const maxW = pw - (2 * marginX); // 160mm
+
+            // Cargar Membretes y Gráficos
+            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            const capturaPortalBgUrl = await getBase64FromUrl('captura_portal.png');
+            const capturaRetencionesBgUrl = await getBase64FromUrl('captura_retenciones.png');
+            const capturaContabilidadBgUrl = await getBase64FromUrl('captura_contabilidad.png');
+            const capturaVouchersAcuerdoBgUrl = await getBase64FromUrl('captura_vouchers_acuerdo.png');
+            const capturaVouchersContratoBgUrl = await getBase64FromUrl('captura_vouchers_contrato.png');
+            const capturaConstanciasBgUrl = await getBase64FromUrl('captura_constancias.png');
+            const capturaIncapacidadesBgUrl = await getBase64FromUrl('captura_incapacidades.png');
+            const diagramaReintegroBgUrl = await getBase64FromUrl('diagrama_reintegro.png');
+            const capturaProduccionBgUrl = await getBase64FromUrl('captura_produccion.png');
+
+            let pageNum = 1;
+            const totalPaginasTotal = 9;
+
+            function drawHeaderFooter(doc, logoBgUrl, numPagina) {
+                if (logoBgUrl) {
+                    doc.addImage(logoBgUrl, 'PNG', 0, 0, pw, ph);
+                }
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.setFont('helvetica', 'normal');
+                doc.text(`Página ${numPagina} de ${totalPaginasTotal}`, pw - marginX, ph - 15, { align: 'right' });
+            }
+
+            // --- PÁGINA 1: PORTADA ---
+            if (logoBgUrl) {
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pw, ph);
+            }
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(24);
+            doc.text("MANUAL DE USUARIO", 105, 95, { align: 'center' });
+            
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'normal');
+            doc.text("SISTEMA DE GESTIÓN ADMINISTRATIVA", 105, 105, { align: 'center' });
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)", 105, 112, { align: 'center' });
+
+            doc.setDrawColor(0, 33, 71);
+            doc.setLineWidth(1);
+            doc.line(40, 120, 170, 120);
+
+            doc.setFontSize(10.5);
+            doc.text("Guía integral ilustrada y de control para los departamentos de:", 105, 135, { align: 'center' });
+            doc.setFont('helvetica', 'bold');
+            doc.text("Contabilidad, Recursos Humanos y Producción", 105, 142, { align: 'center' });
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.text("Honduras, C.A. — Versión 3.5 (Julio 2026)", 105, 230, { align: 'center' });
+
+            // --- PÁGINA 2: INTRODUCCIÓN Y PANTALLA PRINCIPAL ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("1. INTRODUCCIÓN Y CONTROL DE ACCESO", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pIntro = "El portal administrativo centraliza las herramientas informáticas de la ENAG. La seguridad del sistema está configurada mediante PINes de acceso para restringir la manipulación de información reservada o sensible de los departamentos contables y de personal:\n" +
+                         " • Módulo de Contabilidad: PIN de acceso 'CONTA@2026'\n" +
+                         " • Módulo de Recursos Humanos: PIN de acceso '1212'\n" +
+                         " • Módulo de Producción: Libre acceso.";
+            let splitIntro = doc.splitTextToSize(pIntro, maxW);
+            doc.text(splitIntro, marginX, 54);
+
+            if (capturaPortalBgUrl) {
+                doc.addImage(capturaPortalBgUrl, 'PNG', marginX + 10, 85, maxW - 20, 80);
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 1: Captura de pantalla de la interfaz principal del Portal Administrativo ENAG.", 105, 172, { align: 'center' });
+            }
+
+            // --- PÁGINA 3: CONTABILIDAD - RETENCIONES ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("2. CONTABILIDAD — 2.1. RETENCIONES DE IMPUESTOS", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            let y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pRet = "Herramienta estructurada para calcular retenciones de impuestos sobre cobros de proveedores de servicios. Al ingresar el RTN, concepto y monto bruto de la factura, el sistema deduce automáticamente las retenciones de ley (ej. 1% para compras ordinarias o 12.5% para honorarios profesionales). Genera un comprobante oficial en formato PDF firmado y sellado por Contabilidad.";
+            let splitRet = doc.splitTextToSize(pRet, maxW);
+            doc.text(splitRet, marginX, y);
+            y += (splitRet.length * 5) + 8;
+
+            if (capturaRetencionesBgUrl) {
+                doc.addImage(capturaRetencionesBgUrl, 'PNG', marginX + 10, y, maxW - 20, 80);
+                y += 85;
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 2: Captura del formulario de Retenciones de Impuestos.", 105, y, { align: 'center' });
+            }
+
+            // --- PÁGINA 4: CONTABILIDAD - PARTIDAS CONTABLES ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("2. CONTABILIDAD — 2.2. REGISTRO DE PARTIDAS CONTABLES", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pPart = "Permite registrar las partidas diarias del libro contable. La interfaz cuenta con validación de balance contable en tiempo real: el total del Debe debe ser idéntico al total del Haber para que el sistema permita registrar el asiento en la base de datos contable. El registro exitoso añade de forma automática un histórico a la bitácora de auditoría.";
+            let splitPart = doc.splitTextToSize(pPart, maxW);
+            doc.text(splitPart, marginX, y);
+            y += (splitPart.length * 5) + 8;
+
+            if (capturaContabilidadBgUrl) {
+                doc.addImage(capturaContabilidadBgUrl, 'PNG', marginX + 10, y, maxW - 20, 80);
+                y += 85;
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 3: Captura de la interfaz para el registro de Partidas Contables de Diario.", 105, y, { align: 'center' });
+            }
+
+            // --- PÁGINA 5: RECURSOS HUMANOS - VOUCHERS ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("3. RECURSOS HUMANOS — 3.1. VOUCHERS DE PAGO", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pVouch = "Permite cargar planillas de salarios para Acuerdo (personal permanente) y Contrato (personal temporal) mediante archivos Excel (.xls). El sistema analiza las columnas y desglosa los salarios netos, aportaciones de ley (IHSS, cooperativas) y deducciones privadas. Genera vouchers individuales de pago listos para impresión.";
+            let splitVouch = doc.splitTextToSize(pVouch, maxW);
+            doc.text(splitVouch, marginX, y);
+            y += (splitVouch.length * 5) + 8;
+
+            if (capturaVouchersAcuerdoBgUrl) {
+                doc.addImage(capturaVouchersAcuerdoBgUrl, 'PNG', marginX, y, (maxW / 2) - 3, 55);
+            }
+            if (capturaVouchersContratoBgUrl) {
+                doc.addImage(capturaVouchersContratoBgUrl, 'PNG', marginX + (maxW / 2) + 3, y, (maxW / 2) - 3, 55);
+            }
+            y += 60;
+            doc.setFontSize(8.5);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Figura 4 y 5: Capturas de pantalla de los cargadores de planillas para Acuerdo y Contrato.", 105, y, { align: 'center' });
+
+            // --- PÁGINA 6: RECURSOS HUMANOS - CONSTANCIAS ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("3. RECURSOS HUMANOS — 3.2. CONSTANCIAS LABORALES", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pConst = "Genera certificaciones de empleo oficiales con firmas pre-configuradas. Permite 4 variantes: Con o Sin Deducciones salariales (para Acuerdo o Contrato). El usuario puede cargar la base de empleados desde el archivo Excel o digitar los datos generales en el formulario. Exporta un documento de correspondencia con membrete de la ENAG y formato formal de carta.";
+            let splitConst = doc.splitTextToSize(pConst, maxW);
+            doc.text(splitConst, marginX, y);
+            y += (splitConst.length * 5) + 8;
+
+            if (capturaConstanciasBgUrl) {
+                doc.addImage(capturaConstanciasBgUrl, 'PNG', marginX + 10, y, maxW - 20, 80);
+                y += 85;
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 6: Interfaz para la generación de Constancias de Trabajo.", 105, y, { align: 'center' });
+            }
+
+            // --- PÁGINA 7: RECURSOS HUMANOS - INCAPACIDADES (FORMULARIO) ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("3. RECURSOS HUMANOS — 3.3. INCAPACIDADES Y SUBSIDIOS", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pIncap = "Módulo diseñado para calcular la distribución de fondos de incapacidades del Seguro Social. Determina la base diaria mediante la suma de los días calendario reales de los 3 meses anteriores al inicio de la incapacidad. Utiliza el Techo de Cotización vigente (L. 11,903.13) para calcular el 66% a reintegrar a favor de la ENAG y el 34% del aporte complementario del patrono.";
+            let splitIncap = doc.splitTextToSize(pIncap, maxW);
+            doc.text(splitIncap, marginX, y);
+            y += (splitIncap.length * 5) + 8;
+
+            if (capturaIncapacidadesBgUrl) {
+                doc.addImage(capturaIncapacidadesBgUrl, 'PNG', marginX + 10, y, maxW - 20, 80);
+                y += 85;
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 7: Captura de pantalla del módulo interactivo para el cálculo de reintegros de incapacidad.", 105, y, { align: 'center' });
+            }
+
+            // --- PÁGINA 8: RECURSOS HUMANOS - INCAPACIDADES (DIAGRAMA) ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("3. RECURSOS HUMANOS — 3.3. FLUJO DE REINTEGRO IHSS", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pDiag = "Dado que el empleado recibe el 100% de su sueldo nominal normal de planilla por parte de la ENAG mientras está incapacitado, la ley obliga a que el subsidio en efectivo otorgado por el IHSS (66% de la base) sea reintegrado a la tesorería de la institución. El siguiente diagrama ilustra el flujo de fondos:";
+            let splitDiag = doc.splitTextToSize(pDiag, maxW);
+            doc.text(splitDiag, marginX, y);
+            y += (splitDiag.length * 5) + 10;
+
+            if (diagramaReintegroBgUrl) {
+                doc.addImage(diagramaReintegroBgUrl, 'PNG', marginX + 15, y, maxW - 30, 65);
+                y += 70;
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 8: Proceso y flujo de reintegro de subsidio IHSS en la ENAG.", 105, y, { align: 'center' });
+            }
+
+            // --- PÁGINA 9: PRODUCCIÓN ---
+            doc.addPage();
+            pageNum++;
+            drawHeaderFooter(doc, logoBgUrl, pageNum);
+
+            doc.setTextColor(0, 33, 71);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("4. MÓDULO DE PRODUCCIÓN", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9.5);
+            doc.setTextColor(51, 51, 51);
+            let pProd = "Diseñado para controlar la ejecución de trabajos gráficos en los talleres de la imprenta nacional. El formulario registra cliente, descripción del tiraje (ej. diarios oficiales, afiches, libros), tipo de papel, acabados e indica el personal de taller a cargo. Exporta la orden de taller oficial lista para circular físicamente con los insumos.";
+            let splitProd = doc.splitTextToSize(pProd, maxW);
+            doc.text(splitProd, marginX, y);
+            y += (splitProd.length * 5) + 8;
+
+            if (capturaProduccionBgUrl) {
+                doc.addImage(capturaProduccionBgUrl, 'PNG', marginX + 10, y, maxW - 20, 80);
+                y += 85;
+                doc.setFontSize(8.5);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Figura 9: Captura del formulario de Órdenes de Producción en los Talleres Gráficos.", 105, y, { align: 'center' });
+            }
+
+            // Guardar PDF
+            doc.save("Manual_de_Usuario_ENAG.pdf");
+        }
+    </script>
+</body>
+
+</html>
