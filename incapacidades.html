@@ -166,7 +166,7 @@
             color: #002147;
         }
 
-        .form-field input, .form-field select {
+        .form-field input, .form-field select, .form-field textarea {
             padding: 10px 12px;
             border: 1px solid #cbd5e1;
             border-radius: 6px;
@@ -177,7 +177,7 @@
             transition: all 0.2s;
         }
 
-        .form-field input:focus, .form-field select:focus {
+        .form-field input:focus, .form-field select:focus, .form-field textarea:focus {
             outline: none;
             border-color: #002147;
             box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.15);
@@ -513,6 +513,14 @@
                             El empleado está hospitalizado y NO tiene dependientes directos (Reduce subsidio al 50%)
                         </label>
                     </div>
+
+                    <div class="form-field full-width" style="margin-top: 10px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center;">
+                            <label for="notaControlInterno">Nota de Control Interno (RRHH)</label>
+                            <button type="button" onclick="restablecerNota()" style="background: none; border: none; color: #002147; text-decoration: underline; cursor: pointer; font-size: 0.8em; font-weight: bold; padding: 0;">Restablecer por Defecto</button>
+                        </div>
+                        <textarea id="notaControlInterno" rows="4" placeholder="Escriba aquí la nota de control interno..." oninput="marcarNotaModificada()" style="resize: vertical; font-family: inherit; line-height: 1.4;"></textarea>
+                    </div>
                 </div>
 
                 <div class="info-box">
@@ -638,6 +646,17 @@
     <script src="js/jspdf-autotable.min.js"></script>
 
     <script>
+        let notaModificada = false;
+
+        function marcarNotaModificada() {
+            notaModificada = true;
+        }
+
+        function restablecerNota() {
+            notaModificada = false;
+            calcularTodo();
+        }
+
         // Ocultar o mostrar opción de hospitalizado según tipo de incapacidad
         function toggleOpcionesEspeciales() {
             const tipo = document.getElementById("tipoIncapacidad").value;
@@ -798,6 +817,13 @@
             document.getElementById("tdTotalSubsidio").innerText = `L. ${totalSubsidio.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
             
             document.getElementById("resMontoReintegro").innerText = `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+
+            // Actualizar la nota de control interno si el usuario no la ha modificado
+            if (!notaModificada) {
+                const totalIHSSFmt = totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                const textoDefault = `En conformidad con la planilla mensual de la ENAG, el empleado recibe el 100% de su sueldo nominal completo. Por consiguiente, el empleado queda obligado a realizar el reintegro de L. ${totalIHSSFmt} (monto de subsidio emitido por el IHSS) a favor de la Tesorería de la ENAG en un plazo de 10 días tras recibir la orden de pago.`;
+                document.getElementById("notaControlInterno").value = textoDefault;
+            }
 
             // Dibujar la línea de tiempo visual
             dibujarCronograma(totalDias, diasCarencia, diasSubsidio);
@@ -992,22 +1018,31 @@
             const finalY = doc.lastAutoTable.finalY + 10;
 
             // Cuadro explicativo
-            doc.setFillColor(239, 246, 255); // Azul suave
-            doc.rect(15, finalY, 180, 24, 'F');
-            doc.setDrawColor(59, 130, 246);
-            doc.line(15, finalY, 15, finalY + 24);
-            
+            const notaTexto = document.getElementById("notaControlInterno").value.trim();
             doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'normal');
+            const lineasNota = doc.splitTextToSize(notaTexto, 174);
+            const lineHeight = 4.2;
+            const rectHeight = 6 + (lineasNota.length * lineHeight);
+
+            doc.setFillColor(239, 246, 255); // Azul suave
+            doc.rect(15, finalY, 180, rectHeight, 'F');
+            doc.setDrawColor(59, 130, 246);
+            doc.line(15, finalY, 15, finalY + rectHeight);
+            
             doc.setTextColor(30, 58, 138);
             doc.setFont('helvetica', 'bold');
             doc.text("Nota de Control Interno (RRHH):", 18, finalY + 5);
             doc.setFont('helvetica', 'normal');
-            doc.text(`En conformidad con la planilla mensual de la ENAG, el empleado recibe el 100% de su sueldo nominal completo.`, 18, finalY + 10);
-            doc.text(`Por consiguiente, el empleado queda obligado a realizar el reintegro de L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2 })} (monto de subsidio`, 18, finalY + 14);
-            doc.text(`emitido por el IHSS) a favor de la Tesorería de la ENAG en un plazo de 10 días tras recibir la orden de pago.`, 18, finalY + 18);
+            
+            let currentY = finalY + 9.5;
+            for (let i = 0; i < lineasNota.length; i++) {
+                doc.text(lineasNota[i], 18, currentY);
+                currentY += lineHeight;
+            }
 
             // Firmas
-            const firmaY = finalY + 45;
+            const firmaY = finalY + rectHeight + 20;
             doc.setFontSize(9.5);
             doc.setTextColor(51, 51, 51);
             doc.setDrawColor(150, 150, 150);
