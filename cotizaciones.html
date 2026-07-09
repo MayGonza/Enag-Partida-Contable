@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="logo.ico" type="image/x-icon">
     <title>Módulo de Cotizaciones — ENAG</title>
-    <meta name="description" content="Módulo de cotizaciones oficiales de la Empresa Nacional de Artes Gráficas (ENAG).">
+    <meta name="description"
+        content="Módulo de cotizaciones oficiales de la Empresa Nacional de Artes Gráficas (ENAG).">
 
     <style>
         :root {
@@ -51,6 +52,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -160,7 +162,9 @@
             margin-left: 2px;
         }
 
-        input, select, textarea {
+        input,
+        select,
+        textarea {
             width: 100%;
             padding: 10px 12px;
             border: 1px solid var(--border-color);
@@ -171,7 +175,9 @@
             box-sizing: border-box;
         }
 
-        input:focus, select:focus, textarea:focus {
+        input:focus,
+        select:focus,
+        textarea:focus {
             outline: none;
             border-color: var(--primary-light);
             box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.15);
@@ -263,7 +269,7 @@
             font-weight: bold;
             font-size: 1em;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
             display: inline-flex;
             align-items: center;
@@ -414,7 +420,8 @@
             background-color: #fca5a5;
         }
 
-        .desc-field, .prod-field {
+        .desc-field,
+        .prod-field {
             font-size: 0.9em;
             padding: 8px;
         }
@@ -480,15 +487,22 @@
             <div class="grid-layout">
                 <div class="form-group span-2">
                     <label for="clienteNombre">Cliente / Empresa: <span class="required">*</span></label>
-                    <input type="text" id="clienteNombre" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL" oninput="this.value = this.value.toUpperCase()" required>
+                    <input type="text" id="clienteNombre" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL"
+                        oninput="this.value = this.value.toUpperCase()" required>
                 </div>
                 <div class="form-group">
                     <label for="clienteRtn">RTN: <span class="required">*</span></label>
-                    <input type="text" id="clienteRtn" placeholder="0801-1990-123456" oninput="formatRtnInput(this)" required>
+                    <input type="text" id="clienteRtn" placeholder="0801-1990-123456" oninput="formatRtnInput(this)"
+                        required>
+                </div>
+                <div class="form-group">
+                    <label for="clienteContacto">Contacto (Nombre y Apellido):</label>
+                    <input type="text" id="clienteContacto" placeholder="Nombre y Apellido del Representante">
                 </div>
                 <div class="form-group">
                     <label for="clienteTelefono">Teléfono:</label>
-                    <input type="text" id="clienteTelefono" placeholder="+504 2230-1120" oninput="formatTelefonoInput(this)">
+                    <input type="text" id="clienteTelefono" placeholder="+504 2230-1120"
+                        oninput="formatTelefonoInput(this)">
                 </div>
                 <div class="form-group span-2">
                     <label for="clienteDireccion">Dirección:</label>
@@ -526,11 +540,39 @@
             </div>
 
             <!-- TOTALES -->
-            <div class="totals-section">
-                <div class="totals-card">
+            <div class="totals-section" style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+                <!-- SECCIÓN DE DESCUENTOS -->
+                <div style="flex: 1; min-width: 250px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px;">
+                    <h4 style="margin-top: 0; color: var(--primary); font-size: 1em; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">Descuento Legislado (Adulto Mayor u Otros)</h4>
+                    <div class="form-group" style="margin-bottom: 10px;">
+                        <label for="tipoDescuento" style="font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Tipo de Descuento:</label>
+                        <select id="tipoDescuento" onchange="actualizarDescuentoForm()" style="padding: 6px 10px; font-size: 0.95em; border-radius: 8px;">
+                            <option value="0">Sin Descuento (0%)</option>
+                            <option value="25">Tercera Edad (60-79 años) - 25% desc.</option>
+                            <option value="40">Cuarta Edad (80+ años) - 40% desc.</option>
+                            <option value="50">Gobierno / Institucional - 50% desc.</option>
+                            <option value="custom">Personalizado...</option>
+                        </select>
+                    </div>
+                    <div id="customDescuentoGroup" class="form-group" style="display: none; margin-bottom: 0;">
+                        <label for="porcentajeDescuento" style="font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Porcentaje (%):</label>
+                        <input type="number" id="porcentajeDescuento" min="0" max="100" value="0" oninput="calcularTotales()" style="padding: 6px 10px; font-size: 0.95em; border-radius: 8px;">
+                    </div>
+                </div>
+
+                <!-- CARD DE TOTALES -->
+                <div class="totals-card" style="flex: 1; min-width: 250px; margin-top: 0;">
                     <div class="totals-row">
-                        <label>Total Base:</label>
+                        <label>Subtotal Bruto:</label>
                         <span id="totalBase" style="font-weight: bold;">L. 0.00</span>
+                    </div>
+                    <div class="totals-row">
+                        <label>Descuento aplicado:</label>
+                        <span id="valorDescuento" style="font-weight: bold; color: #dc2626;">- L. 0.00</span>
+                    </div>
+                    <div class="totals-row">
+                        <label>Subtotal Neto:</label>
+                        <span id="totalNeto" style="font-weight: bold;">L. 0.00</span>
                     </div>
                     <div class="totals-row">
                         <label>Impuestos:</label>
@@ -547,11 +589,15 @@
             <div class="form-actions">
                 <button type="button" class="btn-secondary" onclick="limpiarFormulario()">Limpiar Formulario</button>
                 <div style="display: flex; gap: 10px;">
-                    <button type="button" class="btn-secondary" style="background-color: var(--success);" onclick="guardarCotizacion()">Guardar en Historial</button>
+                    <button type="button" class="btn-secondary" style="background-color: var(--success);"
+                        onclick="guardarCotizacion()">Guardar en Historial</button>
                     <button type="submit" class="btn-primary">
-                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
-                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16"
+                            style="vertical-align: middle;">
+                            <path
+                                d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                            <path
+                                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
                         </svg>
                         Generar PDF de Cotización
                     </button>
@@ -563,7 +609,8 @@
         <div class="history-section">
             <h3>Historial de Cotizaciones</h3>
             <div class="search-box">
-                <input type="text" id="historialBusqueda" placeholder="Buscar por cliente o número de cotización..." oninput="filtrarHistorial()">
+                <input type="text" id="historialBusqueda" placeholder="Buscar por cliente o número de cotización..."
+                    oninput="filtrarHistorial()">
             </div>
             <div style="overflow-x: auto;">
                 <table class="history-table" id="tablaHistorial">
@@ -593,7 +640,10 @@
         // Funciones auxiliares de conversión
         function parseMoneda(valor) {
             if (!valor) return 0;
-            let limpio = String(valor).replace(/L\.\s?/g, '').replace(/,/g, '').replace(/\s?L\.?/g, '');
+            // Primero remover "L." y "L" (incluyendo cualquier espacio)
+            let limpio = String(valor).replace(/L\./g, '').replace(/L/g, '');
+            // Luego quedarse solo con dígitos, punto decimal y signo menos
+            limpio = limpio.replace(/[^0-9.-]/g, '');
             let num = parseFloat(limpio);
             return isNaN(num) ? 0 : num;
         }
@@ -613,7 +663,7 @@
         function formatRtnInput(input) {
             let val = input.value.replace(/\D/g, '');
             if (val.length > 14) val = val.substring(0, 14);
-            
+
             let formatted = '';
             if (val.length > 0) {
                 formatted += val.substring(0, 4);
@@ -635,7 +685,7 @@
                 hasPrefix = true;
             }
             if (val.length > 8) val = val.substring(0, 8);
-            
+
             let formatted = '';
             if (val.length > 0) {
                 formatted += val.substring(0, 4);
@@ -643,7 +693,7 @@
             if (val.length > 4) {
                 formatted += '-' + val.substring(4, 8);
             }
-            
+
             if (hasPrefix || input.value.includes('+504')) {
                 input.value = '+504 ' + formatted;
             } else {
@@ -685,14 +735,15 @@
         }
 
         const PRODUCTOS_PREDEFINIDOS = [
-            { desc: "1 PÁGINA (PUBLICACIONES)", precio: 3200.00, impuesto: "ISV 12%" },
-            { desc: "2/3 PÁGINA (PUBLICACIONES)", precio: 2800.00, impuesto: "ISV 12%" },
-            { desc: "1/2 PÁGINA (PUBLICACIONES)", precio: 1800.00, impuesto: "ISV 12%" },
-            { desc: "1/3 PÁGINA (PUBLICACIONES)", precio: 1400.00, impuesto: "ISV 12%" },
-            { desc: "1/4 PÁGINA (PUBLICACIONES)", precio: 1200.00, impuesto: "ISV 12%" },
-            { desc: "1/5 PÁGINA (PUBLICACIONES)", precio: 800.00, impuesto: "ISV 12%" },
-            { desc: "1/4 DE PÁGINA (3 PUBLICACIONES - MARCAS Y PATENTES)", precio: 3928.00, impuesto: "ISV 12%" },
-            { desc: "1/5 DE PÁGINA (3 PUBLICACIONES - MARCAS Y PATENTES)", precio: 3814.00, impuesto: "ISV 12%" }
+            { desc: "1 PÁGINA (PUBLICACIONES - TEXTO)", precio: 3200.00, impuesto: "ISV 15%" },
+            { desc: "2/3 PÁGINA (PUBLICACIONES- TEXTO)", precio: 2800.00, impuesto: "ISV 15%" },
+            { desc: "1/2 PÁGINA (PUBLICACIONES- TEXTO)", precio: 1800.00, impuesto: "ISV 15%" },
+            { desc: "1/3 PÁGINA (PUBLICACIONES- TEXTO)", precio: 1400.00, impuesto: "ISV 15%" },
+            { desc: "1/4 PÁGINA (PUBLICACIONES- TEXTO)", precio: 1200.00, impuesto: "ISV 15%" },
+            { desc: "1/5 PÁGINA (PUBLICACIONES- TEXTO)", precio: 800.00, impuesto: "ISV 15%" },
+            { desc: "1/4 DE PÁGINA (MARCAS Y PATENTES- 3 PUBLICACIONES )", precio: 3928.00, impuesto: "ISV 15%" },
+            { desc: "1/5 DE PÁGINA ( MARCAS Y PATENTES -3 PUBLICACIONES)", precio: 3814.00, impuesto: "ISV 15%" },
+            { desc: "JUNTAS DE AGUA", precio: 0.00, impuesto: "Exento" }
         ];
 
         function verificarProductoPredefinido(selectElement) {
@@ -702,27 +753,27 @@
             const unitField = row.querySelector('.unit-field');
             const impField = row.querySelector('.imp-field');
             const cantField = row.querySelector('.cant-field');
-            
+
             if (val === 'OTRO') {
                 prodField.style.display = 'block';
                 prodField.value = '';
                 prodField.focus();
                 unitField.value = '';
-                impField.value = 'ISV 12%';
+                impField.value = 'ISV 15%';
             } else if (val === '') {
                 prodField.style.display = 'none';
                 prodField.value = '';
                 unitField.value = '';
-                impField.value = 'ISV 12%';
+                impField.value = 'ISV 15%';
             } else {
                 prodField.style.display = 'none';
                 prodField.value = val;
-                
+
                 const prod = PRODUCTOS_PREDEFINIDOS.find(p => p.desc === val);
                 if (prod) {
                     unitField.value = formatMoneda(prod.precio);
                     impField.value = prod.impuesto;
-                    
+
                     if (!cantField.value || cantField.value === '0') {
                         cantField.value = '1';
                     }
@@ -733,9 +784,9 @@
         }
 
         // Gestión de la tabla interactiva
-        function agregarFila(prod = '', desc = '', cant = '', unitVal = '', imp = 'ISV 12%') {
+        function agregarFila(prod = '', desc = '', cant = '', unitVal = '', imp = 'ISV 15%') {
             const row = tablaConceptos.insertRow();
-            
+
             const cellProd = row.insertCell(0);
             const cellDesc = row.insertCell(1);
             const cellCant = row.insertCell(2);
@@ -754,12 +805,12 @@
 
             let selectHTML = `<select class="prod-select" onchange="verificarProductoPredefinido(this)" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px;" required>
                 <option value="">Seleccione...</option>`;
-            
+
             PRODUCTOS_PREDEFINIDOS.forEach(p => {
                 const selected = (selectVal === p.desc) ? 'selected' : '';
                 selectHTML += `<option value="${p.desc}" ${selected}>${p.desc} - ${formatMoneda(p.precio)}</option>`;
             });
-            
+
             const otroSelected = selectVal === 'OTRO' ? 'selected' : '';
             selectHTML += `<option value="OTRO" ${otroSelected}>Otro / Personalizado</option></select>`;
 
@@ -770,17 +821,16 @@
             cellDesc.innerHTML = `<input type="text" class="desc-field" value="${desc}" placeholder="Detalle o descripción del ítem...">`;
             cellCant.innerHTML = `<input type="number" class="cant-field align-center" value="${cant}" min="1" oninput="calcularFila(this)" placeholder="0" required>`;
             cellUnit.innerHTML = `<input type="text" class="unit-field align-right" value="${valUnitFormatted}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" placeholder="L. 0.00" required>`;
-            
+
             cellImp.innerHTML = `
                 <select class="imp-field align-center" onchange="calcularTotales()">
-                    <option value="ISV 12%" ${imp === 'ISV 12%' ? 'selected' : ''}>ISV 12%</option>
                     <option value="ISV 15%" ${imp === 'ISV 15%' ? 'selected' : ''}>ISV 15%</option>
                     <option value="Exento" ${imp === 'Exento' ? 'selected' : ''}>Exento</option>
                 </select>
             `;
             cellTotal.innerHTML = `<input type="text" class="total-field align-right" value="${totalFormatted}" readonly style="font-weight: bold; background: #f1f5f9;">`;
             cellAccion.innerHTML = `<button type="button" class="btn-danger" onclick="eliminarFila(this)">x</button>`;
-            
+
             calcularTotales();
         }
 
@@ -799,15 +849,43 @@
             const cant = parseFloat(row.querySelector('.cant-field').value) || 0;
             const unit = parseMoneda(row.querySelector('.unit-field').value);
             const totalInput = row.querySelector('.total-field');
-            
+
             const total = cant * unit;
             totalInput.value = formatMoneda(total);
             calcularTotales();
         }
 
+        function actualizarDescuentoForm() {
+            const tipo = document.getElementById('tipoDescuento').value;
+            const customGroup = document.getElementById('customDescuentoGroup');
+            const pctInput = document.getElementById('porcentajeDescuento');
+            
+            if (tipo === 'custom') {
+                customGroup.style.display = 'block';
+                pctInput.focus();
+            } else {
+                customGroup.style.display = 'none';
+                pctInput.value = tipo;
+            }
+            calcularTotales();
+        }
+
         function calcularTotales() {
-            let subtotal = 0;
+            let subtotalBruto = 0;
+            let totalDescuento = 0;
             let impuestos = 0;
+
+            // Obtener el porcentaje de descuento
+            const tipo = document.getElementById('tipoDescuento').value;
+            let pctDescuento = 0;
+            if (tipo === 'custom') {
+                pctDescuento = parseFloat(document.getElementById('porcentajeDescuento').value) || 0;
+            } else {
+                pctDescuento = parseFloat(tipo) || 0;
+            }
+            
+            if (pctDescuento < 0) pctDescuento = 0;
+            if (pctDescuento > 100) pctDescuento = 100;
 
             const rows = tablaConceptos.querySelectorAll('tr');
             rows.forEach(row => {
@@ -816,21 +894,29 @@
                 const imp = row.querySelector('.imp-field').value;
                 const totalInput = row.querySelector('.total-field');
 
-                const totalFila = cant * unit;
-                totalInput.value = formatMoneda(totalFila);
+                const totalFilaBruto = cant * unit;
+                const totalFilaDescuento = totalFilaBruto * (pctDescuento / 100);
+                const totalFilaNeto = totalFilaBruto - totalFilaDescuento;
+                
+                totalInput.value = formatMoneda(totalFilaBruto);
 
-                subtotal += totalFila;
+                subtotalBruto += totalFilaBruto;
+                totalDescuento += totalFilaDescuento;
 
                 if (imp === 'ISV 15%') {
-                    impuestos += (totalFila * 0.15);
+                    impuestos += (totalFilaNeto * 0.15);
                 } else if (imp === 'ISV 12%') {
-                    impuestos += (totalFila * 0.12);
+                    // Mantenemos soporte para registros antiguos del historial
+                    impuestos += (totalFilaNeto * 0.12);
                 }
             });
 
-            const grandTotal = subtotal + impuestos;
+            const subtotalNeto = subtotalBruto - totalDescuento;
+            const grandTotal = subtotalNeto + impuestos;
 
-            document.getElementById('totalBase').innerText = formatMoneda(subtotal);
+            document.getElementById('totalBase').innerText = formatMoneda(subtotalBruto);
+            document.getElementById('valorDescuento').innerText = "- " + formatMoneda(totalDescuento);
+            document.getElementById('totalNeto').innerText = formatMoneda(subtotalNeto);
             document.getElementById('totalImpuestos').innerText = formatMoneda(impuestos);
             document.getElementById('totalGeneral').innerText = formatMoneda(grandTotal);
         }
@@ -840,7 +926,7 @@
             const alertBox = document.getElementById('alertBox');
             alertBox.innerText = msg;
             alertBox.style.display = 'block';
-            
+
             if (type === 'success') {
                 alertBox.style.borderLeftColor = 'var(--success)';
                 alertBox.style.color = '#065f46';
@@ -860,7 +946,11 @@
         function limpiarFormulario() {
             document.getElementById('cotizacionForm').reset();
             tablaConceptos.innerHTML = '';
-            
+
+            document.getElementById('tipoDescuento').value = '0';
+            document.getElementById('porcentajeDescuento').value = 0;
+            document.getElementById('customDescuentoGroup').style.display = 'none';
+
             // Reestablecer fecha y sugerir número de cotización
             const now = new Date();
             const offset = now.getTimezoneOffset() * 60000;
@@ -878,10 +968,11 @@
             const fecha = document.getElementById('fecha').value;
             const comercial = document.getElementById('comercial').value;
             const terminos = document.getElementById('terminosPago').value;
-            
+
             const cliente = {
                 nombre: document.getElementById('clienteNombre').value,
                 rtn: document.getElementById('clienteRtn').value,
+                contacto: document.getElementById('clienteContacto').value,
                 telefono: document.getElementById('clienteTelefono').value,
                 direccion: document.getElementById('clienteDireccion').value,
                 correo: document.getElementById('clienteCorreo').value
@@ -907,7 +998,11 @@
                 terminos,
                 cliente,
                 items,
+                tipoDescuento: document.getElementById('tipoDescuento').value,
+                porcentajeDescuento: parseFloat(document.getElementById('porcentajeDescuento').value) || 0,
                 totalBase: parseMoneda(document.getElementById('totalBase').innerText),
+                valorDescuento: Math.abs(parseMoneda(document.getElementById('valorDescuento').innerText)),
+                totalNeto: parseMoneda(document.getElementById('totalNeto').innerText),
                 totalImpuesto: parseMoneda(document.getElementById('totalImpuestos').innerText),
                 totalGeneral: parseMoneda(document.getElementById('totalGeneral').innerText)
             };
@@ -916,14 +1011,14 @@
         // Persistencia LocalStorage
         function guardarCotizacion() {
             const data = obtenerDatosDeFormulario();
-            
+
             // Validaciones básicas
             if (!data.numero || !data.cliente.nombre || !data.cliente.rtn) {
                 showAlert('Por favor, llene los campos obligatorios del presupuesto y del cliente.');
                 return;
             }
 
-            if (data.items.length === 0 || data.items.some(item => !item.producto || item.cantidad <= 0 || item.precioUnitario <= 0)) {
+            if (data.items.length === 0 || data.items.some(item => !item.producto || item.cantidad <= 0 || item.precioUnitario < 0)) {
                 showAlert('Asegúrese de registrar al menos un ítem con producto/servicio, cantidad y precio unitario.');
                 return;
             }
@@ -957,9 +1052,15 @@
 
             document.getElementById('clienteNombre').value = data.cliente.nombre;
             document.getElementById('clienteRtn').value = data.cliente.rtn;
+            document.getElementById('clienteContacto').value = data.cliente.contacto || '';
             document.getElementById('clienteTelefono').value = data.cliente.telefono || '';
             document.getElementById('clienteDireccion').value = data.cliente.direccion || '';
             document.getElementById('clienteCorreo').value = data.cliente.correo || '';
+
+            // Cargar descuento
+            document.getElementById('tipoDescuento').value = data.tipoDescuento || '0';
+            document.getElementById('porcentajeDescuento').value = data.porcentajeDescuento || 0;
+            actualizarDescuentoForm();
 
             // Cargar ítems
             tablaConceptos.innerHTML = '';
@@ -987,7 +1088,7 @@
         // Historial UI y Buscador
         function actualizarHistorialUI(datosAMostrar = cotizaciones) {
             tablaHistorial.innerHTML = '';
-            
+
             // Ordenar por número descendente
             const datosOrdenados = [...datosAMostrar].sort((a, b) => Number(b.numero) - Number(a.numero));
 
@@ -998,9 +1099,9 @@
 
             datosOrdenados.forEach(c => {
                 const row = tablaHistorial.insertRow();
-                
+
                 const f = new Date(c.fecha);
-                const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 row.innerHTML = `
                     <td class="align-center" style="font-weight: bold; color: var(--primary);">${c.numero}</td>
@@ -1042,8 +1143,8 @@
         document.getElementById('cotizacionForm').onsubmit = (e) => {
             e.preventDefault();
             const data = obtenerDatosDeFormulario();
-            
-            if (data.items.length === 0 || data.items.some(item => !item.producto || item.cantidad <= 0 || item.precioUnitario <= 0)) {
+
+            if (data.items.length === 0 || data.items.some(item => !item.producto || item.cantidad <= 0 || item.precioUnitario < 0)) {
                 showAlert('Asegúrese de registrar al menos un ítem con producto/servicio, cantidad y precio unitario.');
                 return;
             }
@@ -1076,10 +1177,15 @@
 
             const logoData = await getBase64FromUrl('logo.png');
 
-            // 1. Dibujar logotipo centrado y expandido
+            // 1. Dibujar logotipo centrado y expandido (con proporción correcta)
             if (logoData) {
-                const logoW = 125;
-                const logoH = 25;
+                const props = doc.getImageProperties(logoData);
+                let logoW = 135;
+                let logoH = (props.height * logoW) / props.width;
+                if (logoH > 24) {
+                    logoH = 24;
+                    logoW = (props.width * logoH) / props.height;
+                }
                 const logoX = (pageWidth - logoW) / 2;
                 doc.addImage(logoData, 'PNG', logoX, 10, logoW, logoH);
             }
@@ -1097,7 +1203,7 @@
             doc.setFontSize(8.5);
             doc.setTextColor(80, 80, 80);
             doc.text("Empresa Nacional de Artes Gráficas", 15, 49);
-            
+
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(8);
             doc.setTextColor(100, 100, 100);
@@ -1117,7 +1223,7 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(9.5);
             doc.setTextColor(0, 33, 71);
-            
+
             // Ajustar nombre cliente si es largo
             const nombreCliente = data.cliente.nombre.toUpperCase();
             const clienteLines = doc.splitTextToSize(nombreCliente, 85);
@@ -1129,22 +1235,19 @@
             doc.setFontSize(8);
             doc.setTextColor(100, 100, 100);
             doc.text("RTN: " + data.cliente.rtn, 110, nextY);
-            
+
             let direccion = data.cliente.direccion || 'Tegucigalpa, Honduras';
             const dirLines = doc.splitTextToSize("Dirección: " + direccion, 85);
             doc.text(dirLines, 110, nextY + 4);
-            
+
             nextY = nextY + 4 + (dirLines.length * 4);
-            
+
             let tel = data.cliente.telefono || 'N/A';
             let correo = data.cliente.correo || 'N/A';
             doc.text("Teléfono: " + tel, 110, nextY);
             doc.text("Correo: " + correo, 110, nextY + 4);
 
-            nextY = nextY + 8;
-            doc.setFont('helvetica', 'bold');
-            doc.setTextColor(0, 33, 71);
-            doc.text("Términos de pago: " + data.terminos, 110, nextY);
+
 
             // 3. Título de la Cotización
             const titleY = Math.max(84, nextY + 10);
@@ -1158,17 +1261,17 @@
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(80, 80, 80);
             doc.text("Fecha de presupuesto:", 15, titleY + 7);
-            
+
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(100, 100, 100);
             const f = new Date(data.fecha);
-            const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
             doc.text(fechaFormateada, 52, titleY + 7);
 
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(80, 80, 80);
             doc.text("Comercial:", 110, titleY + 7);
-            
+
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(100, 100, 100);
             doc.text(data.comercial, 128, titleY + 7);
@@ -1192,28 +1295,30 @@
                 head: [['Descripción', 'Cantidad', 'Precio unitario', 'Impuestos', 'Precio']],
                 body: tableRows,
                 foot: [
-                    ['', '', '', 'Total base:', formatMoneda(data.totalBase)],
+                    ['', '', '', 'Subtotal Bruto:', formatMoneda(data.totalBase)],
+                    ['', '', '', `Descuento (${data.porcentajeDescuento || 0}%):`, "- " + formatMoneda(data.valorDescuento || 0)],
+                    ['', '', '', 'Subtotal Neto:', formatMoneda(data.totalNeto || (data.totalBase - (data.valorDescuento || 0)))],
                     ['', '', '', 'Impuestos:', formatMoneda(data.totalImpuesto)],
-                    ['', '', '', 'Total:', formatMoneda(data.totalGeneral)]
+                    ['', '', '', 'Total General:', formatMoneda(data.totalGeneral)]
                 ],
                 theme: 'grid',
-                headStyles: { 
-                    fillColor: [0, 33, 71], 
-                    textColor: [255, 255, 255], 
-                    fontStyle: 'bold', 
+                headStyles: {
+                    fillColor: [0, 33, 71],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
                     halign: 'center',
                     fontSize: 8.5
                 },
-                footStyles: { 
-                    fillColor: [248, 250, 252], 
-                    textColor: [0, 33, 71], 
-                    fontStyle: 'bold', 
+                footStyles: {
+                    fillColor: [248, 250, 252],
+                    textColor: [0, 33, 71],
+                    fontStyle: 'bold',
                     fontSize: 9.5
                 },
-                styles: { 
-                    fontSize: 8.5, 
-                    cellPadding: 3, 
-                    valign: 'middle' 
+                styles: {
+                    fontSize: 8.5,
+                    cellPadding: 3,
+                    valign: 'middle'
                 },
                 columnStyles: {
                     0: { cellWidth: 'auto', halign: 'left' },
@@ -1233,55 +1338,31 @@
                             dataCell.cell.styles.halign = 'right';
                         }
                     }
-                },
-                // Watermark hook - Se dibuja en el fondo de cada página
-                didDrawPage: function (dataDraw) {
-                    if (logoData) {
-                        try {
-                            dataDraw.doc.saveGraphicsState();
-                            if (typeof dataDraw.doc.setGState === 'function') {
-                                var gState = new dataDraw.doc.GState({ opacity: 0.05 });
-                                dataDraw.doc.setGState(gState);
-                            }
-                            const size = 120;
-                            dataDraw.doc.addImage(
-                                logoData, 
-                                'PNG', 
-                                (pageWidth - size) / 2, 
-                                (pageHeight - size) / 2, 
-                                size, 
-                                size
-                            );
-                            dataDraw.doc.restoreGraphicsState();
-                        } catch (err) {
-                            console.error("Error al renderizar marca de agua en PDF:", err);
-                        }
-                    }
                 }
             });
 
             // 5. Firmas y validez final
-            const finalY = doc.lastAutoTable.finalY + 30;
-            
+            const finalY = doc.lastAutoTable.finalY + 35;
+
             // Verificar si cabe en la misma página
             if (finalY + 25 > pageHeight) {
                 doc.addPage();
                 // Si agregamos página, volvemos a calcular el Y inicial
-                var newFinalY = 40;
-                dibujarSeccionFirmas(doc, newFinalY);
+                var newFinalY = 45;
+                dibujarSeccionFirmas(doc, newFinalY, data);
             } else {
-                dibujarSeccionFirmas(doc, finalY);
+                dibujarSeccionFirmas(doc, finalY, data);
             }
 
             // Descargar el documento PDF
             doc.save(`Cotizacion_${data.numero}_ENAG.pdf`);
         }
 
-        function dibujarSeccionFirmas(doc, y) {
+        function dibujarSeccionFirmas(doc, y, data) {
             doc.setDrawColor(180, 180, 180);
             doc.setLineWidth(0.4);
 
-            // Línea firma 1
+            // Línea firma 1: Comercialización
             doc.line(20, y, 80, y);
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(8.5);
@@ -1291,20 +1372,29 @@
             doc.setFontSize(7.5);
             doc.text("Empresa Nacional de Artes Gráficas", 50, y + 8, { align: 'center' });
 
-            // Línea firma 2
-            doc.line(130, y, 190, y);
+            // Datos del Cliente (En lugar de firma)
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(8.5);
-            doc.text("Aceptado por el Cliente", 160, y + 4.5, { align: 'center' });
+            doc.setFontSize(9);
+            doc.setTextColor(0, 33, 71);
+            doc.text("ACEPTADO POR EL CLIENTE", 130, y - 10);
+
             doc.setFont('helvetica', 'normal');
-            doc.setFontSize(7.5);
-            doc.text("Firma y Sello del Solicitante", 160, y + 8, { align: 'center' });
+            doc.setFontSize(8);
+            doc.setTextColor(80, 80, 80);
+
+            const contacto = data.cliente.contacto || 'N/A';
+            const tel = data.cliente.telefono || 'N/A';
+
+            doc.text("Empresa: " + data.cliente.nombre, 130, y - 5);
+            doc.text("Contacto: " + contacto, 130, y);
+            doc.text("Teléfono: " + tel, 130, y + 5);
 
             // Nota de validez
             doc.setFont('helvetica', 'italic');
             doc.setFontSize(8);
             doc.setTextColor(120, 120, 120);
-            doc.text("* Esta cotización tiene una validez oficial de 30 días calendario a partir de su emisión.", 15, y + 20);
+            doc.text("* Esta cotización tiene una validez oficial de 15 días calendario a partir de su emisión.", 15, y + 20);
+            doc.text("* Los precios cotizados están establecidos según el Acuerdo Ejecutivo N° 249-2010, publicado en el Diario Oficial La Gaceta.", 15, y + 24);
         }
     </script>
 </body>

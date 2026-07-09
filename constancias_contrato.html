@@ -432,6 +432,24 @@
                     <label>Puesto Funcional</label>
                     <input type="text" id="cfgPuestoFuncional" value="" placeholder="ej. Encargado de Facturación (Opcional)">
                 </div>
+                <div class="config-field">
+                    <label>Mes de Deducciones</label>
+                    <select id="cfgMesDeducciones">
+                        <option value="auto">Automático (Mes anterior)</option>
+                        <option value="enero">Enero</option>
+                        <option value="febrero">Febrero</option>
+                        <option value="marzo">Marzo</option>
+                        <option value="abril">Abril</option>
+                        <option value="mayo">Mayo</option>
+                        <option value="junio">Junio</option>
+                        <option value="julio">Julio</option>
+                        <option value="agosto">Agosto</option>
+                        <option value="septiembre">Septiembre</option>
+                        <option value="octubre">Octubre</option>
+                        <option value="noviembre">Noviembre</option>
+                        <option value="diciembre">Diciembre</option>
+                    </select>
+                </div>
                 <div class="config-field" style="grid-column: span 2; display: flex; gap: 20px; align-items: center; margin-top: 15px; flex-wrap: wrap;">
                     <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147;">
                         <input type="checkbox" id="showFechaIngreso" checked style="width: 18px; height: 18px; cursor: pointer;">
@@ -1187,11 +1205,37 @@
             }
 
             const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
-                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele las siguientes deducciones:`;
+                `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele en el mes de **${obtenerMesDeducciones()}** las siguientes deducciones:`;
 
             const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };
+        }
+
+        function obtenerMesDeducciones() {
+            const selectVal = document.getElementById('cfgMesDeducciones').value;
+            if (selectVal !== 'auto') {
+                return selectVal;
+            }
+            
+            const fechaText = document.getElementById('cfgFecha').value.toLowerCase();
+            const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+            
+            let mesEmisionIdx = -1;
+            for (let i = 0; i < meses.length; i++) {
+                if (fechaText.includes(meses[i])) {
+                    mesEmisionIdx = i;
+                    break;
+                }
+            }
+            
+            if (mesEmisionIdx !== -1) {
+                const mesDeduccionIdx = (mesEmisionIdx - 1 + 12) % 12;
+                return meses[mesDeduccionIdx];
+            }
+            
+            const prevMonthIdx = (new Date().getMonth() - 1 + 12) % 12;
+            return meses[prevMonthIdx];
         }
 
         function formatMoneda(v) {
