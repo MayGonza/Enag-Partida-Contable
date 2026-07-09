@@ -315,15 +315,10 @@
                 <h2>Producción</h2>
                 <p>Generación de órdenes de producción y control de talleres gráficos.</p>
             </div>
-            <div class="card area-card disabled-card" style="opacity: 0.65; cursor: not-allowed; position: relative;">
-                <div class="maintenance-badge"
-                    style="position: absolute; top: 12px; right: 12px; background: #d97706; color: white; padding: 4px 8px; border-radius: 4px; font-size: 0.75em; font-weight: bold;">
-                    🛠️ Mantenimiento</div>
+            <div class="card area-card" onclick="solicitarAcceso('comercializacion')">
                 <div class="icon">🎯</div>
                 <h2>Comercialización</h2>
-                <p>Gestión de ventas, marketing y relaciones con clientes.</p>
-                <span style="display: block; color: #d97706; font-weight: bold; font-size: 0.85em; margin-top: 8px;">⚠️
-                    Deshabilitado Temporalmente</span>
+                <p>Gestión de cotizaciones, ventas y relaciones con clientes.</p>
             </div>
         </div>
 
@@ -406,7 +401,13 @@
         </div>
 
         <!-- BOTÓN VOLVER (Oculto al inicio) -->
-        <div id="menuComercializacion" class="grid-container sub-menu" style="display: none;"></div>
+        <div id="menuComercializacion" class="grid-container sub-menu" style="display: none;">
+            <a href="cotizaciones.html" class="card">
+                <div class="icon">📄</div>
+                <h2>Cotizaciones</h2>
+                <p>Gestión y generación de cotizaciones oficiales para clientes.</p>
+            </a>
+        </div>
         <div id="backButtonContainer" style="display: none; margin-top: 30px;">
             <button onclick="volverAlMenuPrincipal()" class="btn-back">← Volver al Menú Principal</button>
         </div>
@@ -538,6 +539,7 @@
             document.getElementById('menuContabilidad').style.display = 'none';
             document.getElementById('menuRRHH').style.display = 'none';
             document.getElementById('menuProduccion').style.display = 'none';
+            document.getElementById('menuComercializacion').style.display = 'none';
             document.getElementById('backButtonContainer').style.display = 'none';
 
             // Restaurar título y mostrar las áreas principales

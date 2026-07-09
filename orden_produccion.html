@@ -556,7 +556,7 @@
 
         async function generarPDF() {
             const { jsPDF } = window.jspdf;
-            const doc = new jsPDF('p', 'mm', 'letter');
+            const doc = new jsPDF('p', 'mm', 'legal');
 
             let logoW = 0, logoH = 0;
             const logoBgUrl = await getBase64FromUrl('logo.png');

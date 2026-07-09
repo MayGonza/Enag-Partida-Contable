@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <title>Módulo de Cotizaciones — ENAG</title>
+    <meta name="description" content="Módulo de cotizaciones oficiales de la Empresa Nacional de Artes Gráficas (ENAG).">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --primary-accent: #0f172a;
+            --bg-body: #002147;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: var(--bg-body);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        /* Fondo difuminado */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid var(--primary);
+            animation: fadeIn 0.6s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 20px;
+        }
+
+        .form-header img {
+            max-width: 250px;
+            margin-bottom: 10px;
+        }
+
+        h2 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.8em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h3 {
+            color: var(--primary);
+            border-bottom: 2px dashed #e2e8f0;
+            padding-bottom: 8px;
+            margin-top: 30px;
+            margin-bottom: 15px;
+            font-size: 1.25em;
+            text-transform: uppercase;
+        }
+
+        .grid-layout {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group.span-2 {
+            grid-column: span 2;
+        }
+
+        @media (max-width: 768px) {
+            .form-group.span-2 {
+                grid-column: span 1;
+            }
+        }
+
+        label {
+            font-weight: bold;
+            font-size: 0.9em;
+            color: var(--primary-accent);
+        }
+
+        .required {
+            color: var(--danger);
+            margin-left: 2px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-family: inherit;
+            font-size: 0.95em;
+            transition: all 0.2s;
+            box-sizing: border-box;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: var(--primary-light);
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.15);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+            background: white;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+            padding: 12px 10px;
+            font-size: 0.9em;
+            text-transform: uppercase;
+            text-align: center;
+        }
+
+        td {
+            padding: 8px 10px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: middle;
+        }
+
+        .align-right {
+            text-align: right;
+        }
+
+        .align-center {
+            text-align: center;
+        }
+
+        /* Ocultar flechas en input de tipo número */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .btn-add-row {
+            background-color: var(--success);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-add-row:hover {
+            background-color: #059669;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background-color: #64748b;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: bold;
+            font-size: 1em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+
+        .btn-secondary:hover {
+            background-color: #475569;
+        }
+
+        .totals-section {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .totals-card {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 20px;
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .totals-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.95em;
+        }
+
+        .totals-row.grand-total {
+            font-size: 1.25em;
+            font-weight: bold;
+            color: var(--primary);
+            border-top: 2px solid #e2e8f0;
+            padding-top: 10px;
+            margin-top: 5px;
+        }
+
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 20px;
+            gap: 10px;
+        }
+
+        .history-section {
+            margin-top: 40px;
+            border-top: 4px solid var(--primary);
+            padding-top: 25px;
+        }
+
+        .search-box {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+
+        .search-box input {
+            max-width: 400px;
+        }
+
+        .history-table {
+            background: white;
+        }
+
+        .history-table th {
+            background-color: #475569;
+        }
+
+        .badge {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .badge-info {
+            background-color: #dbeafe;
+            color: #1e40af;
+        }
+
+        .badge-success {
+            background-color: #d1fae5;
+            color: #065f46;
+        }
+
+        .btn-history-action {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.85em;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-history-load {
+            background-color: #dbeafe;
+            color: #1e40af;
+            margin-right: 5px;
+        }
+
+        .btn-history-load:hover {
+            background-color: #bfdbfe;
+        }
+
+        .btn-history-pdf {
+            background-color: #fef3c7;
+            color: #92400e;
+            margin-right: 5px;
+        }
+
+        .btn-history-pdf:hover {
+            background-color: #fde68a;
+        }
+
+        .btn-history-delete {
+            background-color: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-history-delete:hover {
+            background-color: #fca5a5;
+        }
+
+        .desc-field, .prod-field {
+            font-size: 0.9em;
+            padding: 8px;
+        }
+
+        .alert-message {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #b45309;
+            padding: 12px 15px;
+            border-radius: 6px;
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            display: none;
+        }
+    </style>
+
+    <script src="js/jspdf.umd.min.js"></script>
+    <script src="js/jspdf-autotable.min.js"></script>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="index.html" class="btn-nav btn-nav-menu">← Volver al Menú Principal</a>
+    </div>
+
+    <div class="container">
+        <div class="form-header">
+            <img src="logo.png" alt="ENAG Logo">
+            <h2>Gestión de Cotizaciones</h2>
+        </div>
+
+        <div id="alertBox" class="alert-message"></div>
+
+        <form id="cotizacionForm">
+            <!-- DATOS GENERALES DEL PRESUPUESTO -->
+            <h3>Datos del Presupuesto</h3>
+            <div class="grid-layout">
+                <div class="form-group">
+                    <label for="numeroCotizacion">Número de Cotización: <span class="required">*</span></label>
+                    <input type="number" id="numeroCotizacion" required min="1">
+                </div>
+                <div class="form-group">
+                    <label for="fecha">Fecha y Hora: <span class="required">*</span></label>
+                    <input type="datetime-local" id="fecha" required>
+                </div>
+                <div class="form-group">
+                    <label for="comercial">Comercial / Vendedor: <span class="required">*</span></label>
+                    <input type="text" id="comercial" value="Carlos Araujo" required>
+                </div>
+                <div class="form-group">
+                    <label for="terminosPago">Términos de Pago: <span class="required">*</span></label>
+                    <select id="terminosPago" required>
+                        <option value="15 días" selected>15 días</option>
+                        <option value="30 días">30 días</option>
+                        <option value="Contado">Contado</option>
+                        <option value="Contra Entrega">Contra Entrega</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- DATOS DEL CLIENTE -->
+            <h3>Datos del Cliente</h3>
+            <div class="grid-layout">
+                <div class="form-group span-2">
+                    <label for="clienteNombre">Cliente / Empresa: <span class="required">*</span></label>
+                    <input type="text" id="clienteNombre" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL" oninput="this.value = this.value.toUpperCase()" required>
+                </div>
+                <div class="form-group">
+                    <label for="clienteRtn">RTN: <span class="required">*</span></label>
+                    <input type="text" id="clienteRtn" placeholder="0801-1990-123456" oninput="formatRtnInput(this)" required>
+                </div>
+                <div class="form-group">
+                    <label for="clienteTelefono">Teléfono:</label>
+                    <input type="text" id="clienteTelefono" placeholder="+504 2230-1120" oninput="formatTelefonoInput(this)">
+                </div>
+                <div class="form-group span-2">
+                    <label for="clienteDireccion">Dirección:</label>
+                    <input type="text" id="clienteDireccion" placeholder="Dirección completa del cliente">
+                </div>
+                <div class="form-group">
+                    <label for="clienteCorreo">Correo Electrónico:</label>
+                    <input type="email" id="clienteCorreo" placeholder="correo@ejemplo.com">
+                </div>
+            </div>
+
+            <!-- DETALLE DE CONCEPTOS (TABLA) -->
+            <h3>Detalle de la Cotización</h3>
+            <div style="overflow-x: auto;">
+                <table id="tablaConceptos">
+                    <thead>
+                        <tr>
+                            <th style="width: 250px;">Producto / Servicio</th>
+                            <th>Descripción / Detalle</th>
+                            <th style="width: 80px;">Cantidad</th>
+                            <th style="width: 130px;">Precio Unitario</th>
+                            <th style="width: 120px;">Impuestos</th>
+                            <th style="width: 130px;">Precio</th>
+                            <th style="width: 50px;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Fila autogenerada por JS -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div style="margin-top: 15px; display: flex; justify-content: space-between; align-items: center;">
+                <button type="button" class="btn-add-row" onclick="agregarFila()">+ Agregar Fila</button>
+            </div>
+
+            <!-- TOTALES -->
+            <div class="totals-section">
+                <div class="totals-card">
+                    <div class="totals-row">
+                        <label>Total Base:</label>
+                        <span id="totalBase" style="font-weight: bold;">L. 0.00</span>
+                    </div>
+                    <div class="totals-row">
+                        <label>Impuestos:</label>
+                        <span id="totalImpuestos" style="font-weight: bold;">L. 0.00</span>
+                    </div>
+                    <div class="totals-row grand-total">
+                        <label>Total General:</label>
+                        <span id="totalGeneral">L. 0.00</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ACCIONES DEL FORMULARIO -->
+            <div class="form-actions">
+                <button type="button" class="btn-secondary" onclick="limpiarFormulario()">Limpiar Formulario</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-secondary" style="background-color: var(--success);" onclick="guardarCotizacion()">Guardar en Historial</button>
+                    <button type="submit" class="btn-primary">
+                        <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16" style="vertical-align: middle;">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                        </svg>
+                        Generar PDF de Cotización
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <!-- HISTORIAL DE COTIZACIONES -->
+        <div class="history-section">
+            <h3>Historial de Cotizaciones</h3>
+            <div class="search-box">
+                <input type="text" id="historialBusqueda" placeholder="Buscar por cliente o número de cotización..." oninput="filtrarHistorial()">
+            </div>
+            <div style="overflow-x: auto;">
+                <table class="history-table" id="tablaHistorial">
+                    <thead>
+                        <tr>
+                            <th style="width: 100px;">N° Cotización</th>
+                            <th style="width: 150px;">Fecha</th>
+                            <th>Cliente</th>
+                            <th style="width: 140px;">Términos</th>
+                            <th style="width: 140px;" class="align-right">Total</th>
+                            <th style="width: 200px;" class="align-center">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Datos cargados desde localStorage -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const tablaConceptos = document.getElementById('tablaConceptos').getElementsByTagName('tbody')[0];
+        const tablaHistorial = document.getElementById('tablaHistorial').getElementsByTagName('tbody')[0];
+        let cotizaciones = [];
+
+        // Funciones auxiliares de conversión
+        function parseMoneda(valor) {
+            if (!valor) return 0;
+            let limpio = String(valor).replace(/L\.\s?/g, '').replace(/,/g, '').replace(/\s?L\.?/g, '');
+            let num = parseFloat(limpio);
+            return isNaN(num) ? 0 : num;
+        }
+
+        // Formatea el valor a moneda sin agregar de nuevo el sufijo si ya se hizo, retorna L. #,##0.00
+        function formatMoneda(valor) {
+            return "L. " + Number(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatInput(input) {
+            let num = parseMoneda(input.value);
+            input.value = num > 0 ? formatMoneda(num) : '';
+            calcularTotales();
+        }
+
+        // Formateadores automáticos para RTN y Teléfono
+        function formatRtnInput(input) {
+            let val = input.value.replace(/\D/g, '');
+            if (val.length > 14) val = val.substring(0, 14);
+            
+            let formatted = '';
+            if (val.length > 0) {
+                formatted += val.substring(0, 4);
+            }
+            if (val.length > 4) {
+                formatted += '-' + val.substring(4, 8);
+            }
+            if (val.length > 8) {
+                formatted += '-' + val.substring(8, 14);
+            }
+            input.value = formatted;
+        }
+
+        function formatTelefonoInput(input) {
+            let val = input.value.replace(/\D/g, '');
+            let hasPrefix = false;
+            if (val.startsWith('504') && val.length > 8) {
+                val = val.substring(3);
+                hasPrefix = true;
+            }
+            if (val.length > 8) val = val.substring(0, 8);
+            
+            let formatted = '';
+            if (val.length > 0) {
+                formatted += val.substring(0, 4);
+            }
+            if (val.length > 4) {
+                formatted += '-' + val.substring(4, 8);
+            }
+            
+            if (hasPrefix || input.value.includes('+504')) {
+                input.value = '+504 ' + formatted;
+            } else {
+                input.value = formatted;
+            }
+        }
+
+        // Prefiltrado e inicialización
+        window.addEventListener('DOMContentLoaded', () => {
+            // Cargar fecha actual local
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+            document.getElementById('fecha').value = localISOTime;
+
+            // Cargar datos de localStorage
+            const localData = localStorage.getItem('enag_cotizaciones');
+            if (localData) {
+                cotizaciones = JSON.parse(localData);
+            }
+
+            // Generar N° de cotización autoincrementado
+            sugerirNumeroCotizacion();
+
+            // Agregar primera fila vacía
+            agregarFila();
+
+            // Dibujar historial
+            actualizarHistorialUI();
+        });
+
+        function sugerirNumeroCotizacion() {
+            if (cotizaciones.length > 0) {
+                const maxNum = Math.max(...cotizaciones.map(c => Number(c.numero)));
+                document.getElementById('numeroCotizacion').value = maxNum + 1;
+            } else {
+                document.getElementById('numeroCotizacion').value = 30238; // Default inicial
+            }
+        }
+
+        const PRODUCTOS_PREDEFINIDOS = [
+            { desc: "1 PÁGINA (PUBLICACIONES)", precio: 3200.00, impuesto: "ISV 12%" },
+            { desc: "2/3 PÁGINA (PUBLICACIONES)", precio: 2800.00, impuesto: "ISV 12%" },
+            { desc: "1/2 PÁGINA (PUBLICACIONES)", precio: 1800.00, impuesto: "ISV 12%" },
+            { desc: "1/3 PÁGINA (PUBLICACIONES)", precio: 1400.00, impuesto: "ISV 12%" },
+            { desc: "1/4 PÁGINA (PUBLICACIONES)", precio: 1200.00, impuesto: "ISV 12%" },
+            { desc: "1/5 PÁGINA (PUBLICACIONES)", precio: 800.00, impuesto: "ISV 12%" },
+            { desc: "1/4 DE PÁGINA (3 PUBLICACIONES - MARCAS Y PATENTES)", precio: 3928.00, impuesto: "ISV 12%" },
+            { desc: "1/5 DE PÁGINA (3 PUBLICACIONES - MARCAS Y PATENTES)", precio: 3814.00, impuesto: "ISV 12%" }
+        ];
+
+        function verificarProductoPredefinido(selectElement) {
+            const row = selectElement.parentNode.parentNode;
+            const val = selectElement.value;
+            const prodField = row.querySelector('.prod-field');
+            const unitField = row.querySelector('.unit-field');
+            const impField = row.querySelector('.imp-field');
+            const cantField = row.querySelector('.cant-field');
+            
+            if (val === 'OTRO') {
+                prodField.style.display = 'block';
+                prodField.value = '';
+                prodField.focus();
+                unitField.value = '';
+                impField.value = 'ISV 12%';
+            } else if (val === '') {
+                prodField.style.display = 'none';
+                prodField.value = '';
+                unitField.value = '';
+                impField.value = 'ISV 12%';
+            } else {
+                prodField.style.display = 'none';
+                prodField.value = val;
+                
+                const prod = PRODUCTOS_PREDEFINIDOS.find(p => p.desc === val);
+                if (prod) {
+                    unitField.value = formatMoneda(prod.precio);
+                    impField.value = prod.impuesto;
+                    
+                    if (!cantField.value || cantField.value === '0') {
+                        cantField.value = '1';
+                    }
+                    calcularFila(cantField);
+                }
+            }
+            calcularTotales();
+        }
+
+        // Gestión de la tabla interactiva
+        function agregarFila(prod = '', desc = '', cant = '', unitVal = '', imp = 'ISV 12%') {
+            const row = tablaConceptos.insertRow();
+            
+            const cellProd = row.insertCell(0);
+            const cellDesc = row.insertCell(1);
+            const cellCant = row.insertCell(2);
+            const cellUnit = row.insertCell(3);
+            const cellImp = row.insertCell(4);
+            const cellTotal = row.insertCell(5);
+            const cellAccion = row.insertCell(6);
+
+            const valUnitFormatted = unitVal !== '' ? formatMoneda(unitVal) : '';
+            const totalFormatted = (cant !== '' && unitVal !== '') ? formatMoneda(cant * unitVal) : 'L. 0.00';
+
+            // Determinar si el valor 'prod' es predefinido o personalizado
+            const esPredefinido = PRODUCTOS_PREDEFINIDOS.some(p => p.desc === prod);
+            const esOtro = prod !== '' && !esPredefinido;
+            const selectVal = esPredefinido ? prod : (esOtro ? 'OTRO' : '');
+
+            let selectHTML = `<select class="prod-select" onchange="verificarProductoPredefinido(this)" style="width: 100%; border: 1px solid var(--border-color); border-radius: 8px; padding: 8px;" required>
+                <option value="">Seleccione...</option>`;
+            
+            PRODUCTOS_PREDEFINIDOS.forEach(p => {
+                const selected = (selectVal === p.desc) ? 'selected' : '';
+                selectHTML += `<option value="${p.desc}" ${selected}>${p.desc} - ${formatMoneda(p.precio)}</option>`;
+            });
+            
+            const otroSelected = selectVal === 'OTRO' ? 'selected' : '';
+            selectHTML += `<option value="OTRO" ${otroSelected}>Otro / Personalizado</option></select>`;
+
+            const inputStyle = esOtro ? 'display: block; margin-top: 5px;' : 'display: none; margin-top: 5px;';
+            const inputHTML = `<input type="text" class="prod-field" value="${prod}" placeholder="Nombre del producto..." style="${inputStyle}" required>`;
+
+            cellProd.innerHTML = selectHTML + inputHTML;
+            cellDesc.innerHTML = `<input type="text" class="desc-field" value="${desc}" placeholder="Detalle o descripción del ítem...">`;
+            cellCant.innerHTML = `<input type="number" class="cant-field align-center" value="${cant}" min="1" oninput="calcularFila(this)" placeholder="0" required>`;
+            cellUnit.innerHTML = `<input type="text" class="unit-field align-right" value="${valUnitFormatted}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" placeholder="L. 0.00" required>`;
+            
+            cellImp.innerHTML = `
+                <select class="imp-field align-center" onchange="calcularTotales()">
+                    <option value="ISV 12%" ${imp === 'ISV 12%' ? 'selected' : ''}>ISV 12%</option>
+                    <option value="ISV 15%" ${imp === 'ISV 15%' ? 'selected' : ''}>ISV 15%</option>
+                    <option value="Exento" ${imp === 'Exento' ? 'selected' : ''}>Exento</option>
+                </select>
+            `;
+            cellTotal.innerHTML = `<input type="text" class="total-field align-right" value="${totalFormatted}" readonly style="font-weight: bold; background: #f1f5f9;">`;
+            cellAccion.innerHTML = `<button type="button" class="btn-danger" onclick="eliminarFila(this)">x</button>`;
+            
+            calcularTotales();
+        }
+
+        function eliminarFila(btn) {
+            const row = btn.parentNode.parentNode;
+            if (tablaConceptos.rows.length > 1) {
+                row.parentNode.removeChild(row);
+                calcularTotales();
+            } else {
+                showAlert('Debe mantener al menos un concepto en la cotización.');
+            }
+        }
+
+        function calcularFila(input) {
+            const row = input.parentNode.parentNode;
+            const cant = parseFloat(row.querySelector('.cant-field').value) || 0;
+            const unit = parseMoneda(row.querySelector('.unit-field').value);
+            const totalInput = row.querySelector('.total-field');
+            
+            const total = cant * unit;
+            totalInput.value = formatMoneda(total);
+            calcularTotales();
+        }
+
+        function calcularTotales() {
+            let subtotal = 0;
+            let impuestos = 0;
+
+            const rows = tablaConceptos.querySelectorAll('tr');
+            rows.forEach(row => {
+                const cant = parseFloat(row.querySelector('.cant-field').value) || 0;
+                const unit = parseMoneda(row.querySelector('.unit-field').value);
+                const imp = row.querySelector('.imp-field').value;
+                const totalInput = row.querySelector('.total-field');
+
+                const totalFila = cant * unit;
+                totalInput.value = formatMoneda(totalFila);
+
+                subtotal += totalFila;
+
+                if (imp === 'ISV 15%') {
+                    impuestos += (totalFila * 0.15);
+                } else if (imp === 'ISV 12%') {
+                    impuestos += (totalFila * 0.12);
+                }
+            });
+
+            const grandTotal = subtotal + impuestos;
+
+            document.getElementById('totalBase').innerText = formatMoneda(subtotal);
+            document.getElementById('totalImpuestos').innerText = formatMoneda(impuestos);
+            document.getElementById('totalGeneral').innerText = formatMoneda(grandTotal);
+        }
+
+        // Alertas personalizadas
+        function showAlert(msg, type = 'warning') {
+            const alertBox = document.getElementById('alertBox');
+            alertBox.innerText = msg;
+            alertBox.style.display = 'block';
+            
+            if (type === 'success') {
+                alertBox.style.borderLeftColor = 'var(--success)';
+                alertBox.style.color = '#065f46';
+                alertBox.style.backgroundColor = '#d1fae5';
+            } else {
+                alertBox.style.borderLeftColor = 'var(--warning)';
+                alertBox.style.color = '#b45309';
+                alertBox.style.backgroundColor = '#fffbeb';
+            }
+
+            setTimeout(() => {
+                alertBox.style.display = 'none';
+            }, 5000);
+        }
+
+        // Limpiar el formulario
+        function limpiarFormulario() {
+            document.getElementById('cotizacionForm').reset();
+            tablaConceptos.innerHTML = '';
+            
+            // Reestablecer fecha y sugerir número de cotización
+            const now = new Date();
+            const offset = now.getTimezoneOffset() * 60000;
+            const localISOTime = (new Date(now - offset)).toISOString().slice(0, 16);
+            document.getElementById('fecha').value = localISOTime;
+
+            sugerirNumeroCotizacion();
+            agregarFila();
+            calcularTotales();
+        }
+
+        // Obtener el objeto de datos del formulario actual
+        function obtenerDatosDeFormulario() {
+            const numero = document.getElementById('numeroCotizacion').value;
+            const fecha = document.getElementById('fecha').value;
+            const comercial = document.getElementById('comercial').value;
+            const terminos = document.getElementById('terminosPago').value;
+            
+            const cliente = {
+                nombre: document.getElementById('clienteNombre').value,
+                rtn: document.getElementById('clienteRtn').value,
+                telefono: document.getElementById('clienteTelefono').value,
+                direccion: document.getElementById('clienteDireccion').value,
+                correo: document.getElementById('clienteCorreo').value
+            };
+
+            const items = [];
+            const rows = tablaConceptos.querySelectorAll('tr');
+            rows.forEach(row => {
+                items.push({
+                    producto: row.querySelector('.prod-field').value,
+                    descripcion: row.querySelector('.desc-field').value,
+                    cantidad: parseFloat(row.querySelector('.cant-field').value) || 0,
+                    precioUnitario: parseMoneda(row.querySelector('.unit-field').value),
+                    impuesto: row.querySelector('.imp-field').value,
+                    precioTotal: parseMoneda(row.querySelector('.total-field').value)
+                });
+            });
+
+            return {
+                numero,
+                fecha,
+                comercial,
+                terminos,
+                cliente,
+                items,
+                totalBase: parseMoneda(document.getElementById('totalBase').innerText),
+                totalImpuesto: parseMoneda(document.getElementById('totalImpuestos').innerText),
+                totalGeneral: parseMoneda(document.getElementById('totalGeneral').innerText)
+            };
+        }
+
+        // Persistencia LocalStorage
+        function guardarCotizacion() {
+            const data = obtenerDatosDeFormulario();
+            
+            // Validaciones básicas
+            if (!data.numero || !data.cliente.nombre || !data.cliente.rtn) {
+                showAlert('Por favor, llene los campos obligatorios del presupuesto y del cliente.');
+                return;
+            }
+
+            if (data.items.length === 0 || data.items.some(item => !item.producto || item.cantidad <= 0 || item.precioUnitario <= 0)) {
+                showAlert('Asegúrese de registrar al menos un ítem con producto/servicio, cantidad y precio unitario.');
+                return;
+            }
+
+            // Buscar si ya existe la cotización
+            const index = cotizaciones.findIndex(c => Number(c.numero) === Number(data.numero));
+            if (index !== -1) {
+                if (confirm(`La cotización N° ${data.numero} ya existe en el historial. ¿Desea sobrescribirla?`)) {
+                    cotizaciones[index] = data;
+                    showAlert('Cotización actualizada con éxito.', 'success');
+                } else {
+                    return;
+                }
+            } else {
+                cotizaciones.push(data);
+                showAlert('Cotización guardada con éxito en el historial.', 'success');
+            }
+
+            localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
+            actualizarHistorialUI();
+        }
+
+        function cargarCotizacionDesdeHistorial(numero) {
+            const data = cotizaciones.find(c => Number(c.numero) === Number(numero));
+            if (!data) return;
+
+            document.getElementById('numeroCotizacion').value = data.numero;
+            document.getElementById('fecha').value = data.fecha;
+            document.getElementById('comercial').value = data.comercial;
+            document.getElementById('terminosPago').value = data.terminos;
+
+            document.getElementById('clienteNombre').value = data.cliente.nombre;
+            document.getElementById('clienteRtn').value = data.cliente.rtn;
+            document.getElementById('clienteTelefono').value = data.cliente.telefono || '';
+            document.getElementById('clienteDireccion').value = data.cliente.direccion || '';
+            document.getElementById('clienteCorreo').value = data.cliente.correo || '';
+
+            // Cargar ítems
+            tablaConceptos.innerHTML = '';
+            data.items.forEach(item => {
+                const prod = item.producto || item.descripcion || '';
+                const desc = item.producto ? (item.descripcion || '') : '';
+                agregarFila(prod, desc, item.cantidad, item.precioUnitario, item.impuesto);
+            });
+
+            calcularTotales();
+            showAlert(`Cotización N° ${numero} cargada en el formulario.`, 'success');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function eliminarCotizacion(numero) {
+            if (confirm(`¿Está seguro de que desea eliminar la cotización N° ${numero} del historial?`)) {
+                cotizaciones = cotizaciones.filter(c => Number(c.numero) !== Number(numero));
+                localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
+                actualizarHistorialUI();
+                sugerirNumeroCotizacion();
+                showAlert(`Cotización N° ${numero} eliminada.`, 'success');
+            }
+        }
+
+        // Historial UI y Buscador
+        function actualizarHistorialUI(datosAMostrar = cotizaciones) {
+            tablaHistorial.innerHTML = '';
+            
+            // Ordenar por número descendente
+            const datosOrdenados = [...datosAMostrar].sort((a, b) => Number(b.numero) - Number(a.numero));
+
+            if (datosOrdenados.length === 0) {
+                tablaHistorial.innerHTML = `<tr><td colspan="6" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
+                return;
+            }
+
+            datosOrdenados.forEach(c => {
+                const row = tablaHistorial.insertRow();
+                
+                const f = new Date(c.fecha);
+                const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+
+                row.innerHTML = `
+                    <td class="align-center" style="font-weight: bold; color: var(--primary);">${c.numero}</td>
+                    <td>${fechaFormateada}</td>
+                    <td style="font-weight: bold; font-size: 0.9em;">${c.cliente.nombre}</td>
+                    <td class="align-center"><span class="badge badge-info">${c.terminos}</span></td>
+                    <td class="align-right" style="font-weight: bold;">${formatMoneda(c.totalGeneral)}</td>
+                    <td class="align-center">
+                        <button class="btn-history-action btn-history-load" onclick="cargarCotizacionDesdeHistorial(${c.numero})">Cargar</button>
+                        <button class="btn-history-action btn-history-pdf" onclick="generarPDFDirecto(${c.numero})">PDF</button>
+                        <button class="btn-history-action btn-history-delete" onclick="eliminarCotizacion(${c.numero})">Eliminar</button>
+                    </td>
+                `;
+            });
+        }
+
+        function filtrarHistorial() {
+            const query = document.getElementById('historialBusqueda').value.toLowerCase().trim();
+            if (!query) {
+                actualizarHistorialUI(cotizaciones);
+                return;
+            }
+
+            const filtrados = cotizaciones.filter(c => {
+                return String(c.numero).includes(query) || c.cliente.nombre.toLowerCase().includes(query);
+            });
+            actualizarHistorialUI(filtrados);
+        }
+
+        // Generar PDF desde el historial directamente
+        function generarPDFDirecto(numero) {
+            const data = cotizaciones.find(c => Number(c.numero) === Number(numero));
+            if (data) {
+                procesarGeneracionPDF(data);
+            }
+        }
+
+        // Envío de Formulario para Generar PDF
+        document.getElementById('cotizacionForm').onsubmit = (e) => {
+            e.preventDefault();
+            const data = obtenerDatosDeFormulario();
+            
+            if (data.items.length === 0 || data.items.some(item => !item.producto || item.cantidad <= 0 || item.precioUnitario <= 0)) {
+                showAlert('Asegúrese de registrar al menos un ítem con producto/servicio, cantidad y precio unitario.');
+                return;
+            }
+
+            // Guardar automáticamente al generar
+            guardarCotizacion();
+            procesarGeneracionPDF(data);
+        };
+
+        // Lógica de Generación de PDF (jsPDF & jsPDF-AutoTable)
+        async function procesarGeneracionPDF(data) {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Convertir logo local a base64
+            const getBase64FromUrl = (url) => new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width; canvas.height = img.height;
+                    canvas.getContext("2d").drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL("image/png"));
+                };
+                img.onerror = () => resolve(null);
+                img.src = url;
+            });
+
+            const logoData = await getBase64FromUrl('logo.png');
+
+            // 1. Dibujar logotipo centrado y expandido
+            if (logoData) {
+                const logoW = 125;
+                const logoH = 25;
+                const logoX = (pageWidth - logoW) / 2;
+                doc.addImage(logoData, 'PNG', logoX, 10, logoW, logoH);
+            }
+
+
+
+            // Línea divisoria
+            doc.setDrawColor(180, 180, 180);
+            doc.setLineWidth(0.5);
+            doc.line(15, 43, 195, 43);
+
+            // 2. Bloque de columnas: Datos ENAG (Izquierda) y Datos del Cliente (Derecha)
+            // Dirección y Datos ENAG
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Empresa Nacional de Artes Gráficas", 15, 49);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text("Col. Miraflores Sur, Centro Cívico Gubernamental", 15, 54);
+            doc.text("Tegucigalpa, Honduras", 15, 58);
+            doc.text("RTN: 08019999408225", 15, 62);
+            doc.text("Email: ventas@enag.gob.hn", 15, 66);
+            doc.text("Teléfono: (+504) 2230-1120", 15, 70);
+            doc.text("Website: www.enag.gob.hn", 15, 74);
+
+            // Datos del Cliente
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Datos del Cliente:", 110, 49);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9.5);
+            doc.setTextColor(0, 33, 71);
+            
+            // Ajustar nombre cliente si es largo
+            const nombreCliente = data.cliente.nombre.toUpperCase();
+            const clienteLines = doc.splitTextToSize(nombreCliente, 85);
+            doc.text(clienteLines, 110, 54);
+
+            let nextY = 54 + (clienteLines.length * 4.5);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 100, 100);
+            doc.text("RTN: " + data.cliente.rtn, 110, nextY);
+            
+            let direccion = data.cliente.direccion || 'Tegucigalpa, Honduras';
+            const dirLines = doc.splitTextToSize("Dirección: " + direccion, 85);
+            doc.text(dirLines, 110, nextY + 4);
+            
+            nextY = nextY + 4 + (dirLines.length * 4);
+            
+            let tel = data.cliente.telefono || 'N/A';
+            let correo = data.cliente.correo || 'N/A';
+            doc.text("Teléfono: " + tel, 110, nextY);
+            doc.text("Correo: " + correo, 110, nextY + 4);
+
+            nextY = nextY + 8;
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 33, 71);
+            doc.text("Términos de pago: " + data.terminos, 110, nextY);
+
+            // 3. Título de la Cotización
+            const titleY = Math.max(84, nextY + 10);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(20);
+            doc.setTextColor(0, 33, 71);
+            doc.text("Cotización # " + data.numero, 15, titleY);
+
+            // Sub-información de cotización
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(80, 80, 80);
+            doc.text("Fecha de presupuesto:", 15, titleY + 7);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            const f = new Date(data.fecha);
+            const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+            doc.text(fechaFormateada, 52, titleY + 7);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(80, 80, 80);
+            doc.text("Comercial:", 110, titleY + 7);
+            
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            doc.text(data.comercial, 128, titleY + 7);
+
+            // 4. Estructura de la Tabla de Conceptos
+            const tableRows = [];
+            data.items.forEach(item => {
+                const descCompleta = (item.producto && item.descripcion) ? `${item.producto} (${item.descripcion})` : (item.producto || item.descripcion || '');
+                tableRows.push([
+                    descCompleta,
+                    item.cantidad,
+                    formatMoneda(item.precioUnitario),
+                    item.impuesto,
+                    formatMoneda(item.precioTotal)
+                ]);
+            });
+
+            // AutoTable
+            doc.autoTable({
+                startY: titleY + 13,
+                head: [['Descripción', 'Cantidad', 'Precio unitario', 'Impuestos', 'Precio']],
+                body: tableRows,
+                foot: [
+                    ['', '', '', 'Total base:', formatMoneda(data.totalBase)],
+                    ['', '', '', 'Impuestos:', formatMoneda(data.totalImpuesto)],
+                    ['', '', '', 'Total:', formatMoneda(data.totalGeneral)]
+                ],
+                theme: 'grid',
+                headStyles: { 
+                    fillColor: [0, 33, 71], 
+                    textColor: [255, 255, 255], 
+                    fontStyle: 'bold', 
+                    halign: 'center',
+                    fontSize: 8.5
+                },
+                footStyles: { 
+                    fillColor: [248, 250, 252], 
+                    textColor: [0, 33, 71], 
+                    fontStyle: 'bold', 
+                    fontSize: 9.5
+                },
+                styles: { 
+                    fontSize: 8.5, 
+                    cellPadding: 3, 
+                    valign: 'middle' 
+                },
+                columnStyles: {
+                    0: { cellWidth: 'auto', halign: 'left' },
+                    1: { cellWidth: 20, halign: 'center' },
+                    2: { cellWidth: 32, halign: 'right' },
+                    3: { cellWidth: 25, halign: 'center' },
+                    4: { cellWidth: 32, halign: 'right' }
+                },
+                didParseCell: function (dataCell) {
+                    if (dataCell.section === 'foot') {
+                        // Alinear y ocultar celdas de pie de página innecesarias
+                        if (dataCell.column.index < 3) {
+                            dataCell.cell.styles.lineWidth = 0;
+                            dataCell.cell.styles.fillColor = [255, 255, 255];
+                            dataCell.cell.text = [''];
+                        } else if (dataCell.column.index === 3) {
+                            dataCell.cell.styles.halign = 'right';
+                        }
+                    }
+                },
+                // Watermark hook - Se dibuja en el fondo de cada página
+                didDrawPage: function (dataDraw) {
+                    if (logoData) {
+                        try {
+                            dataDraw.doc.saveGraphicsState();
+                            if (typeof dataDraw.doc.setGState === 'function') {
+                                var gState = new dataDraw.doc.GState({ opacity: 0.05 });
+                                dataDraw.doc.setGState(gState);
+                            }
+                            const size = 120;
+                            dataDraw.doc.addImage(
+                                logoData, 
+                                'PNG', 
+                                (pageWidth - size) / 2, 
+                                (pageHeight - size) / 2, 
+                                size, 
+                                size
+                            );
+                            dataDraw.doc.restoreGraphicsState();
+                        } catch (err) {
+                            console.error("Error al renderizar marca de agua en PDF:", err);
+                        }
+                    }
+                }
+            });
+
+            // 5. Firmas y validez final
+            const finalY = doc.lastAutoTable.finalY + 30;
+            
+            // Verificar si cabe en la misma página
+            if (finalY + 25 > pageHeight) {
+                doc.addPage();
+                // Si agregamos página, volvemos a calcular el Y inicial
+                var newFinalY = 40;
+                dibujarSeccionFirmas(doc, newFinalY);
+            } else {
+                dibujarSeccionFirmas(doc, finalY);
+            }
+
+            // Descargar el documento PDF
+            doc.save(`Cotizacion_${data.numero}_ENAG.pdf`);
+        }
+
+        function dibujarSeccionFirmas(doc, y) {
+            doc.setDrawColor(180, 180, 180);
+            doc.setLineWidth(0.4);
+
+            // Línea firma 1
+            doc.line(20, y, 80, y);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(80, 80, 80);
+            doc.text("Autorizado por Comercialización", 50, y + 4.5, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.text("Empresa Nacional de Artes Gráficas", 50, y + 8, { align: 'center' });
+
+            // Línea firma 2
+            doc.line(130, y, 190, y);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.text("Aceptado por el Cliente", 160, y + 4.5, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.text("Firma y Sello del Solicitante", 160, y + 8, { align: 'center' });
+
+            // Nota de validez
+            doc.setFont('helvetica', 'italic');
+            doc.setFontSize(8);
+            doc.setTextColor(120, 120, 120);
+            doc.text("* Esta cotización tiene una validez oficial de 30 días calendario a partir de su emisión.", 15, y + 20);
+        }
+    </script>
+</body>
+
+</html>
