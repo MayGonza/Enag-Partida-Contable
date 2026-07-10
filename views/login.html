@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Iniciar Sesión — Portal Administrativo ENAG</title>
+    <!-- Import Google Fonts: Outfit and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --accent: #d97706;
+            --accent-hover: #b45309;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(226, 232, 240, 0.8);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Ambient animated backgrounds */
+        body::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 50%;
+            filter: blur(15px) opacity(0.12);
+            z-index: -2;
+        }
+
+        .bg-gradient-circle {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 33, 71, 0.3) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+            filter: blur(40px);
+            animation: float-slow 20s infinite alternate;
+        }
+
+        .circle-1 {
+            top: -10%;
+            right: -10%;
+        }
+
+        .circle-2 {
+            bottom: -15%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.15) 0%, rgba(0, 0, 0, 0) 70%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float-slow {
+            0% {
+                transform: translate(0, 0) scale(1);
+            }
+
+            50% {
+                transform: translate(50px, 40px) scale(1.1);
+            }
+
+            100% {
+                transform: translate(-30px, -20px) scale(0.95);
+            }
+        }
+
+        /* Glassmorphism Container */
+        .login-card {
+            width: 100%;
+            max-width: 440px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 45px 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 10;
+            box-sizing: border-box;
+            border-top: 6px solid var(--primary);
+            animation: card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes card-appear {
+            from {
+                opacity: 0;
+                transform: translateY(40px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Brand Elements */
+        .brand-logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            padding: 12px;
+            border-radius: 20px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            margin-bottom: 25px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .brand-logo {
+            height: 55px;
+            object-fit: contain;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            margin: 0 0 8px 0;
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95em;
+            margin: 0 0 35px 0;
+            line-height: 1.5;
+        }
+
+        /* Form Controls */
+        .form-group {
+            margin-bottom: 22px;
+            text-align: left;
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 8px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 16px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 14px 16px 14px 48px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.8);
+            outline: none;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(0, 33, 71, 0.15);
+        }
+
+        .form-input:focus~.input-icon {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Remember Me & Recover Password */
+        .options-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            font-size: 0.88rem;
+        }
+
+        .checkbox-container {
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            user-select: none;
+            color: var(--text-muted);
+        }
+
+        .checkbox-container input {
+            position: absolute;
+            opacity: 0;
+            cursor: pointer;
+            height: 0;
+            width: 0;
+        }
+
+        .custom-checkmark {
+            height: 18px;
+            width: 18px;
+            background-color: #ffffff;
+            border: 1.5px solid #d1d5db;
+            border-radius: 5px;
+            margin-right: 8px;
+            display: inline-block;
+            position: relative;
+            transition: var(--transition);
+        }
+
+        .checkbox-container:hover input~.custom-checkmark {
+            border-color: var(--primary);
+        }
+
+        .checkbox-container input:checked~.custom-checkmark {
+            background-color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .custom-checkmark::after {
+            content: "";
+            position: absolute;
+            display: none;
+            left: 5px;
+            top: 2px;
+            width: 5px;
+            height: 9px;
+            border: solid white;
+            border-width: 0 2px 2px 0;
+            transform: rotate(45deg);
+        }
+
+        .checkbox-container input:checked~.custom-checkmark::after {
+            display: block;
+        }
+
+        .recover-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: var(--transition);
+        }
+
+        .recover-link:hover {
+            color: var(--primary-light);
+            text-decoration: underline;
+        }
+
+        /* Action Button */
+        .btn-submit {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.25);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 33, 71, 0.35);
+            background: linear-gradient(135deg, var(--primary-light) 0%, #00428d 100%);
+        }
+
+        .btn-submit:active {
+            transform: translateY(0);
+            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.2);
+        }
+
+        /* Bottom registration link */
+        .register-footer {
+            margin-top: 30px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 25px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .register-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-left: 5px;
+        }
+
+        .register-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        /* Error Banner animation */
+        .error-banner {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.3s ease-in-out;
+        }
+
+        @keyframes shake {
+
+            0%,
+            100% {
+                transform: translateX(0);
+            }
+
+            25% {
+                transform: translateX(-8px);
+            }
+
+            75% {
+                transform: translateX(8px);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated background layers -->
+    <div class="bg-gradient-circle circle-1"></div>
+    <div class="bg-gradient-circle circle-2"></div>
+
+    <div class="login-card">
+        <div class="brand-logo-container">
+            <img src="../assets/logo.png" alt="Logo ENAG" class="brand-logo">
+        </div>
+        <h2>Sistema de Gestión</h2>
+        <p class="subtitle">Ingrese sus credenciales para acceder al Portal Administrativo de la ENAG</p>
+
+        <!-- Error Banner -->
+        <div id="errorBanner" class="error-banner">
+            <span>⚠️</span>
+            <span id="errorMessage">Nombre de usuario o contraseña incorrectos.</span>
+        </div>
+
+        <!-- Form -->
+        <form id="loginForm" onsubmit="handleLogin(event)">
+            <div class="form-group">
+                <label for="username" class="form-label">Usuario o Correo</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">👤</span>
+                    <input type="text" id="username" class="form-input" placeholder="ej. jgomez o correo@enag.hn"
+                        required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="password" class="form-label">Contraseña</label>
+                <div class="input-wrapper">
+                    <span class="input-icon">🔑</span>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••••••" required>
+                </div>
+            </div>
+
+            <div class="options-row">
+                <label class="checkbox-container">
+                    <input type="checkbox" id="rememberMe">
+                    <span class="custom-checkmark"></span>
+                    Recordar sesión
+                </label>
+                <a href="#" class="recover-link" onclick="handleRecover(event)">¿Olvidó su contraseña?</a>
+            </div>
+
+            <button type="submit" class="btn-submit" id="loginBtn">
+                <span>Ingresar al Sistema</span>
+                <span>➔</span>
+            </button>
+        </form>
+
+        <div class="register-footer">
+            ¿No tienes una cuenta? <a href="registro.html" class="register-link">Regístrate aquí</a>
+        </div>
+    </div>
+
+    <script>
+        function handleLogin(event) {
+            event.preventDefault();
+            const userVal = document.getElementById('username').value.trim();
+            const passVal = document.getElementById('password').value;
+            const btn = document.getElementById('loginBtn');
+            const banner = document.getElementById('errorBanner');
+
+            // Quick loading simulation
+            btn.disabled = true;
+            btn.querySelector('span').innerText = 'Iniciando sesión...';
+
+            setTimeout(() => {
+                // For now, accept any dummy credential or allow redirect directly
+                // To make it look like a real login, we can do a mock validation:
+                // Let's accept anything for this demonstration.
+                window.location.href = '../index.html';
+            }, 1000);
+        }
+
+        function handleRecover(event) {
+            event.preventDefault();
+            alert("Para restablecer su contraseña, por favor póngase en contacto con el Departamento de TI o Administrador del Sistema.");
+        }
+    </script>
+</body>
+
+</html>

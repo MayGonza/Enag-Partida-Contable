@@ -1,0 +1,441 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Registro de Usuario — Portal Administrativo ENAG</title>
+    <!-- Import Google Fonts: Outfit and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --accent: #d97706;
+            --accent-hover: #b45309;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bg-panel: rgba(255, 255, 255, 0.85);
+            --border-color: rgba(226, 232, 240, 0.8);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #020617;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        /* Ambient animated backgrounds */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 50%;
+            filter: blur(15px) opacity(0.12);
+            z-index: -2;
+        }
+
+        .bg-gradient-circle {
+            position: fixed;
+            width: 550px;
+            height: 550px;
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(0, 33, 71, 0.25) 0%, rgba(0, 0, 0, 0) 70%);
+            z-index: -1;
+            filter: blur(45px);
+            animation: float-slow 20s infinite alternate;
+        }
+
+        .circle-1 {
+            top: -10%;
+            right: -10%;
+        }
+
+        .circle-2 {
+            bottom: -15%;
+            left: -10%;
+            background: radial-gradient(circle, rgba(217, 119, 6, 0.12) 0%, rgba(0, 0, 0, 0) 70%);
+            animation-delay: -10s;
+        }
+
+        @keyframes float-slow {
+            0% { transform: translate(0, 0) scale(1); }
+            50% { transform: translate(50px, 40px) scale(1.05); }
+            100% { transform: translate(-30px, -20px) scale(0.95); }
+        }
+
+        /* Glassmorphism Container */
+        .register-card {
+            width: 100%;
+            max-width: 500px;
+            background: var(--bg-panel);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid var(--border-color);
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            text-align: center;
+            z-index: 10;
+            box-sizing: border-box;
+            border-top: 6px solid var(--primary);
+            animation: card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes card-appear {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Brand Elements */
+        .brand-logo-container {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #ffffff;
+            padding: 10px;
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            margin-bottom: 20px;
+            border: 1px solid #f1f5f9;
+        }
+
+        .brand-logo {
+            height: 45px;
+            object-fit: contain;
+        }
+
+        h2 {
+            font-family: 'Outfit', sans-serif;
+            color: var(--primary);
+            margin: 0 0 8px 0;
+            font-size: 1.8em;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 0.95em;
+            margin: 0 0 30px 0;
+            line-height: 1.5;
+        }
+
+        /* Grid inputs layout */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 16px 20px;
+            margin-bottom: 25px;
+            text-align: left;
+        }
+
+        .form-group-full {
+            grid-column: span 2;
+        }
+
+        /* Form Controls */
+        .form-group {
+            position: relative;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+
+        .input-icon {
+            position: absolute;
+            left: 14px;
+            color: var(--text-muted);
+            font-size: 1.1rem;
+            pointer-events: none;
+            transition: var(--transition);
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 12px 14px 12px 42px;
+            border: 1.5px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            background-color: rgba(255, 255, 255, 0.8);
+            outline: none;
+            transition: var(--transition);
+            box-sizing: border-box;
+        }
+
+        .form-input:focus {
+            border-color: var(--primary);
+            background-color: #ffffff;
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.15);
+        }
+
+        .form-input:focus ~ .input-icon {
+            color: var(--primary);
+            transform: scale(1.1);
+        }
+
+        /* Dropdown Select custom styling */
+        select.form-input {
+            appearance: none;
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2364748b' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            background-size: 16px;
+            padding-right: 40px;
+            cursor: pointer;
+        }
+
+        select.form-input:focus {
+            background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23002147' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        }
+
+        /* Action Button */
+        .btn-submit {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: #ffffff;
+            border: none;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0, 33, 71, 0.25);
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 33, 71, 0.35);
+            background: linear-gradient(135deg, var(--primary-light) 0%, #00428d 100%);
+        }
+
+        /* Bottom registration link */
+        .login-footer {
+            margin-top: 25px;
+            border-top: 1px solid rgba(0, 0, 0, 0.05);
+            padding-top: 20px;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .login-link {
+            color: var(--accent);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            margin-left: 5px;
+        }
+
+        .login-link:hover {
+            color: var(--accent-hover);
+            text-decoration: underline;
+        }
+
+        /* Feedback dialog */
+        .alert-banner {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #b91c1c;
+            padding: 12px;
+            border-radius: 10px;
+            font-size: 0.88rem;
+            margin-bottom: 20px;
+            display: none;
+            align-items: center;
+            gap: 8px;
+            animation: shake 0.3s ease-in-out;
+            text-align: left;
+        }
+
+        .alert-success {
+            background-color: #d1fae5;
+            border: 1px solid #a7f3d0;
+            color: #065f46;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-8px); }
+            75% { transform: translateX(8px); }
+        }
+
+        @media (max-width: 520px) {
+            .form-grid {
+                grid-template-columns: 1fr;
+            }
+            .form-group-full {
+                grid-column: span 1;
+            }
+            .register-card {
+                padding: 30px 20px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Animated background layers -->
+    <div class="bg-gradient-circle circle-1"></div>
+    <div class="bg-gradient-circle circle-2"></div>
+
+    <div class="register-card">
+        <div class="brand-logo-container">
+            <img src="../assets/logo.png" alt="Logo ENAG" class="brand-logo">
+        </div>
+        <h2>Crear Cuenta</h2>
+        <p class="subtitle">Regístrese en el sistema de gestión interna de la ENAG</p>
+
+        <!-- Alert Banner -->
+        <div id="alertBanner" class="alert-banner">
+            <span id="alertIcon">⚠️</span>
+            <span id="alertMessage">Las contraseñas no coinciden.</span>
+        </div>
+
+        <!-- Form -->
+        <form id="registerForm" onsubmit="handleRegister(event)">
+            <div class="form-grid">
+                
+                <div class="form-group form-group-full">
+                    <label for="fullName" class="form-label">Nombre Completo</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">📝</span>
+                        <input type="text" id="fullName" class="form-input" placeholder="Juan Pérez" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="username" class="form-label">Usuario</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">👤</span>
+                        <input type="text" id="username" class="form-input" placeholder="ej. jperez" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email" class="form-label">Correo Institucional</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">✉️</span>
+                        <input type="email" id="email" class="form-input" placeholder="jperez@enag.hn" required>
+                    </div>
+                </div>
+
+                <div class="form-group form-group-full">
+                    <label for="department" class="form-label">Departamento / Área</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">💼</span>
+                        <select id="department" class="form-input" required>
+                            <option value="" disabled selected>Seleccione su departamento...</option>
+                            <option value="contabilidad">Contabilidad</option>
+                            <option value="rrhh">Recursos Humanos</option>
+                            <option value="produccion">Producción / Talleres Gráficos</option>
+                            <option value="comercializacion">Comercialización / Ventas</option>
+                            <option value="ti">Tecnología de la Información (TI)</option>
+                            <option value="direccion">Dirección / Administración</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="password" class="form-label">Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔑</span>
+                        <input type="password" id="password" class="form-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="confirmPassword" class="form-label">Confirmar Contraseña</label>
+                    <div class="input-wrapper">
+                        <span class="input-icon">🔒</span>
+                        <input type="password" id="confirmPassword" class="form-input" placeholder="••••••••" required>
+                    </div>
+                </div>
+
+            </div>
+
+            <button type="submit" class="btn-submit" id="registerBtn">
+                <span>Registrar Usuario</span>
+                <span>➔</span>
+            </button>
+        </form>
+
+        <div class="login-footer">
+            ¿Ya tienes una cuenta? <a href="login.html" class="login-link">Inicia sesión aquí</a>
+        </div>
+    </div>
+
+    <script>
+        function handleRegister(event) {
+            event.preventDefault();
+            const password = document.getElementById('password').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const btn = document.getElementById('registerBtn');
+            const banner = document.getElementById('alertBanner');
+            const icon = document.getElementById('alertIcon');
+            const message = document.getElementById('alertMessage');
+
+            // Hide banner
+            banner.style.display = 'none';
+
+            // Simple Password Match Check
+            if (password !== confirmPassword) {
+                banner.classList.remove('alert-success');
+                banner.style.display = 'flex';
+                icon.innerText = '⚠️';
+                message.innerText = 'Las contraseñas no coinciden. Por favor, intente de nuevo.';
+                return;
+            }
+
+            // Simulate loading and successful registration
+            btn.disabled = true;
+            btn.querySelector('span').innerText = 'Creando cuenta...';
+
+            setTimeout(() => {
+                banner.classList.add('alert-success');
+                banner.style.display = 'flex';
+                icon.innerText = '✔';
+                message.innerText = 'Usuario registrado exitosamente. Redirigiendo al login...';
+
+                setTimeout(() => {
+                    window.location.href = 'login.html';
+                }, 1500);
+            }, 1000);
+        }
+    </script>
+</body>
+
+</html>
