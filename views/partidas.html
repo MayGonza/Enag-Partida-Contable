@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
     <title>Nueva Partida Contable</title>
 
     <style>
@@ -35,7 +35,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
+            background: url('../assets/logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
@@ -273,13 +273,13 @@
             font-size: 15px !important;
         }
     </style>
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
 </head>
 
 <body>
     <div class="nav-container">
-        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
     </div>
     <div class="container">
         <div class="form-header">
@@ -648,7 +648,7 @@
                 img.src = url.includes(' ') ? encodeURI(url) : url;
             });
 
-            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
 
             if (logoBgUrl) {
                 const pageWidth = doc.internal.pageSize.getWidth();

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
     <title>Manual de Usuario — Sistema ENAG</title>
     <meta name="description" content="Manual de usuario completo del Sistema de Gestión de la Empresa Nacional de Artes Gráficas (ENAG).">
 
@@ -303,7 +303,7 @@
         <div class="navbar-brand">
             <span>📖 Manual de Usuario</span>
         </div>
-        <a href="index.html" class="btn-nav-back">← Volver al Portal</a>
+        <a href="../index.html" class="btn-nav-back">← Volver al Portal</a>
     </div>
 
     <!-- MAIN WORKSPACE LAYOUT -->
@@ -343,7 +343,7 @@
                 </ul>
 
                 <div class="manual-image-container">
-                    <img src="captura_portal.png" alt="Pantalla Principal del Portal Administrativo">
+                    <img src="../assets/captura_portal.png" alt="Pantalla Principal del Portal Administrativo">
                     <div class="manual-image-caption">Figura 1: Captura de pantalla de la interfaz principal del Portal Administrativo de la ENAG.</div>
                 </div>
 
@@ -368,7 +368,7 @@
                 </ol>
 
                 <div class="manual-image-container">
-                    <img src="captura_retenciones.png" alt="Pantalla de Comprobantes de Retención">
+                    <img src="../assets/captura_retenciones.png" alt="Pantalla de Comprobantes de Retención">
                     <div class="manual-image-caption">Figura 2: Captura del formulario de Retenciones de Impuestos.</div>
                 </div>
 
@@ -381,7 +381,7 @@
                 </ul>
 
                 <div class="manual-image-container">
-                    <img src="captura_contabilidad.png" alt="Pantalla de Registro de Partidas Contables">
+                    <img src="../assets/captura_contabilidad.png" alt="Pantalla de Registro de Partidas Contables">
                     <div class="manual-image-caption">Figura 3: Captura de la interfaz para el registro de Partidas Contables de Diario.</div>
                 </div>
             </div>
@@ -394,14 +394,14 @@
                 <h2>3.1. Vouchers de Pago (Acuerdo)</h2>
                 <p>Permite cargar planillas para personal permanente bajo régimen de Acuerdo y emitir sus recibos membretados correspondientes.</p>
                 <div class="manual-image-container">
-                    <img src="captura_vouchers_acuerdo.png" alt="Pantalla de Vouchers Acuerdo">
+                    <img src="../assets/captura_vouchers_acuerdo.png" alt="Pantalla de Vouchers Acuerdo">
                     <div class="manual-image-caption">Figura 4: Interfaz de carga de planilla y generación de vouchers para Acuerdo.</div>
                 </div>
 
                 <h2>3.2. Vouchers de Pago (Contrato)</h2>
                 <p>Permite cargar la planilla exclusiva para el personal bajo contrato temporal y emitir los recibos bajo la misma estructura.</p>
                 <div class="manual-image-container">
-                    <img src="captura_vouchers_contrato.png" alt="Pantalla de Vouchers Contrato">
+                    <img src="../assets/captura_vouchers_contrato.png" alt="Pantalla de Vouchers Contrato">
                     <div class="manual-image-caption">Figura 5: Interfaz de carga de planilla y generación de vouchers para Contrato.</div>
                 </div>
 
@@ -427,7 +427,7 @@
                 </ul>
 
                 <div class="manual-image-container">
-                    <img src="captura_constancias.png" alt="Pantalla de Constancias Laborales">
+                    <img src="../assets/captura_constancias.png" alt="Pantalla de Constancias Laborales">
                     <div class="manual-image-caption">Figura 6: Captura de la interfaz para la generación de Constancias de Trabajo.</div>
                 </div>
 
@@ -450,7 +450,7 @@
                 </div>
 
                 <div class="manual-image-container">
-                    <img src="captura_incapacidades.png" alt="Pantalla de Cálculo de Incapacidades IHSS">
+                    <img src="../assets/captura_incapacidades.png" alt="Pantalla de Cálculo de Incapacidades IHSS">
                     <div class="manual-image-caption">Figura 7: Captura de pantalla del módulo interactivo para el cálculo de reintegros de incapacidades.</div>
                 </div>
 
@@ -469,7 +469,7 @@
                 </ul>
 
                 <div class="manual-image-container" style="margin-top: 15px;">
-                    <img src="diagrama_reintegro.png" alt="Flujo de Reintegro de Subsidio" style="max-width: 60%;">
+                    <img src="../assets/diagrama_reintegro.png" alt="Flujo de Reintegro de Subsidio" style="max-width: 60%;">
                     <div class="manual-image-caption">Figura 8: Diagrama de flujo de fondos y proceso de reintegro de incapacidades en la ENAG.</div>
                 </div>
 
@@ -502,7 +502,7 @@
                 </ol>
 
                 <div class="manual-image-container">
-                    <img src="captura_produccion.png" alt="Pantalla de Creación de Orden de Producción">
+                    <img src="../assets/captura_produccion.png" alt="Pantalla de Creación de Orden de Producción">
                     <div class="manual-image-caption">Figura 9: Captura del formulario de Órdenes de Producción en los Talleres Gráficos.</div>
                 </div>
             </div>
@@ -517,8 +517,8 @@
     </div>
 
     <!-- Carga de librerías locales -->
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
 
     <script>
         // Efecto scroll activo en la barra lateral
@@ -566,16 +566,16 @@
             const maxW = pw - (2 * marginX); // 160mm
 
             // Cargar Membretes y Gráficos
-            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
-            const capturaPortalBgUrl = await getBase64FromUrl('captura_portal.png');
-            const capturaRetencionesBgUrl = await getBase64FromUrl('captura_retenciones.png');
-            const capturaContabilidadBgUrl = await getBase64FromUrl('captura_contabilidad.png');
-            const capturaVouchersAcuerdoBgUrl = await getBase64FromUrl('captura_vouchers_acuerdo.png');
-            const capturaVouchersContratoBgUrl = await getBase64FromUrl('captura_vouchers_contrato.png');
-            const capturaConstanciasBgUrl = await getBase64FromUrl('captura_constancias.png');
-            const capturaIncapacidadesBgUrl = await getBase64FromUrl('captura_incapacidades.png');
-            const diagramaReintegroBgUrl = await getBase64FromUrl('diagrama_reintegro.png');
-            const capturaProduccionBgUrl = await getBase64FromUrl('captura_produccion.png');
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+            const capturaPortalBgUrl = await getBase64FromUrl('../assets/captura_portal.png');
+            const capturaRetencionesBgUrl = await getBase64FromUrl('../assets/captura_retenciones.png');
+            const capturaContabilidadBgUrl = await getBase64FromUrl('../assets/captura_contabilidad.png');
+            const capturaVouchersAcuerdoBgUrl = await getBase64FromUrl('../assets/captura_vouchers_acuerdo.png');
+            const capturaVouchersContratoBgUrl = await getBase64FromUrl('../assets/captura_vouchers_contrato.png');
+            const capturaConstanciasBgUrl = await getBase64FromUrl('../assets/captura_constancias.png');
+            const capturaIncapacidadesBgUrl = await getBase64FromUrl('../assets/captura_incapacidades.png');
+            const diagramaReintegroBgUrl = await getBase64FromUrl('../assets/diagrama_reintegro.png');
+            const capturaProduccionBgUrl = await getBase64FromUrl('../assets/captura_produccion.png');
 
             let pageNum = 1;
             const totalPaginasTotal = 9;

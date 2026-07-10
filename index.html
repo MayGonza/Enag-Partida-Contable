@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="icon" href="assets/logo.ico" type="image/x-icon">
     <title>Sistema de Gestión ENAG</title>
     <style>
         body {
@@ -28,7 +28,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
+            background: url('assets/logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
@@ -295,7 +295,7 @@
 <body>
 
     <div class="main-container">
-        <img src="logo.png" alt="ENAG Logo" class="header-logo">
+        <img src="assets/logo.png" alt="ENAG Logo" class="header-logo">
         <h1 id="menuTitle">Portal Administrativo</h1>
 
         <!-- VISTA DE ÁREAS PRINCIPALES (Inicial) -->
@@ -324,12 +324,12 @@
 
         <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
         <div id="menuContabilidad" class="grid-container sub-menu" style="display: none;">
-            <a href="comprobante_retencion.html" class="card">
+            <a href="views/comprobante_retencion.html" class="card">
                 <div class="icon">📄</div>
                 <h2>Retenciones</h2>
                 <p>Generación y registro oficial de comprobantes de retención de impuestos.</p>
             </a>
-            <a href="partidas.html" class="card">
+            <a href="views/partidas.html" class="card">
                 <div class="icon">📊</div>
                 <h2>Partidas</h2>
                 <p>Creación y registro de partidas contables.</p>
@@ -338,41 +338,41 @@
 
         <!-- SUB-MENÚ: RECURSOS HUMANOS (Oculto al inicio) -->
         <div id="menuRRHH" class="grid-container sub-menu" style="display: none;">
-            <a href="vouchers.html" class="card">
+            <a href="views/vouchers.html" class="card">
                 <div class="icon">💵</div>
                 <h2>Vouchers (Acuerdo)</h2>
                 <p>Carga de planilla de salarios y generación masiva de recibos de pago para empleados por Acuerdo.</p>
             </a>
-            <a href="vouchers_contrato.html" class="card">
+            <a href="views/vouchers_contrato.html" class="card">
                 <div class="icon">💵</div>
                 <h2>Vouchers (Contrato)</h2>
                 <p>Carga de planilla de salarios y generación masiva de recibos de pago para empleados por Contrato.</p>
             </a>
-            <a href="constancias.html" class="card">
+            <a href="views/constancias.html" class="card">
                 <div class="icon">📋</div>
                 <h2>Constancia con Deducciones (Acuerdo)</h2>
                 <p>Generación de constancias laborales oficiales con detalle de sueldo y deducciones para empleados por
                     Acuerdo.</p>
             </a>
-            <a href="constancias_contrato.html" class="card">
+            <a href="views/constancias_contrato.html" class="card">
                 <div class="icon">📋</div>
                 <h2>Constancia con Deducciones (Contrato)</h2>
                 <p>Generación de constancias laborales oficiales con detalle de sueldo y deducciones para empleados por
                     Contrato.</p>
             </a>
-            <a href="constancias_sin_deducciones.html" class="card">
+            <a href="views/constancias_sin_deducciones.html" class="card">
                 <div class="icon">📋</div>
                 <h2>Constancia sin Deducciones (Acuerdo)</h2>
                 <p>Generación de constancias laborales oficiales sin detalle de deducciones para empleados por Acuerdo.
                 </p>
             </a>
-            <a href="constancias_sin_deducciones_contrato.html" class="card">
+            <a href="views/constancias_sin_deducciones_contrato.html" class="card">
                 <div class="icon">📋</div>
                 <h2>Constancia sin Deducciones (Contrato)</h2>
                 <p>Generación de constancias laborales oficiales sin detalle de deducciones para empleados por Contrato.
                 </p>
             </a>
-            <a href="incapacidades.html" class="card">
+            <a href="views/incapacidades.html" class="card">
                 <div class="icon">🏥</div>
                 <h2>Cálculo de Incapacidades IHSS</h2>
                 <p>Cálculo del subsidio por incapacidad temporal del IHSS y desglose del reintegro institucional para el
@@ -393,7 +393,7 @@
 
         <!-- SUB-MENÚ: PRODUCCIÓN (Oculto al inicio) -->
         <div id="menuProduccion" class="grid-container sub-menu" style="display: none;">
-            <a href="orden_produccion.html" class="card">
+            <a href="views/orden_produccion.html" class="card">
                 <div class="icon">🏭</div>
                 <h2>Orden de Producción</h2>
                 <p>Formulario para la creación y registro de las órdenes de producción.</p>
@@ -402,7 +402,7 @@
 
         <!-- BOTÓN VOLVER (Oculto al inicio) -->
         <div id="menuComercializacion" class="grid-container sub-menu" style="display: none;">
-            <a href="cotizaciones.html" class="card">
+            <a href="views/cotizaciones.html" class="card">
                 <div class="icon">📄</div>
                 <h2>Cotizaciones</h2>
                 <p>Gestión y generación de cotizaciones oficiales para clientes.</p>
@@ -413,7 +413,7 @@
         </div>
 
         <div class="footer-text">
-            EMPRESA NACIONAL DE ARTES GRÁFICAS - ENAG 2026 | <a href="manual.html"
+            EMPRESA NACIONAL DE ARTES GRÁFICAS - ENAG 2026 | <a href="views/manual.html"
                 style="color: #002147; text-decoration: underline; font-weight: bold; margin-left: 5px;">Manual de
                 Usuario</a>
         </div>

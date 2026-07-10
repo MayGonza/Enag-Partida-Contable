@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
     <title>Generación de Constancias de Trabajo (Acuerdo) — ENAG</title>
 
     <meta name="description"
@@ -38,7 +38,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
+            background: url('../assets/logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
@@ -502,13 +502,13 @@
             background: #003470;
         }
     </style>
-    <script src="js/xlsx.full.min.js"></script>
-    <script src="js/jspdf.umd.min.js"></script>
+    <script src="../js/xlsx.full.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
 </head>
 
 <body>
     <div class="nav-container">
-        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
     </div>
 
     <div class="container">
@@ -687,10 +687,10 @@
                 `${diaOrdinal} (${String(dia).padStart(2, '0')}) días del mes de ${mes} de ${anio}`;
 
             // Auto-cargar planilla2.xls (o planilla.xls) si existe
-            fetch('planilla2.xls')
+            fetch('../templates/planilla2.xls')
                 .then(res => {
                     if (res.ok) return res.arrayBuffer();
-                    return fetch('planilla.xls').then(res2 => {
+                    return fetch('../templates/planilla.xls').then(res2 => {
                         if (res2.ok) return res2.arrayBuffer();
                         throw new Error("No default spreadsheet found");
                     });
@@ -1460,7 +1460,7 @@
             }
 
             // Fondo con logo
-            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
             if (logoBgUrl) {
                 const pw = doc.internal.pageSize.getWidth();
                 const ph = doc.internal.pageSize.getHeight();
