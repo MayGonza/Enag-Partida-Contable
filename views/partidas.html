@@ -634,6 +634,7 @@
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            doc.setTextColor(0, 0, 0);
 
             const getBase64FromUrl = (url) => new Promise((resolve) => {
                 const img = new Image();
@@ -766,7 +767,7 @@
                 theme: 'grid',
                 headStyles: { fillColor: [44, 62, 80], halign: 'center' },
                 footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
-                styles: { fontSize: 9, cellPadding: 3 },
+                styles: { fontSize: 9, cellPadding: 3, textColor: [0, 0, 0] },
                 columnStyles: {
                     0: { cellWidth: 35, halign: 'center' }, // Objeto
                     1: { cellWidth: 'auto' }, // Cuenta
