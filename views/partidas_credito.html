@@ -1,0 +1,1275 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Nueva Partida Contable (Facturas al Crédito)</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 950px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input,
+        select,
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+            transition: all 0.3s ease;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            outline: none;
+            border-color: #002147;
+            box-shadow: 0 0 8px rgba(0, 33, 71, 0.2);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            text-align: center;
+        }
+
+        .actions {
+            margin-top: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        button {
+            padding: 10px 15px;
+            cursor: pointer;
+            border: none;
+            border-radius: 4px;
+        }
+
+        .btn-add {
+            background-color: #28a745;
+            color: white;
+        }
+
+        .btn-submit {
+            background-color: #007bff;
+            color: white;
+            font-size: 16px;
+        }
+
+        .btn-clean {
+            background-color: #6c757d;
+            color: white;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        .btn-clean:hover {
+            background-color: #5a6268;
+        }
+
+        .required {
+            color: #dc3545;
+            margin-left: 2px;
+            font-weight: bold;
+        }
+
+        .btn-remove {
+            background-color: #dc3545;
+            color: white;
+            padding: 5px 10px;
+        }
+
+        .totals {
+            font-weight: bold;
+            font-size: 1.1em;
+        }
+
+        .error {
+            color: red;
+            margin-top: 10px;
+        }
+
+        input.Objeto,
+        select.Objeto,
+        input.Cuenta {
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .tax-options {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .tax-options input[type="radio"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+            vertical-align: middle;
+        }
+
+        .nav-container {
+            max-width: 950px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-nav-active {
+            background-color: #002147;
+            color: white;
+            cursor: default;
+        }
+
+        .btn-nav-inactive {
+            background-color: #f1f3f5;
+            color: #333;
+            border: 1px solid #ccc;
+        }
+
+        .btn-nav-inactive:hover {
+            background-color: #e9ecef;
+        }
+
+        /* Alineación derecha para campos monetarios */
+        .Debe,
+        .Haber,
+        .debe,
+        .haber {
+            text-align: right;
+            font-family: monospace;
+            font-size: 13px;
+            padding: 8px 4px;
+        }
+
+        /* Ocultar flechas de inputs de tipo número */
+        input[type=number]::-webkit-inner-spin-button,
+        input[type=number]::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type=number] {
+            -moz-appearance: textfield;
+        }
+
+        .destacado-label {
+            font-size: 15px !important;
+            text-transform: uppercase;
+        }
+
+        .destacado-input {
+            font-size: 15px !important;
+            font-weight: bold !important;
+            text-transform: uppercase;
+        }
+
+        .descripcion-input {
+            font-size: 15px !important;
+        }
+    </style>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+    </div>
+    <div class="container">
+        <div class="form-header">
+            <h2>Gestión de Partidas (Facturas al Crédito)</h2>
+            <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
+                <label for="importarPDF" class="btn-clean"
+                    style="cursor: pointer; background-color: #002147; color: white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 8px 15px;">
+                    <svg width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                        <path
+                            d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z" />
+                    </svg>
+                    Cargar PDF de Partida
+                </label>
+                <input type="file" id="importarPDF" accept="application/pdf" style="display: none;"
+                    onchange="importarPDF(event)">
+            </div>
+        </div>
+        <form id="partidaForm">
+            <!-- Fecha y Número de Partida -->
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Fecha: <span class="required">*</span></label>
+                    <input type="date" id="fecha" class="destacado-input" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>Número de Partida: <span class="required">*</span></label>
+                    <input type="number" id="numeroPartida" required>
+                </div>
+            </div>
+
+            <!-- RTN y Orden de Compra -->
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">RTN: <span class="required">*</span></label>
+                    <input type="text" id="rtn" placeholder="0000-0000-000000" class="destacado-input" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Orden de Compra: <span class="required">*</span></label>
+                    <input type="text" id="ordenCompra" placeholder="OC-XXXXXX" class="destacado-input" required>
+                </div>
+            </div>
+
+            <!-- Proceso y Factura -->
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Proceso: <span class="required">*</span></label>
+                    <input type="text" id="proceso" placeholder="LPN-XXX-XXXX" class="destacado-input" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Factura: <span class="required">*</span></label>
+                    <input type="text" id="factura" placeholder="000-000-00-00000000" class="destacado-input" required>
+                </div>
+            </div>
+
+            <!-- CAI -->
+            <div class="form-group">
+                <label class="destacado-label">CAI: <span class="required">*</span></label>
+                <input type="text" id="cai" placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX" class="destacado-input" required style="text-transform: uppercase;">
+            </div>
+
+            <div class="form-group">
+                <label class="destacado-label">Beneficiario: <span class="required">*</span></label>
+                <input type="text" id="beneficiario" placeholder="NOMBRE DEL BENEFICIARIO" class="destacado-input"
+                    oninput="this.value = this.value.toUpperCase()" required>
+            </div>
+            <div class="form-group">
+                <label class="destacado-label">Descripción: <span class="required">*</span></label>
+                <textarea id="descripcion" rows="2" placeholder="Descripción de la partida contable"
+                    class="descripcion-input" required></textarea>
+            </div>
+            <h3>Detalle de la Partida</h3>
+            <table id="tablaDetalles">
+                <thead>
+                    <tr>
+                        <th>Objeto</th>
+                        <th>Cuenta</th>
+                        <th style="width: 160px; text-align: center;">Debe</th>
+                        <th style="width: 160px; text-align: center;">Haber</th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody></tbody>
+                <tfoot>
+                    <tr class="totals">
+                        <td colspan="2" style="text-align: right;">Totales:</td>
+                        <td style="text-align: right;"><span id="totalDebe">L. 0.00</span></td>
+                        <td style="text-align: right;"><span id="totalHaber">L. 0.00</span></td>
+                        <td></td>
+                    </tr>
+                </tfoot>
+            </table>
+            <div class="form-group">
+                <label>Tipo de Impuesto:</label>
+                <div class="tax-options">
+                    <input type="radio" id="tax15" name="taxType" value="15% Impuesto S/V"
+                        onchange="updateTaxRowDescription(this.value)">
+                    <label for="tax15">15% Impuesto S/V</label>
+                    <input type="radio" id="tax12_5" name="taxType" value="12.5% Impuesto S/R"
+                        onchange="updateTaxRowDescription(this.value)">
+                    <label for="tax12_5">12.5% Impuesto S/R</label>
+                    <input type="radio" id="taxExento" name="taxType" value="Exento"
+                        onchange="updateTaxRowDescription(this.value)" checked>
+                    <label for="taxExento">Exento</label>
+                </div>
+            </div>
+            <div class="actions">
+                <button type="button" class="btn-clean" onclick="limpiarFormulario()">Limpiar Formulario</button>
+                <div style="display: flex; gap: 10px;">
+                    <button type="button" class="btn-add" onclick="agregarFila()">+ Agregar Fila</button>
+                    <button type="submit" class="btn-submit">Generar PDF de Partida</button>
+                </div>
+            </div>
+            <div id="mensaje" class="error"></div>
+        </form>
+    </div>
+
+    <script>
+        const tabla = document.getElementById('tablaDetalles').getElementsByTagName('tbody')[0];
+
+        const OBJETOS_PREDEFINIDOS = {
+            "11100": "SUELDOS BASICOS ACUERDO",
+            "11510": "DECIMOTERCER MES DE SALARIO",
+            "11520": "DECIMOCUARTO MES DE SALARIO",
+            "11600": "COMPLEMENTOS/VACACIONES",
+            "11710": "CONTRIBUCIONES INJUPEM",
+            "11750": "CONTRIBUCIONES IHSS",
+            "11760": "CONTRIBUCIONES INFOP ACUERDO",
+            "12100": "SUELDOS BASICOS POR CONTRATO",
+            "12410": "DECIMOTERCER MES POR CONTRATO",
+            "12420": "DECIMOCUARTO MES POR CONTRATO",
+            "12550": "CONTRIBUCIONES IHSS POR CONTRATO",
+            "12560": "CONTRIBUCIONES INFOP POR CONTRATO",
+            "14100": "HORAS EXTRAS",
+            "14300": "GASTOS DE REPRESENTACION",
+            "15900": "OTRAS ASISTENCIAS SOCIALES AL PERSONAL",
+            "16200": "COMPENSACIONES",
+            "21110": "ENERGIA ELECTRICA",
+            "21200": "AGUA",
+            "21420": "TELEFONIA FIJA",
+            "21430": "TELEFONIA CELULAR",
+            "26110": "PASAJES NACIONALES",
+            "23100": "MANTENIMIENTO Y REPARACION DE EDIFICIOS Y LOCALES",
+            "24600": "SERVICIO DE INFORMATICA Y SISTEMAS COMPUTACIONALES",
+            "23310": "MANTENIMIENTO Y REPARACION DE EQUIPOS Y MAQUINARIA DE PRODUCCION",
+            "23320": "MANTENIMIENTO Y REPARACION DE TRACCION Y ELEVACION TRANSPORTE",
+            "23360": "MANTENIMIENTO Y REPARACION DE OTROS EQUIPOS DE OFICINA Y MUEBLES/REPARACION DE MUEBLES",
+            "23390": "MANTENIMIENTO Y REPARACION DE OTROS EQUIPOS / MANTENIMIENTO DE AIRES ACONDICIONADOS",
+            "23500": "LIMPIEZA, ASEO Y FUMIGACIÓN",
+            "24130": "SERVICIOS MÉDICOS",
+            "24300": "SERVICIOS JURÍDICOS PAGOS/ABOGADO ",
+            "24500": "SERVICIO DE CAPACITACIÓN ",
+            "25100": "SERVICIOS DE TRANSPORTE",
+            "25300": "SERVICIOS DE IMPRENTA, PUBLICACIONES Y REPRODUCCIONES ",
+            "25400": "PRIMAS Y GASTOS DE SEGUROS ",
+            "25600": "PUBLICACIONES Y PROPAGANDA",
+            "25700": "SERVICIOS DE INTERNET  ",
+            "25900": "OTROS SERVICIOS COMERCIALES Y FINANCIEROS",
+            "26120": "PASAJES AL EXTERIOR",
+            "26210": "VIÁTICOS NACIONALES",
+            "26220": "VIÁTICOS AL EXTERIOR",
+            "27111": "IMPUESTO SOBRE LA RENTA PERSONA JURÍDICA",
+            "27114": "IMPUESTO SOBRE LA VENTA 15%",
+            "27210": "TASA (MATRICULA DE VEHICULOS)",
+            "27300": "MULTAS Y RECARGOS",
+            "29100": "CEREMONIAL Y PROTOCOLO",
+            "29300": "ACTUACIONES DEPORTIVAS",
+            "31110": "PRODUCTOS ALIMENTOS Y BEBIDAS",
+            "32100": "HILADOS Y TELAS",
+            "32310": "PRENDAS DE VESTIR",
+            "33100": "PRODUCTOS DE CARTON",
+            "33300": "PRODUCTOS DE ARTES GRAFICAS",
+            "34400": "LLANTAS Y CAMARAS DE AIRE",
+            "35100": "PRODUCTOS QUIMICOS",
+            "35210": "PRODUCTOS FARMACEUTICOS Y MEDICINALES VARIOS",
+            "35400": "INSECTICIDAS FUMIGANTES Y OTROS",
+            "35500": "TINTAS, PINTURAS Y COLORANTE",
+            "35610": "GASOLINA",
+            "35620": "DIESEL",
+            "35650": "ACEITES,GRASAS Y LUBRICANTES",
+            "35800": "PRODUCTOS DE MATERIAL PLÁSTICO",
+            "35920": "PRODUCTOS FOTOQUIMICOS",
+            "36100": "PRODUCTOS FERROSOS",
+            "36400": "HERRAMIENTAS MENORES",
+            "36930": "ELEMENTOS DE FERRETERIA",
+            "37500": "MINERALES METALÍFEROS",
+            "39100": "ELEMENTOS DE LIMPIEZA Y ASEO PERSONAL",
+            "39200": "ÚTILES DE ESCRITORIO, OFICINA Y ENSEÑANZA",
+            "39300": "ÚTILES Y MATERIALES ELÉCTRICOS",
+            "39400": "UTENSILIOS DE COCINA Y COMEDOR",
+            "39600": "REPUESTOS Y ACCESORIOS",
+            "42120": "EQUIPOS VARIOS DE OFICINA",
+            "42250": "MAQUINARIAS Y EQUIPOS DE IMPRENTA",
+            "42310": "EQUIPO DE TRASNPORTE TERRESTRE PARA PERSONAS",
+            "42600": "EQUIPÓS DE COMPUTACIÓN",
+            "51240": "BENEFECIOS ESPECIALES"
+
+        };
+
+        function parseMoneda(valor) {
+            if (!valor) return 0;
+            let limpio = valor.replace(/L\.\s?/g, '').replace(/,/g, '');
+            let num = parseFloat(limpio);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function formatMoneda(valor) {
+            return "L. " + Number(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatInput(input) {
+            let num = parseMoneda(input.value);
+            if (num === 0 && input.value === '') {
+                input.value = '';
+            } else {
+                input.value = formatMoneda(num);
+            }
+            calcularTotales();
+        }
+
+        function calcularTotales() {
+            let sumOfNormalDebe = 0;
+            let taxRowHaberInput = null;
+            let bankRowHaberInput = null;
+            let currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
+            let divisor = (currentTaxType === '15% Impuesto S/V') ? 1.15 : (currentTaxType === '12.5% Impuesto S/R' ? 1.125 : 1);
+
+            document.querySelectorAll('#tablaDetalles tbody tr').forEach(row => {
+                if (row.classList.contains('comment-row')) return;
+                const debeInput = row.querySelector('.Debe');
+                const haberInput = row.querySelector('.Haber');
+                if (row.classList.contains('tax-row')) {
+                    taxRowHaberInput = haberInput;
+                } else if (row.classList.contains('fixed-row')) {
+                    bankRowHaberInput = haberInput;
+                } else {
+                    sumOfNormalDebe += parseMoneda(debeInput.value);
+                }
+            });
+
+            const valorBanco = sumOfNormalDebe / divisor;
+            const valorImpuesto = sumOfNormalDebe - valorBanco;
+
+            if (taxRowHaberInput) taxRowHaberInput.value = formatMoneda(valorImpuesto);
+            if (bankRowHaberInput) bankRowHaberInput.value = formatMoneda(valorBanco);
+
+            let totalDebe = 0, totalHaber = 0;
+            document.querySelectorAll('#tablaDetalles tbody tr').forEach(row => {
+                if (row.classList.contains('comment-row')) return;
+                totalDebe += parseMoneda(row.querySelector('.Debe').value);
+                totalHaber += parseMoneda(row.querySelector('.Haber').value);
+            });
+
+            document.getElementById('totalDebe').innerText = formatMoneda(totalDebe);
+            document.getElementById('totalHaber').innerText = formatMoneda(totalHaber);
+
+            document.getElementById('mensaje').innerText = (totalDebe.toFixed(2) !== totalHaber.toFixed(2)) ? "REVISA VALORES PARTIDA DESCUADRADA" : "";
+        }
+
+        function actualizarCuenta(selectElement) {
+            const row = selectElement.closest('tr');
+            const cuentaInput = row.querySelector('.Cuenta');
+            const valorSeleccionado = selectElement.value;
+
+            if (OBJETOS_PREDEFINIDOS[valorSeleccionado]) {
+                cuentaInput.value = OBJETOS_PREDEFINIDOS[valorSeleccionado];
+            } else if (valorSeleccionado === "") {
+                cuentaInput.value = "";
+            }
+        }
+
+        function agregarFila(cuentaVal = '', descVal = '', debeVal = 0, haberVal = 0, isFixed = false, isTax = false, comentarioVal = '') {
+            let index = -1;
+            if (!isFixed && !isTax) {
+                for (let i = 0; i < tabla.rows.length; i++) {
+                    if (tabla.rows[i].classList.contains('fixed-row') || tabla.rows[i].classList.contains('tax-row')) { index = i; break; }
+                }
+            } else if (isTax) {
+                for (let i = 0; i < tabla.rows.length; i++) {
+                    if (tabla.rows[i].classList.contains('fixed-row')) { index = i; break; }
+                }
+            }
+
+            const row = tabla.insertRow(index);
+            if (isFixed) row.classList.add('fixed-row');
+            if (isTax) row.classList.add('tax-row');
+            row.classList.add('main-row');
+
+            let strDebe = debeVal > 0 ? formatMoneda(debeVal) : (isFixed || isTax ? formatMoneda(0) : '');
+            let strHaber = haberVal > 0 ? formatMoneda(haberVal) : (isFixed || isTax ? formatMoneda(0) : '');
+
+            let selectHTML = '';
+            if (isFixed || isTax) {
+                selectHTML = `<input type="text" class="Objeto" value="${cuentaVal}" readonly>`;
+            } else {
+                selectHTML = `<select class="Objeto" onchange="actualizarCuenta(this)">
+                    <option value="">SELECCIONE OBJETO...</option>`;
+                for (const [code, description] of Object.entries(OBJETOS_PREDEFINIDOS)) {
+                    const selected = (cuentaVal === code) ? 'selected' : '';
+                    selectHTML += `<option value="${code}" ${selected}>${code} - ${description}</option>`;
+                }
+                if (cuentaVal && !OBJETOS_PREDEFINIDOS[cuentaVal]) {
+                    selectHTML += `<option value="${cuentaVal}" selected>${cuentaVal}</option>`;
+                }
+                selectHTML += `</select>`;
+            }
+
+            row.innerHTML = `
+            <td>${selectHTML}</td>
+            <td><input type="text" class="Cuenta" ${isTax ? 'id="taxDescriptionInput"' : ''} value="${descVal}" ${isFixed || isTax ? 'readonly' : ''}></td>
+            <td><input type="text" class="Debe" value="${strDebe}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" ${isFixed || isTax ? 'readonly' : ''}></td>
+            <td><input type="text" class="Haber" value="${strHaber}" onblur="formatInput(this)" onfocus="this.value = this.value ? parseMoneda(this.value) : ''" oninput="this.value = this.value.replace(/[^0-9.]/g, '')" ${isFixed || isTax ? 'readonly' : ''}></td>
+            <td>${isFixed || isTax ? '' : '<button type="button" class="btn-remove" onclick="eliminarFila(this)">x</button>'}</td>
+        `;
+
+            if (!isFixed && !isTax) {
+                let commentIndex = index === -1 ? -1 : index + 1;
+                const commentRow = tabla.insertRow(commentIndex);
+                commentRow.classList.add('comment-row');
+                commentRow.innerHTML = `
+                <td colspan="4">
+                    <input type="text" class="comentario-linea" value="${comentarioVal}" placeholder="Detalle la transacción" style="width: 100%; border: none; border-bottom: 1px dashed #ccc; background: transparent; padding: 4px; box-sizing: border-box;">
+                </td>
+                <td></td>
+            `;
+            }
+        }
+
+        function eliminarFila(button) {
+            const row = button.parentElement.parentElement;
+            const nextRow = row.nextElementSibling;
+            if (nextRow && nextRow.classList.contains('comment-row')) {
+                nextRow.remove();
+            }
+            row.remove();
+            calcularTotales();
+        }
+
+        function updateTaxRowDescription(description) {
+            if (document.getElementById('taxDescriptionInput')) document.getElementById('taxDescriptionInput').value = description;
+            calcularTotales();
+        }
+
+        document.getElementById('partidaForm').onsubmit = async (e) => {
+            e.preventDefault();
+
+            // Validar filas principales (ignorar vacías por defecto, alertar incompletas)
+            let filaIncompleta = false;
+            let filasValidas = 0;
+
+            document.querySelectorAll('#tablaDetalles tbody tr.main-row').forEach(fila => {
+                if (fila.classList.contains('fixed-row') || fila.classList.contains('tax-row')) return;
+
+                const objeto = fila.querySelector('.Objeto').value.trim();
+                const cuenta = fila.querySelector('.Cuenta').value.trim();
+                const debeVal = parseMoneda(fila.querySelector('.Debe').value);
+                const haberVal = parseMoneda(fila.querySelector('.Haber').value);
+
+                const estaVacio = !objeto && !cuenta && debeVal === 0 && haberVal === 0;
+
+                if (estaVacio) {
+                    return; // Ignorar filas completamente vacías
+                }
+
+                if (!objeto || !cuenta || (debeVal === 0 && haberVal === 0)) {
+                    filaIncompleta = true;
+                } else {
+                    filasValidas++;
+                }
+            });
+
+            if (filaIncompleta) {
+                alert("Por favor, complete todos los campos (Objeto, Cuenta, y Debe o Haber) de las filas que ha empezado a llenar.");
+                return;
+            }
+
+            if (filasValidas === 0) {
+                alert("Debe ingresar al menos un registro contable válido.");
+                return;
+            }
+
+            if (document.getElementById('mensaje').innerText) { alert("La partida está descuadrada."); return; }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+
+            const getBase64FromUrl = (url) => new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width; canvas.height = img.height;
+                    canvas.getContext("2d").drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL("image/png"));
+                };
+                img.onerror = () => resolve(null);
+                img.src = url.includes(' ') ? encodeURI(url) : url;
+            });
+
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+
+            if (logoBgUrl) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(16);
+            const title = "PARTIDA FACTURA AL CRÉDITO";
+            doc.text(title, 105, 52, { align: "center" });
+            const titleWidth = doc.getTextWidth(title);
+            doc.setLineWidth(0.5);
+            doc.line(105 - (titleWidth / 2), 53, 105 + (titleWidth / 2), 53);
+
+            const num = document.getElementById('numeroPartida').value;
+
+            doc.setFontSize(14);
+            doc.setFont('helvetica', 'bold');
+            const textLabel = "N° de Partida: ";
+            const totalNumWidth = doc.getTextWidth(textLabel + num);
+
+            const startX = 105 - (totalNumWidth / 2);
+            const labelWidth = doc.getTextWidth(textLabel);
+
+            doc.text(textLabel, startX, 62);
+            doc.text(num, startX + labelWidth, 62);
+
+            const numWidth = doc.getTextWidth(num);
+            doc.setLineWidth(0.5);
+            doc.line(startX + labelWidth, 63.5, startX + labelWidth + numWidth, 63.5);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            const fecha = document.getElementById('fecha').value;
+            const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
+            const rtn = document.getElementById('rtn').value;
+            const ordenCompra = document.getElementById('ordenCompra').value.toUpperCase();
+            const proceso = document.getElementById('proceso').value.toUpperCase();
+            const factura = document.getElementById('factura').value;
+            const cai = document.getElementById('cai').value.toUpperCase();
+            const descripcion = document.getElementById('descripcion').value;
+
+            // Fila 1 (Y = 72)
+            doc.text("FECHA:", 14, 72);
+            doc.setFont('helvetica', 'normal');
+            doc.text(fecha, 14 + doc.getTextWidth("FECHA:") + 3, 72);
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("N° PARTIDA:", 110, 72);
+            doc.setFont('helvetica', 'normal');
+            doc.text(num, 110 + doc.getTextWidth("N° PARTIDA:") + 3, 72);
+
+            // Fila 2 (Y = 78)
+            doc.setFont('helvetica', 'bold');
+            doc.text("BENEFICIARIO:", 14, 78);
+            doc.setFont('helvetica', 'normal');
+            doc.text(beneficiario, 14 + doc.getTextWidth("BENEFICIARIO:") + 3, 78);
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("RTN:", 110, 78);
+            doc.setFont('helvetica', 'normal');
+            doc.text(rtn, 110 + doc.getTextWidth("RTN:") + 3, 78);
+
+            // Fila 3 (Y = 84)
+            doc.setFont('helvetica', 'bold');
+            doc.text("ORDEN DE COMPRA:", 14, 84);
+            doc.setFont('helvetica', 'normal');
+            doc.text(ordenCompra, 14 + doc.getTextWidth("ORDEN DE COMPRA:") + 3, 84);
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("PROCESO:", 110, 84);
+            doc.setFont('helvetica', 'normal');
+            doc.text(proceso, 110 + doc.getTextWidth("PROCESO:") + 3, 84);
+
+            // Fila 4 (Y = 90)
+            doc.setFont('helvetica', 'bold');
+            doc.text("FACTURA N°:", 14, 90);
+            doc.setFont('helvetica', 'normal');
+            doc.text(factura, 14 + doc.getTextWidth("FACTURA N°:") + 3, 90);
+
+            // Fila 5 (Y = 96)
+            doc.setFont('helvetica', 'bold');
+            doc.text("CAI:", 14, 96);
+            doc.setFont('helvetica', 'normal');
+            doc.text(cai, 14 + doc.getTextWidth("CAI:") + 3, 96);
+
+            // Fila 6 (Y = 102)
+            doc.setFont('helvetica', 'bold');
+            doc.text("DESCRIPCIÓN:", 14, 102);
+
+            const offsetDescripcion = doc.getTextWidth("DESCRIPCIÓN:") + 3;
+            const anchoMaximoDescripcion = 180 - offsetDescripcion;
+
+            doc.setFont('helvetica', 'normal');
+            const lineasDescripcion = doc.splitTextToSize(descripcion, anchoMaximoDescripcion);
+            doc.text(lineasDescripcion, 14 + offsetDescripcion, 102, { maxWidth: anchoMaximoDescripcion, align: "justify" });
+
+            const altoLinea = 5.0;
+            const finalConceptoY = 102 + ((lineasDescripcion.length - 1) * altoLinea);
+
+            const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
+            const filasData = [];
+            let prevMainRowWasEmpty = false;
+            document.querySelectorAll('#tablaDetalles tbody tr').forEach(fila => {
+                if (fila.classList.contains('comment-row')) {
+                    if (prevMainRowWasEmpty) {
+                        prevMainRowWasEmpty = false;
+                        return; // Omitir el comentario si la fila principal estaba vacía
+                    }
+                    const commentVal = fila.querySelector('.comentario-linea').value.trim();
+                    if (commentVal) {
+                        filasData.push(['', commentVal, '', '']);
+                    }
+                    return;
+                }
+                prevMainRowWasEmpty = false;
+
+                if (fila.classList.contains('tax-row') && currentTaxType === 'Exento') {
+                    return; // Omitir la fila de impuesto si es Exento
+                }
+
+                const objetoVal = fila.querySelector('.Objeto').value.trim();
+                const cuentaVal = fila.querySelector('.Cuenta').value.trim();
+                const debeVal = parseMoneda(fila.querySelector('.Debe').value);
+                const haberVal = parseMoneda(fila.querySelector('.Haber').value);
+
+                // Si es una fila editable del usuario y está vacía, ignorarla
+                if (!fila.classList.contains('fixed-row') && !fila.classList.contains('tax-row')) {
+                    const estaVacio = !objetoVal && !cuentaVal && debeVal === 0 && haberVal === 0;
+                    if (estaVacio) {
+                        prevMainRowWasEmpty = true;
+                        return;
+                    }
+                }
+
+                // Si es la fila del banco central
+                if (fila.classList.contains('fixed-row') || objetoVal === '111020100000700') {
+                    filasData.push([
+                        '',
+                        `${objetoVal}\n${cuentaVal}`,
+                        formatMoneda(debeVal),
+                        formatMoneda(haberVal)
+                    ]);
+                } else {
+                    filasData.push([
+                        objetoVal,
+                        cuentaVal,
+                        formatMoneda(debeVal),
+                        formatMoneda(haberVal)
+                    ]);
+                }
+            });
+
+            doc.autoTable({
+                startY: finalConceptoY + 8,
+                head: [['Objeto', 'Cuenta', 'Debe', 'Haber']],
+                body: filasData,
+                foot: [['', 'TOTALES:', document.getElementById('totalDebe').innerText, document.getElementById('totalHaber').innerText]],
+                theme: 'grid',
+                headStyles: { fillColor: [44, 62, 80], halign: 'center' },
+                footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
+                styles: { fontSize: 9, cellPadding: 3 },
+                columnStyles: {
+                    0: { cellWidth: 35, halign: 'center' }, // Objeto
+                    1: { cellWidth: 'auto' }, // Cuenta
+                    2: { cellWidth: 40, halign: 'right' }, // Debe
+                    3: { cellWidth: 40, halign: 'right' }  // Haber
+                },
+                didParseCell: function (data) {
+                    if (data.section === 'body') {
+                        // Es un comentario si la columna 0 y la columna 2 (Debe) están vacías
+                        const isComment = data.row.raw[0] === '' && data.row.raw[2] === '';
+                        if (!isComment) {
+                            data.cell.styles.fontStyle = 'bold';
+                        }
+                    } else if (data.section === 'foot') {
+                        // Alinear pie de página
+                        if (data.column.index === 2 || data.column.index === 3) {
+                            data.cell.styles.halign = 'right';
+                        }
+                    }
+                }
+            });
+
+            const finalY = doc.lastAutoTable.finalY + 40;
+            doc.line(15, finalY, 65, finalY);
+            doc.text("AUTORIZADO POR\nCONTABILIDAD", 40, finalY + 5, { align: 'center' });
+            doc.line(80, finalY, 130, finalY);
+            doc.text("REVISADO POR\nCONTABILIDAD", 105, finalY + 5, { align: 'center' });
+            doc.line(145, finalY, 195, finalY);
+            doc.text("AUTORIZADO POR\nADMINISTRACION", 170, finalY + 5, { align: 'center' });
+
+            // Exportar datos del formulario embebidos en el PDF
+            const formData = {
+                fecha: fecha,
+                numeroPartida: num,
+                beneficiario: beneficiario,
+                descripcion: descripcion,
+                taxType: currentTaxType,
+                rows: []
+            };
+
+            document.querySelectorAll('#tablaDetalles tbody tr.main-row').forEach(row => {
+                const objeto = row.querySelector('.Objeto').value.trim();
+                const cuenta = row.querySelector('.Cuenta').value.trim();
+                const debe = parseMoneda(row.querySelector('.Debe').value);
+                const haber = parseMoneda(row.querySelector('.Haber').value);
+                const isFixed = row.classList.contains('fixed-row');
+                const isTax = row.classList.contains('tax-row');
+
+                let comentario = '';
+                if (!isFixed && !isTax) {
+                    const nextRow = row.nextElementSibling;
+                    if (nextRow && nextRow.classList.contains('comment-row')) {
+                        comentario = nextRow.querySelector('.comentario-linea').value.trim();
+                    }
+                }
+                formData.rows.push({ objeto, cuenta, debe, haber, isFixed, isTax, comentario });
+            });
+
+            const pdfBlob = doc.output('blob');
+            const dataString = "\n%PARTIDA_DATA:" + btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
+            const finalBlob = new Blob([pdfBlob, dataString], { type: 'application/pdf' });
+
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(finalBlob);
+            link.download = `Partida_${num}.pdf`;
+            link.click();
+            URL.revokeObjectURL(link.href);
+        };
+
+        function importarPDF(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = async function (e) {
+                const arrayBuffer = e.target.result;
+                const uint8Array = new Uint8Array(arrayBuffer);
+                const decoder = new TextDecoder('utf-8');
+                const text = decoder.decode(uint8Array);
+
+                const marker = "%PARTIDA_DATA:";
+                const index = text.indexOf(marker);
+                if (index !== -1) {
+                    const base64Data = text.substring(index + marker.length).trim().split('\n')[0].split('\r')[0].trim();
+                    try {
+                        const jsonData = decodeURIComponent(escape(atob(base64Data)));
+                        const data = JSON.parse(jsonData);
+                        cargarDatosEnFormulario(data);
+                    } catch (err) {
+                        alert("Error al decodificar los datos del PDF: " + err.message);
+                    }
+                } else {
+                    // Fallback para PDFs antiguos (creados antes del cambio)
+                    try {
+                        const decompressedText = await decompressPDF(uint8Array);
+                        const texts = extraerTextosPDF(decompressedText);
+
+                        if (texts.length > 0 && texts.some(t => t.toUpperCase().includes("PARTIDA CONTABLE") || t.toUpperCase().includes("COMPROBANTE DE PARTIDA"))) {
+                            const data = recuperarDesdeTextoPlanoPartida(texts);
+                            cargarDatosEnFormulario(data);
+                        } else {
+                            alert("Este PDF no contiene datos de partida contable editables o fue modificado.");
+                        }
+                    } catch (err) {
+                        alert("Error al intentar parsear el PDF antiguo: " + err.message);
+                    }
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            event.target.value = '';
+        }
+
+        async function decompressPDF(uint8Array) {
+            const decoder = new TextDecoder('latin1');
+            const text = decoder.decode(uint8Array);
+            let decompressedText = "";
+            let pos = 0;
+
+            while (true) {
+                let streamIndex = text.indexOf("stream", pos);
+                if (streamIndex === -1) {
+                    decompressedText += text.substring(pos);
+                    break;
+                }
+
+                decompressedText += text.substring(pos, streamIndex);
+
+                let dictStart = text.lastIndexOf("<<", streamIndex);
+                let dictEnd = text.indexOf(">>", dictStart);
+                let isCompressed = false;
+                if (dictStart !== -1 && dictEnd !== -1 && dictEnd < streamIndex) {
+                    let dictText = text.substring(dictStart, dictEnd);
+                    if (dictText.includes("/FlateDecode")) {
+                        isCompressed = true;
+                    }
+                }
+
+                let dataStart = streamIndex + "stream".length;
+                if (text.charCodeAt(dataStart) === 13) dataStart++;
+                if (text.charCodeAt(dataStart) === 10) dataStart++;
+
+                let endStreamIndex = text.indexOf("endstream", dataStart);
+                if (endStreamIndex === -1) {
+                    break;
+                }
+
+                let dataEnd = endStreamIndex;
+                if (text.charCodeAt(dataEnd - 1) === 10) dataEnd--;
+                if (text.charCodeAt(dataEnd - 1) === 13) dataEnd--;
+
+                let streamData = uint8Array.subarray(dataStart, dataEnd);
+
+                if (isCompressed && streamData.length > 0) {
+                    try {
+                        const ds = new DecompressionStream('deflate');
+                        const writer = ds.writable.getWriter();
+                        writer.write(streamData);
+                        writer.close();
+                        const response = new Response(ds.readable);
+                        const decompressedBuffer = await response.arrayBuffer();
+                        const decompressedBytes = new Uint8Array(decompressedBuffer);
+                        const decompressedStr = decoder.decode(decompressedBytes);
+                        decompressedText += "stream\n" + decompressedStr + "\nendstream";
+                    } catch (err) {
+                        console.error("Error decompressing stream: ", err);
+                        decompressedText += "stream\n" + text.substring(dataStart, dataEnd) + "\nendstream";
+                    }
+                } else {
+                    decompressedText += "stream\n" + text.substring(dataStart, dataEnd) + "\nendstream";
+                }
+
+                pos = endStreamIndex + "endstream".length;
+            }
+
+            return decompressedText;
+        }
+
+        function stripStreams(text) {
+            let result = "";
+            let pos = 0;
+            while (true) {
+                let start = text.indexOf("stream", pos);
+                if (start === -1) {
+                    result += text.substring(pos);
+                    break;
+                }
+                result += text.substring(pos, start);
+                let end = text.indexOf("endstream", start);
+                if (end === -1) {
+                    break;
+                }
+                pos = end + "endstream".length;
+            }
+            return result;
+        }
+
+        function extraerTextosPDF(text) {
+            const texts = [];
+            let pos = 0;
+            while (true) {
+                let start = text.indexOf("(", pos);
+                if (start === -1) break;
+
+                let bsCount = 0;
+                let p = start - 1;
+                while (p >= 0 && text[p] === '\\') {
+                    bsCount++;
+                    p--;
+                }
+                if (bsCount % 2 !== 0) {
+                    pos = start + 1;
+                    continue;
+                }
+
+                let end = start + 1;
+                while (end < text.length) {
+                    if (text[end] === ')') {
+                        let bsCountEnd = 0;
+                        let pEnd = end - 1;
+                        while (pEnd >= 0 && text[pEnd] === '\\') {
+                            bsCountEnd++;
+                            pEnd--;
+                        }
+                        if (bsCountEnd % 2 === 0) {
+                            break;
+                        }
+                    }
+                    end++;
+                }
+
+                if (end >= text.length) break;
+
+                let val = text.substring(start + 1, end);
+                val = val.replace(/\\([()\\])/g, '$1');
+                val = val.replace(/\\([0-7]{3})/g, (m, oct) => {
+                    return String.fromCharCode(parseInt(oct, 8));
+                });
+                texts.push(val.trim());
+                pos = end + 1;
+            }
+            return texts;
+        }
+
+        function recuperarDesdeTextoPlanoPartida(texts) {
+            const data = {
+                fecha: '',
+                numeroPartida: '',
+                beneficiario: '',
+                descripcion: '',
+                taxType: 'Exento',
+                rows: []
+            };
+
+            function findIndex(list, term) {
+                return list.findIndex(item => item.toUpperCase().includes(term.toUpperCase()));
+            }
+
+            // 1. Fecha
+            let idx = findIndex(texts, "FECHA:");
+            if (idx === -1) idx = findIndex(texts, "Fecha:");
+            if (idx !== -1 && idx + 1 < texts.length) {
+                data.fecha = texts[idx + 1];
+            }
+
+            // 2. Número de Partida
+            idx = findIndex(texts, "N° de Partida:");
+            if (idx === -1) idx = findIndex(texts, "PDA N°:");
+            if (idx !== -1 && idx + 1 < texts.length) {
+                data.numeroPartida = texts[idx + 1];
+            }
+
+            // 3. Beneficiario
+            idx = findIndex(texts, "BENEFICIARIO:");
+            if (idx === -1) idx = findIndex(texts, "Beneficiario:");
+            if (idx !== -1 && idx + 1 < texts.length) {
+                data.beneficiario = texts[idx + 1];
+            }
+
+            // 4. Descripción
+            idx = findIndex(texts, "DESCRIPCIÓN:");
+            if (idx === -1) idx = findIndex(texts, "Concepto:");
+            if (idx !== -1) {
+                let descLines = [];
+                let i = idx + 1;
+                // Tomamos líneas hasta encontrar el encabezado de tabla "Objeto" o "Cuenta"
+                while (i < texts.length && texts[i].toUpperCase() !== "OBJETO" && texts[i].toUpperCase() !== "CUENTA") {
+                    descLines.push(texts[i]);
+                    i++;
+                }
+                data.descripcion = descLines.join("\n");
+            }
+
+            // 5. Tabla
+            let headerIdx = findIndex(texts, "HABER");
+            if (headerIdx !== -1) {
+                let i = headerIdx + 1;
+                while (i < texts.length) {
+                    if (texts[i].toUpperCase().includes("TOTALES:") || texts[i].toUpperCase().includes("AUTORIZADO POR") || texts[i].toUpperCase().includes("REVISADO POR")) {
+                        break;
+                    }
+
+                    let col1 = texts[i] || '';
+                    let col2 = texts[i + 1] || '';
+                    let col3 = texts[i + 2] || '';
+                    let col4 = texts[i + 3] || '';
+
+                    // Si es una fila de comentario en partidas
+                    const isComment = (col1 === '' && col3 === '') && col2 !== '';
+
+                    if (isComment) {
+                        if (data.rows.length > 0) {
+                            data.rows[data.rows.length - 1].comentario = col2;
+                        }
+                        i += 4;
+                    } else {
+                        let debe = parseMoneda(col3);
+                        let haber = parseMoneda(col4);
+                        let isFixed = col2.includes("Banco Central");
+                        let isTax = col2.includes("Impuesto") || col2.includes("Exento");
+
+                        if (isTax) {
+                            data.taxType = col2;
+                        }
+
+                        data.rows.push({
+                            objeto: col1,
+                            cuenta: col2,
+                            debe: debe,
+                            haber: haber,
+                            isFixed: isFixed,
+                            isTax: isTax,
+                            comentario: ''
+                        });
+                        i += 4;
+                    }
+                }
+            }
+            return data;
+        }
+
+        function cargarDatosEnFormulario(data) {
+            document.getElementById('fecha').value = data.fecha || '';
+            document.getElementById('numeroPartida').value = data.numeroPartida || '';
+            document.getElementById('beneficiario').value = (data.beneficiario || '').toUpperCase();
+            document.getElementById('descripcion').value = data.descripcion || '';
+
+            const taxValue = data.taxType || 'Exento';
+            const radio = document.querySelector(`input[name="taxType"][value="${taxValue}"]`);
+            if (radio) {
+                radio.checked = true;
+            }
+
+            tabla.innerHTML = '';
+
+            if (data.rows && data.rows.length > 0) {
+                data.rows.forEach(r => {
+                    agregarFila(r.objeto, r.cuenta, r.debe, r.haber, r.isFixed, r.isTax, r.comentario);
+                });
+            } else {
+                agregarFila(); agregarFila();
+                agregarFila('27115', 'Exento', 0, 0, false, true);
+                agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
+            }
+            calcularTotales();
+        }
+
+        function limpiarFormulario() {
+            if (confirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) {
+                document.getElementById('partidaForm').reset();
+                tabla.innerHTML = '';
+                // Restaurar filas iniciales
+                agregarFila(); agregarFila();
+                agregarFila('27115', 'Exento', 0, 0, false, true);
+                agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
+                calcularTotales();
+            }
+        }
+
+        // Input masks and constraints for credit invoice fields
+        document.getElementById('rtn').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // numbers only
+            if (value.length > 14) value = value.slice(0, 14);
+            let formatted = '';
+            if (value.length > 0) formatted += value.slice(0, 4);
+            if (value.length > 4) formatted += '-' + value.slice(4, 8);
+            if (value.length > 8) formatted += '-' + value.slice(8, 14);
+            e.target.value = formatted;
+        });
+
+        document.getElementById('factura').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // numbers only
+            if (value.length > 16) value = value.slice(0, 16);
+            let formatted = '';
+            if (value.length > 0) formatted += value.slice(0, 3);
+            if (value.length > 3) formatted += '-' + value.slice(3, 6);
+            if (value.length > 6) formatted += '-' + value.slice(6, 8);
+            if (value.length > 8) formatted += '-' + value.slice(8, 16);
+            e.target.value = formatted;
+        });
+
+        document.getElementById('cai').addEventListener('input', function (e) {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); // alphanumeric uppercase
+            if (value.length > 32) value = value.slice(0, 32);
+            let formatted = '';
+            if (value.length > 0) formatted += value.slice(0, 6);
+            if (value.length > 6) formatted += '-' + value.slice(6, 12);
+            if (value.length > 12) formatted += '-' + value.slice(12, 18);
+            if (value.length > 18) formatted += '-' + value.slice(18, 24);
+            if (value.length > 24) formatted += '-' + value.slice(24, 30);
+            if (value.length > 30) formatted += '-' + value.slice(30, 32);
+            e.target.value = formatted;
+        });
+
+        document.getElementById('ordenCompra').addEventListener('input', function (e) {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9\-]/g, '');
+        });
+
+        document.getElementById('proceso').addEventListener('input', function (e) {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9\-]/g, '');
+        });
+
+        agregarFila(); agregarFila();
+        agregarFila('27115', 'Exento', 0, 0, false, true);
+        agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
+        calcularTotales();
+    </script>
+</body>
+
+</html>
