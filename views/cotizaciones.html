@@ -461,7 +461,7 @@
             <div class="grid-layout">
                 <div class="form-group">
                     <label for="numeroCotizacion">Número de Cotización: <span class="required">*</span></label>
-                    <input type="text" id="numeroCotizacion" required placeholder="00000">
+                    <input type="number" id="numeroCotizacion" required min="1">
                 </div>
                 <div class="form-group">
                     <label for="fecha">Fecha y Hora: <span class="required">*</span></label>
@@ -767,28 +767,14 @@
 
             // Dibujar historial
             actualizarHistorialUI();
-
-            // Formateador para número de cotización con ceros a la izquierda al salir del foco
-            document.getElementById('numeroCotizacion').addEventListener('blur', (e) => {
-                let val = e.target.value.replace(/\D/g, '');
-                let num = parseInt(val, 10) || 0;
-                e.target.value = String(num).padStart(5, '0');
-            });
         });
 
         function sugerirNumeroCotizacion() {
-            // Ignorar cotizaciones antiguas (que inician en el rango de 30000)
-            const cotizacionesNuevas = cotizaciones.filter(c => {
-                const num = parseInt(c.numero, 10) || 0;
-                return num < 30000;
-            });
-
-            if (cotizacionesNuevas.length > 0) {
-                const maxNum = Math.max(...cotizacionesNuevas.map(c => parseInt(c.numero, 10) || 0));
-                const nextNum = maxNum + 1;
-                document.getElementById('numeroCotizacion').value = String(nextNum).padStart(5, '0');
+            if (cotizaciones.length > 0) {
+                const maxNum = Math.max(...cotizaciones.map(c => Number(c.numero)));
+                document.getElementById('numeroCotizacion').value = maxNum + 1;
             } else {
-                document.getElementById('numeroCotizacion').value = "00000"; // Default inicial
+                document.getElementById('numeroCotizacion').value = 30238; // Default inicial
             }
         }
 
@@ -1183,9 +1169,9 @@
                     <td class="align-center"><span class="badge badge-info">${c.terminos}</span></td>
                     <td class="align-right" style="font-weight: bold;">${formatMoneda(c.totalGeneral)}</td>
                     <td class="align-center">
-                        <button class="btn-history-action btn-history-load" onclick="cargarCotizacionDesdeHistorial('${c.numero}')">Cargar</button>
-                        <button class="btn-history-action btn-history-pdf" onclick="generarPDFDirecto('${c.numero}')">PDF</button>
-                        <button class="btn-history-action btn-history-delete" onclick="eliminarCotizacion('${c.numero}')">Eliminar</button>
+                        <button class="btn-history-action btn-history-load" onclick="cargarCotizacionDesdeHistorial(${c.numero})">Cargar</button>
+                        <button class="btn-history-action btn-history-pdf" onclick="generarPDFDirecto(${c.numero})">PDF</button>
+                        <button class="btn-history-action btn-history-delete" onclick="eliminarCotizacion(${c.numero})">Eliminar</button>
                     </td>
                 `;
             });
