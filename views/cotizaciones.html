@@ -540,24 +540,41 @@
             </div>
 
             <!-- TOTALES -->
-            <div class="totals-section" style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
+            <div class="totals-section"
+                style="display: flex; justify-content: space-between; gap: 20px; flex-wrap: wrap;">
                 <!-- SECCIÓN DE DESCUENTOS -->
-                <div style="flex: 1; min-width: 250px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px;">
-                    <h4 style="margin-top: 0; color: var(--primary); font-size: 1em; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">Descuento Legislado (Adulto Mayor u Otros)</h4>
+                <div
+                    style="flex: 1; min-width: 250px; background: #f8fafc; border: 1px solid var(--border-color); border-radius: 12px; padding: 15px;">
+                    <h4
+                        style="margin-top: 0; color: var(--primary); font-size: 1em; border-bottom: 2px solid #e2e8f0; padding-bottom: 8px; margin-bottom: 12px;">
+                        Descuento Legislado (Adulto Mayor u Otros)</h4>
                     <div class="form-group" style="margin-bottom: 10px;">
-                        <label for="tipoDescuento" style="font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Tipo de Descuento:</label>
-                        <select id="tipoDescuento" onchange="actualizarDescuentoForm()" style="padding: 6px 10px; font-size: 0.95em; border-radius: 8px;">
+                        <label for="tipoDescuento"
+                            style="font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Tipo de Descuento:</label>
+                        <select id="tipoDescuento" onchange="actualizarDescuentoForm()"
+                            style="padding: 6px 10px; font-size: 0.95em; border-radius: 8px;">
                             <option value="0">Sin Descuento (0%)</option>
-                            <option value="20">ONG / Sin Fines de Lucro - 20% desc.</option>
+                            <!-- Descuentos de Ley -->
                             <option value="25">Tercera Edad (60-79 años) - 25% desc.</option>
                             <option value="40">Cuarta Edad (80+ años) - 40% desc.</option>
-                            <option value="50">Gobierno / Institucional - 50% desc.</option>
+                            <!-- Descuentos Alcaldía y ONGs -->
+                            <option value="mun_60">Municipales (Plan de Arbitrio) - 60% desc.</option>
+                            <option value="pat_60">Patronatos (Personerías Jurídicas) - 60% desc.</option>
+                            <option value="aso_40">Asociaciones (Personerías Jurídicas, donaciones y convenios) - 40%
+                                desc.</option>
+                            <option value="fun_30">Fundaciones (Personería Jurídica, donaciones y convenios) - 30% desc.
+                            </option>
+                            <option value="ong_30">ONGs (Personería Jurídica, donaciones y convenios) - 30% desc.
+                            </option>
                             <option value="custom">Personalizado...</option>
                         </select>
                     </div>
                     <div id="customDescuentoGroup" class="form-group" style="display: none; margin-bottom: 0;">
-                        <label for="porcentajeDescuento" style="font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Porcentaje (%):</label>
-                        <input type="number" id="porcentajeDescuento" min="0" max="100" value="0" oninput="calcularTotales()" style="padding: 6px 10px; font-size: 0.95em; border-radius: 8px;">
+                        <label for="porcentajeDescuento"
+                            style="font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Porcentaje (%):</label>
+                        <input type="number" id="porcentajeDescuento" min="0" max="100" value="0"
+                            oninput="calcularTotales()"
+                            style="padding: 6px 10px; font-size: 0.95em; border-radius: 8px;">
                     </div>
                 </div>
 
@@ -608,10 +625,23 @@
 
         <!-- HISTORIAL DE COTIZACIONES -->
         <div class="history-section">
-            <h3>Historial de Cotizaciones</h3>
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 15px; margin-bottom: 10px;">
+                <h3 style="margin: 0;">Historial de Cotizaciones</h3>
+                <button type="button" class="btn-primary" onclick="imprimirHistorial()"
+                    style="padding: 8px 16px; font-size: 0.9em; height: fit-content; display: flex; align-items: center; gap: 8px;">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor"
+                        class="bi bi-printer" viewBox="0 0 16 16">
+                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1" />
+                        <path
+                            d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z" />
+                    </svg>
+                    Imprimir Historial
+                </button>
+            </div>
             <div class="search-box">
                 <input type="text" id="historialBusqueda" placeholder="Buscar por cliente o número de cotización..."
-                    oninput="filtrarHistorial()">
+                    oninput="filtrarHistorial()" style="flex: 1; max-width: 400px;">
             </div>
             <div style="overflow-x: auto;">
                 <table class="history-table" id="tablaHistorial">
@@ -637,6 +667,19 @@
         const tablaConceptos = document.getElementById('tablaConceptos').getElementsByTagName('tbody')[0];
         const tablaHistorial = document.getElementById('tablaHistorial').getElementsByTagName('tbody')[0];
         let cotizaciones = [];
+        let cotizacionesFiltradas = [];
+
+        const DESCUENTOS_MAP = {
+            '0': 0,
+            '25': 25,
+            '40': 40,
+            'mun_60': 60,
+            'pat_60': 60,
+            'aso_40': 40,
+            'fun_30': 30,
+            'ong_30': 30,
+            'custom': 0
+        };
 
         // Funciones auxiliares de conversión
         function parseMoneda(valor) {
@@ -860,13 +903,13 @@
             const tipo = document.getElementById('tipoDescuento').value;
             const customGroup = document.getElementById('customDescuentoGroup');
             const pctInput = document.getElementById('porcentajeDescuento');
-            
+
             if (tipo === 'custom') {
                 customGroup.style.display = 'block';
                 pctInput.focus();
             } else {
                 customGroup.style.display = 'none';
-                pctInput.value = tipo;
+                pctInput.value = DESCUENTOS_MAP[tipo] !== undefined ? DESCUENTOS_MAP[tipo] : (parseFloat(tipo) || 0);
             }
             calcularTotales();
         }
@@ -882,9 +925,9 @@
             if (tipo === 'custom') {
                 pctDescuento = parseFloat(document.getElementById('porcentajeDescuento').value) || 0;
             } else {
-                pctDescuento = parseFloat(tipo) || 0;
+                pctDescuento = DESCUENTOS_MAP[tipo] !== undefined ? DESCUENTOS_MAP[tipo] : (parseFloat(tipo) || 0);
             }
-            
+
             if (pctDescuento < 0) pctDescuento = 0;
             if (pctDescuento > 100) pctDescuento = 100;
 
@@ -898,7 +941,7 @@
                 const totalFilaBruto = cant * unit;
                 const totalFilaDescuento = totalFilaBruto * (pctDescuento / 100);
                 const totalFilaNeto = totalFilaBruto - totalFilaDescuento;
-                
+
                 totalInput.value = formatMoneda(totalFilaBruto);
 
                 subtotalBruto += totalFilaBruto;
@@ -1059,8 +1102,22 @@
             document.getElementById('clienteCorreo').value = data.cliente.correo || '';
 
             // Cargar descuento
-            document.getElementById('tipoDescuento').value = data.tipoDescuento || '0';
-            document.getElementById('porcentajeDescuento').value = data.porcentajeDescuento || 0;
+            const tipoDes = data.tipoDescuento || '0';
+            const selectDes = document.getElementById('tipoDescuento');
+            let existeOp = false;
+            for (let i = 0; i < selectDes.options.length; i++) {
+                if (selectDes.options[i].value === tipoDes) {
+                    existeOp = true;
+                    break;
+                }
+            }
+            if (existeOp) {
+                selectDes.value = tipoDes;
+                document.getElementById('porcentajeDescuento').value = data.porcentajeDescuento || 0;
+            } else {
+                selectDes.value = 'custom';
+                document.getElementById('porcentajeDescuento').value = data.porcentajeDescuento || 0;
+            }
             actualizarDescuentoForm();
 
             // Cargar ítems
@@ -1088,6 +1145,7 @@
 
         // Historial UI y Buscador
         function actualizarHistorialUI(datosAMostrar = cotizaciones) {
+            cotizacionesFiltradas = datosAMostrar;
             tablaHistorial.innerHTML = '';
 
             // Ordenar por número descendente
@@ -1138,6 +1196,118 @@
             if (data) {
                 procesarGeneracionPDF(data);
             }
+        }
+
+        // Imprimir Reporte de Historial Completo o Filtrado en PDF
+        async function imprimirHistorial() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            const getBase64FromUrl = (url) => new Promise((resolve) => {
+                const img = new Image();
+                img.crossOrigin = "Anonymous";
+                img.onload = () => {
+                    const canvas = document.createElement("canvas");
+                    canvas.width = img.width; canvas.height = img.height;
+                    canvas.getContext("2d").drawImage(img, 0, 0);
+                    resolve(canvas.toDataURL("image/png"));
+                };
+                img.onerror = () => resolve(null);
+                img.src = url;
+            });
+
+            const logoData = await getBase64FromUrl('../assets/logo.png');
+
+            // 1. Dibujar logotipo centrado
+            if (logoData) {
+                const props = doc.getImageProperties(logoData);
+                let logoW = 100;
+                let logoH = (props.height * logoW) / props.width;
+                if (logoH > 18) {
+                    logoH = 18;
+                    logoW = (props.width * logoH) / props.height;
+                }
+                const logoX = (pageWidth - logoW) / 2;
+                doc.addImage(logoData, 'PNG', logoX, 10, logoW, logoH);
+            }
+
+            // Título
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(14);
+            doc.setTextColor(0, 33, 71);
+            doc.text("REPORTE DE HISTORIAL DE COTIZACIONES", pageWidth / 2, 35, { align: "center" });
+
+            // Fecha de emisión
+            const fReporte = new Date();
+            const fStr = fReporte.toLocaleDateString() + ' ' + fReporte.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(100, 100, 100);
+            doc.text(`Fecha de emisión: ${fStr}`, pageWidth / 2, 40, { align: "center" });
+
+            // Línea divisoria
+            doc.setDrawColor(180, 180, 180);
+            doc.setLineWidth(0.5);
+            doc.line(15, 43, 195, 43);
+
+            const dataToPrint = [...cotizacionesFiltradas].sort((a, b) => Number(b.numero) - Number(a.numero));
+
+            if (dataToPrint.length === 0) {
+                doc.setFontSize(11);
+                doc.setTextColor(100, 100, 100);
+                doc.text("No hay cotizaciones para mostrar en el historial.", pageWidth / 2, 60, { align: "center" });
+                doc.save("Reporte_Historial_Cotizaciones.pdf");
+                return;
+            }
+
+            const bodyData = dataToPrint.map(c => {
+                const f = new Date(c.fecha);
+                const fFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                return [
+                    c.numero,
+                    fFormateada,
+                    c.cliente.nombre,
+                    c.terminos,
+                    formatMoneda(c.totalGeneral)
+                ];
+            });
+
+            doc.autoTable({
+                startY: 48,
+                head: [['N° Cotización', 'Fecha y Hora', 'Cliente', 'Términos', 'Total']],
+                body: bodyData,
+                theme: 'striped',
+                headStyles: {
+                    fillColor: [0, 33, 71],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    fontSize: 9,
+                    halign: 'center'
+                },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 25 },
+                    1: { halign: 'center', cellWidth: 35 },
+                    2: { cellWidth: 70 },
+                    3: { halign: 'center', cellWidth: 25 },
+                    4: { halign: 'right', cellWidth: 25 }
+                },
+                styles: {
+                    fontSize: 8,
+                    cellPadding: 3,
+                    valign: 'middle'
+                },
+                didDrawPage: function (data) {
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(8);
+                    doc.setTextColor(150, 150, 150);
+                    doc.text(`Página ${data.pageNumber}`, pageWidth - 20, pageHeight - 10, { align: 'right' });
+                    doc.text("Empresa Nacional de Artes Gráficas (ENAG)", 15, pageHeight - 10);
+                }
+            });
+
+            doc.save("Reporte_Historial_Cotizaciones.pdf");
         }
 
         // Envío de Formulario para Generar PDF
