@@ -461,14 +461,14 @@
             <div class="grid-layout">
                 <div class="form-group">
                     <label for="numeroCotizacion">Número de Cotización: <span class="required">*</span></label>
-                    <input type="number" id="numeroCotizacion" required min="1">
+                    <input type="text" id="numeroCotizacion" required placeholder="00000">
                 </div>
                 <div class="form-group">
                     <label for="fecha">Fecha y Hora: <span class="required">*</span></label>
                     <input type="datetime-local" id="fecha" required>
                 </div>
                 <div class="form-group">
-                    <label for="comercial">Comercial / Vendedor: <span class="required">*</span></label>
+                    <label for="comercial">Encargado de Cotización: <span class="required">*</span></label>
                     <input type="text" id="comercial" value="Carlos Araujo" required>
                 </div>
                 <div class="form-group">
@@ -767,14 +767,28 @@
 
             // Dibujar historial
             actualizarHistorialUI();
+
+            // Formateador para número de cotización con ceros a la izquierda al salir del foco
+            document.getElementById('numeroCotizacion').addEventListener('blur', (e) => {
+                let val = e.target.value.replace(/\D/g, '');
+                let num = parseInt(val, 10) || 0;
+                e.target.value = String(num).padStart(5, '0');
+            });
         });
 
         function sugerirNumeroCotizacion() {
-            if (cotizaciones.length > 0) {
-                const maxNum = Math.max(...cotizaciones.map(c => Number(c.numero)));
-                document.getElementById('numeroCotizacion').value = maxNum + 1;
+            // Ignorar cotizaciones antiguas (que inician en el rango de 30000)
+            const cotizacionesNuevas = cotizaciones.filter(c => {
+                const num = parseInt(c.numero, 10) || 0;
+                return num < 30000;
+            });
+
+            if (cotizacionesNuevas.length > 0) {
+                const maxNum = Math.max(...cotizacionesNuevas.map(c => parseInt(c.numero, 10) || 0));
+                const nextNum = maxNum + 1;
+                document.getElementById('numeroCotizacion').value = String(nextNum).padStart(5, '0');
             } else {
-                document.getElementById('numeroCotizacion').value = 30238; // Default inicial
+                document.getElementById('numeroCotizacion').value = "00000"; // Default inicial
             }
         }
 
@@ -1169,9 +1183,9 @@
                     <td class="align-center"><span class="badge badge-info">${c.terminos}</span></td>
                     <td class="align-right" style="font-weight: bold;">${formatMoneda(c.totalGeneral)}</td>
                     <td class="align-center">
-                        <button class="btn-history-action btn-history-load" onclick="cargarCotizacionDesdeHistorial(${c.numero})">Cargar</button>
-                        <button class="btn-history-action btn-history-pdf" onclick="generarPDFDirecto(${c.numero})">PDF</button>
-                        <button class="btn-history-action btn-history-delete" onclick="eliminarCotizacion(${c.numero})">Eliminar</button>
+                        <button class="btn-history-action btn-history-load" onclick="cargarCotizacionDesdeHistorial('${c.numero}')">Cargar</button>
+                        <button class="btn-history-action btn-history-pdf" onclick="generarPDFDirecto('${c.numero}')">PDF</button>
+                        <button class="btn-history-action btn-history-delete" onclick="eliminarCotizacion('${c.numero}')">Eliminar</button>
                     </td>
                 `;
             });
@@ -1431,21 +1445,21 @@
             doc.setFontSize(9);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(80, 80, 80);
-            doc.text("Fecha de presupuesto:", 15, titleY + 7);
+            doc.text("Fecha de emisión:", 15, titleY + 7);
 
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(100, 100, 100);
             const f = new Date(data.fecha);
             const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            doc.text(fechaFormateada, 52, titleY + 7);
+            doc.text(fechaFormateada, 46, titleY + 7);
 
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(80, 80, 80);
-            doc.text("Comercial:", 110, titleY + 7);
+            doc.text("Encargado de cotización:", 110, titleY + 7);
 
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(100, 100, 100);
-            doc.text(data.comercial, 128, titleY + 7);
+            doc.text(data.comercial, 148, titleY + 7);
 
             // 4. Estructura de la Tabla de Conceptos
             const tableRows = [];
@@ -1465,13 +1479,6 @@
                 startY: titleY + 13,
                 head: [['Descripción', 'Cantidad', 'Precio unitario', 'Impuestos', 'Precio']],
                 body: tableRows,
-                foot: [
-                    ['', '', '', 'Subtotal Bruto:', formatMoneda(data.totalBase)],
-                    ['', '', '', `Descuento (${data.porcentajeDescuento || 0}%):`, "- " + formatMoneda(data.valorDescuento || 0)],
-                    ['', '', '', 'Subtotal Neto:', formatMoneda(data.totalNeto || (data.totalBase - (data.valorDescuento || 0)))],
-                    ['', '', '', 'Impuestos:', formatMoneda(data.totalImpuesto)],
-                    ['', '', '', 'Total General:', formatMoneda(data.totalGeneral)]
-                ],
                 theme: 'grid',
                 headStyles: {
                     fillColor: [0, 33, 71],
@@ -1480,15 +1487,9 @@
                     halign: 'center',
                     fontSize: 8.5
                 },
-                footStyles: {
-                    fillColor: [248, 250, 252],
-                    textColor: [0, 33, 71],
-                    fontStyle: 'bold',
-                    fontSize: 9.5
-                },
                 styles: {
                     fontSize: 8.5,
-                    cellPadding: 3,
+                    cellPadding: 2.5,
                     valign: 'middle'
                 },
                 columnStyles: {
@@ -1497,25 +1498,65 @@
                     2: { cellWidth: 32, halign: 'right' },
                     3: { cellWidth: 25, halign: 'center' },
                     4: { cellWidth: 32, halign: 'right' }
-                },
-                didParseCell: function (dataCell) {
-                    if (dataCell.section === 'foot') {
-                        // Alinear y ocultar celdas de pie de página innecesarias
-                        if (dataCell.column.index < 3) {
-                            dataCell.cell.styles.lineWidth = 0;
-                            dataCell.cell.styles.fillColor = [255, 255, 255];
-                            dataCell.cell.text = [''];
-                        } else if (dataCell.column.index === 3) {
-                            dataCell.cell.styles.halign = 'right';
-                        }
-                    }
                 }
             });
 
-            // 5. Firmas y validez final
-            const finalY = doc.lastAutoTable.finalY + 35;
+            // 4.5 Dibujar desglose de cotización horizontal debajo de la tabla
+            const totalY = doc.lastAutoTable.finalY + 6;
+            const boxHeight = 14; 
+            
+            // Dibujar fondo gris claro
+            doc.setFillColor(248, 250, 252);
+            doc.rect(15, totalY, 180, boxHeight, 'F');
+            
+            // Borde superior e inferior
+            doc.setDrawColor(226, 232, 240);
+            doc.setLineWidth(0.3);
+            doc.line(15, totalY, 195, totalY);
+            doc.line(15, totalY + boxHeight, 195, totalY + boxHeight);
+            
+            // Preparar bloques a dibujar
+            const bloques = [];
+            bloques.push({ label: 'Subtotal Bruto', value: formatMoneda(data.totalBase) });
+            
+            if (data.porcentajeDescuento > 0) {
+                bloques.push({ label: `Descuento (${data.porcentajeDescuento}%)`, value: "- " + formatMoneda(data.valorDescuento) });
+                bloques.push({ label: 'Subtotal Neto', value: formatMoneda(data.totalNeto || (data.totalBase - data.valorDescuento)) });
+            }
+            
+            bloques.push({ label: 'Impuestos (ISV)', value: formatMoneda(data.totalImpuesto) });
+            bloques.push({ label: 'Total General', value: formatMoneda(data.totalGeneral), isHighlight: true });
+            
+            const numBloques = bloques.length;
+            const blockWidth = 180 / numBloques;
+            
+            bloques.forEach((b, index) => {
+                const startX = 15 + (index * blockWidth);
+                const centerX = startX + (blockWidth / 2);
+                
+                // Dibujar línea divisoria vertical (excepto en el último bloque)
+                if (index < numBloques - 1) {
+                    doc.setDrawColor(226, 232, 240);
+                    doc.line(startX + blockWidth, totalY + 2, startX + blockWidth, totalY + boxHeight - 2);
+                }
+                
+                // Texto de etiqueta (Label)
+                doc.setFont('helvetica', b.isHighlight ? 'bold' : 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(b.isHighlight ? 0 : 100, b.isHighlight ? 33 : 100, b.isHighlight ? 71 : 100);
+                doc.text(b.label, centerX, totalY + 4.5, { align: 'center' });
+                
+                // Texto del valor
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(b.isHighlight ? 9.5 : 9);
+                doc.setTextColor(b.isHighlight ? 0 : 30, b.isHighlight ? 33 : 30, b.isHighlight ? 71 : 30);
+                doc.text(b.value, centerX, totalY + 10.5, { align: 'center' });
+            });
 
-            // Verificar si cabe en la misma página
+            // 5. Firmas y validez final (Espaciado reducido de 35 a 15)
+            const finalY = totalY + boxHeight + 15;
+
+            // Verificar si cabe en la misma página (Ajustado margen requerido)
             if (finalY + 25 > pageHeight) {
                 doc.addPage();
                 // Si agregamos página, volvemos a calcular el Y inicial
