@@ -459,7 +459,7 @@
             <!-- DATOS GENERALES DEL PRESUPUESTO -->
             <h3>Datos del Presupuesto</h3>
             <div class="grid-layout">
-                <div class="form-group">
+                <div class="form-group" style="display: none;">
                     <label for="numeroCotizacion">Número de Cotización: <span class="required">*</span></label>
                     <input type="number" id="numeroCotizacion" required min="1">
                 </div>
@@ -1489,49 +1489,49 @@
 
             // 4.5 Dibujar desglose de cotización horizontal debajo de la tabla
             const totalY = doc.lastAutoTable.finalY + 6;
-            const boxHeight = 14; 
-            
+            const boxHeight = 14;
+
             // Dibujar fondo gris claro
             doc.setFillColor(248, 250, 252);
             doc.rect(15, totalY, 180, boxHeight, 'F');
-            
+
             // Borde superior e inferior
             doc.setDrawColor(226, 232, 240);
             doc.setLineWidth(0.3);
             doc.line(15, totalY, 195, totalY);
             doc.line(15, totalY + boxHeight, 195, totalY + boxHeight);
-            
+
             // Preparar bloques a dibujar
             const bloques = [];
             bloques.push({ label: 'Subtotal Bruto', value: formatMoneda(data.totalBase) });
-            
+
             if (data.porcentajeDescuento > 0) {
                 bloques.push({ label: `Descuento (${data.porcentajeDescuento}%)`, value: "- " + formatMoneda(data.valorDescuento) });
                 bloques.push({ label: 'Subtotal Neto', value: formatMoneda(data.totalNeto || (data.totalBase - data.valorDescuento)) });
             }
-            
+
             bloques.push({ label: 'Impuestos (ISV)', value: formatMoneda(data.totalImpuesto) });
             bloques.push({ label: 'Total General', value: formatMoneda(data.totalGeneral), isHighlight: true });
-            
+
             const numBloques = bloques.length;
             const blockWidth = 180 / numBloques;
-            
+
             bloques.forEach((b, index) => {
                 const startX = 15 + (index * blockWidth);
                 const centerX = startX + (blockWidth / 2);
-                
+
                 // Dibujar línea divisoria vertical (excepto en el último bloque)
                 if (index < numBloques - 1) {
                     doc.setDrawColor(226, 232, 240);
                     doc.line(startX + blockWidth, totalY + 2, startX + blockWidth, totalY + boxHeight - 2);
                 }
-                
+
                 // Texto de etiqueta (Label)
                 doc.setFont('helvetica', b.isHighlight ? 'bold' : 'normal');
                 doc.setFontSize(8);
                 doc.setTextColor(b.isHighlight ? 0 : 100, b.isHighlight ? 33 : 100, b.isHighlight ? 71 : 100);
                 doc.text(b.label, centerX, totalY + 4.5, { align: 'center' });
-                
+
                 // Texto del valor
                 doc.setFont('helvetica', 'bold');
                 doc.setFontSize(b.isHighlight ? 9.5 : 9);
