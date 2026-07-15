@@ -456,8 +456,8 @@
         <div id="alertBox" class="alert-message"></div>
 
         <form id="cotizacionForm">
-            <!-- DATOS GENERALES DEL PRESUPUESTO -->
-            <h3>Detalles de la Cotización </h3>
+            <!-- DATOS GENERALES DE LA COTIZACIÓN -->
+            <h3>Datos de la Cotización</h3>
             <div class="grid-layout">
                 <div class="form-group" style="display: none;">
                     <label for="numeroCotizacion">Número de Cotización: <span class="required">*</span></label>
@@ -1058,7 +1058,7 @@
 
             // Validaciones básicas
             if (!data.numero || !data.cliente.nombre || !data.cliente.rtn) {
-                showAlert('Por favor, llene los campos obligatorios del presupuesto y del cliente.');
+                showAlert('Por favor, llene los campos obligatorios de la cotización y del cliente.');
                 return;
             }
 
