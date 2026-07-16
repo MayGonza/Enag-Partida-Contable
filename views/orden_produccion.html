@@ -316,23 +316,19 @@
                     <label>Entrega (Fecha)</label>
                     <input type="date" id="fechaEntrega">
                 </div>
-                <div class="form-group" style="grid-column: span 2;">
-                    <!-- Espacio vacio para mantener el grid, Tipo de Impresion eliminado -->
+                <div class="form-group">
+                    <label>Máquina</label>
+                    <input type="text" id="maquina" placeholder="Ej. CD-102 / GTO">
+                </div>
+                <div class="form-group">
+                    <!-- Espacio vacio para mantener el grid -->
                 </div>
             </div>
 
-            <div class="grid-3" style="margin-top: 15px;">
+            <div style="margin-top: 15px;">
                 <div class="form-group">
                     <label>Cliente</label>
                     <input type="text" id="cliente" placeholder="Nombre del cliente">
-                </div>
-                <div class="form-group">
-                    <label>Teléfono Fijo</label>
-                    <input type="text" id="telFijo" placeholder="Ej. 2233-4455">
-                </div>
-                <div class="form-group">
-                    <label>Celular</label>
-                    <input type="text" id="celular" placeholder="Ej. 9988-7766">
                 </div>
             </div>
         </div>
@@ -380,43 +376,28 @@
 
         <div class="section-card">
             <h3>Especificaciones Técnicas (Opcionales)</h3>
-            <div class="grid-2">
-                <!-- Diseño Grafico -->
-                <div class="section-card" style="margin: 0; background: white;">
-                    <h4 style="margin: 0 0 10px 0; color: #333;">Diseño Gráfico</h4>
-                    <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="dg_sencillo"> <span>1. Arte
-                                sencillo</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="dg_doble"> <span>2. Arte
-                                doble</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="dg_libro"> <span>3. Libro
-                                completo</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="dg_imprimir"> <span>4. Imprimir
-                                trabajo</span></label>
-                    </div>
+            
+            <!-- Offset / CTP -->
+            <div class="section-card" style="margin: 0; background: white;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Offset / CTP</h4>
+                <div class="grid-2">
+                    <label class="checkbox-group"><input type="checkbox" id="off_bn"> <span>1. Impresión
+                            B/N</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_fc"> <span>2. Full
+                            Color</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_pantone"> <span>3.
+                            PANTONE</span></label>
                 </div>
-
-                <!-- Offset / CTP -->
-                <div class="section-card" style="margin: 0; background: white;">
-                    <h4 style="margin: 0 0 10px 0; color: #333;">Offset / CTP</h4>
-                    <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="off_bn"> <span>1. Impresión
-                                B/N</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_fc"> <span>2. Full
-                                Color</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_pantone"> <span>3.
-                                PANTONE</span></label>
-                    </div>
-                    <h5 style="margin: 10px 0 5px 0; color: #555;">Máquina:</h5>
-                    <div class="grid-2">
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_cd102">
-                            <span>CD-102</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_gto"> <span>GTO</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_kord"> <span>KORD</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="off_m_sord"> <span>SORD</span></label>
-                    </div>
+                <h5 style="margin: 10px 0 5px 0; color: #555;">Máquina:</h5>
+                <div class="grid-2">
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_cd102">
+                        <span>CD-102</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_gto"> <span>GTO</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_kord"> <span>KORD</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_sord"> <span>SORD</span></label>
                 </div>
             </div>
+        </div>
 
 
 
@@ -425,21 +406,25 @@
                 <div class="section-card" style="margin: 0; background: white;">
                     <h4 style="margin: 0 0 10px 0; color: #333;">Tipografía / Prensas</h4>
                     <div class="form-group">
-                        <input type="text" id="tipo_numerado" placeholder="1. Numerado del: al:">
-                        <input type="text" id="tipo_color_num" placeholder="Color del Nº">
+                        <label>1. Numerado</label>
+                        <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                            <input type="text" id="tipo_numerado_del" placeholder="Del: Ej. 0001">
+                            <input type="text" id="tipo_numerado_al" placeholder="Al: Ej. 1000">
+                        </div>
+                        <input type="text" id="tipo_color_num" placeholder="2. Color del Nº">
                     </div>
                     <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
-                        <label class="checkbox-group"><input type="checkbox" id="tipo_perf_lat"> <span>2. Perf.
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_perf_lat"> <span>3. Perf.
                                 lateral</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipo_perf_arr"> <span>3. Perf.
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_perf_arr"> <span>4. Perf.
                                 arriba</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipo_troquelado"> <span>4.
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_troquelado"> <span>5.
                                 Troquelado</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipo_sisado"> <span>5.
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_sisado"> <span>6.
                                 Sisado</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipo_embosado"> <span>6.
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_embosado"> <span>7.
                                 Embosado</span></label>
-                        <label class="checkbox-group"><input type="checkbox" id="tipo_estampado"> <span>7.
+                        <label class="checkbox-group"><input type="checkbox" id="tipo_estampado"> <span>8.
                                 Estampado</span></label>
                     </div>
                 </div>
@@ -576,30 +561,55 @@
             let currentY = 15;
 
             // --- HEADER ---
+            // Centered below the logo
             doc.setFont("helvetica", "bold");
             doc.setFontSize(22);
-            doc.text("ORDEN DE PRODUCCIÓN", 55, 25);
+            doc.text("ORDEN DE PRODUCCIÓN", 107.5, 38, { align: 'center' });
 
-            // Header Text Removed
-
-            // Numero de orden box
-            doc.rect(155, 18, 45, 10);
+            // Nº de orden de producción, centrado
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.text("Nº", 158, 25);
-            doc.setTextColor(200, 0, 0);
             const noOrden = document.getElementById('noOrden').value || "13993";
-            doc.text(noOrden, 170, 25);
+            const txtN = "Nº ";
+            const widthN = doc.getTextWidth(txtN);
+            const widthNum = doc.getTextWidth(noOrden);
+            const totalWidth = widthN + widthNum;
+            const startX = 107.5 - totalWidth / 2;
+
+            doc.text(txtN, startX, 44);
+            doc.setTextColor(200, 0, 0);
+            doc.text(noOrden, startX + widthN, 44);
             doc.setTextColor(0, 0, 0);
+
+            // Caja de Máquina donde estaba el Nº (sigue a nivel del logo en y=18)
+            doc.rect(155, 18, 45, 10);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text("MÁQUINA:", 157, 24);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            const maquinaVal = document.getElementById('maquina').value || "";
+            doc.text(maquinaVal, 175, 24);
 
             let lastPageCount = doc.internal.getNumberOfPages();
 
-            // General Info and Right side Dates
-            currentY = 40;
+            // INFORMACIÓN GENERAL Heading
+            currentY = 52;
+            doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
-            doc.text("INFORMACIÓN GENERAL", 80, currentY);
+            doc.text("INFORMACIÓN GENERAL", marginX, currentY);
 
-            // Fechas Right Side
+            // Cliente Line (spans wider since phone inputs were removed)
+            currentY = 60;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("CLIENTE:", marginX, currentY);
+            doc.setFont("helvetica", "normal");
+            const clienteVal = document.getElementById('cliente').value || "";
+            doc.text(clienteVal, 35, currentY);
+            doc.line(35, currentY + 1, 200, currentY + 1);
+
+            // Date boxes drawn horizontally below Cliente
             const fechaIng = formateaFechaPDF(document.getElementById('fechaIngreso').value);
             const fechaProd = formateaFechaPDF(document.getElementById('fechaProduccion').value);
             const fechaEnt = formateaFechaPDF(document.getElementById('fechaEntrega').value);
@@ -623,35 +633,13 @@
                 doc.text(a, x + 22, y + 9);
             }
 
-            drawDateBox(165, 45, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
-            drawDateBox(165, 60, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
-            drawDateBox(165, 75, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
-
-            // Maquina Removed
-
-            // Cliente
-            currentY = 65;
-            doc.setFont("helvetica", "bold");
-            doc.text("CLIENTE:", marginX, currentY);
-            doc.setFont("helvetica", "normal");
-            doc.text(document.getElementById('cliente').value, 35, currentY);
-            doc.line(35, currentY + 1, 150, currentY + 1);
-
-            currentY = 75;
-            doc.setFont("helvetica", "bold");
-            doc.text("TELEFONO FIJO:", marginX, currentY);
-            doc.setFont("helvetica", "normal");
-            doc.text(document.getElementById('telFijo').value, 48, currentY);
-            doc.line(48, currentY + 1, 90, currentY + 1);
-
-            doc.setFont("helvetica", "bold");
-            doc.text("CELULAR:", 95, currentY);
-            doc.setFont("helvetica", "normal");
-            doc.text(document.getElementById('celular').value, 115, currentY);
-            doc.line(115, currentY + 1, 150, currentY + 1);
+            const dateY = 71;
+            drawDateBox(15, dateY, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
+            drawDateBox(92.5, dateY, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
+            drawDateBox(170, dateY, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
 
             // --- TABLAS ---
-            currentY = 85;
+            currentY = 88;
 
             // Extract Trabajo
             let rowTrabajo = [];
@@ -673,7 +661,8 @@
                 body: rowTrabajo,
                 theme: 'grid',
                 headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
-                bodyStyles: { fontSize: 8, minCellHeight: 6, cellPadding: 1 },
+                bodyStyles: { fontSize: 8, minCellHeight: 8, cellPadding: 2, textColor: [0, 0, 0] },
+                styles: { lineColor: [0, 0, 0], lineWidth: 0.3 },
                 margin: { top: 35, left: marginX, right: marginX },
                 willDrawPage: function (data) {
                     const currentPage = doc.internal.getNumberOfPages();
@@ -707,7 +696,8 @@
                 body: rowMat,
                 theme: 'grid',
                 headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
-                bodyStyles: { fontSize: 8, minCellHeight: 6, cellPadding: 1 },
+                bodyStyles: { fontSize: 8, minCellHeight: 8, cellPadding: 2, textColor: [0, 0, 0] },
+                styles: { lineColor: [0, 0, 0], lineWidth: 0.3 },
                 margin: { top: 35, left: marginX, right: marginX },
                 willDrawPage: function (data) {
                     const currentPage = doc.internal.getNumberOfPages();
@@ -734,11 +724,11 @@
             }
 
             // --- CAJAS DE OPCIONES ---
-            // Render checkboxes in 3 columns
+            // Render checkboxes in 2 columns
             doc.setFontSize(8);
-            const boxW = 60;
-            const boxH = 32;
-            const gap = 3;
+            const boxW = 90;
+            const boxH = 38; // Increased height to fit 7 lines in TIPOGRAFIA section
+            const gap = 5;
 
             function drawCheckSection(title, x, y, options) {
                 doc.setDrawColor(0);
@@ -753,42 +743,71 @@
 
                 let optY = y + 8.5;
                 options.forEach(opt => {
-                    doc.text(opt.label, x + 2, optY);
-                    doc.rect(x + boxW - 6, optY - 3, 4, 4);
-                    if (opt.checked) {
-                        doc.text("X", x + boxW - 5, optY);
+                    if (opt.isMachineGrid) {
+                        // Título de la subsección Máquina
+                        doc.setFont("helvetica", "bold");
+                        doc.text("Máquina:", x + 2, optY);
+                        doc.setFont("helvetica", "normal");
+                        optY += 4.5;
+
+                        // Fila 1: CD-102 y GTO
+                        doc.text("CD-102", x + 6, optY);
+                        doc.rect(x + 28, optY - 3, 4, 4);
+                        if (opt.machines[0].checked) {
+                            doc.text("X", x + 29, optY);
+                        }
+
+                        doc.text("GTO", x + 48, optY);
+                        doc.rect(x + 70, optY - 3, 4, 4);
+                        if (opt.machines[1].checked) {
+                            doc.text("X", x + 71, optY);
+                        }
+                        optY += 4.5;
+
+                        // Fila 2: KORD y SORD
+                        doc.text("KORD", x + 6, optY);
+                        doc.rect(x + 28, optY - 3, 4, 4);
+                        if (opt.machines[2].checked) {
+                            doc.text("X", x + 29, optY);
+                        }
+
+                        doc.text("SORD", x + 48, optY);
+                        doc.rect(x + 70, optY - 3, 4, 4);
+                        if (opt.machines[3].checked) {
+                            doc.text("X", x + 71, optY);
+                        }
+                        optY += 4.5;
+                    } else {
+                        doc.text(opt.label, x + 2, optY);
+                        doc.rect(x + boxW - 6, optY - 3, 4, 4);
+                        if (opt.checked) {
+                            doc.text("X", x + boxW - 5, optY);
+                        }
+                        optY += 4.5;
                     }
-                    optY += 4.5;
                 });
             }
 
             checkPageBreak(boxH + gap);
-            // Col 1
-            drawCheckSection("DISEÑO GRÁFICO", marginX, currentY, [
-                { label: "1- Arte sencillo", checked: document.getElementById('dg_sencillo').checked },
-                { label: "2- Arte doble", checked: document.getElementById('dg_doble').checked },
-                { label: "3- Libro completo", checked: document.getElementById('dg_libro').checked },
-                { label: "4- Imprimir trabajo", checked: document.getElementById('dg_imprimir').checked }
-            ]);
-
-            // Col 2
-            drawCheckSection("OFFSET / CTP", marginX + boxW + gap, currentY, [
+            // Row 1 of boxes
+            // Col 1: OFFSET / CTP
+            drawCheckSection("OFFSET / CTP", marginX, currentY, [
                 { label: "1- Impresión B/N", checked: document.getElementById('off_bn').checked },
                 { label: "2- Full Color", checked: document.getElementById('off_fc').checked },
                 { label: "3- PANTONE", checked: document.getElementById('off_pantone').checked },
-                { label: "Máquina:", checked: false },
-                { label: "   CD-102: " + (document.getElementById('off_m_cd102').checked ? "X" : "") + "   GTO: " + (document.getElementById('off_m_gto').checked ? "X" : ""), checked: false },
-                { label: "   KORD: " + (document.getElementById('off_m_kord').checked ? "X" : "") + "     SORD: " + (document.getElementById('off_m_sord').checked ? "X" : ""), checked: false }
+                {
+                    isMachineGrid: true,
+                    machines: [
+                        { checked: document.getElementById('off_m_cd102').checked },
+                        { checked: document.getElementById('off_m_gto').checked },
+                        { checked: document.getElementById('off_m_kord').checked },
+                        { checked: document.getElementById('off_m_sord').checked }
+                    ]
+                }
             ]);
 
-            // Guillotinas Removed
-
-            currentY += boxH + gap;
-
-            checkPageBreak(boxH + gap);
-            // Row 2 of boxes
-            // Col 1 Encuadernacion
-            drawCheckSection("ENCUADERNACIÓN", marginX, currentY, [
+            // Col 2: ENCUADERNACIÓN
+            drawCheckSection("ENCUADERNACIÓN", marginX + boxW + gap, currentY, [
                 { label: "1- Pegado arriba", checked: document.getElementById('enc_peg_arr').checked },
                 { label: "2- Pegado lateral izq", checked: document.getElementById('enc_peg_lat').checked },
                 { label: "3- Engrapado arriba", checked: document.getElementById('enc_eng_arr').checked },
@@ -797,18 +816,29 @@
                 { label: "6- Sólo original", checked: document.getElementById('enc_solo_orig').checked }
             ]);
 
-            // Col 2 Tipografia
-            drawCheckSection("TIPOGRAFIA / PRENSAS", marginX + boxW + gap, currentY, [
-                { label: document.getElementById('tipo_numerado').value || "1- Numerado del: al:", checked: false },
-                { label: "2- Perf. lateral", checked: document.getElementById('tipo_perf_lat').checked },
-                { label: "3- Perf. arriba", checked: document.getElementById('tipo_perf_arr').checked },
-                { label: "4- Troquelado", checked: document.getElementById('tipo_troquelado').checked },
-                { label: "5- Sisado", checked: document.getElementById('tipo_sisado').checked },
-                { label: "6- Embosado / Estam.", checked: (document.getElementById('tipo_embosado').checked || document.getElementById('tipo_estampado').checked) }
+            currentY += boxH + gap;
+
+            checkPageBreak(boxH + gap);
+            // Row 2 of boxes
+            // Col 1: TIPOGRAFIA / PRENSAS
+            drawCheckSection("TIPOGRAFIA / PRENSAS", marginX, currentY, [
+                { 
+                    label: "1- Numerado del: " + (document.getElementById('tipo_numerado_del').value || "________") + " al: " + (document.getElementById('tipo_numerado_al').value || "________"), 
+                    checked: !!(document.getElementById('tipo_numerado_del').value || document.getElementById('tipo_numerado_al').value) 
+                },
+                { 
+                    label: "2- Color de Nº: " + (document.getElementById('tipo_color_num').value || "_______________"), 
+                    checked: !!document.getElementById('tipo_color_num').value 
+                },
+                { label: "3- Perf. lateral", checked: document.getElementById('tipo_perf_lat').checked },
+                { label: "4- Perf. arriba", checked: document.getElementById('tipo_perf_arr').checked },
+                { label: "5- Troquelado", checked: document.getElementById('tipo_troquelado').checked },
+                { label: "6- Sisado", checked: document.getElementById('tipo_sisado').checked },
+                { label: "7- Embosado / Estam.", checked: (document.getElementById('tipo_embosado').checked || document.getElementById('tipo_estampado').checked) }
             ]);
 
-            // Col 3 Empaste Fino
-            drawCheckSection("EMPASTE FINO", marginX + (boxW + gap) * 2, currentY, [
+            // Col 2: EMPASTE FINO
+            drawCheckSection("EMPASTE FINO", marginX + boxW + gap, currentY, [
                 { label: "1- Encuadernado", checked: document.getElementById('emp_enc').checked },
                 { label: "2- Empastado", checked: document.getElementById('emp_empast').checked },
                 { label: "3- Empaste con estam.", checked: document.getElementById('emp_empast_est').checked },
@@ -816,7 +846,7 @@
                 { label: "5- Costurado", checked: document.getElementById('emp_costur').checked }
             ]);
 
-            currentY += boxH + gap;
+            currentY += boxH + gap + 10;
 
             checkPageBreak(60);
             // Observaciones
@@ -827,7 +857,7 @@
             doc.line(marginX + 30, currentY + 1, 200, currentY + 1);
 
             // Firmas
-            currentY += 18;
+            currentY += 22;
             doc.setFontSize(8);
             doc.setFont("helvetica", "bold");
 
@@ -841,14 +871,14 @@
             doc.line(155, currentY, 200, currentY);
             doc.text("Firma Cotización", 177.5, currentY + 4, { align: 'center' });
 
-            currentY += 15;
+            currentY += 18;
 
-            // Row 2 Signatures
-            doc.line(45, currentY, 95, currentY);
-            doc.text("Firma Control de Calidad", 70, currentY + 4, { align: 'center' });
+            // Row 2 Signatures (re-centered under Row 1 gaps)
+            doc.line(47.5, currentY, 97.5, currentY);
+            doc.text("Firma Control de Calidad", 72.5, currentY + 4, { align: 'center' });
 
-            doc.line(125, currentY, 175, currentY);
-            doc.text("Firma Subgerente de Producción", 150, currentY + 4, { align: 'center' });
+            doc.line(117.5, currentY, 167.5, currentY);
+            doc.text("Firma Subgerente de Producción", 142.5, currentY + 4, { align: 'center' });
 
             // Save PDF
             doc.save(`Orden_Produccion_${noOrden}.pdf`);
