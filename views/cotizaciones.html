@@ -469,7 +469,7 @@
                 </div>
                 <div class="form-group">
                     <label for="comercial">Encargado de Cotización: <span class="required">*</span></label>
-                    <input type="text" id="comercial" value="Carlos Araujo" required>
+                    <input type="text" id="comercial" value="" required>
                 </div>
                 <div class="form-group">
                     <label for="terminosPago">Términos de Pago: <span class="required">*</span></label>
@@ -1425,7 +1425,7 @@
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(20);
             doc.setTextColor(0, 33, 71);
-            doc.text("Cotización # " + data.numero, 15, titleY);
+            doc.text("Cotización", 15, titleY);
 
             // Sub-información de cotización
             doc.setFontSize(9);
@@ -1553,7 +1553,8 @@
             }
 
             // Descargar el documento PDF
-            doc.save(`Cotizacion_${data.numero}_ENAG.pdf`);
+            const nombreClienteArchivo = (data.cliente.nombre || "Cliente").trim().replace(/[^a-zA-Z0-9-_]/g, "_");
+            doc.save(`Cotizacion_${nombreClienteArchivo}_ENAG.pdf`);
         }
 
         function dibujarSeccionFirmas(doc, y, data) {
