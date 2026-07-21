@@ -640,14 +640,13 @@
                 </button>
             </div>
             <div class="search-box">
-                <input type="text" id="historialBusqueda" placeholder="Buscar por cliente o número de cotización..."
+                <input type="text" id="historialBusqueda" placeholder="Buscar por nombre de cliente..."
                     oninput="filtrarHistorial()" style="flex: 1; max-width: 400px;">
             </div>
             <div style="overflow-x: auto;">
                 <table class="history-table" id="tablaHistorial">
                     <thead>
                         <tr>
-                            <th style="width: 100px;">N° Cotización</th>
                             <th style="width: 150px;">Fecha</th>
                             <th>Cliente</th>
                             <th style="width: 140px;">Términos</th>
@@ -1067,15 +1066,11 @@
                 return;
             }
 
-            // Buscar si ya existe la cotización
+            // Guardar o actualizar sin pedir confirmación
             const index = cotizaciones.findIndex(c => Number(c.numero) === Number(data.numero));
             if (index !== -1) {
-                if (confirm(`La cotización N° ${data.numero} ya existe en el historial. ¿Desea sobrescribirla?`)) {
-                    cotizaciones[index] = data;
-                    showAlert('Cotización actualizada con éxito.', 'success');
-                } else {
-                    return;
-                }
+                cotizaciones[index] = data;
+                showAlert('Cotización actualizada con éxito en el historial.', 'success');
             } else {
                 cotizaciones.push(data);
                 showAlert('Cotización guardada con éxito en el historial.', 'success');
@@ -1129,17 +1124,17 @@
             });
 
             calcularTotales();
-            showAlert(`Cotización N° ${numero} cargada en el formulario.`, 'success');
+            showAlert(`Cotización cargada en el formulario.`, 'success');
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
         function eliminarCotizacion(numero) {
-            if (confirm(`¿Está seguro de que desea eliminar la cotización N° ${numero} del historial?`)) {
+            if (confirm(`¿Está seguro de que desea eliminar esta cotización del historial?`)) {
                 cotizaciones = cotizaciones.filter(c => Number(c.numero) !== Number(numero));
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
                 actualizarHistorialUI();
                 sugerirNumeroCotizacion();
-                showAlert(`Cotización N° ${numero} eliminada.`, 'success');
+                showAlert(`Cotización eliminada.`, 'success');
             }
         }
 
@@ -1152,7 +1147,7 @@
             const datosOrdenados = [...datosAMostrar].sort((a, b) => Number(b.numero) - Number(a.numero));
 
             if (datosOrdenados.length === 0) {
-                tablaHistorial.innerHTML = `<tr><td colspan="6" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
+                tablaHistorial.innerHTML = `<tr><td colspan="5" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
                 return;
             }
 
@@ -1163,7 +1158,6 @@
                 const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
 
                 row.innerHTML = `
-                    <td class="align-center" style="font-weight: bold; color: var(--primary);">${c.numero}</td>
                     <td>${fechaFormateada}</td>
                     <td style="font-weight: bold; font-size: 0.9em;">${c.cliente.nombre}</td>
                     <td class="align-center"><span class="badge badge-info">${c.terminos}</span></td>
@@ -1185,7 +1179,7 @@
             }
 
             const filtrados = cotizaciones.filter(c => {
-                return String(c.numero).includes(query) || c.cliente.nombre.toLowerCase().includes(query);
+                return c.cliente.nombre.toLowerCase().includes(query);
             });
             actualizarHistorialUI(filtrados);
         }
@@ -1266,7 +1260,6 @@
                 const f = new Date(c.fecha);
                 const fFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
                 return [
-                    c.numero,
                     fFormateada,
                     c.cliente.nombre,
                     c.terminos,
@@ -1276,7 +1269,7 @@
 
             doc.autoTable({
                 startY: 48,
-                head: [['N° Cotización', 'Fecha y Hora', 'Cliente', 'Términos', 'Total']],
+                head: [['Fecha y Hora', 'Cliente', 'Términos', 'Total']],
                 body: bodyData,
                 theme: 'striped',
                 headStyles: {
@@ -1287,11 +1280,10 @@
                     halign: 'center'
                 },
                 columnStyles: {
-                    0: { halign: 'center', cellWidth: 25 },
-                    1: { halign: 'center', cellWidth: 35 },
-                    2: { cellWidth: 70 },
-                    3: { halign: 'center', cellWidth: 25 },
-                    4: { halign: 'right', cellWidth: 25 }
+                    0: { halign: 'center', cellWidth: 40 },
+                    1: { cellWidth: 80 },
+                    2: { halign: 'center', cellWidth: 30 },
+                    3: { halign: 'right', cellWidth: 30 }
                 },
                 styles: {
                     fontSize: 8,
