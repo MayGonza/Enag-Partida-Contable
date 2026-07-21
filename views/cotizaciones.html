@@ -469,7 +469,11 @@
                 </div>
                 <div class="form-group">
                     <label for="comercial">Encargado de Cotización: <span class="required">*</span></label>
-                    <input type="text" id="comercial" value="" required>
+                    <select id="comercial" required>
+                        <option value="">Seleccione encargado...</option>
+                        <option value="Belinda Rodriguez">Belinda Rodriguez</option>
+                        <option value="Yancy Izaguirre">Yancy Izaguirre</option>
+                    </select>
                 </div>
                 <div class="form-group">
                     <label for="terminosPago">Términos de Pago: <span class="required">*</span></label>
@@ -639,9 +643,17 @@
                     Imprimir Historial
                 </button>
             </div>
-            <div class="search-box">
+            <div class="search-box" style="display: flex; flex-wrap: wrap; gap: 10px; align-items: center;">
                 <input type="text" id="historialBusqueda" placeholder="Buscar por nombre de cliente..."
-                    oninput="filtrarHistorial()" style="flex: 1; max-width: 400px;">
+                    oninput="filtrarHistorial()" style="flex: 1; min-width: 200px; max-width: 400px;">
+                <div style="display: flex; align-items: center; gap: 8px;">
+                    <label for="historialFecha" style="font-size: 0.9em; white-space: nowrap; margin: 0;">Filtrar por
+                        fecha:</label>
+                    <input type="date" id="historialFecha" oninput="filtrarHistorial()"
+                        style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9em;">
+                    <button type="button" onclick="limpiarFiltroFecha()" title="Limpiar fecha"
+                        style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-muted); cursor: pointer; font-size: 0.85em;">✕</button>
+                </div>
             </div>
             <div style="overflow-x: auto;">
                 <table class="history-table" id="tablaHistorial">
@@ -1173,15 +1185,28 @@
 
         function filtrarHistorial() {
             const query = document.getElementById('historialBusqueda').value.toLowerCase().trim();
-            if (!query) {
-                actualizarHistorialUI(cotizaciones);
-                return;
-            }
+            const fechaFiltro = document.getElementById('historialFecha').value; // formato YYYY-MM-DD
 
             const filtrados = cotizaciones.filter(c => {
-                return c.cliente.nombre.toLowerCase().includes(query);
+                const coincideNombre = !query || c.cliente.nombre.toLowerCase().includes(query);
+                let coincideFecha = true;
+                if (fechaFiltro && c.fecha) {
+                    // Usar Date para extraer fecha en hora local (evita desfase por timezone)
+                    const d = new Date(c.fecha);
+                    const anio = d.getFullYear();
+                    const mes = String(d.getMonth() + 1).padStart(2, '0');
+                    const dia = String(d.getDate()).padStart(2, '0');
+                    const fechaLocal = `${anio}-${mes}-${dia}`;
+                    coincideFecha = fechaLocal === fechaFiltro;
+                }
+                return coincideNombre && coincideFecha;
             });
             actualizarHistorialUI(filtrados);
+        }
+
+        function limpiarFiltroFecha() {
+            document.getElementById('historialFecha').value = '';
+            filtrarHistorial();
         }
 
         // Generar PDF desde el historial directamente
