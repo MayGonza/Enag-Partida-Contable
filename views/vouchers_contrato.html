@@ -1413,7 +1413,13 @@
             // Datos del empleado
             doc.setFontSize(10.5);
             doc.text(`Nombre del Empleado: ${formatNombreOracion(emp.nombre)}`, 25, 66);
-            doc.text(`Puesto: ${(emp.puesto || '').toLowerCase()}`, 25, 72);
+            const puestoStr = emp.puesto || '';
+            const excepciones = ['de', 'del', 'y', 'en', 'el', 'la', 'los', 'las', 'a', 'con', 'por', 'para'];
+            const puestoOracion = puestoStr.toLowerCase().split(' ').map((word, i) => {
+                if (i > 0 && excepciones.includes(word)) return word;
+                return word ? word.charAt(0).toUpperCase() + word.slice(1) : '';
+            }).join(' ');
+            doc.text(`Puesto: ${puestoOracion}`, 25, 72);
             
             let currentY = 78;
             if (emp.numeroPuesto && emp.numeroPuesto !== "N/D") {
