@@ -1413,7 +1413,7 @@
             // Datos del empleado
             doc.setFontSize(10.5);
             doc.text(`Nombre del Empleado: ${formatNombreOracion(emp.nombre)}`, 25, 66);
-            doc.text(`Puesto: ${emp.puesto}`, 25, 72);
+            doc.text(`Puesto: ${(emp.puesto || '').toLowerCase()}`, 25, 72);
             
             let currentY = 78;
             if (emp.numeroPuesto && emp.numeroPuesto !== "N/D") {
