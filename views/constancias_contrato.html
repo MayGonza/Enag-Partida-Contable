@@ -1153,7 +1153,8 @@
             if (!str) return "";
             return str.toLowerCase().split(' ').map(word => {
                 if (!word) return "";
-                return word.charAt(0).toUpperCase() + word.slice(1);
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                return isRoman ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
             }).join(' ');
         }
 
@@ -1204,7 +1205,7 @@
                 datesText += ` con un periodo de contratación **${emp.periodoContratacion}**`;
             }
 
-            const intro = `${artSuscritas} ${jefaO} Interina de Recursos Humanos de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
+            const intro = `${artSuscritas} **${jefaO} Interina de Recursos Humanos** de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele en el mes de **${obtenerMesDeducciones()}** las siguientes deducciones:`;
 
             const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;

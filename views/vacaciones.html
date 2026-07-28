@@ -1439,7 +1439,8 @@
             if (!str) return "";
             return str.toLowerCase().split(' ').map(word => {
                 if (!word) return "";
-                return word.charAt(0).toUpperCase() + word.slice(1);
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                return isRoman ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
             }).join(' ');
         }
 

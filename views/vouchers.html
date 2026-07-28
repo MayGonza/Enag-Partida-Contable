@@ -1364,7 +1364,8 @@
             if (!str) return "";
             return str.toLowerCase().split(' ').map(word => {
                 if (!word) return "";
-                return word.charAt(0).toUpperCase() + word.slice(1);
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                return isRoman ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
             }).join(' ');
         }
 
@@ -1397,6 +1398,8 @@
             const excepciones = ['de', 'del', 'y', 'en', 'el', 'la', 'los', 'las', 'a', 'con', 'por', 'para'];
             const puestoOracion = puestoStr.toLowerCase().split(' ').map((word, i) => {
                 if (i > 0 && excepciones.includes(word)) return word;
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                if (isRoman) return word.toUpperCase();
                 return word ? word.charAt(0).toUpperCase() + word.slice(1) : '';
             }).join(' ');
             doc.text(`Puesto: ${puestoOracion}`, 25, 72);
@@ -1499,7 +1502,7 @@
                 doc.text(firmante, tableLeft, y);
                 if (cargoF) {
                     doc.setFontSize(9);
-                    doc.setFont('helvetica', 'normal');
+                    doc.setFont('helvetica', 'bold');
                     doc.text(cargoF, tableLeft, y + 4.5);
                 }
             } else {
