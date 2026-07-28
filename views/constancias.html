@@ -544,6 +544,10 @@
                     <input type="text" id="cfgPuestoNominal" value="[Excel]"
                         placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
                 </div>
+                <div class="config-field" style="grid-column: span 2;">
+                    <label>A Solicitud de (Opcional)</label>
+                    <input type="text" id="cfgSolicitante" placeholder="ej. la parte interesada, o de Juan Pérez">
+                </div>
                 <div class="config-field">
                     <label>Puesto Funcional</label>
                     <input type="text" id="cfgPuestoFuncional" value=""
@@ -1273,6 +1277,7 @@
             const tipoTexto = emp.genero === 'M' ? 'como empleado con acuerdo' : 'como empleada con acuerdo';
             const firmante = document.getElementById('cfgFirmante').value.trim();
             const cargoF = document.getElementById('cfgCargoFirmante').value.trim();
+            const solicitante = document.getElementById('cfgSolicitante').value.trim();
             const ciudad = document.getElementById('cfgCiudad').value.trim();
             const fecha = document.getElementById('cfgFecha').value.trim();
 
@@ -1311,7 +1316,8 @@
                 ((document.getElementById('showFechaIngreso').checked && emp.ingreso && emp.ingreso !== 'N/D') ? ` a partir del **${emp.ingreso}**` : "") +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele en el mes de **${obtenerMesDeducciones()}** las siguientes deducciones:`;
 
-            const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
+            const prefixPie = solicitante ? `A petición de ${solicitante}, p` : "P";
+            const pie = `${prefixPie}ara todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };
         }

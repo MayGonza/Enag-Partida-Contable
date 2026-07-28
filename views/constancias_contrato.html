@@ -428,6 +428,10 @@
                     <label>Puesto Nominal</label>
                     <input type="text" id="cfgPuestoNominal" value="[Excel]" placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
                 </div>
+                <div class="config-field" style="grid-column: span 2;">
+                    <label>A Solicitud de (Opcional)</label>
+                    <input type="text" id="cfgSolicitante" placeholder="ej. la parte interesada, o de Juan Pérez">
+                </div>
                 <div class="config-field">
                     <label>Puesto Funcional</label>
                     <input type="text" id="cfgPuestoFuncional" value="" placeholder="ej. Encargado de Facturación (Opcional)">
@@ -1162,8 +1166,9 @@
             const art = emp.genero === 'M' ? ["El ciudadano", "el cargo", "labora"] : ["La ciudadana", "el cargo", "labora"];
             const tipoTexto = emp.genero === 'M' ? 'como empleado por contrato' : 'como empleada por contrato';
             const firmante  = document.getElementById('cfgFirmante').value.trim();
-            const cargoF    = document.getElementById('cfgCargoFirmante').value.trim();
-            const ciudad    = document.getElementById('cfgCiudad').value.trim();
+            const cargoF = document.getElementById('cfgCargoFirmante').value.trim();
+            const solicitante = document.getElementById('cfgSolicitante').value.trim();
+            const ciudad = document.getElementById('cfgCiudad').value.trim();
             const fecha     = document.getElementById('cfgFecha').value.trim();
 
             const nominalInput = document.getElementById('cfgPuestoNominal').value.trim();
@@ -1208,7 +1213,8 @@
             const intro = `${artSuscritas} **${jefaO} Interina de Recursos Humanos** de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele en el mes de **${obtenerMesDeducciones()}** las siguientes deducciones:`;
 
-            const pie = `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
+            const prefixPie = solicitante ? `A petición de ${solicitante}, p` : "P";
+            const pie = `${prefixPie}ara todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };
         }
