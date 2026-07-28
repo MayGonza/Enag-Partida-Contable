@@ -1316,7 +1316,7 @@
                 ((document.getElementById('showFechaIngreso').checked && emp.ingreso && emp.ingreso !== 'N/D') ? ` a partir del **${emp.ingreso}**` : "") +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele en el mes de **${obtenerMesDeducciones()}** las siguientes deducciones:`;
 
-            const prefixPie = solicitante ? `A petición de ${solicitante}, p` : "P";
+            const prefixPie = solicitante ? `**A petición de ${solicitante}**, p` : "P";
             const pie = `${prefixPie}ara todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };

@@ -1319,7 +1319,7 @@
             const intro = `${artSuscritas} **${jefaO} Interina de Recursos Humanos** de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}).`;
 
-            const prefixPie = solicitante ? `A petición de ${solicitante}, p` : "P";
+            const prefixPie = solicitante ? `**A petición de ${solicitante}**, p` : "P";
             const pie = `${prefixPie}ara todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };
