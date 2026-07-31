@@ -310,10 +310,16 @@
                     <input type="number" id="numeroPartida" required>
                 </div>
             </div>
-            <div class="form-group">
-                <label class="destacado-label">Beneficiario: <span class="required">*</span></label>
-                <input type="text" id="beneficiario" placeholder="NOMBRE DEL BENEFICIARIO" class="destacado-input"
-                    oninput="this.value = this.value.toUpperCase()" required>
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 2;">
+                    <label class="destacado-label">Beneficiario: <span class="required">*</span></label>
+                    <input type="text" id="beneficiario" placeholder="NOMBRE DEL BENEFICIARIO" class="destacado-input"
+                        oninput="this.value = this.value.toUpperCase()" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label>RTN:</label>
+                    <input type="text" id="rtn" placeholder="RTN (opcional)">
+                </div>
             </div>
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
@@ -696,6 +702,7 @@
             doc.setFontSize(11);
             const fecha = document.getElementById('fecha').value;
             const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
+            const rtn = document.getElementById('rtn').value.trim();
             const ordenCompra = document.getElementById('ordenCompra').value.trim();
             const procesoNumero = document.getElementById('procesoNumero').value.trim();
             const descripcion = document.getElementById('descripcion').value;
@@ -709,21 +716,22 @@
             doc.text("BENEFICIARIO:", 14, currentHeaderY);
             doc.text(beneficiario, 14 + doc.getTextWidth("BENEFICIARIO:") + 3, currentHeaderY);
 
-            if (ordenCompra || procesoNumero) {
-                currentHeaderY += 6;
-                if (ordenCompra && procesoNumero) {
-                    doc.text("ORDEN DE COMPRA:", 14, currentHeaderY);
-                    doc.text(ordenCompra, 14 + doc.getTextWidth("ORDEN DE COMPRA:") + 3, currentHeaderY);
+            const optionalFields = [];
+            if (rtn) optionalFields.push({ label: "RTN:", val: rtn });
+            if (ordenCompra) optionalFields.push({ label: "ORDEN DE COMPRA:", val: ordenCompra });
+            if (procesoNumero) optionalFields.push({ label: "PROCESO N°:", val: procesoNumero });
 
-                    const procX = 110;
-                    doc.text("PROCESO N°:", procX, currentHeaderY);
-                    doc.text(procesoNumero, procX + doc.getTextWidth("PROCESO N°:") + 3, currentHeaderY);
-                } else if (ordenCompra) {
-                    doc.text("ORDEN DE COMPRA:", 14, currentHeaderY);
-                    doc.text(ordenCompra, 14 + doc.getTextWidth("ORDEN DE COMPRA:") + 3, currentHeaderY);
-                } else {
-                    doc.text("PROCESO N°:", 14, currentHeaderY);
-                    doc.text(procesoNumero, 14 + doc.getTextWidth("PROCESO N°:") + 3, currentHeaderY);
+            for (let i = 0; i < optionalFields.length; i += 2) {
+                currentHeaderY += 6;
+                const item1 = optionalFields[i];
+                doc.text(item1.label, 14, currentHeaderY);
+                doc.text(item1.val, 14 + doc.getTextWidth(item1.label) + 3, currentHeaderY);
+
+                if (i + 1 < optionalFields.length) {
+                    const item2 = optionalFields[i + 1];
+                    const posX2 = 110;
+                    doc.text(item2.label, posX2, currentHeaderY);
+                    doc.text(item2.val, posX2 + doc.getTextWidth(item2.label) + 3, currentHeaderY);
                 }
             }
 
@@ -837,6 +845,7 @@
                 fecha: fecha,
                 numeroPartida: num,
                 beneficiario: beneficiario,
+                rtn: rtn,
                 ordenCompra: ordenCompra,
                 procesoNumero: procesoNumero,
                 descripcion: descripcion,
@@ -1052,6 +1061,7 @@
                 fecha: '',
                 numeroPartida: '',
                 beneficiario: '',
+                rtn: '',
                 ordenCompra: '',
                 procesoNumero: '',
                 descripcion: '',
@@ -1065,7 +1075,6 @@
 
             // 1. Fecha
             let idx = findIndex(texts, "FECHA:");
-            if (idx === -1) idx = findIndex(texts, "Fecha:");
             if (idx !== -1 && idx + 1 < texts.length) {
                 data.fecha = texts[idx + 1];
             }
@@ -1082,6 +1091,12 @@
             if (idx === -1) idx = findIndex(texts, "Beneficiario:");
             if (idx !== -1 && idx + 1 < texts.length) {
                 data.beneficiario = texts[idx + 1];
+            }
+
+            // 3.1 RTN
+            idx = findIndex(texts, "RTN:");
+            if (idx !== -1 && idx + 1 < texts.length) {
+                data.rtn = texts[idx + 1];
             }
 
             // 3.5 Orden de Compra & Proceso N°
@@ -1161,6 +1176,7 @@
             document.getElementById('fecha').value = data.fecha || '';
             document.getElementById('numeroPartida').value = data.numeroPartida || '';
             document.getElementById('beneficiario').value = (data.beneficiario || '').toUpperCase();
+            document.getElementById('rtn').value = data.rtn || '';
             document.getElementById('ordenCompra').value = data.ordenCompra || '';
             document.getElementById('procesoNumero').value = data.procesoNumero || '';
             document.getElementById('descripcion').value = data.descripcion || '';
