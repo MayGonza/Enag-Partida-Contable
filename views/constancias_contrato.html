@@ -429,8 +429,8 @@
                     <input type="text" id="cfgPuestoNominal" value="[Excel]" placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
                 </div>
                 <div class="config-field" style="grid-column: span 2;">
-                    <label>A Solicitud de (Opcional)</label>
-                    <input type="text" id="cfgSolicitante" placeholder="ej. la parte interesada, o de Juan Pérez">
+                    <label>Para Uso Exclusivo de (Opcional)</label>
+                    <input type="text" id="cfgSolicitante" placeholder="ej. Banco Atlántida, o la parte interesada">
                 </div>
                 <div class="config-field">
                     <label>Puesto Funcional</label>
@@ -1213,8 +1213,9 @@
             const intro = `${artSuscritas} **${jefaO} Interina de Recursos Humanos** de la Empresa Nacional de Artes Gráficas (ENAG) hace Constar: Que ${art[0]}, **${formatNombreOracion(emp.nombre)}** ${art[2]} en esta institución ${tipoTexto}${puestoTexto}${datesText}` +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}), practicándosele en el mes de **${obtenerMesDeducciones()}** las siguientes deducciones:`;
 
-            const prefixPie = solicitante ? `**A petición de ${solicitante}**, p` : "P";
-            const pie = `${prefixPie}ara todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
+            const pie = solicitante
+                ? `Esta constancia se extiende, para uso exclusivo de **${solicitante}**, en la ciudad de ${ciudad} al **${fecha}**.`
+                : `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };
         }

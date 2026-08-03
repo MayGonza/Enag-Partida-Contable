@@ -544,8 +544,8 @@
                         placeholder="ej. Auxiliar de Contabilidad (o '[Excel]')">
                 </div>
                 <div class="config-field" style="grid-column: span 2;">
-                    <label>A Solicitud de (Opcional)</label>
-                    <input type="text" id="cfgSolicitante" placeholder="ej. la parte interesada, o de Juan Pérez">
+                    <label>Para Uso Exclusivo de (Opcional)</label>
+                    <input type="text" id="cfgSolicitante" placeholder="ej. Banco Atlántida, o la parte interesada">
                 </div>
                 <div class="config-field">
                     <label>Puesto Funcional</label>
@@ -1298,8 +1298,9 @@
                 ((document.getElementById('showFechaIngreso').checked && emp.ingreso && emp.ingreso !== 'N/D') ? ` a partir del **${emp.ingreso}**` : "") +
                 `; devengando un sueldo mensual de ${sueldoEnLetras} (${sueldoFormato}).`;
 
-            const prefixPie = solicitante ? `**A petición de ${solicitante}**, p` : "P";
-            const pie = `${prefixPie}ara todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
+            const pie = solicitante
+                ? `Esta constancia se extiende, para uso exclusivo de **${solicitante}**, en la ciudad de ${ciudad} al **${fecha}**.`
+                : `Para todos los fines que estime conveniente se extiende la presente en la ciudad de ${ciudad} al **${fecha}**.`;
 
             return { intro, pie, firmante, cargoF };
         }
