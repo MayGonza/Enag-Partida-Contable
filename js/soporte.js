@@ -277,7 +277,7 @@
         );
         const mailtoUrl = `mailto:maygonza.cs@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
 
-        // Intentar envío por FormSubmit directo desde GitHub Pages / Web
+        // Intentar envío por FormSubmit directo desde GitHub Pages / Web con plantilla HTML de tabla formateada
         let emailWebEnviado = false;
         try {
             const formSubmitRes = await fetch('https://formsubmit.co/ajax/maygonza.cs@gmail.com', {
@@ -287,12 +287,15 @@
                     'Accept': 'application/json'
                 },
                 body: JSON.stringify({
-                    _subject: `[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`,
-                    ticket: `#TICK-${numeroTicket}`,
-                    solicitante: datos.nombre,
-                    fecha_hora: datos.fechaHora,
-                    departamento: datos.departamento,
-                    detalle_problema: datos.descripcion
+                    _subject: `🎧 [TICKET #${numeroTicket}] Solicitud de Soporte Técnico - ${datos.departamento}`,
+                    _template: "table",
+                    _captcha: "false",
+                    "🎫 NUMERO DE TICKET": `#TICK-${numeroTicket}`,
+                    "👤 SOLICITANTE": datos.nombre,
+                    "📅 FECHA Y HORA (HN)": datos.fechaHora,
+                    "🏢 DEPARTAMENTO": datos.departamento,
+                    "📌 ESTADO": "NUEVO / PENDIENTE",
+                    "📝 DETALLE DE LA SOLICITUD": datos.descripcion
                 })
             });
             if (formSubmitRes.ok) {
