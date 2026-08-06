@@ -277,52 +277,40 @@
         );
         const mailtoUrl = `mailto:maygonza.cs@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
 
-        // Intentar envío por Web3Forms directo desde el cliente web
+        // Intentar envío por FormSubmit directo desde GitHub Pages / Web
         let emailWebEnviado = false;
         try {
-            const webRes = await fetch('https://api.web3forms.com/submit', {
+            const formSubmitRes = await fetch('https://formsubmit.co/ajax/maygonza.cs@gmail.com', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
                 body: JSON.stringify({
-                    access_key: '5a8c9b20-1a2b-4c3d-8e5f-6a7b8c9d0e1f',
-                    subject: `[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`,
-                    from_name: `Sistema ENAG Soporte`,
-                    to_email: 'maygonza.cs@gmail.com',
-                    nombre_solicitante: datos.nombre,
+                    _subject: `[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`,
+                    ticket: `#TICK-${numeroTicket}`,
+                    solicitante: datos.nombre,
                     fecha_hora: datos.fechaHora,
                     departamento: datos.departamento,
-                    mensaje_detalle: datos.descripcion
+                    detalle_problema: datos.descripcion
                 })
             });
-            const webResult = await webRes.json();
-            if (webResult.success) {
+            if (formSubmitRes.ok) {
                 emailWebEnviado = true;
             }
         } catch (errWeb) {
-            console.warn("Envío por Web3Forms no disponible, usando enlace directo a correo.", errWeb);
+            console.warn("Envío por FormSubmit no disponible.", errWeb);
         }
 
         mostrarExitoSoporte({
             numeroTicket,
             emailEnviado: emailWebEnviado,
-            destino: 'maygonza.cs@gmail.com',
-            mailtoUrl
+            destino: 'maygonza.cs@gmail.com'
         });
     }
 
     function mostrarExitoSoporte(res) {
         const bodyContent = document.getElementById('soporteBodyContent');
-
-        // Si el servidor no envió el correo automáticamente por falta de SMTP, abrir el cliente de correo automáticamente
-        if (!res.emailEnviado && res.mailtoUrl) {
-            setTimeout(() => {
-                window.location.href = res.mailtoUrl;
-            }, 600);
-        }
-
-        const estadoCorreoMsg = res.emailEnviado 
-            ? `<span style="color: #16a34a; font-weight: 600;">✓ Notificación enviada automáticamente a su correo.</span>`
-            : `Se ha abierto su programa de correo para enviar la solicitud a: <br><strong style="color: #002147;">${res.destino || 'maygonza.cs@gmail.com'}</strong>`;
 
         bodyContent.innerHTML = `
             <div class="ticket-exito-box">
@@ -331,13 +319,11 @@
                 <p style="color: #64748b; font-size: 14px; margin: 5px 0;">Su número de ticket asignado es:</p>
                 <div class="ticket-badge">#TICK-${res.numeroTicket}</div>
                 <p style="font-size: 13.5px; color: #334155; line-height: 1.5; margin: 15px 0;">
-                    ${estadoCorreoMsg}
+                    La solicitud ha sido registrada y enviada al correo: <br>
+                    <strong style="color: #002147;">${res.destino || 'maygonza.cs@gmail.com'}</strong>
                 </p>
-                <div style="display: flex; gap: 10px; justify-content: center; margin-top: 20px;">
-                    <a href="${res.mailtoUrl}" class="btn-soporte-enviar" style="text-decoration: none; padding: 10px 16px; font-size: 13px;">
-                        <span>✉️ Reabrir en mi Correo</span>
-                    </a>
-                    <button type="button" class="btn-soporte-cancelar" onclick="document.getElementById('modalSoporteOverlay').classList.remove('active')">
+                <div style="display: flex; justify-content: center; margin-top: 20px;">
+                    <button type="button" class="btn-soporte-enviar" style="padding: 10px 24px; font-size: 14px;" onclick="document.getElementById('modalSoporteOverlay').classList.remove('active')">
                         Cerrar
                     </button>
                 </div>

@@ -1159,11 +1159,26 @@
                 return;
             }
 
-            datosOrdenados.forEach(c => {
-                const row = tablaHistorial.insertRow();
+        function formatFechaHoraHonduras(d) {
+            if (!d) return '';
+            const f = (d instanceof Date) ? d : new Date(d);
+            if (isNaN(f.getTime())) return String(d);
+            const day = String(f.getDate()).padStart(2, '0');
+            const month = String(f.getMonth() + 1).padStart(2, '0');
+            const year = f.getFullYear();
+            let hours = f.getHours();
+            const minutes = String(f.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const hoursStr = String(hours).padStart(2, '0');
+            return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
+        }
 
-                const f = new Date(c.fecha);
-                const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        datosOrdenados.forEach(c => {
+            const row = tablaHistorial.insertRow();
+
+            const fechaFormateada = formatFechaHoraHonduras(c.fecha);
 
                 row.innerHTML = `
                     <td>${fechaFormateada}</td>
@@ -1255,8 +1270,7 @@
             doc.text("REPORTE DE HISTORIAL DE COTIZACIONES", pageWidth / 2, 35, { align: "center" });
 
             // Fecha de emisión
-            const fReporte = new Date();
-            const fStr = fReporte.toLocaleDateString() + ' ' + fReporte.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const fStr = formatFechaHoraHonduras(new Date());
             doc.setFont('helvetica', 'normal');
             doc.setFontSize(9);
             doc.setTextColor(100, 100, 100);
@@ -1278,8 +1292,7 @@
             }
 
             const bodyData = dataToPrint.map(c => {
-                const f = new Date(c.fecha);
-                const fFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const fFormateada = formatFechaHoraHonduras(c.fecha);
                 return [
                     fFormateada,
                     c.cliente.nombre,
@@ -1448,8 +1461,7 @@
 
             doc.setFont('helvetica', 'normal');
             doc.setTextColor(100, 100, 100);
-            const f = new Date(data.fecha);
-            const fechaFormateada = f.toLocaleDateString() + ' ' + f.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            const fechaFormateada = formatFechaHoraHonduras(data.fecha);
             doc.text(fechaFormateada, 46, titleY + 7);
 
             doc.setFont('helvetica', 'bold');
