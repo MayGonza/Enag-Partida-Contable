@@ -1,5 +1,8 @@
 const { app, BrowserWindow } = require("electron");
 
+// Iniciar servidor Express/API contable y de soporte técnico
+require("./app");
+
 function createWindow() {
   const win = new BrowserWindow({
     width: 1200, // Mantener un ancho predeterminado razonable

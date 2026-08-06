@@ -10,9 +10,11 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^17.4.2",
     "express": "^4.19.2",
     "jspdf": "^2.5.1",
     "jspdf-autotable": "^3.5.25",
-    "mysql2": "^3.9.7"
+    "mysql2": "^3.9.7",
+    "nodemailer": "^9.0.4"
   }
 }
