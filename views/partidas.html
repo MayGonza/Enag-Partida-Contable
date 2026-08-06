@@ -302,8 +302,8 @@
         <form id="partidaForm">
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
-                    <label class="destacado-label">Fecha: <span class="required">*</span></label>
-                    <input type="date" id="fecha" class="destacado-input" required>
+                    <label class="destacado-label">Fecha (DD/MM/YYYY): <span class="required">*</span></label>
+                    <input type="text" id="fecha" class="destacado-input" placeholder="DD/MM/YYYY" maxlength="10" required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Número de Partida: <span class="required">*</span></label>
@@ -1211,6 +1211,29 @@
                 agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
                 calcularTotales();
             }
+        }
+
+        // Auto-formateo de Fecha en formato Honduras (DD/MM/YYYY)
+        const fechaElem = document.getElementById('fecha');
+        if (fechaElem) {
+            if (!fechaElem.value) {
+                const hoy = new Date();
+                const d = String(hoy.getDate()).padStart(2, '0');
+                const m = String(hoy.getMonth() + 1).padStart(2, '0');
+                const y = hoy.getFullYear();
+                fechaElem.value = `${d}/${m}/${y}`;
+            }
+            fechaElem.addEventListener('input', function(e) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length > 8) v = v.substring(0, 8);
+                if (v.length >= 5) {
+                    e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+                } else if (v.length >= 3) {
+                    e.target.value = `${v.substring(0, 2)}/${v.substring(2)}`;
+                } else {
+                    e.target.value = v;
+                }
+            });
         }
 
         agregarFila(); agregarFila();

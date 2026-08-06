@@ -673,12 +673,12 @@
                     <!-- Fechas de la solicitud -->
                     <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
                         <div class="form-group">
-                            <label for="fechaInicio">Fecha de Inicio *</label>
-                            <input type="date" id="fechaInicio" class="form-control" onchange="calcularDiasFechas()" required disabled>
+                            <label for="fechaInicio">Fecha de Inicio (DD/MM/YYYY) *</label>
+                            <input type="text" id="fechaInicio" class="form-control" placeholder="DD/MM/YYYY" maxlength="10" oninput="calcularDiasFechas()" required disabled>
                         </div>
                         <div class="form-group">
-                            <label for="fechaFin">Fecha de Fin *</label>
-                            <input type="date" id="fechaFin" class="form-control" onchange="calcularDiasFechas()" required disabled>
+                            <label for="fechaFin">Fecha de Fin (DD/MM/YYYY) *</label>
+                            <input type="text" id="fechaFin" class="form-control" placeholder="DD/MM/YYYY" maxlength="10" oninput="calcularDiasFechas()" required disabled>
                         </div>
                     </div>
 

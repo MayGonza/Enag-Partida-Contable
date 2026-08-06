@@ -643,9 +643,8 @@
                 <input type="text" id="historialBusqueda" placeholder="Buscar por nombre de cliente..."
                     oninput="filtrarHistorial()" style="flex: 1; min-width: 200px; max-width: 400px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="historialFecha" style="font-size: 0.9em; white-space: nowrap; margin: 0;">Filtrar por
-                        fecha:</label>
-                    <input type="date" id="historialFecha" oninput="filtrarHistorial()"
+                    <label for="historialFecha" style="font-size: 0.9em; white-space: nowrap; margin: 0;">Filtrar por fecha (DD/MM/YYYY):</label>
+                    <input type="text" id="historialFecha" placeholder="DD/MM/YYYY" maxlength="10" oninput="filtrarHistorial()"
                         style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9em;">
                     <button type="button" onclick="limpiarFiltroFecha()" title="Limpiar fecha"
                         style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-muted); cursor: pointer; font-size: 0.85em;">✕</button>
