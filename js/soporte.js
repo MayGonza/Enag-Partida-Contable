@@ -90,7 +90,7 @@
                                     <option value="Producción">Producción</option>
                                     <option value="Comercialización">Comercialización</option>
                                     <option value="Administración">Administración</option>
-                                    <option value="Dirección General">Dirección General</option>
+                                    <option value="Gerencia General">Dirección General</option>
                                     <option value="Otro">Otro</option>
                                 </select>
                             </div>
