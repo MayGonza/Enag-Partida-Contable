@@ -700,7 +700,7 @@
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(11);
-            const fecha = document.getElementById('fecha').value;
+            const fecha = formatFechaHonduras(document.getElementById('fecha').value);
             const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
             const rtn = document.getElementById('rtn').value.trim();
             const ordenCompra = document.getElementById('ordenCompra').value.trim();

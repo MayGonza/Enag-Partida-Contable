@@ -717,7 +717,8 @@
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(10);
-            const fecha = document.getElementById('fecha').value;
+            const fechaRaw = document.getElementById('fecha').value;
+            const fecha = formatFechaHonduras(fechaRaw);
             const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
             const rtn = document.getElementById('rtn').value;
             const ordenCompra = document.getElementById('ordenCompra').value.toUpperCase();
