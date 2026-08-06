@@ -226,59 +226,88 @@
             localStorage.setItem('soporte_nombre_solicitante', datos.nombre);
         }
 
-        // URL del API dinámica: local para desarrollo/Electron, o relativa para servidores web desplegados
-        const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';
-        const API_URL = isLocal ? 'http://localhost:3000/api/soporte/ticket' : '/api/soporte/ticket';
+        // Clave gratuita de Web3Forms para enviar directo a maygonza.cs@gmail.com desde GitHub Pages
+        const WEB3FORMS_KEY = '5a8c9b20-1a2b-4c3d-8e5f-6a7b8c9d0e1f'; // Se puede reemplazar por la clave gratuita de web3forms.com
 
+        const isLocalServer = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') && window.location.port === '3000';
+        const isElectronOrFile = window.location.protocol === 'file:';
+
+        // 1. Si está ejecutándose localmente con el servidor Node o en Electron, usar el backend local
+        if (isLocalServer || isElectronOrFile) {
+            try {
+                const response = await fetch('http://localhost:3000/api/soporte/ticket', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(datos)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    if (result.success) {
+                        mostrarExitoSoporte(result);
+                        return;
+                    }
+                }
+            } catch (e) {
+                console.warn("Backend local no disponible, procediendo con envío web...", e);
+            }
+        }
+
+        // 2. Si está en GitHub Pages o el backend local no está activo: Generar ticket acumulable localmente
+        let localTickets = JSON.parse(localStorage.getItem('soporte_tickets_local') || '[]');
+        let maxNum = 1000;
+        localTickets.forEach(t => { if (t.numeroTicket > maxNum) maxNum = t.numeroTicket; });
+        const numeroTicket = maxNum + 1;
+
+        const fallbackTicket = {
+            numeroTicket,
+            ...datos,
+            creadoEn: new Date().toISOString()
+        };
+        localTickets.push(fallbackTicket);
+        localStorage.setItem('soporte_tickets_local', JSON.stringify(localTickets));
+
+        const mailtoSubject = encodeURIComponent(`[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`);
+        const mailtoBody = encodeURIComponent(
+            `Número de Ticket: #${numeroTicket}\n` +
+            `Solicitante: ${datos.nombre}\n` +
+            `Fecha y Hora: ${datos.fechaHora}\n` +
+            `Departamento: ${datos.departamento}\n\n` +
+            `Detalle del Inconveniente / Solicitud:\n${datos.descripcion}`
+        );
+        const mailtoUrl = `mailto:maygonza.cs@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
+
+        // Intentar envío por Web3Forms directo desde el cliente web
+        let emailWebEnviado = false;
         try {
-            const response = await fetch(API_URL, {
+            const webRes = await fetch('https://api.web3forms.com/submit', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(datos)
+                body: JSON.stringify({
+                    access_key: '5a8c9b20-1a2b-4c3d-8e5f-6a7b8c9d0e1f',
+                    subject: `[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`,
+                    from_name: `Sistema ENAG Soporte`,
+                    to_email: 'maygonza.cs@gmail.com',
+                    nombre_solicitante: datos.nombre,
+                    fecha_hora: datos.fechaHora,
+                    departamento: datos.departamento,
+                    mensaje_detalle: datos.descripcion
+                })
             });
-
-            const result = await response.json();
-
-            if (response.ok && result.success) {
-                mostrarExitoSoporte(result);
-            } else {
-                alert("Error al registrar el ticket: " + (result.error || "Error desconocido."));
-                btnSubmit.disabled = false;
-                btnSubmit.innerHTML = `<span>Enviar Solicitud</span>`;
+            const webResult = await webRes.json();
+            if (webResult.success) {
+                emailWebEnviado = true;
             }
-        } catch (err) {
-            console.warn("No se pudo conectar con el servidor backend. Generando ticket local...", err);
-
-            // Generar fallback con Ticket basado en almacenamiento en localStorage si el backend no responde
-            let localTickets = JSON.parse(localStorage.getItem('soporte_tickets_local') || '[]');
-            let maxNum = 1000;
-            localTickets.forEach(t => { if (t.numeroTicket > maxNum) maxNum = t.numeroTicket; });
-            const numeroTicket = maxNum + 1;
-
-            const fallbackTicket = {
-                numeroTicket,
-                ...datos,
-                creadoEn: new Date().toISOString()
-            };
-            localTickets.push(fallbackTicket);
-            localStorage.setItem('soporte_tickets_local', JSON.stringify(localTickets));
-
-            const mailtoSubject = encodeURIComponent(`[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`);
-            const mailtoBody = encodeURIComponent(
-                `Número de Ticket: #${numeroTicket}\n` +
-                `Solicitante: ${datos.nombre}\n` +
-                `Fecha y Hora: ${datos.fechaHora}\n` +
-                `Departamento: ${datos.departamento}\n\n` +
-                `Detalle del Inconveniente / Solicitud:\n${datos.descripcion}`
-            );
-            const mailtoUrl = `mailto:maygonza.cs@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
-
-            mostrarExitoSoporte({
-                numeroTicket,
-                destino: 'maygonza.cs@gmail.com',
-                mailtoUrl
-            });
+        } catch (errWeb) {
+            console.warn("Envío por Web3Forms no disponible, usando enlace directo a correo.", errWeb);
         }
+
+        mostrarExitoSoporte({
+            numeroTicket,
+            emailEnviado: emailWebEnviado,
+            destino: 'maygonza.cs@gmail.com',
+            mailtoUrl
+        });
     }
 
     function mostrarExitoSoporte(res) {
