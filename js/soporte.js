@@ -277,31 +277,37 @@
         );
         const mailtoUrl = `mailto:maygonza.cs@gmail.com?subject=${mailtoSubject}&body=${mailtoBody}`;
 
-        // Intentar envío web mediante Web3Forms con formato estructurado
+        // Configuración de EmailJS
+        const EMAILJS_SERVICE_ID = 'service_m4nwa33';
+        const EMAILJS_TEMPLATE_ID = 'template_abz297u';
+        const EMAILJS_PUBLIC_KEY = 'L9psQ9g3wbdxheABd';
+
+        // Intentar envío web mediante EmailJS con plantilla HTML totalmente personalizada
         let emailWebEnviado = false;
         try {
-            const web3Key = 'cc18aace-0fb5-47fd-bb61-c422b4ec7b83';
-            const webRes = await fetch('https://api.web3forms.com/submit', {
+            const emailJsRes = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
-                    access_key: web3Key,
-                    subject: `🎧 [TICKET #${numeroTicket}] Solicitud de Soporte Técnico - ${datos.departamento}`,
-                    from_name: `Sistema ENAG Soporte`,
-                    "🎫 NUMERO DE TICKET": `#TICK-${numeroTicket}`,
-                    "👤 SOLICITANTE": datos.nombre,
-                    "📅 FECHA Y HORA (HONDURAS)": datos.fechaHora,
-                    "🏢 DEPARTAMENTO": datos.departamento,
-                    "📌 ESTADO": "NUEVO / PENDIENTE",
-                    "📝 DETALLE DE LA SOLICITUD": datos.descripcion
+                    service_id: EMAILJS_SERVICE_ID,
+                    template_id: EMAILJS_TEMPLATE_ID,
+                    user_id: EMAILJS_PUBLIC_KEY,
+                    template_params: {
+                        numero_ticket: `#TICK-${numeroTicket}`,
+                        solicitante: datos.nombre,
+                        fecha_hora: datos.fechaHora,
+                        departamento: datos.departamento,
+                        descripcion: datos.descripcion,
+                        to_email: 'maygonza.cs@gmail.com'
+                    }
                 })
             });
-            const webResult = await webRes.json();
-            if (webResult.success) {
+
+            if (emailJsRes.ok) {
                 emailWebEnviado = true;
             }
         } catch (errWeb) {
-            console.warn("Envío por servicio web no disponible.", errWeb);
+            console.warn("Envío por EmailJS no disponible.", errWeb);
         }
 
         mostrarExitoSoporte({
