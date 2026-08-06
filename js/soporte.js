@@ -86,6 +86,7 @@
                                 <select id="soporteDepto" required>
                                     <option value="">-- Seleccionar --</option>
                                     <option value="Contabilidad">Contabilidad</option>
+                                     <option value="TI">TI</option>
                                     <option value="Recursos Humanos">Recursos Humanos</option>
                                     <option value="Producción">Producción</option>
                                     <option value="Comercialización">Comercialización</option>
