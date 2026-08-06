@@ -131,8 +131,19 @@
         // Actualizar la fecha y hora al momento de abrir el modal en formato Honduras (DD/MM/YYYY hh:mm AM/PM)
         document.getElementById('soporteFecha').value = obtenerFechaHoraHonduras();
 
+        // Auto-completar con el nombre guardado previamente o del usuario activo
+        const nombreInput = document.getElementById('soporteNombre');
+        const nombreGuardado = localStorage.getItem('soporte_nombre_solicitante') || localStorage.getItem('usuario') || sessionStorage.getItem('usuario') || '';
+        if (nombreGuardado && !nombreInput.value) {
+            nombreInput.value = nombreGuardado;
+        }
+
         overlay.classList.add('active');
-        document.getElementById('soporteNombre').focus();
+        if (nombreInput.value) {
+            document.getElementById('soporteDescripcion').focus();
+        } else {
+            nombreInput.focus();
+        }
     }
 
     function cerrarModalSoporte() {
@@ -209,6 +220,11 @@
             departamento: document.getElementById('soporteDepto').value,
             descripcion: document.getElementById('soporteDescripcion').value.trim()
         };
+
+        // Recordar el nombre ingresado para futuros tickets
+        if (datos.nombre) {
+            localStorage.setItem('soporte_nombre_solicitante', datos.nombre);
+        }
 
         // URL del API dinámica: local para desarrollo/Electron, o relativa para servidores web desplegados
         const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1' || window.location.protocol === 'file:';

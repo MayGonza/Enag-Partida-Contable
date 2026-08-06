@@ -1,1 +1,11 @@
-[]
+[
+  {
+    "id": 1,
+    "numeroTicket": 1001,
+    "nombre": "iris ramos",
+    "fechaHora": "05/08/2026 10:50 PM",
+    "departamento": "Contabilidad",
+    "descripcion": "coñoooo",
+    "creadoEn": "05/08/2026 10:50 PM"
+  }
+]
