@@ -502,12 +502,14 @@
 
                     <div class="form-field">
                         <label for="fechaInicio">Fecha de Inicio (DD/MM/YYYY)</label>
-                        <input type="text" id="fechaInicio" placeholder="DD/MM/YYYY" maxlength="10" value="28/06/2026" oninput="calcularTodo()">
+                        <input type="text" id="fechaInicio" placeholder="DD/MM/YYYY" maxlength="10" value="28/06/2026"
+                            oninput="calcularTodo()" onchange="calcularTodo()" onkeyup="calcularTodo()">
                     </div>
 
                     <div class="form-field">
                         <label for="fechaFin">Fecha de Finalización (DD/MM/YYYY)</label>
-                        <input type="text" id="fechaFin" placeholder="DD/MM/YYYY" maxlength="10" value="07/07/2026" oninput="calcularTodo()">
+                        <input type="text" id="fechaFin" placeholder="DD/MM/YYYY" maxlength="10" value="07/07/2026"
+                            oninput="calcularTodo()" onchange="calcularTodo()" onkeyup="calcularTodo()">
                     </div>
 
                     <div class="form-field full-width">
@@ -687,6 +689,30 @@
             }
         }
 
+        // Parser flexible de fechas que soporta DD/MM/YYYY, YYYY-MM-DD y objetos Date
+        function parseFechaFlexible(str) {
+            if (!str) return null;
+            if (str instanceof Date && !isNaN(str.getTime())) return str;
+            str = String(str).trim();
+            const parts = str.split(/[-\/]/);
+            if (parts.length === 3) {
+                const p0 = parts[0].trim();
+                const p1 = parts[1].trim();
+                const p2 = parts[2].trim();
+
+                if (p0.length === 4) { // YYYY-MM-DD
+                    return new Date(parseInt(p0, 10), parseInt(p1, 10) - 1, parseInt(p2, 10));
+                } else if (p2.length === 4) { // DD/MM/YYYY o DD-MM-YYYY
+                    return new Date(parseInt(p2, 10), parseInt(p1, 10) - 1, parseInt(p0, 10));
+                }
+            }
+            const parsed = Date.parse(str);
+            if (!isNaN(parsed)) {
+                return new Date(parsed);
+            }
+            return null;
+        }
+
         // Obtener los nombres y días de los 3 meses anteriores
         function obtenerMesesPrevios(fechaInicioStr) {
             const nombresMeses = [
@@ -694,7 +720,8 @@
                 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'
             ];
 
-            const fecha = new Date(fechaInicioStr + "T00:00:00");
+            const fecha = parseFechaFlexible(fechaInicioStr);
+            if (!fecha) return [];
             let mes = fecha.getMonth(); // 0-11
             let año = fecha.getFullYear();
 
@@ -748,8 +775,17 @@
                 return;
             }
 
-            const fInicio = new Date(fechaIniVal + "T00:00:00");
-            const fFin = new Date(fechaFinVal + "T00:00:00");
+            const fInicio = parseFechaFlexible(fechaIniVal);
+            const fFin = parseFechaFlexible(fechaFinVal);
+
+            if (!fInicio || !fFin) {
+                alertError.style.display = "block";
+                alertError.innerText = "Error: Por favor ingrese fechas válidas en formato DD/MM/YYYY.";
+                document.getElementById("resDiasTotales").innerText = "0";
+                document.getElementById("resMontoReintegro").innerText = "L. 0.00";
+                document.getElementById("timelineBar").innerHTML = "";
+                return;
+            }
 
             if (fFin < fInicio) {
                 alertError.style.display = "block";
@@ -881,8 +917,12 @@
             const hospitalizado = document.getElementById("hospitalizado").checked;
             const techo = parseFloat(document.getElementById("techoIhss").value) || 0;
 
-            const fInicio = new Date(fechaIniVal + "T00:00:00");
-            const fFin = new Date(fechaFinVal + "T00:00:00");
+            const fInicio = parseFechaFlexible(fechaIniVal);
+            const fFin = parseFechaFlexible(fechaFinVal);
+            if (!fInicio || !fFin) {
+                alert("Por favor ingrese fechas válidas en formato DD/MM/YYYY.");
+                return;
+            }
 
             const diffTime = Math.abs(fFin - fInicio);
             const totalDias = Math.ceil(diffTime / (1000 * 60 * 60 * 24)) + 1;
@@ -1075,9 +1115,19 @@
             doc.save(nombreArchivo);
         }
 
-        // Ejecutar cálculo inicial al cargar
-        toggleOpcionesEspeciales();
-        calcularTodo();
+        // Asignar event listeners para cálculo automático inmediato
+        document.addEventListener("DOMContentLoaded", () => {
+            ["fechaInicio", "fechaFin", "techoIhss", "empNombre", "empDni"].forEach(id => {
+                const el = document.getElementById(id);
+                if (el) {
+                    el.addEventListener("input", calcularTodo);
+                    el.addEventListener("change", calcularTodo);
+                    el.addEventListener("keyup", calcularTodo);
+                }
+            });
+            toggleOpcionesEspeciales();
+            calcularTodo();
+        });
     </script>
     <script src="../js/soporte.js"></script>
     <script src="../js/honduras-datepicker.js"></script>

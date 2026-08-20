@@ -50,7 +50,11 @@ document.addEventListener('DOMContentLoaded', () => {
                 locale: "es",
                 dateFormat: "d/m/Y",
                 allowInput: true,
-                disableMobile: false
+                disableMobile: false,
+                onChange: function(selectedDates, dateStr, instance) {
+                    input.dispatchEvent(new Event('input', { bubbles: true }));
+                    input.dispatchEvent(new Event('change', { bubbles: true }));
+                }
             });
         });
     };
