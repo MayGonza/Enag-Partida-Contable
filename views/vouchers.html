@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
-    <title>Generación de Vouchers de Pago por Contrato</title>
+    <title>Generación de Vouchers de Pago (Acuerdo)</title>
 
     <style>
         body {
@@ -640,6 +640,35 @@
             return isNaN(num) ? 0 : num;
         }
 
+        function esColumnaDeduccion(header) {
+            if (!header) return false;
+            const norm = normalize(header);
+            if (!norm) return false;
+
+            // Palabras clave que indican campos informativos, sueldos, fechas, totales o control de días/tiempo trabajados (NO SON DEDUCCIONES INDIVIDUALES)
+            const noDeduccionKeywords = [
+                "diastrabajad", "diaslaborad", "diaspagad", "diasdevengad", "diastrab", "diaslab",
+                "diasdetrabajo", "tiempotrabajado", "diasalmes", "diashabiles", "dias", "dt",
+                "nombre", "cargo", "puesto", "numero", "num", "ingreso", "fecha", "periodo",
+                "contrata", "contratacion", "reingreso", "tipo", "identidad", "dni", "rtn",
+                "sueldoasignado", "sueldodevengado", "sueldobase", "salariobase", "sueldomensual",
+                "sueldobruto", "totaldevengado", "salariodevengado", "asignado", "devengado",
+                "totaldeduccion", "totaldeduc", "total", "sueldoneto", "netoapagar", "neto", "liquido",
+                "totalapagar", "totalliquido", "observacion", "firma"
+            ];
+
+            if (noDeduccionKeywords.some(kw => norm === kw || norm.includes(kw))) {
+                return false;
+            }
+
+            // Si expresamente dice deducción o descuento, es una deducción válida (ej. "Deducción Tiempo", "Deducción Préstamo")
+            if (norm.includes("deduc") || norm.includes("descuento")) {
+                return true;
+            }
+
+            return true;
+        }
+
         function obtenerHojaPredeterminada(workbook) {
             const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
             for (const name of workbook.SheetNames) {
@@ -904,7 +933,7 @@
                 }
 
                 let nombreIdx = -1, puestoIdx = -1, tipoIdx = -1, mesIdx = -1, asignadoIdx = -1, devengadoIdx = -1, ingresoIdx = -1;
-                let numeroPuestoIdx = -1, totalDeduccionesIdx = -1;
+                let numeroPuestoIdx = -1, totalDeduccionesIdx = -1, diasTrabajadosIdx = -1;
 
                 // Mapear cabeceras
                 headers.forEach((header, index) => {
@@ -914,9 +943,16 @@
                         puestoIdx = index;
                     }
                     if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
-                    if (norm.includes("mes") || norm.includes("periodo")) mesIdx = index;
-                    if (norm.includes("asignado")) asignadoIdx = index;
-                    if (norm.includes("devengado")) devengadoIdx = index;
+                    if ((norm.includes("mes") || norm.includes("periodo")) && !norm.includes("contrat")) mesIdx = index;
+                    if ((norm.includes("diastrabaj") || norm.includes("diaslabor") || norm.includes("diaspag") || norm.includes("diastrab") || norm.includes("diaslab") || norm.includes("tiempotrabaj") || norm.includes("diasdetrabajo") || norm === "dias" || norm === "dt") && !norm.includes("deduc") && !norm.includes("descuento")) {
+                        diasTrabajadosIdx = index;
+                    }
+                    if ((norm.includes("asignado") || norm.includes("sueldobase") || norm.includes("salariobase") || norm.includes("sueldomensual")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
+                        asignadoIdx = index;
+                    }
+                    if ((norm.includes("devengado") || norm.includes("totaldevengado") || norm.includes("sueldodevengado") || norm.includes("salariodevengado")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
+                        devengadoIdx = index;
+                    }
                     if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
                     if (norm.includes("totaldededucciones") || (norm.includes("total") && norm.includes("deduc"))) totalDeduccionesIdx = index;
                     if ((norm.includes("ingreso") || norm.includes("contrata") || norm.includes("periododecontratacion")) && !norm.includes("reingreso")) ingresoIdx = index;
@@ -993,14 +1029,15 @@
                                 // Las deducciones se encuentran entre la columna "Sueldo Devengado" y "Total de Deducciones"
                                 headers.forEach((header, index) => {
                                     if (index > devengadoIdx && index < totalDeduccionesIdx) {
+                                        if (!esColumnaDeduccion(header)) return;
+
                                         const val = parseCleanFloat(rowA[index]);
                                         if (val && !isNaN(val) && val > 0) {
                                             // Reemplazar múltiples espacios internos por uno solo y limpiar prefijos
                                             const cleanName = header.toString().replace(/\s+/g, ' ').trim()
                                                 .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                                 .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
-                                            const lowerHeader = header.toString().toLowerCase();
-                                            if (cleanName && cleanName.trim() !== "" && !lowerHeader.includes("periodo") && !lowerHeader.includes("contrataci") && !lowerHeader.includes("fecha")) {
+                                            if (cleanName && cleanName.trim() !== "") {
                                                 deducciones.push({
                                                     nombre: cleanName,
                                                     monto: val
@@ -1033,6 +1070,8 @@
                                 }
                                 if (!empIngreso) empIngreso = "N/D";
 
+                                const diasTrab = diasTrabajadosIdx !== -1 && rowA[diasTrabajadosIdx] !== undefined ? parseCleanFloat(rowA[diasTrabajadosIdx]) : null;
+
                                 // Solo agregarlo si el nombre no está vacío
                                 if (empName !== "") {
                                     empleados.push({
@@ -1042,6 +1081,7 @@
                                         numeroPuesto: empNumPuesto,
                                         ingreso: empIngreso,
                                         tipo: empTipo,
+                                        diasTrabajados: diasTrab,
                                         mes: mesIdx !== -1 && rowA[mesIdx] ? rowA[mesIdx].toString().trim() : "marzo 2026",
                                         sueldoAsignado: sueldoAsignado,
                                         sueldoDevengado: sueldoDevengado,
@@ -1071,13 +1111,14 @@
 
                         headers.forEach((header, index) => {
                             if (index > devengadoIdx && index < totalDeduccionesIdx) {
+                                if (!esColumnaDeduccion(header)) return;
+
                                 const val = parseCleanFloat(row[index]);
                                 if (val && !isNaN(val) && val > 0) {
                                     const cleanName = header.toString().replace(/\s+/g, ' ').trim()
                                         .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                         .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
-                                    const lowerHeader = header.toString().toLowerCase();
-                                    if (cleanName && cleanName.trim() !== "" && !lowerHeader.includes("periodo") && !lowerHeader.includes("contrataci") && !lowerHeader.includes("fecha")) {
+                                    if (cleanName && cleanName.trim() !== "") {
                                         deducciones.push({
                                             nombre: cleanName,
                                             monto: val
@@ -1111,6 +1152,8 @@
                         }
                         if (!empIngreso) empIngreso = "N/D";
 
+                        const diasTrab = diasTrabajadosIdx !== -1 && row[diasTrabajadosIdx] !== undefined ? parseCleanFloat(row[diasTrabajadosIdx]) : null;
+
                         empleados.push({
                             id: i,
                             nombre: empName,
@@ -1118,6 +1161,7 @@
                             numeroPuesto: empNumPuesto,
                             ingreso: empIngreso,
                             tipo: empTipo,
+                            diasTrabajados: diasTrab,
                             mes: mesIdx !== -1 && row[mesIdx] ? row[mesIdx].toString().trim() : "marzo 2026",
                             sueldoAsignado: sueldoAsignado,
                             sueldoDevengado: sueldoDevengado,

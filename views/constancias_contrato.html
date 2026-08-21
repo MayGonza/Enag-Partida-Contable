@@ -682,6 +682,35 @@
             return isNaN(num) ? 0 : num;
         }
 
+        function esColumnaDeduccion(header) {
+            if (!header) return false;
+            const norm = normalize(header);
+            if (!norm) return false;
+
+            // Palabras clave que indican campos informativos, sueldos, fechas, totales o control de días/tiempo trabajados (NO SON DEDUCCIONES INDIVIDUALES)
+            const noDeduccionKeywords = [
+                "diastrabajad", "diaslaborad", "diaspagad", "diasdevengad", "diastrab", "diaslab",
+                "diasdetrabajo", "tiempotrabajado", "diasalmes", "diashabiles", "dias", "dt",
+                "nombre", "cargo", "puesto", "numero", "num", "ingreso", "fecha", "periodo",
+                "contrata", "contratacion", "reingreso", "tipo", "identidad", "dni", "rtn",
+                "sueldoasignado", "sueldodevengado", "sueldobase", "salariobase", "sueldomensual",
+                "sueldobruto", "totaldevengado", "salariodevengado", "asignado", "devengado",
+                "totaldeduccion", "totaldeduc", "total", "sueldoneto", "netoapagar", "neto", "liquido",
+                "totalapagar", "totalliquido", "observacion", "firma"
+            ];
+
+            if (noDeduccionKeywords.some(kw => norm === kw || norm.includes(kw))) {
+                return false;
+            }
+
+            // Si expresamente dice deducción o descuento, es una deducción válida (ej. "Deducción Tiempo", "Deducción Préstamo")
+            if (norm.includes("deduc") || norm.includes("descuento")) {
+                return true;
+            }
+
+            return true;
+        }
+
         function obtenerHojaPredeterminada(workbook) {
             const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
             for (const name of workbook.SheetNames) {
@@ -855,7 +884,7 @@
                     }
                 }
 
-                let nombreIdx=-1,puestoIdx=-1,ingresoIdx=-1,periodoIdx=-1,tipoIdx=-1,asignadoIdx=-1,devengadoIdx=-1,numeroPuestoIdx=-1,totalDeduccionesIdx=-1;
+                let nombreIdx=-1,puestoIdx=-1,ingresoIdx=-1,periodoIdx=-1,tipoIdx=-1,asignadoIdx=-1,devengadoIdx=-1,numeroPuestoIdx=-1,totalDeduccionesIdx=-1,diasTrabajadosIdx=-1;
                 headers.forEach((h,i)=>{
                     const n=normalize(h);
                     if (n.includes("nombre")&&nombreIdx===-1) nombreIdx=i;
@@ -863,8 +892,15 @@
                     if (n.includes("ingreso") && !n.includes("reingreso")) ingresoIdx=i;
                     if ((n.includes("periodo")||n.includes("contratacion")) && periodoIdx===-1) periodoIdx=i;
                     if (n.includes("tipo")||n.includes("acuerdo")||n.includes("contrato")) tipoIdx=i;
-                    if (n.includes("asignado")) asignadoIdx=i;
-                    if (n.includes("devengado")) devengadoIdx=i;
+                    if ((n.includes("diastrabaj") || n.includes("diaslabor") || n.includes("diaspag") || n.includes("diastrab") || n.includes("diaslab") || n.includes("tiempotrabaj") || n.includes("diasdetrabajo") || n === "dias" || n === "dt") && !n.includes("deduc") && !n.includes("descuento")) {
+                        diasTrabajadosIdx = i;
+                    }
+                    if ((n.includes("asignado") || n.includes("sueldobase") || n.includes("salariobase") || n.includes("sueldomensual")) && !n.includes("dia") && !n.includes("hora") && !n.includes("deduc")) {
+                        asignadoIdx = i;
+                    }
+                    if ((n.includes("devengado") || n.includes("totaldevengado") || n.includes("sueldodevengado") || n.includes("salariodevengado")) && !n.includes("dia") && !n.includes("hora") && !n.includes("deduc")) {
+                        devengadoIdx = i;
+                    }
                     if (n.includes("numerodepuesto")||(n.includes("puesto")&&n.includes("num"))) numeroPuestoIdx=i;
                     if (n.includes("totaldededucciones")||(n.includes("total")&&n.includes("deduc"))) totalDeduccionesIdx=i;
                 });
@@ -908,10 +944,8 @@
                     const deducciones=[];
                     headers.forEach((h,i)=>{
                         if (i>devengadoIdx&&i<totalDeduccionesIdx) {
-                            const n = normalize(h);
-                            if (n.includes("periodo") || n.includes("contratacion") || n.includes("ingreso") || n.includes("fecha") || n.includes("tipo") || n.includes("nombre") || n.includes("cargo") || n.includes("puesto") || n.includes("numero")) {
-                                return;
-                            }
+                            if (!esColumnaDeduccion(h)) return;
+
                             const val=parseCleanFloat(rowA[i]);
                             if (val&&!isNaN(val)&&val>0) {
                                 const cleanName=h.toString().replace(/\s+/g,' ').trim()
@@ -939,6 +973,8 @@
                     let empPeriodo = periodoIdx!==-1&&rowA[periodoIdx]!==undefined&&rowA[periodoIdx]!==""?parsearFechaIngreso(rowA[periodoIdx]):"";
                     if (!empPeriodo&&window.empleadoPeriodoMap&&window.empleadoPeriodoMap[empName]) empPeriodo=window.empleadoPeriodoMap[empName];
                     if (!empPeriodo) empPeriodo="N/D";
+
+                    const diasTrab = diasTrabajadosIdx !== -1 && rowA[diasTrabajadosIdx] !== undefined ? parseCleanFloat(rowA[diasTrabajadosIdx]) : null;
 
                     const empTipo = "Contrato";
 
