@@ -127,7 +127,8 @@
             margin-bottom: 5px;
         }
 
-        .config-field input, .config-field select {
+        .config-field input,
+        .config-field select {
             width: 100%;
             padding: 9px 12px;
             border: 1px solid #cbd5e1;
@@ -139,7 +140,8 @@
             transition: border-color 0.2s;
         }
 
-        .config-field input:focus, .config-field select:focus {
+        .config-field input:focus,
+        .config-field select:focus {
             outline: none;
             border-color: #002147;
         }
@@ -402,21 +404,23 @@
                     <label>Mes Correspondiente</label>
                     <input type="text" id="mesVoucher" placeholder="ej. marzo 2026" value="">
                 </div>
-                <div class="config-field">
-                    <label>Fecha de Emisión (Opcional)</label>
-                    <input type="text" id="fechaEmision" placeholder="ej. 30 de marzo del 2026" value="">
-                </div>
+
                 <div class="config-field">
                     <label>Nombre del/la firmante</label>
-                    <input type="text" id="cfgFirmante" value="María José Valverde Bardales" placeholder="ej. María José Valverde Bardales">
+                    <input type="text" id="cfgFirmante" value="María José Valverde Bardales"
+                        placeholder="ej. María José Valverde Bardales">
                 </div>
                 <div class="config-field">
                     <label>Cargo del/la firmante</label>
-                    <input type="text" id="cfgCargoFirmante" value="Jefe Interina de Recursos Humanos" placeholder="ej. Jefe Interina de Recursos Humanos">
+                    <input type="text" id="cfgCargoFirmante" value="Jefe Interina de Recursos Humanos"
+                        placeholder="ej. Jefe Interina de Recursos Humanos">
                 </div>
-                <div class="config-field" style="grid-column: span 2; display: flex; align-items: center; margin-top: 10px;">
-                    <label style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147;">
-                        <input type="checkbox" id="showFechaIngreso" style="width: 18px; height: 18px; cursor: pointer;">
+                <div class="config-field"
+                    style="grid-column: span 2; display: flex; align-items: center; margin-top: 10px;">
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147;">
+                        <input type="checkbox" id="showFechaIngreso"
+                            style="width: 18px; height: 18px; cursor: pointer;">
                         Mostrar Fecha de Ingreso en PDF
                     </label>
                 </div>
@@ -522,7 +526,6 @@
             const dia = fechaActual.getDate();
             const mesLetras = meses[fechaActual.getMonth()];
             const anio = fechaActual.getFullYear();
-            document.getElementById('fechaEmision').value = `${dia} de ${mesLetras} del ${anio}`;
 
             // Auto-cargar planilla2.xls (o planilla.xls) si existe en el servidor
             fetch('../templates/planilla2.xls')
@@ -649,11 +652,11 @@
             if (
                 ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) ||
                 norm === "total" ||
-                norm.includes("sueldoneto") || 
-                norm.includes("netoapagar") || 
-                norm === "neto" || 
-                norm === "liquido" || 
-                norm.includes("totalliquido") || 
+                norm.includes("sueldoneto") ||
+                norm.includes("netoapagar") ||
+                norm === "neto" ||
+                norm === "liquido" ||
+                norm.includes("totalliquido") ||
                 norm.includes("totalapagar")
             ) {
                 return false;
@@ -661,15 +664,15 @@
 
             // 2. Columnas de sueldos / devengados
             if (
-                norm.includes("sueldoasignado") || 
-                norm.includes("sueldodevengado") || 
-                norm.includes("sueldobase") || 
-                norm.includes("salariobase") || 
+                norm.includes("sueldoasignado") ||
+                norm.includes("sueldodevengado") ||
+                norm.includes("sueldobase") ||
+                norm.includes("salariobase") ||
                 norm.includes("sueldomensual") ||
-                norm.includes("sueldobruto") || 
-                norm.includes("totaldevengado") || 
+                norm.includes("sueldobruto") ||
+                norm.includes("totaldevengado") ||
                 norm.includes("salariodevengado") ||
-                norm === "asignado" || 
+                norm === "asignado" ||
                 norm === "devengado" ||
                 norm === "sueldo" ||
                 norm === "salario"
@@ -681,15 +684,15 @@
             if (
                 norm === "dias" ||
                 norm === "dt" ||
-                norm.includes("diastrabajad") || 
-                norm.includes("diaslaborad") || 
-                norm.includes("diaspagad") || 
-                norm.includes("diasdevengad") || 
-                norm.includes("diastrab") || 
+                norm.includes("diastrabajad") ||
+                norm.includes("diaslaborad") ||
+                norm.includes("diaspagad") ||
+                norm.includes("diasdevengad") ||
+                norm.includes("diastrab") ||
                 norm.includes("diaslab") ||
-                norm.includes("diasdetrabajo") || 
-                norm.includes("tiempotrabajado") || 
-                norm.includes("diasalmes") || 
+                norm.includes("diasdetrabajo") ||
+                norm.includes("tiempotrabajado") ||
+                norm.includes("diasalmes") ||
                 norm.includes("diashabiles")
             ) {
                 return false;
@@ -697,34 +700,34 @@
 
             // 4. Columnas informativas del empleado (nombre, cargo, puesto, fecha de ingreso, etc.)
             if (
-                norm.includes("nombre") || 
-                norm.includes("empleado") || 
+                norm.includes("nombre") ||
+                norm.includes("empleado") ||
                 norm.includes("colaborador") ||
-                norm === "cargo" || 
-                norm === "cargoo puesto" || 
-                norm === "puesto" || 
+                norm === "cargo" ||
+                norm === "cargoo puesto" ||
+                norm === "puesto" ||
                 norm === "puestocargo" ||
-                norm === "numero" || 
-                norm === "num" || 
-                norm === "no" || 
-                norm.includes("numerodepuesto") || 
+                norm === "numero" ||
+                norm === "num" ||
+                norm === "no" ||
+                norm.includes("numerodepuesto") ||
                 norm.includes("numpuesto") ||
                 norm.includes("nopuesto") ||
-                norm === "ingreso" || 
-                norm === "fechaingreso" || 
+                norm === "ingreso" ||
+                norm === "fechaingreso" ||
                 norm === "fechadeingreso" ||
-                norm === "reingreso" || 
+                norm === "reingreso" ||
                 norm === "fechadereingreso" ||
-                norm.includes("identidad") || 
-                norm === "dni" || 
+                norm.includes("identidad") ||
+                norm === "dni" ||
                 norm === "rtn" ||
-                norm === "periodo" || 
-                norm.includes("periododecontratacion") || 
+                norm === "periodo" ||
+                norm.includes("periododecontratacion") ||
                 norm.includes("periodocontratacion") ||
-                norm === "tipo" || 
-                norm === "contrato" || 
+                norm === "tipo" ||
+                norm === "contrato" ||
                 norm === "acuerdo" ||
-                norm.includes("observacion") || 
+                norm.includes("observacion") ||
                 norm.includes("firma")
             ) {
                 return false;
@@ -1598,21 +1601,12 @@
             // Pie de Firma
             y += 12;
             doc.setFont('helvetica', 'bold');
-            const fechaEmisionStr = document.getElementById('fechaEmision').value || "";
-            if (fechaEmisionStr) {
-                doc.setFontSize(9.5);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Fecha de emisión: Tegucigalpa M.D.C., ${fechaEmisionStr}`, tableLeft, y);
-                y += 30;
-            } else {
-                y += 25;
-            }
             doc.setFontSize(10.5);
             doc.setFont('helvetica', 'bold');
-            
+
             const firmante = document.getElementById('cfgFirmante').value.trim();
             const cargoF = document.getElementById('cfgCargoFirmante').value.trim();
-            
+
             if (firmante) {
                 doc.line(tableLeft, y - 5, tableLeft + 70, y - 5);
                 doc.text(firmante, tableLeft, y);

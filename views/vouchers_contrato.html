@@ -405,10 +405,7 @@
                     <label>Mes Correspondiente</label>
                     <input type="text" id="mesVoucher" placeholder="ej. marzo 2026" value="">
                 </div>
-                <div class="config-field">
-                    <label>Fecha de Emisión (Opcional)</label>
-                    <input type="text" id="fechaEmision" placeholder="ej. 30 de marzo del 2026" value="">
-                </div>
+
                 <div class="config-field">
                     <label>Nombre del/la firmante</label>
                     <input type="text" id="cfgFirmante" value="María José Valverde Bardales"
@@ -536,7 +533,6 @@
             const dia = fechaActual.getDate();
             const mesLetras = meses[fechaActual.getMonth()];
             const anio = fechaActual.getFullYear();
-            document.getElementById('fechaEmision').value = `${dia} de ${mesLetras} del ${anio}`;
 
             // Auto-cargar planilla2.xls (o planilla.xls) si existe en el servidor
             fetch('../templates/planilla2.xls')
@@ -663,11 +659,11 @@
             if (
                 ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) ||
                 norm === "total" ||
-                norm.includes("sueldoneto") || 
-                norm.includes("netoapagar") || 
-                norm === "neto" || 
-                norm === "liquido" || 
-                norm.includes("totalliquido") || 
+                norm.includes("sueldoneto") ||
+                norm.includes("netoapagar") ||
+                norm === "neto" ||
+                norm === "liquido" ||
+                norm.includes("totalliquido") ||
                 norm.includes("totalapagar")
             ) {
                 return false;
@@ -675,15 +671,15 @@
 
             // 2. Columnas de sueldos / devengados
             if (
-                norm.includes("sueldoasignado") || 
-                norm.includes("sueldodevengado") || 
-                norm.includes("sueldobase") || 
-                norm.includes("salariobase") || 
+                norm.includes("sueldoasignado") ||
+                norm.includes("sueldodevengado") ||
+                norm.includes("sueldobase") ||
+                norm.includes("salariobase") ||
                 norm.includes("sueldomensual") ||
-                norm.includes("sueldobruto") || 
-                norm.includes("totaldevengado") || 
+                norm.includes("sueldobruto") ||
+                norm.includes("totaldevengado") ||
                 norm.includes("salariodevengado") ||
-                norm === "asignado" || 
+                norm === "asignado" ||
                 norm === "devengado" ||
                 norm === "sueldo" ||
                 norm === "salario"
@@ -695,15 +691,15 @@
             if (
                 norm === "dias" ||
                 norm === "dt" ||
-                norm.includes("diastrabajad") || 
-                norm.includes("diaslaborad") || 
-                norm.includes("diaspagad") || 
-                norm.includes("diasdevengad") || 
-                norm.includes("diastrab") || 
+                norm.includes("diastrabajad") ||
+                norm.includes("diaslaborad") ||
+                norm.includes("diaspagad") ||
+                norm.includes("diasdevengad") ||
+                norm.includes("diastrab") ||
                 norm.includes("diaslab") ||
-                norm.includes("diasdetrabajo") || 
-                norm.includes("tiempotrabajado") || 
-                norm.includes("diasalmes") || 
+                norm.includes("diasdetrabajo") ||
+                norm.includes("tiempotrabajado") ||
+                norm.includes("diasalmes") ||
                 norm.includes("diashabiles")
             ) {
                 return false;
@@ -711,34 +707,38 @@
 
             // 4. Columnas informativas del empleado (nombre, cargo, puesto, fecha de ingreso, etc.)
             if (
-                norm.includes("nombre") || 
-                norm.includes("empleado") || 
+                norm.includes("nombre") ||
+                norm.includes("empleado") ||
                 norm.includes("colaborador") ||
-                norm === "cargo" || 
-                norm === "cargoo puesto" || 
-                norm === "puesto" || 
+                norm === "cargo" ||
+                norm === "cargoo puesto" ||
+                norm === "puesto" ||
                 norm === "puestocargo" ||
-                norm === "numero" || 
-                norm === "num" || 
-                norm === "no" || 
-                norm.includes("numerodepuesto") || 
+                norm === "numero" ||
+                norm === "num" ||
+                norm === "no" ||
+                norm.includes("numerodepuesto") ||
                 norm.includes("numpuesto") ||
                 norm.includes("nopuesto") ||
-                norm === "ingreso" || 
-                norm === "fechaingreso" || 
+                norm === "ingreso" ||
+                norm === "fechaingreso" ||
                 norm === "fechadeingreso" ||
-                norm === "reingreso" || 
+                norm === "reingreso" ||
                 norm === "fechadereingreso" ||
-                norm.includes("identidad") || 
-                norm === "dni" || 
+                norm.includes("identidad") ||
+                norm === "dni" ||
                 norm === "rtn" ||
-                norm === "periodo" || 
-                norm.includes("periododecontratacion") || 
+                norm === "periodo" ||
+                norm.includes("periododecontratacion") ||
                 norm.includes("periodocontratacion") ||
-                norm === "tipo" || 
-                norm === "contrato" || 
+                norm.includes("periodecontracion") ||  // typo frecuente en archivo ENAG
+                norm.includes("contracion") ||          // typo de "contratacion"
+                norm.includes("claveplaza") ||          // Clave de Plaza por Contrato
+                norm.includes("clavepor") ||
+                norm === "tipo" ||
+                norm === "contrato" ||
                 norm === "acuerdo" ||
-                norm.includes("observacion") || 
+                norm.includes("observacion") ||
                 norm.includes("firma")
             ) {
                 return false;
@@ -985,7 +985,8 @@
                 const rowSiguiente = rowsData[headerRowIndex + 1] || [];
                 const rowSiguienteNorm = rowSiguiente.map(h => normalize(h));
                 const tieneSegundaCabecera = rowSiguienteNorm.some(h =>
-                    h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato")
+                    h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato") ||
+                    h.includes("impuesto") || h.includes("deduc") || h.includes("ihss") || h.includes("cooperativa") || h.includes("banco")
                 );
 
                 if (tieneSegundaCabecera) {
@@ -1020,8 +1021,9 @@
                     if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) {
                         puestoIdx = index;
                     }
-                    if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
-                    if ((norm.includes("mes") || norm.includes("periodo")) && !norm.includes("contrat")) mesIdx = index;
+                    // tipoIdx: solo si es exactamente tipo/acuerdo, NO si es "periodo de contracion" con typo
+                    if ((norm === "tipo" || norm.includes("acuerdo") || norm === "contrato") && !norm.includes("periodo") && !norm.includes("contracion")) tipoIdx = index;
+                    if ((norm.includes("mes") || norm.includes("periodo")) && !norm.includes("contrat") && !norm.includes("contraci")) mesIdx = index;
                     if ((norm.includes("diastrabaj") || norm.includes("diaslabor") || norm.includes("diaspag") || norm.includes("diastrab") || norm.includes("diaslab") || norm.includes("tiempotrabaj") || norm.includes("diasdetrabajo") || norm === "dias" || norm === "dt") && !norm.includes("deduc") && !norm.includes("descuento")) {
                         diasTrabajadosIdx = index;
                     }
@@ -1031,10 +1033,11 @@
                     if ((norm.includes("devengado") || norm.includes("totaldevengado") || norm.includes("sueldodevengado") || norm.includes("salariodevengado")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
                         devengadoIdx = index;
                     }
-                    if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
+                    if (norm.includes("numerodepuesto") || norm.includes("claveplaza") || norm.includes("clavepor") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
                     if ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) totalDeduccionesIdx = index;
                     if (norm.includes("ingreso") && !norm.includes("reingreso")) ingresoIdx = index;
-                    if ((norm.includes("periodo") || norm.includes("contratacion")) && !norm.includes("reingreso") && periodoIdx === -1) periodoIdx = index;
+                    // Detectar período de contratación (incluyendo typo "contracion" del archivo real)
+                    if ((norm.includes("periodo") || norm.includes("contratacion") || norm.includes("contracion")) && !norm.includes("reingreso") && periodoIdx === -1) periodoIdx = index;
                 });
 
                 // Si no se mapearon adecuadamente por nombre completo, forzar defaults para el formato ENAG
@@ -1114,7 +1117,7 @@
                                         if (val && !isNaN(val) && val > 0) {
                                             // Reemplazar múltiples espacios internos por uno solo y limpiar prefijos
                                             const cleanName = header.toString().replace(/\s+/g, ' ').trim()
-                                                .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
+                                                .replace(/^(DEDUCCIONES|Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                                 .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
                                             if (cleanName && cleanName.trim() !== "") {
                                                 deducciones.push({
@@ -1202,7 +1205,7 @@
                                 const val = parseCleanFloat(row[index]);
                                 if (val && !isNaN(val) && val > 0) {
                                     const cleanName = header.toString().replace(/\s+/g, ' ').trim()
-                                        .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
+                                        .replace(/^(DEDUCCIONES|Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                         .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
                                     if (cleanName && cleanName.trim() !== "") {
                                         deducciones.push({
@@ -1633,15 +1636,6 @@
             // Pie de Firma
             y += 12;
             doc.setFont('helvetica', 'bold');
-            const fechaEmisionStr = document.getElementById('fechaEmision').value || "";
-            if (fechaEmisionStr) {
-                doc.setFontSize(9.5);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Fecha de emisión: Tegucigalpa M.D.C., ${fechaEmisionStr}`, tableLeft, y);
-                y += 30;
-            } else {
-                y += 25;
-            }
             doc.setFontSize(10.5);
             doc.setFont('helvetica', 'bold');
 
