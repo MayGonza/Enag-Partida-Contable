@@ -659,25 +659,89 @@
             const norm = normalize(header);
             if (!norm) return false;
 
-            // Palabras clave que indican campos informativos, sueldos, fechas, totales o control de días/tiempo trabajados (NO SON DEDUCCIONES INDIVIDUALES)
-            const noDeduccionKeywords = [
-                "diastrabajad", "diaslaborad", "diaspagad", "diasdevengad", "diastrab", "diaslab",
-                "diasdetrabajo", "tiempotrabajado", "diasalmes", "diashabiles", "dias", "dt",
-                "nombre", "cargo", "puesto", "numero", "num", "ingreso", "fecha", "periodo",
-                "contrata", "contratacion", "reingreso", "tipo", "identidad", "dni", "rtn",
-                "sueldoasignado", "sueldodevengado", "sueldobase", "salariobase", "sueldomensual",
-                "sueldobruto", "totaldevengado", "salariodevengado", "asignado", "devengado",
-                "totaldeduccion", "totaldeduc", "total", "sueldoneto", "netoapagar", "neto", "liquido",
-                "totalapagar", "totalliquido", "observacion", "firma"
-            ];
-
-            if (noDeduccionKeywords.some(kw => norm === kw || norm.includes(kw))) {
+            // 1. Columnas de totales o netos (NUNCA son deducciones individuales)
+            if (
+                ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) ||
+                norm === "total" ||
+                norm.includes("sueldoneto") || 
+                norm.includes("netoapagar") || 
+                norm === "neto" || 
+                norm === "liquido" || 
+                norm.includes("totalliquido") || 
+                norm.includes("totalapagar")
+            ) {
                 return false;
             }
 
-            // Si expresamente dice deducción o descuento, es una deducción válida (ej. "Deducción Tiempo", "Deducción Préstamo")
-            if (norm.includes("deduc") || norm.includes("descuento")) {
-                return true;
+            // 2. Columnas de sueldos / devengados
+            if (
+                norm.includes("sueldoasignado") || 
+                norm.includes("sueldodevengado") || 
+                norm.includes("sueldobase") || 
+                norm.includes("salariobase") || 
+                norm.includes("sueldomensual") ||
+                norm.includes("sueldobruto") || 
+                norm.includes("totaldevengado") || 
+                norm.includes("salariodevengado") ||
+                norm === "asignado" || 
+                norm === "devengado" ||
+                norm === "sueldo" ||
+                norm === "salario"
+            ) {
+                return false;
+            }
+
+            // 3. Columnas de control de días / tiempo trabajado
+            if (
+                norm === "dias" ||
+                norm === "dt" ||
+                norm.includes("diastrabajad") || 
+                norm.includes("diaslaborad") || 
+                norm.includes("diaspagad") || 
+                norm.includes("diasdevengad") || 
+                norm.includes("diastrab") || 
+                norm.includes("diaslab") ||
+                norm.includes("diasdetrabajo") || 
+                norm.includes("tiempotrabajado") || 
+                norm.includes("diasalmes") || 
+                norm.includes("diashabiles")
+            ) {
+                return false;
+            }
+
+            // 4. Columnas informativas del empleado (nombre, cargo, puesto, fecha de ingreso, etc.)
+            if (
+                norm.includes("nombre") || 
+                norm.includes("empleado") || 
+                norm.includes("colaborador") ||
+                norm === "cargo" || 
+                norm === "cargoo puesto" || 
+                norm === "puesto" || 
+                norm === "puestocargo" ||
+                norm === "numero" || 
+                norm === "num" || 
+                norm === "no" || 
+                norm.includes("numerodepuesto") || 
+                norm.includes("numpuesto") ||
+                norm.includes("nopuesto") ||
+                norm === "ingreso" || 
+                norm === "fechaingreso" || 
+                norm === "fechadeingreso" ||
+                norm === "reingreso" || 
+                norm === "fechadereingreso" ||
+                norm.includes("identidad") || 
+                norm === "dni" || 
+                norm === "rtn" ||
+                norm === "periodo" || 
+                norm.includes("periododecontratacion") || 
+                norm.includes("periodocontratacion") ||
+                norm === "tipo" || 
+                norm === "contrato" || 
+                norm === "acuerdo" ||
+                norm.includes("observacion") || 
+                norm.includes("firma")
+            ) {
+                return false;
             }
 
             return true;
@@ -968,7 +1032,7 @@
                         devengadoIdx = index;
                     }
                     if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
-                    if (norm.includes("totaldededucciones") || (norm.includes("total") && norm.includes("deduc"))) totalDeduccionesIdx = index;
+                    if ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) totalDeduccionesIdx = index;
                     if (norm.includes("ingreso") && !norm.includes("reingreso")) ingresoIdx = index;
                     if ((norm.includes("periodo") || norm.includes("contratacion")) && !norm.includes("reingreso") && periodoIdx === -1) periodoIdx = index;
                 });
@@ -978,19 +1042,19 @@
                 if (puestoIdx === -1) puestoIdx = 2;
                 if (numeroPuestoIdx === -1) numeroPuestoIdx = 1;
                 if (asignadoIdx === -1) asignadoIdx = 3;
-                if (devengadoIdx === -1) devengadoIdx = 4;
+                if (devengadoIdx === -1) devengadoIdx = asignadoIdx !== -1 ? asignadoIdx : 4;
 
                 // Encontrar total deducciones dinámicamente
                 if (totalDeduccionesIdx === -1) {
                     headers.forEach((header, index) => {
                         const norm = normalize(header);
                         if (norm.includes("neto") || norm.includes("liquido") || norm.includes("sueldoneto")) {
-                            totalDeduccionesIdx = index - 1;
+                            totalDeduccionesIdx = index;
                         }
                     });
                 }
                 if (totalDeduccionesIdx === -1) {
-                    totalDeduccionesIdx = headers.length - 2;
+                    totalDeduccionesIdx = headers.length;
                 }
 
                 // Determinar si la hoja usa el formato de doble fila por empleado
@@ -1552,7 +1616,15 @@
                     doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
                 } else {
                     doc.setFont('helvetica', 'normal');
+                    const maxTextWidth = middleX - labelX - 2;
+                    let currentFontSize = 10;
+                    doc.setFontSize(currentFontSize);
+                    while (doc.getTextWidth(row.label) > maxTextWidth && currentFontSize > 7) {
+                        currentFontSize -= 0.5;
+                        doc.setFontSize(currentFontSize);
+                    }
                     doc.text(row.label, labelX, y + 4.5);
+                    doc.setFontSize(10);
                     doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
                 }
                 y += rowHeight;
