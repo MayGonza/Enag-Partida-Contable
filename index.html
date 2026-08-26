@@ -643,8 +643,8 @@
                         <span id="badgeCountAvisos" class="badge-count-avisos">0 Avisos</span>
                     </div>
                     <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
-                        <button type="button" class="btn-refresh-aviso" onclick="cargarAvisosRH()"
-                            title="Actualizar avisos ahora">
+                        <button type="button" class="btn-refresh-aviso" onclick="escucharAvisosRHTiempoReal()"
+                            title="Actualizar avisos en tiempo real">
                             <span>🔄</span> Actualizar
                         </button>
                         <button type="button" class="btn-nuevo-aviso" onclick="abrirModalNuevoAvisoRH()">
@@ -901,15 +901,20 @@
             document.getElementById('backButtonContainer').style.display = 'block';
 
             if (area === 'rrhh') {
-                cargarAvisosRH();
-                iniciarPollingAvisos();
+                escucharAvisosRHTiempoReal();
             } else {
-                detenerPollingAvisos();
+                if (unsubscribeAvisosFirestore) {
+                    unsubscribeAvisosFirestore();
+                    unsubscribeAvisosFirestore = null;
+                }
             }
         }
 
         function volverAlMenuPrincipal() {
-            detenerPollingAvisos();
+            if (unsubscribeAvisosFirestore) {
+                unsubscribeAvisosFirestore();
+                unsubscribeAvisosFirestore = null;
+            }
             // Ocultar todos los submenús y el botón volver
             document.getElementById('menuContabilidad').style.display = 'none';
             document.getElementById('menuRRHH').style.display = 'none';
@@ -923,46 +928,20 @@
         }
 
         // ========================================================
-        // GESTIÓN DE AVISOS Y COMUNICADOS PARA RECURSOS HUMANOS
+        // GESTIÓN DE AVISOS Y COMUNICADOS PARA RECURSOS HUMANOS (FIREBASE + REALTIME)
         // ========================================================
         const STORAGE_KEY_AVISOS_RH = 'enag_avisos_rh_data';
-        let pollingAvisosInterval = null;
-
-        function iniciarPollingAvisos() {
-            if (pollingAvisosInterval) clearInterval(pollingAvisosInterval);
-            pollingAvisosInterval = setInterval(() => {
-                const menu = document.getElementById('menuRRHH');
-                if (menu && menu.style.display !== 'none') {
-                    cargarAvisosRH(false);
-                }
-            }, 3000); // Consulta en tiempo real cada 3 segundos
-        }
-
-        function detenerPollingAvisos() {
-            if (pollingAvisosInterval) {
-                clearInterval(pollingAvisosInterval);
-                pollingAvisosInterval = null;
-            }
-        }
-
-        window.addEventListener('focus', () => {
-            const menu = document.getElementById('menuRRHH');
-            if (menu && menu.style.display !== 'none') {
-                cargarAvisosRH(false);
-            }
-        });
+        let unsubscribeAvisosFirestore = null;
+        let primerCargueAvisos = true;
 
         function getApiBaseUrl() {
-            // 1. Si se ejecuta en Electron o archivo local (file://)
             if (window.location.protocol === 'file:') {
                 return 'http://localhost:3000';
             }
-            // 2. Si se accede desde un navegador web en otro puerto (ej. 5500 u 8080) o red local
             if (window.location.port && window.location.port !== '3000') {
                 const host = window.location.hostname || 'localhost';
                 return `http://${host}:3000`;
             }
-            // 3. Si se accede directamente a través del servidor Express (puerto 3000)
             return '';
         }
 
@@ -980,20 +959,79 @@
             return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
         }
 
-        async function cargarAvisosRH(mostrarFeedback = false) {
-            const contenedor = document.getElementById('listaAvisosRH');
-            const badgeCount = document.getElementById('badgeCountAvisos');
-            const apiBase = getApiBaseUrl();
+        // Conexión en tiempo real con Firebase Cloud Firestore
+        function escucharAvisosRHTiempoReal() {
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                if (unsubscribeAvisosFirestore) {
+                    unsubscribeAvisosFirestore();
+                }
 
+                try {
+                    unsubscribeAvisosFirestore = dbFirestore.collection('avisos_rh')
+                        .orderBy('timestamp', 'desc')
+                        .onSnapshot((snapshot) => {
+                            const avisos = [];
+                            snapshot.forEach((doc) => {
+                                avisos.push({ id: doc.id, ...doc.data() });
+                            });
+
+                            // Si Firestore está vacío la primera vez, sembrar automáticamente el aviso inicial de avisos_rh.json
+                            if (avisos.length === 0 && primerCargueAvisos) {
+                                primerCargueAvisos = false;
+                                sembrarAvisoInicialEnFirestore();
+                            } else {
+                                localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+                                renderizarAvisosRH(avisos);
+                            }
+                        }, (error) => {
+                            console.warn("⚠️ Firebase Firestore error (usando fallback):", error);
+                            cargarAvisosRHFallback();
+                        });
+                    return;
+                } catch (err) {
+                    console.warn("No se pudo iniciar listener Firestore:", err);
+                }
+            }
+
+            // Si Firebase no está listo o hay error, usar método estándar
+            cargarAvisosRHFallback();
+        }
+
+        async function sembrarAvisoInicialEnFirestore() {
+            try {
+                const jsonPath = window.location.pathname.includes('/views/') ? '../avisos_rh.json' : 'avisos_rh.json';
+                const res = await fetch(`${jsonPath}?_t=${Date.now()}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data) && data.length > 0 && dbFirestore) {
+                        for (const av of data) {
+                            await dbFirestore.collection('avisos_rh').add({
+                                titulo: av.titulo || "Aviso",
+                                categoria: av.categoria || "actualizacion",
+                                autor: av.autor || "Soporte TI / Admin",
+                                mensaje: av.mensaje || "",
+                                fechaHora: av.fechaHora || obtenerFechaHoraHondurasLocal(),
+                                timestamp: Date.now()
+                            });
+                        }
+                        return;
+                    }
+                }
+            } catch (e) {}
+            cargarAvisosRHFallback();
+        }
+
+        async function cargarAvisosRHFallback() {
+            const apiBase = getApiBaseUrl();
             let avisos = [];
             let obtenido = false;
 
-            // 1. Intentar a través de la API (si está corriendo con Node/Express o Electron)
+            // 1. Intentar API local si existe
             if (apiBase || window.location.port === '3000') {
                 try {
                     const res = await fetch(`${apiBase}/api/avisos/rh?_t=${Date.now()}`, {
                         cache: 'no-store',
-                        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                        headers: { 'Cache-Control': 'no-cache' }
                     });
                     if (res.ok) {
                         const data = await res.json();
@@ -1003,18 +1041,16 @@
                             localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
                         }
                     }
-                } catch (err) {
-                    console.log("API de avisos local no disponible, intentando cargar avisos_rh.json estático:", err);
-                }
+                } catch (e) {}
             }
 
-            // 2. Si estamos en GitHub Pages o servidor estático (o la API falló), cargar directamente avisos_rh.json del repositorio
+            // 2. Intentar archivo JSON estático (GitHub Pages)
             if (!obtenido) {
                 try {
                     const jsonPath = window.location.pathname.includes('/views/') ? '../avisos_rh.json' : 'avisos_rh.json';
                     const res = await fetch(`${jsonPath}?_t=${Date.now()}`, {
                         cache: 'no-store',
-                        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                        headers: { 'Cache-Control': 'no-cache' }
                     });
                     if (res.ok) {
                         const data = await res.json();
@@ -1024,21 +1060,15 @@
                             localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
                         }
                     }
-                } catch (e) {
-                    console.log("No se pudo cargar avisos_rh.json estático:", e);
-                }
+                } catch (e) {}
             }
 
-            // 3. Respaldo en localStorage si no hay conexión
+            // 3. LocalStorage
             if (!obtenido) {
-                const cached = localStorage.getItem(STORAGE_KEY_AVISOS_RH);
-                if (cached) {
-                    try {
-                        avisos = JSON.parse(cached);
-                    } catch (e) {
-                        avisos = [];
-                    }
-                }
+                try {
+                    const cached = localStorage.getItem(STORAGE_KEY_AVISOS_RH);
+                    if (cached) avisos = JSON.parse(cached);
+                } catch (e) {}
             }
 
             renderizarAvisosRH(avisos);
@@ -1132,7 +1162,6 @@
             const mensaje = document.getElementById('avisoMensaje').value.trim();
             const btn = document.getElementById('btnGuardarAviso');
             const errorField = document.getElementById('avisoErrorMsg');
-            const apiBase = getApiBaseUrl();
 
             if (!titulo || !mensaje) {
                 errorField.innerText = "Por favor completa el título y el mensaje.";
@@ -1140,76 +1169,97 @@
             }
 
             btn.disabled = true;
-            btn.innerText = "Guardando...";
+            btn.innerText = "Publicando...";
 
             const fechaHora = obtenerFechaHoraHondurasLocal();
             const nuevoAviso = {
-                id: Date.now(),
                 titulo,
                 categoria,
                 autor,
                 mensaje,
-                fechaHora
+                fechaHora,
+                timestamp: Date.now()
             };
 
+            // 1. Guardar en Firebase Cloud Firestore (Tiempo real en la nube)
+            let guardadoEnFirebase = false;
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const docRef = await dbFirestore.collection('avisos_rh').add(nuevoAviso);
+                    nuevoAviso.id = docRef.id;
+                    guardadoEnFirebase = true;
+                    console.log("🔥 Aviso publicado en Firebase Firestore con ID:", docRef.id);
+                } catch (e) {
+                    console.warn("Error al guardar en Firestore:", e);
+                }
+            }
+
+            // 2. Guardar también en backend local si está activo
             try {
-                const res = await fetch(`${apiBase}/api/avisos/rh`, {
+                const apiBase = getApiBaseUrl();
+                await fetch(`${apiBase}/api/avisos/rh`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(nuevoAviso)
                 });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.aviso) {
-                        nuevoAviso.id = data.aviso.id;
-                    }
-                }
-            } catch (e) {
-                console.log("No se pudo conectar a la API, guardando en local:", e);
-            }
+            } catch (e) {}
 
-            // Sincronizar en localStorage
-            let cached = [];
-            try {
-                cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
-            } catch (e) { cached = []; }
-            cached.unshift(nuevoAviso);
-            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
+            // Si Firebase no está activo, actualizar vista local
+            if (!guardadoEnFirebase) {
+                nuevoAviso.id = Date.now().toString();
+                let cached = [];
+                try {
+                    cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
+                } catch (e) { cached = []; }
+                cached.unshift(nuevoAviso);
+                localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
+                renderizarAvisosRH(cached);
+            }
 
             cerrarModalNuevoAvisoRH();
             btn.disabled = false;
             btn.innerText = "Publicar Aviso";
-            await cargarAvisosRH();
         }
 
         async function eliminarAvisoRH(id) {
             if (!confirm("¿Deseas eliminar este aviso de Recursos Humanos?")) {
                 return;
             }
-            const apiBase = getApiBaseUrl();
 
-            // Optimistic update: eliminar de localStorage y de la vista inmediatamente
-            let cached = [];
-            try {
-                cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
-            } catch (e) { cached = []; }
-            cached = cached.filter(a => String(a.id) !== String(id) && Number(a.id) !== Number(id));
-            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
-            renderizarAvisosRH(cached);
+            // 1. Eliminar en Firebase Firestore
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    await dbFirestore.collection('avisos_rh').doc(id).delete();
+                    console.log("🔥 Aviso eliminado de Firebase Firestore:", id);
+                } catch (e) {
+                    console.warn("Error al eliminar de Firestore:", e);
+                }
+            }
 
+            // 2. Eliminar en backend local si está disponible
             try {
+                const apiBase = getApiBaseUrl();
                 await fetch(`${apiBase}/api/avisos/rh/${id}`, {
                     method: 'DELETE',
                     cache: 'no-store',
                     headers: { 'Cache-Control': 'no-cache' }
                 });
-            } catch (e) {
-                console.log("API no disponible para eliminar:", e);
-            }
+            } catch (e) {}
 
-            await cargarAvisosRH();
+            // Optimistic update
+            let cached = [];
+            try {
+                cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
+            } catch (e) { cached = []; }
+            cached = cached.filter(a => String(a.id) !== String(id));
+            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
+            renderizarAvisosRH(cached);
         }
     </script>
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="js/firebase-config.js"></script>
     <script src="js/soporte.js"></script>
 </body>
 
