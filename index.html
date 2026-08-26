@@ -986,26 +986,51 @@
             const apiBase = getApiBaseUrl();
 
             let avisos = [];
-            let obtenidoDeApi = false;
+            let obtenido = false;
 
-            try {
-                const res = await fetch(`${apiBase}/api/avisos/rh?_t=${Date.now()}`, {
-                    cache: 'no-store',
-                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
-                });
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data)) {
-                        avisos = data;
-                        obtenidoDeApi = true;
-                        localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+            // 1. Intentar a través de la API (si está corriendo con Node/Express o Electron)
+            if (apiBase || window.location.port === '3000') {
+                try {
+                    const res = await fetch(`${apiBase}/api/avisos/rh?_t=${Date.now()}`, {
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data)) {
+                            avisos = data;
+                            obtenido = true;
+                            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+                        }
                     }
+                } catch (err) {
+                    console.log("API de avisos local no disponible, intentando cargar avisos_rh.json estático:", err);
                 }
-            } catch (err) {
-                console.log("API de avisos no disponible, usando almacenamiento local:", err);
             }
 
-            if (!obtenidoDeApi) {
+            // 2. Si estamos en GitHub Pages o servidor estático (o la API falló), cargar directamente avisos_rh.json del repositorio
+            if (!obtenido) {
+                try {
+                    const jsonPath = window.location.pathname.includes('/views/') ? '../avisos_rh.json' : 'avisos_rh.json';
+                    const res = await fetch(`${jsonPath}?_t=${Date.now()}`, {
+                        cache: 'no-store',
+                        headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                    });
+                    if (res.ok) {
+                        const data = await res.json();
+                        if (Array.isArray(data)) {
+                            avisos = data;
+                            obtenido = true;
+                            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+                        }
+                    }
+                } catch (e) {
+                    console.log("No se pudo cargar avisos_rh.json estático:", e);
+                }
+            }
+
+            // 3. Respaldo en localStorage si no hay conexión
+            if (!obtenido) {
                 const cached = localStorage.getItem(STORAGE_KEY_AVISOS_RH);
                 if (cached) {
                     try {

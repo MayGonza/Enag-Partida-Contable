@@ -1,34 +1,51 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
+
 <head>
     <meta charset="UTF-8">
     <title>Sistema de Gestión ENAG</title>
     <style>
-        body { font-family: sans-serif; background: #f4f4f9; padding: 50px; text-align: center; }
-        .grid-container { 
-            display: grid; 
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); 
-            gap: 20px; 
-            max-width: 900px; 
-            margin: auto; 
+        body {
+            font-family: sans-serif;
+            background: #f4f4f9;
+            padding: 50px;
+            text-align: center;
         }
-        .card { 
-            background: white; 
-            padding: 30px; 
-            border-radius: 10px; 
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1); 
-            text-decoration: none; 
-            color: #333; 
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            max-width: 900px;
+            margin: auto;
+        }
+
+        .card {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-decoration: none;
+            color: #333;
             transition: transform 0.3s;
         }
-        .card:hover { transform: translateY(-10px); background: #eef; }
-        h1 { color: #2c3e50; margin-bottom: 40px; }
+
+        .card:hover {
+            transform: translateY(-10px);
+            background: #eef;
+        }
+
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 40px;
+        }
     </style>
 </head>
+
 <body>
 
     <h1>Bienvenido al Sistema Administrativo</h1>
-    
+
     <div class="grid-container">
         <!-- Tarjeta para el Comprobante de Retención -->
         <a href="comprobante_retencion.html" class="card">
@@ -39,9 +56,10 @@
         <!-- Puedes ir agregando más tarjetas aquí -->
         <a href="partidas.html" class="card">
             <h2>📊 Partidas Contables</h2>
-            <p>Creacion  de partidas contables</p>
+            <p>Creacion de partidas contables</p>
         </a>
     </div>
 
 </body>
-</html>      
+
+</html>
