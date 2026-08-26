@@ -932,7 +932,6 @@
         // ========================================================
         const STORAGE_KEY_AVISOS_RH = 'enag_avisos_rh_data';
         let unsubscribeAvisosFirestore = null;
-        let primerCargueAvisos = true;
 
         function getApiBaseUrl() {
             if (window.location.protocol === 'file:') {
@@ -975,14 +974,8 @@
                                 avisos.push({ id: doc.id, ...doc.data() });
                             });
 
-                            // Si Firestore está vacío la primera vez, sembrar automáticamente el aviso inicial de avisos_rh.json
-                            if (avisos.length === 0 && primerCargueAvisos) {
-                                primerCargueAvisos = false;
-                                sembrarAvisoInicialEnFirestore();
-                            } else {
-                                localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
-                                renderizarAvisosRH(avisos);
-                            }
+                            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+                            renderizarAvisosRH(avisos);
                         }, (error) => {
                             console.warn("⚠️ Firebase Firestore error (usando fallback):", error);
                             cargarAvisosRHFallback();
@@ -994,30 +987,6 @@
             }
 
             // Si Firebase no está listo o hay error, usar método estándar
-            cargarAvisosRHFallback();
-        }
-
-        async function sembrarAvisoInicialEnFirestore() {
-            try {
-                const jsonPath = window.location.pathname.includes('/views/') ? '../avisos_rh.json' : 'avisos_rh.json';
-                const res = await fetch(`${jsonPath}?_t=${Date.now()}`);
-                if (res.ok) {
-                    const data = await res.json();
-                    if (Array.isArray(data) && data.length > 0 && dbFirestore) {
-                        for (const av of data) {
-                            await dbFirestore.collection('avisos_rh').add({
-                                titulo: av.titulo || "Aviso",
-                                categoria: av.categoria || "actualizacion",
-                                autor: av.autor || "Soporte TI / Admin",
-                                mensaje: av.mensaje || "",
-                                fechaHora: av.fechaHora || obtenerFechaHoraHondurasLocal(),
-                                timestamp: Date.now()
-                            });
-                        }
-                        return;
-                    }
-                }
-            } catch (e) {}
             cargarAvisosRHFallback();
         }
 
