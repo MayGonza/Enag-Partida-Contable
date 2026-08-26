@@ -297,6 +297,142 @@ app.get("/api/soporte/tickets", async (req, res) => {
   return res.json([]);
 });
 
+// ==========================================
+// ENDPOINTS PARA AVISOS Y COMUNICADOS DE RH
+// ==========================================
+
+// Consultar avisos de RH
+app.get("/api/avisos/rh", async (req, res) => {
+  try {
+    const conn = await db.getConnection();
+    try {
+      await conn.query(`
+        CREATE TABLE IF NOT EXISTS avisos_rh (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          titulo VARCHAR(255) NOT NULL,
+          categoria VARCHAR(50) DEFAULT 'actualizacion',
+          autor VARCHAR(150) DEFAULT 'Administrador',
+          mensaje TEXT NOT NULL,
+          fecha_hora VARCHAR(100) NOT NULL,
+          creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+      const [rows] = await conn.query("SELECT id, titulo, categoria, autor, mensaje, fecha_hora as fechaHora, creado_en FROM avisos_rh ORDER BY id DESC");
+      conn.release();
+      return res.json(rows);
+    } catch (e) {
+      conn.release();
+    }
+  } catch (e) { }
+
+  const avisosFilePath = path.join(__dirname, 'avisos_rh.json');
+  if (fs.existsSync(avisosFilePath)) {
+    try {
+      const raw = fs.readFileSync(avisosFilePath, 'utf8');
+      const data = JSON.parse(raw);
+      return res.json(Array.isArray(data) ? data : []);
+    } catch (e) { }
+  }
+  return res.json([]);
+});
+
+// Publicar nuevo aviso de RH
+app.post("/api/avisos/rh", async (req, res) => {
+  const { titulo, categoria, autor, mensaje, fechaHora } = req.body;
+
+  if (!titulo || !mensaje) {
+    return res.status(400).json({ error: "El título y el mensaje son obligatorios." });
+  }
+
+  const horaFinal = fechaHora || (typeof getHondurasFormattedDate === 'function' ? getHondurasFormattedDate() : new Date().toLocaleString());
+  let guardadoEnDb = false;
+  let insertId = null;
+
+  try {
+    const conn = await db.getConnection();
+    try {
+      await conn.query(`
+        CREATE TABLE IF NOT EXISTS avisos_rh (
+          id INT AUTO_INCREMENT PRIMARY KEY,
+          titulo VARCHAR(255) NOT NULL,
+          categoria VARCHAR(50) DEFAULT 'actualizacion',
+          autor VARCHAR(150) DEFAULT 'Administrador',
+          mensaje TEXT NOT NULL,
+          fecha_hora VARCHAR(100) NOT NULL,
+          creado_en TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      const [resInsert] = await conn.query(
+        `INSERT INTO avisos_rh (titulo, categoria, autor, mensaje, fecha_hora)
+         VALUES (?, ?, ?, ?, ?)`,
+        [titulo, categoria || 'actualizacion', autor || 'Administrador', mensaje, horaFinal]
+      );
+      insertId = resInsert.insertId;
+      guardadoEnDb = true;
+    } finally {
+      conn.release();
+    }
+  } catch (e) {
+    console.warn("MySQL no disponible para avisos RH, guardando en avisos_rh.json:", e.message);
+  }
+
+  // Guardar también / sincronizar en JSON
+  const avisosFilePath = path.join(__dirname, 'avisos_rh.json');
+  let avisos = [];
+  if (fs.existsSync(avisosFilePath)) {
+    try {
+      avisos = JSON.parse(fs.readFileSync(avisosFilePath, 'utf8'));
+    } catch (e) {
+      avisos = [];
+    }
+  }
+
+  const nuevoAviso = {
+    id: guardadoEnDb ? insertId : (avisos.length > 0 ? Math.max(...avisos.map(a => a.id || 0)) + 1 : 1),
+    titulo,
+    categoria: categoria || 'actualizacion',
+    autor: autor || 'Administrador',
+    mensaje,
+    fechaHora: horaFinal
+  };
+
+  // Agregar al inicio
+  avisos.unshift(nuevoAviso);
+  fs.writeFileSync(avisosFilePath, JSON.stringify(avisos, null, 2), 'utf8');
+
+  return res.json({
+    success: true,
+    mensaje: "Aviso publicado exitosamente.",
+    aviso: nuevoAviso
+  });
+});
+
+// Eliminar aviso de RH por ID
+app.delete("/api/avisos/rh/:id", async (req, res) => {
+  const avisoId = parseInt(req.params.id);
+
+  try {
+    const conn = await db.getConnection();
+    try {
+      await conn.query("DELETE FROM avisos_rh WHERE id = ?", [avisoId]);
+    } finally {
+      conn.release();
+    }
+  } catch (e) { }
+
+  const avisosFilePath = path.join(__dirname, 'avisos_rh.json');
+  if (fs.existsSync(avisosFilePath)) {
+    try {
+      let avisos = JSON.parse(fs.readFileSync(avisosFilePath, 'utf8'));
+      avisos = avisos.filter(a => a.id !== avisoId);
+      fs.writeFileSync(avisosFilePath, JSON.stringify(avisos, null, 2), 'utf8');
+    } catch (e) { }
+  }
+
+  return res.json({ success: true, mensaje: "Aviso eliminado correctamente." });
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
   console.log(`API contable activa en puerto ${PORT}`);

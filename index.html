@@ -35,7 +35,7 @@
         }
 
         .main-container {
-            max-width: 800px;
+            max-width: 960px;
             width: 100%;
             background: rgba(255, 255, 255, 0.98);
             padding: 40px;
@@ -43,6 +43,7 @@
             box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
             text-align: center;
             border-top: 8px solid #002147;
+            box-sizing: border-box;
         }
 
         .header-logo {
@@ -286,8 +287,275 @@
             }
         }
 
-        .shake {
-            animation: shake 0.3s ease-in-out;
+        /* =========================================
+           ESTILOS: SECCIÓN DE AVISOS PARA RRHH
+           ========================================= */
+        .avisos-rh-panel {
+            grid-column: 1 / -1;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid #cbd5e1;
+            border-left: 6px solid #002147;
+            border-radius: 16px;
+            padding: 22px 24px;
+            box-shadow: 0 10px 25px rgba(0, 33, 71, 0.08);
+            margin-bottom: 10px;
+            text-align: left;
+            transition: all 0.3s ease;
+        }
+
+        .avisos-rh-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            border-bottom: 1.5px solid #e2e8f0;
+            padding-bottom: 12px;
+            margin-bottom: 16px;
+        }
+
+        .avisos-rh-header-left {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avisos-rh-header h3 {
+            margin: 0;
+            color: #002147;
+            font-size: 1.25em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .badge-count-avisos {
+            background: #002147;
+            color: white;
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 0.78em;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-nuevo-aviso {
+            background: linear-gradient(135deg, #002147 0%, #0a3d74 100%);
+            color: white;
+            border: none;
+            padding: 9px 18px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(0, 33, 71, 0.2);
+        }
+
+        .btn-nuevo-aviso:hover {
+            background: linear-gradient(135deg, #0a3d74 0%, #15559a 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 33, 71, 0.3);
+        }
+
+        .avisos-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 380px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .avisos-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .avisos-list::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+
+        .aviso-item-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            padding: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+            position: relative;
+        }
+
+        .aviso-item-card:hover {
+            border-color: #94a3b8;
+            box-shadow: 0 6px 16px rgba(0, 33, 71, 0.08);
+            transform: translateY(-1px);
+        }
+
+        .aviso-item-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 10px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+        }
+
+        .aviso-item-tags {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .aviso-cat-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .badge-actualizacion {
+            background: #e0f2fe;
+            color: #0284c7;
+            border: 1px solid #bae6fd;
+        }
+
+        .badge-importante {
+            background: #fef3c7;
+            color: #d97706;
+            border: 1px solid #fde68a;
+        }
+
+        .badge-mantenimiento {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fed7aa;
+        }
+
+        .badge-comunicado {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #bbf7d0;
+        }
+
+        .aviso-item-title {
+            font-size: 1.05em;
+            font-weight: 700;
+            color: #002147;
+            margin: 0;
+        }
+
+        .aviso-meta {
+            font-size: 0.8em;
+            color: #64748b;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        .aviso-mensaje {
+            margin: 0;
+            font-size: 0.93em;
+            color: #334155;
+            line-height: 1.55;
+            white-space: pre-line;
+        }
+
+        .btn-delete-aviso {
+            background: transparent;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            padding: 4px 6px;
+            border-radius: 4px;
+            font-size: 1.1em;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .btn-delete-aviso:hover {
+            color: #ef4444;
+            background: #fee2e2;
+        }
+
+        .aviso-empty-state {
+            text-align: center;
+            padding: 25px 15px;
+            color: #64748b;
+        }
+
+        .aviso-empty-state .icon-empty {
+            font-size: 2.2em;
+            margin-bottom: 6px;
+        }
+
+        /* Modal formulario aviso */
+        .modal-aviso-card {
+            background: white;
+            padding: 28px;
+            border-radius: 16px;
+            box-shadow: 0 20px 45px rgba(0, 0, 0, 0.35);
+            max-width: 540px;
+            width: 92%;
+            text-align: left;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+            border-top: 6px solid #002147;
+            box-sizing: border-box;
+        }
+
+        .modal-overlay.active .modal-aviso-card {
+            transform: scale(1);
+        }
+
+        .form-group-aviso {
+            margin-bottom: 14px;
+        }
+
+        .form-group-aviso label {
+            display: block;
+            font-size: 0.88em;
+            font-weight: 700;
+            color: #002147;
+            margin-bottom: 5px;
+        }
+
+        .form-group-aviso input[type="text"],
+        .form-group-aviso select,
+        .form-group-aviso textarea {
+            width: 100%;
+            padding: 10px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-family: inherit;
+            box-sizing: border-box;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .form-group-aviso input[type="text"]:focus,
+        .form-group-aviso select:focus,
+        .form-group-aviso textarea:focus {
+            border-color: #002147;
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.1);
+        }
+
+        .form-group-aviso textarea {
+            resize: vertical;
+            min-height: 95px;
         }
     </style>
 </head>
@@ -343,6 +611,28 @@
 
         <!-- SUB-MENÚ: RECURSOS HUMANOS (Oculto al inicio) -->
         <div id="menuRRHH" class="grid-container sub-menu" style="display: none;">
+
+            <!-- PANEL DE AVISOS Y COMUNICADOS DE RH -->
+            <div id="seccionAvisosRH" class="avisos-rh-panel">
+                <div class="avisos-rh-header">
+                    <div class="avisos-rh-header-left">
+                        <h3>
+                            <span>📢</span> Avisos y Comunicados de Recursos Humanos
+                        </h3>
+                        <span id="badgeCountAvisos" class="badge-count-avisos">0 Avisos</span>
+                    </div>
+                    <button type="button" class="btn-nuevo-aviso" onclick="abrirModalNuevoAvisoRH()">
+                        <span>✍️</span> Publicar Nuevo Aviso
+                    </button>
+                </div>
+                <div id="listaAvisosRH" class="avisos-list">
+                    <div class="aviso-empty-state">
+                        <div class="icon-empty">⏳</div>
+                        <p>Cargando comunicados...</p>
+                    </div>
+                </div>
+            </div>
+
             <a href="views/vouchers.html" class="card">
                 <div class="icon">💵</div>
                 <h2>Vouchers (Acuerdo)</h2>
@@ -435,6 +725,51 @@
                 <button onclick="cerrarPasswordModal()" class="btn-cancel">Cancelar</button>
                 <button onclick="verificarPassword()" class="btn-confirm">Ingresar</button>
             </div>
+        </div>
+    </div>
+
+    <!-- MODAL: PUBLICAR NUEVO AVISO RH -->
+    <div id="modalNuevoAvisoRH" class="modal-overlay">
+        <div class="modal-aviso-card">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px;">
+                <h3 style="margin: 0; color: #002147; font-size: 1.25em; display: flex; align-items: center; gap: 8px;">
+                    <span>📢</span> Publicar Mensaje / Aviso para RH
+                </h3>
+                <button type="button" onclick="cerrarModalNuevoAvisoRH()"
+                    style="background: none; border: none; font-size: 1.5em; cursor: pointer; color: #94a3b8;">&times;</button>
+            </div>
+            <form id="formNuevoAvisoRH" onsubmit="guardarNuevoAvisoRH(event)">
+                <div class="form-group-aviso">
+                    <label for="avisoTitulo">Título del Aviso o Cambio *</label>
+                    <input type="text" id="avisoTitulo" required placeholder="Ej. Actualización en formato de Vouchers">
+                </div>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                    <div class="form-group-aviso">
+                        <label for="avisoCategoria">Categoría</label>
+                        <select id="avisoCategoria">
+                            <option value="actualizacion">🚀 Actualización de Sistema</option>
+                            <option value="importante">⚠️ Aviso Importante</option>
+                            <option value="mantenimiento">🛠️ Mantenimiento</option>
+                            <option value="comunicado">📢 Comunicado General</option>
+                        </select>
+                    </div>
+                    <div class="form-group-aviso">
+                        <label for="avisoAutor">Publicado por</label>
+                        <input type="text" id="avisoAutor" required value="Soporte TI / Admin">
+                    </div>
+                </div>
+                <div class="form-group-aviso">
+                    <label for="avisoMensaje">Mensaje / Detalle para el Personal de RH *</label>
+                    <textarea id="avisoMensaje" required
+                        placeholder="Describe aquí los cambios realizados, instrucciones o recordatorios..."></textarea>
+                </div>
+                <div id="avisoErrorMsg" class="error-msg" style="text-align: center;"></div>
+                <div class="modal-buttons" style="margin-top: 15px;">
+                    <button type="button" onclick="cerrarModalNuevoAvisoRH()" class="btn-cancel">Cancelar</button>
+                    <button type="submit" id="btnGuardarAviso" class="btn-confirm">Publicar Aviso</button>
+                </div>
+            </form>
         </div>
     </div>
 
@@ -537,6 +872,10 @@
             document.getElementById(targetId).style.display = 'grid';
             document.getElementById('menuTitle').innerText = titulo;
             document.getElementById('backButtonContainer').style.display = 'block';
+
+            if (area === 'rrhh') {
+                cargarAvisosRH();
+            }
         }
 
         function volverAlMenuPrincipal() {
@@ -550,6 +889,239 @@
             // Restaurar título y mostrar las áreas principales
             document.getElementById('menuTitle').innerText = "Portal Administrativo";
             document.getElementById('areasContainer').style.display = 'grid';
+        }
+
+        // ========================================================
+        // GESTIÓN DE AVISOS Y COMUNICADOS PARA RECURSOS HUMANOS
+        // ========================================================
+        const STORAGE_KEY_AVISOS_RH = 'enag_avisos_rh_data';
+
+        function obtenerFechaHoraHondurasLocal() {
+            const now = new Date();
+            const day = String(now.getDate()).padStart(2, '0');
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const year = now.getFullYear();
+            let hours = now.getHours();
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12;
+            const hoursStr = String(hours).padStart(2, '0');
+            return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
+        }
+
+        async function cargarAvisosRH() {
+            const contenedor = document.getElementById('listaAvisosRH');
+            const badgeCount = document.getElementById('badgeCountAvisos');
+
+            let avisos = [];
+            let obtenidoDeApi = false;
+
+            try {
+                const res = await fetch('/api/avisos/rh');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (Array.isArray(data)) {
+                        avisos = data;
+                        obtenidoDeApi = true;
+                        localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+                    }
+                }
+            } catch (err) {
+                console.log("API de avisos no disponible, usando almacenamiento local:", err);
+            }
+
+            if (!obtenidoDeApi) {
+                const cached = localStorage.getItem(STORAGE_KEY_AVISOS_RH);
+                if (cached) {
+                    try {
+                        avisos = JSON.parse(cached);
+                    } catch (e) {
+                        avisos = [];
+                    }
+                } else {
+                    // Avisos por defecto si no existen
+                    avisos = [
+                        {
+                            id: 1,
+                            titulo: "Ajuste en Formato de Vouchers de Pago (PDF)",
+                            categoria: "actualizacion",
+                            autor: "Soporte TI / Administración",
+                            mensaje: "Se aumentó el margen de separación entre la tabla de deducciones y las firmas autorizadas (a 30mm) tanto en Vouchers de Acuerdo como de Contrato para una mejor presentación e impresión.",
+                            fechaHora: obtenerFechaHoraHondurasLocal()
+                        },
+                        {
+                            id: 2,
+                            titulo: "Verificación de Planillas y Constancias",
+                            categoria: "comunicado",
+                            autor: "Administración del Sistema",
+                            mensaje: "Por favor asegurarse de que los nombres y puestos en los archivos Excel de planilla concuerden con los registros institucionales antes de emitir constancias masivas.",
+                            fechaHora: obtenerFechaHoraHondurasLocal()
+                        }
+                    ];
+                    localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
+                }
+            }
+
+            renderizarAvisosRH(avisos);
+        }
+
+        function renderizarAvisosRH(avisos) {
+            const contenedor = document.getElementById('listaAvisosRH');
+            const badgeCount = document.getElementById('badgeCountAvisos');
+
+            if (!avisos || avisos.length === 0) {
+                badgeCount.innerText = "0 Avisos";
+                badgeCount.style.background = "#64748b";
+                contenedor.innerHTML = `
+                    <div class="aviso-empty-state">
+                        <div class="icon-empty">✨</div>
+                        <p style="margin: 0; font-weight: 600; color: #475569;">No hay avisos ni novedades pendientes.</p>
+                        <span style="font-size: 0.85em; color: #94a3b8;">Todos los módulos de RH operan normalmente.</span>
+                    </div>
+                `;
+                return;
+            }
+
+            badgeCount.innerText = `${avisos.length} ${avisos.length === 1 ? 'Aviso' : 'Avisos'}`;
+            badgeCount.style.background = "#002147";
+
+            const categoriasMeta = {
+                actualizacion: { label: "🚀 Actualización", class: "badge-actualizacion" },
+                importante: { label: "⚠️ Importante", class: "badge-importante" },
+                mantenimiento: { label: "🛠️ Mantenimiento", class: "badge-mantenimiento" },
+                comunicado: { label: "📢 Comunicado", class: "badge-comunicado" }
+            };
+
+            let html = '';
+            avisos.forEach(av => {
+                const catInfo = categoriasMeta[av.categoria] || categoriasMeta.actualizacion;
+                html += `
+                    <div class="aviso-item-card" id="aviso-item-${av.id}">
+                        <div class="aviso-item-top">
+                            <div class="aviso-item-tags">
+                                <span class="aviso-cat-badge ${catInfo.class}">${catInfo.label}</span>
+                                <h4 class="aviso-item-title">${escapeHTML(av.titulo)}</h4>
+                            </div>
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div class="aviso-meta">
+                                    <span>📅 ${escapeHTML(av.fechaHora || '')}</span>
+                                    <span>&bull;</span>
+                                    <span>👤 ${escapeHTML(av.autor || 'Admin')}</span>
+                                </div>
+                                <button type="button" class="btn-delete-aviso" title="Eliminar aviso" onclick="eliminarAvisoRH(${av.id})">🗑️</button>
+                            </div>
+                        </div>
+                        <p class="aviso-mensaje">${escapeHTML(av.mensaje)}</p>
+                    </div>
+                `;
+            });
+
+            contenedor.innerHTML = html;
+        }
+
+        function escapeHTML(str) {
+            if (!str) return '';
+            return String(str)
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#039;');
+        }
+
+        function abrirModalNuevoAvisoRH() {
+            document.getElementById('avisoTitulo').value = '';
+            document.getElementById('avisoMensaje').value = '';
+            document.getElementById('avisoErrorMsg').innerText = '';
+            document.getElementById('avisoCategoria').value = 'actualizacion';
+            const modal = document.getElementById('modalNuevoAvisoRH');
+            modal.classList.add('active');
+            setTimeout(() => {
+                document.getElementById('avisoTitulo').focus();
+            }, 100);
+        }
+
+        function cerrarModalNuevoAvisoRH() {
+            document.getElementById('modalNuevoAvisoRH').classList.remove('active');
+        }
+
+        async function guardarNuevoAvisoRH(event) {
+            event.preventDefault();
+            const titulo = document.getElementById('avisoTitulo').value.trim();
+            const categoria = document.getElementById('avisoCategoria').value;
+            const autor = document.getElementById('avisoAutor').value.trim() || 'Soporte TI / Admin';
+            const mensaje = document.getElementById('avisoMensaje').value.trim();
+            const btn = document.getElementById('btnGuardarAviso');
+            const errorField = document.getElementById('avisoErrorMsg');
+
+            if (!titulo || !mensaje) {
+                errorField.innerText = "Por favor completa el título y el mensaje.";
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerText = "Guardando...";
+
+            const fechaHora = obtenerFechaHoraHondurasLocal();
+            const nuevoAviso = {
+                id: Date.now(),
+                titulo,
+                categoria,
+                autor,
+                mensaje,
+                fechaHora
+            };
+
+            try {
+                const res = await fetch('/api/avisos/rh', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(nuevoAviso)
+                });
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.aviso) {
+                        nuevoAviso.id = data.aviso.id;
+                    }
+                }
+            } catch (e) {
+                console.log("No se pudo conectar a la API, guardando en local:", e);
+            }
+
+            // Sincronizar en localStorage
+            let cached = [];
+            try {
+                cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
+            } catch (e) { cached = []; }
+            cached.unshift(nuevoAviso);
+            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
+
+            cerrarModalNuevoAvisoRH();
+            btn.disabled = false;
+            btn.innerText = "Publicar Aviso";
+            cargarAvisosRH();
+        }
+
+        async function eliminarAvisoRH(id) {
+            if (!confirm("¿Deseas eliminar este aviso de Recursos Humanos?")) {
+                return;
+            }
+
+            try {
+                await fetch(`/api/avisos/rh/${id}`, { method: 'DELETE' });
+            } catch (e) {
+                console.log("API no disponible para eliminar, actualizando localmente:", e);
+            }
+
+            let cached = [];
+            try {
+                cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
+            } catch (e) { cached = []; }
+            cached = cached.filter(a => a.id !== id);
+            localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
+
+            cargarAvisosRH();
         }
     </script>
     <script src="js/soporte.js"></script>

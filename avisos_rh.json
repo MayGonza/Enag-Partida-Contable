@@ -1,0 +1,18 @@
+[
+  {
+    "id": 1,
+    "titulo": "Ajuste en Formato de Vouchers de Pago (PDF)",
+    "categoria": "actualizacion",
+    "autor": "Soporte TI / Administración",
+    "mensaje": "Se aumentó el margen de separación entre la tabla de deducciones y las firmas autorizadas (a 30mm) tanto en Vouchers de Acuerdo como de Contrato para una mejor presentación e impresión.",
+    "fechaHora": "25/08/2026 11:55 PM"
+  },
+  {
+    "id": 2,
+    "titulo": "Verificación de Planillas y Constancias",
+    "categoria": "comunicado",
+    "autor": "Administración del Sistema",
+    "mensaje": "Por favor asegurarse de que los nombres y puestos en los archivos Excel de planilla concuerden con los registros institucionales antes de emitir constancias masivas.",
+    "fechaHora": "25/08/2026 10:00 AM"
+  }
+]
