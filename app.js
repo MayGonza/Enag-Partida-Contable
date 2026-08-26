@@ -4,9 +4,8 @@ const cors = require("cors");
 const db = require("./db");
 
 const app = express();
-app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:8080' // ¡IMPORTANTE! Cambia 'http://localhost:8080' por la URL de tu frontend desplegado
-}));
+// Permitir solicitudes desde cualquier origen (Electron file://, localhost, y otros dispositivos en la red)
+app.use(cors());
 app.use(express.json());
 // Servir archivos estáticos (HTML, JS, Imágenes) para que sean accesibles en la red
 app.use(express.static(__dirname));
@@ -303,6 +302,10 @@ app.get("/api/soporte/tickets", async (req, res) => {
 
 // Consultar avisos de RH
 app.get("/api/avisos/rh", async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate, proxy-revalidate');
+  res.setHeader('Pragma', 'no-cache');
+  res.setHeader('Expires', '0');
+
   try {
     const conn = await db.getConnection();
     try {
@@ -338,6 +341,7 @@ app.get("/api/avisos/rh", async (req, res) => {
 
 // Publicar nuevo aviso de RH
 app.post("/api/avisos/rh", async (req, res) => {
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
   const { titulo, categoria, autor, mensaje, fechaHora } = req.body;
 
   if (!titulo || !mensaje) {
@@ -377,19 +381,20 @@ app.post("/api/avisos/rh", async (req, res) => {
     console.warn("MySQL no disponible para avisos RH, guardando en avisos_rh.json:", e.message);
   }
 
-  // Guardar también / sincronizar en JSON
+  // Guardar siempre en JSON para consistencia local y respaldo
   const avisosFilePath = path.join(__dirname, 'avisos_rh.json');
   let avisos = [];
   if (fs.existsSync(avisosFilePath)) {
     try {
       avisos = JSON.parse(fs.readFileSync(avisosFilePath, 'utf8'));
+      if (!Array.isArray(avisos)) avisos = [];
     } catch (e) {
       avisos = [];
     }
   }
 
   const nuevoAviso = {
-    id: guardadoEnDb ? insertId : (avisos.length > 0 ? Math.max(...avisos.map(a => a.id || 0)) + 1 : 1),
+    id: guardadoEnDb ? insertId : (avisos.length > 0 ? Math.max(...avisos.map(a => Number(a.id) || 0)) + 1 : Date.now()),
     titulo,
     categoria: categoria || 'actualizacion',
     autor: autor || 'Administrador',
@@ -410,7 +415,8 @@ app.post("/api/avisos/rh", async (req, res) => {
 
 // Eliminar aviso de RH por ID
 app.delete("/api/avisos/rh/:id", async (req, res) => {
-  const avisoId = parseInt(req.params.id);
+  res.setHeader('Cache-Control', 'no-store, no-cache, must-revalidate');
+  const avisoId = req.params.id;
 
   try {
     const conn = await db.getConnection();
@@ -425,8 +431,10 @@ app.delete("/api/avisos/rh/:id", async (req, res) => {
   if (fs.existsSync(avisosFilePath)) {
     try {
       let avisos = JSON.parse(fs.readFileSync(avisosFilePath, 'utf8'));
-      avisos = avisos.filter(a => a.id !== avisoId);
-      fs.writeFileSync(avisosFilePath, JSON.stringify(avisos, null, 2), 'utf8');
+      if (Array.isArray(avisos)) {
+        avisos = avisos.filter(a => String(a.id) !== String(avisoId) && Number(a.id) !== Number(avisoId));
+        fs.writeFileSync(avisosFilePath, JSON.stringify(avisos, null, 2), 'utf8');
+      }
     } catch (e) { }
   }
 
@@ -434,7 +442,7 @@ app.delete("/api/avisos/rh/:id", async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`API contable activa en puerto ${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`API contable activa en puerto ${PORT} (Accesible en localhost y en red local)`);
 });
 

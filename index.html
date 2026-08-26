@@ -361,6 +361,27 @@
             box-shadow: 0 6px 14px rgba(0, 33, 71, 0.3);
         }
 
+        .btn-refresh-aviso {
+            background: #e2e8f0;
+            color: #1e293b;
+            border: 1px solid #cbd5e1;
+            padding: 9px 14px;
+            border-radius: 8px;
+            font-size: 0.88em;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .btn-refresh-aviso:hover {
+            background: #cbd5e1;
+            color: #002147;
+            transform: translateY(-1px);
+        }
+
         .avisos-list {
             display: flex;
             flex-direction: column;
@@ -621,9 +642,15 @@
                         </h3>
                         <span id="badgeCountAvisos" class="badge-count-avisos">0 Avisos</span>
                     </div>
-                    <button type="button" class="btn-nuevo-aviso" onclick="abrirModalNuevoAvisoRH()">
-                        <span>✍️</span> Publicar Nuevo Aviso
-                    </button>
+                    <div style="display: flex; gap: 8px; align-items: center; flex-wrap: wrap;">
+                        <button type="button" class="btn-refresh-aviso" onclick="cargarAvisosRH()"
+                            title="Actualizar avisos ahora">
+                            <span>🔄</span> Actualizar
+                        </button>
+                        <button type="button" class="btn-nuevo-aviso" onclick="abrirModalNuevoAvisoRH()">
+                            <span>✍️</span> Publicar Nuevo Aviso
+                        </button>
+                    </div>
                 </div>
                 <div id="listaAvisosRH" class="avisos-list">
                     <div class="aviso-empty-state">
@@ -875,10 +902,14 @@
 
             if (area === 'rrhh') {
                 cargarAvisosRH();
+                iniciarPollingAvisos();
+            } else {
+                detenerPollingAvisos();
             }
         }
 
         function volverAlMenuPrincipal() {
+            detenerPollingAvisos();
             // Ocultar todos los submenús y el botón volver
             document.getElementById('menuContabilidad').style.display = 'none';
             document.getElementById('menuRRHH').style.display = 'none';
@@ -895,6 +926,45 @@
         // GESTIÓN DE AVISOS Y COMUNICADOS PARA RECURSOS HUMANOS
         // ========================================================
         const STORAGE_KEY_AVISOS_RH = 'enag_avisos_rh_data';
+        let pollingAvisosInterval = null;
+
+        function iniciarPollingAvisos() {
+            if (pollingAvisosInterval) clearInterval(pollingAvisosInterval);
+            pollingAvisosInterval = setInterval(() => {
+                const menu = document.getElementById('menuRRHH');
+                if (menu && menu.style.display !== 'none') {
+                    cargarAvisosRH(false);
+                }
+            }, 3000); // Consulta en tiempo real cada 3 segundos
+        }
+
+        function detenerPollingAvisos() {
+            if (pollingAvisosInterval) {
+                clearInterval(pollingAvisosInterval);
+                pollingAvisosInterval = null;
+            }
+        }
+
+        window.addEventListener('focus', () => {
+            const menu = document.getElementById('menuRRHH');
+            if (menu && menu.style.display !== 'none') {
+                cargarAvisosRH(false);
+            }
+        });
+
+        function getApiBaseUrl() {
+            // 1. Si se ejecuta en Electron o archivo local (file://)
+            if (window.location.protocol === 'file:') {
+                return 'http://localhost:3000';
+            }
+            // 2. Si se accede desde un navegador web en otro puerto (ej. 5500 u 8080) o red local
+            if (window.location.port && window.location.port !== '3000') {
+                const host = window.location.hostname || 'localhost';
+                return `http://${host}:3000`;
+            }
+            // 3. Si se accede directamente a través del servidor Express (puerto 3000)
+            return '';
+        }
 
         function obtenerFechaHoraHondurasLocal() {
             const now = new Date();
@@ -910,15 +980,19 @@
             return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
         }
 
-        async function cargarAvisosRH() {
+        async function cargarAvisosRH(mostrarFeedback = false) {
             const contenedor = document.getElementById('listaAvisosRH');
             const badgeCount = document.getElementById('badgeCountAvisos');
+            const apiBase = getApiBaseUrl();
 
             let avisos = [];
             let obtenidoDeApi = false;
 
             try {
-                const res = await fetch('/api/avisos/rh');
+                const res = await fetch(`${apiBase}/api/avisos/rh?_t=${Date.now()}`, {
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' }
+                });
                 if (res.ok) {
                     const data = await res.json();
                     if (Array.isArray(data)) {
@@ -939,27 +1013,6 @@
                     } catch (e) {
                         avisos = [];
                     }
-                } else {
-                    // Avisos por defecto si no existen
-                    avisos = [
-                        {
-                            id: 1,
-                            titulo: "Ajuste en Formato de Vouchers de Pago (PDF)",
-                            categoria: "actualizacion",
-                            autor: "Soporte TI / Administración",
-                            mensaje: "Se aumentó el margen de separación entre la tabla de deducciones y las firmas autorizadas (a 30mm) tanto en Vouchers de Acuerdo como de Contrato para una mejor presentación e impresión.",
-                            fechaHora: obtenerFechaHoraHondurasLocal()
-                        },
-                        {
-                            id: 2,
-                            titulo: "Verificación de Planillas y Constancias",
-                            categoria: "comunicado",
-                            autor: "Administración del Sistema",
-                            mensaje: "Por favor asegurarse de que los nombres y puestos en los archivos Excel de planilla concuerden con los registros institucionales antes de emitir constancias masivas.",
-                            fechaHora: obtenerFechaHoraHondurasLocal()
-                        }
-                    ];
-                    localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
                 }
             }
 
@@ -1009,7 +1062,7 @@
                                     <span>&bull;</span>
                                     <span>👤 ${escapeHTML(av.autor || 'Admin')}</span>
                                 </div>
-                                <button type="button" class="btn-delete-aviso" title="Eliminar aviso" onclick="eliminarAvisoRH(${av.id})">🗑️</button>
+                                <button type="button" class="btn-delete-aviso" title="Eliminar aviso" onclick="eliminarAvisoRH('${av.id}')">🗑️</button>
                             </div>
                         </div>
                         <p class="aviso-mensaje">${escapeHTML(av.mensaje)}</p>
@@ -1054,6 +1107,7 @@
             const mensaje = document.getElementById('avisoMensaje').value.trim();
             const btn = document.getElementById('btnGuardarAviso');
             const errorField = document.getElementById('avisoErrorMsg');
+            const apiBase = getApiBaseUrl();
 
             if (!titulo || !mensaje) {
                 errorField.innerText = "Por favor completa el título y el mensaje.";
@@ -1074,7 +1128,7 @@
             };
 
             try {
-                const res = await fetch('/api/avisos/rh', {
+                const res = await fetch(`${apiBase}/api/avisos/rh`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(nuevoAviso)
@@ -1100,28 +1154,35 @@
             cerrarModalNuevoAvisoRH();
             btn.disabled = false;
             btn.innerText = "Publicar Aviso";
-            cargarAvisosRH();
+            await cargarAvisosRH();
         }
 
         async function eliminarAvisoRH(id) {
             if (!confirm("¿Deseas eliminar este aviso de Recursos Humanos?")) {
                 return;
             }
+            const apiBase = getApiBaseUrl();
 
-            try {
-                await fetch(`/api/avisos/rh/${id}`, { method: 'DELETE' });
-            } catch (e) {
-                console.log("API no disponible para eliminar, actualizando localmente:", e);
-            }
-
+            // Optimistic update: eliminar de localStorage y de la vista inmediatamente
             let cached = [];
             try {
                 cached = JSON.parse(localStorage.getItem(STORAGE_KEY_AVISOS_RH) || '[]');
             } catch (e) { cached = []; }
-            cached = cached.filter(a => a.id !== id);
+            cached = cached.filter(a => String(a.id) !== String(id) && Number(a.id) !== Number(id));
             localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(cached));
+            renderizarAvisosRH(cached);
 
-            cargarAvisosRH();
+            try {
+                await fetch(`${apiBase}/api/avisos/rh/${id}`, {
+                    method: 'DELETE',
+                    cache: 'no-store',
+                    headers: { 'Cache-Control': 'no-cache' }
+                });
+            } catch (e) {
+                console.log("API no disponible para eliminar:", e);
+            }
+
+            await cargarAvisosRH();
         }
     </script>
     <script src="js/soporte.js"></script>
