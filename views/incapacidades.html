@@ -470,8 +470,7 @@
     <div class="container">
         <div class="form-header">
             <h2>Cálculo de Incapacidades y Subsidios IHSS (ENAG)</h2>
-            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal y
-                Reintegro Institucional</p>
+            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal</p>
         </div>
 
         <div id="alertError" class="alert-error"></div>
@@ -485,13 +484,12 @@
                 <div class="form-grid">
                     <div class="form-field full-width">
                         <label for="empNombre">Nombre del Empleado</label>
-                        <input type="text" id="empNombre" placeholder="Ej. Juan Pérez"
-                            value="MARÍA ANGÉLICA HERNÁNDEZ PINEDA">
+                        <input type="text" id="empNombre" placeholder="Ej. Juan Pérez" value="">
                     </div>
 
                     <div class="form-field">
                         <label for="empDni">DNI / Identidad</label>
-                        <input type="text" id="empDni" placeholder="0801-1990-12345" value="0801-1988-02456">
+                        <input type="text" id="empDni" placeholder="0801-1990-12345" value="">
                     </div>
 
                     <div class="form-field">
@@ -502,13 +500,13 @@
 
                     <div class="form-field">
                         <label for="fechaInicio">Fecha de Inicio (DD/MM/YYYY)</label>
-                        <input type="text" id="fechaInicio" placeholder="DD/MM/YYYY" maxlength="10" value="28/06/2026"
+                        <input type="text" id="fechaInicio" placeholder="DD/MM/YYYY" maxlength="10" value=""
                             oninput="calcularTodo()" onchange="calcularTodo()" onkeyup="calcularTodo()">
                     </div>
 
                     <div class="form-field">
                         <label for="fechaFin">Fecha de Finalización (DD/MM/YYYY)</label>
-                        <input type="text" id="fechaFin" placeholder="DD/MM/YYYY" maxlength="10" value="07/07/2026"
+                        <input type="text" id="fechaFin" placeholder="DD/MM/YYYY" maxlength="10" value=""
                             oninput="calcularTodo()" onchange="calcularTodo()" onkeyup="calcularTodo()">
                     </div>
 
@@ -528,17 +526,7 @@
                         </label>
                     </div>
 
-                    <div class="form-field full-width" style="margin-top: 10px;">
-                        <div style="display: flex; justify-content: space-between; align-items: center;">
-                            <label for="notaControlInterno">Nota de Control Interno (RRHH)</label>
-                            <button type="button" onclick="restablecerNota()"
-                                style="background: none; border: none; color: #002147; text-decoration: underline; cursor: pointer; font-size: 0.8em; font-weight: bold; padding: 0;">Restablecer
-                                por Defecto</button>
-                        </div>
-                        <textarea id="notaControlInterno" rows="4"
-                            placeholder="Escriba aquí la nota de control interno..." oninput="marcarNotaModificada()"
-                            style="resize: vertical; font-family: inherit; line-height: 1.4;"></textarea>
-                    </div>
+
                 </div>
 
                 <div class="info-box">
@@ -666,16 +654,7 @@
     <script src="../js/jspdf-autotable.min.js"></script>
 
     <script>
-        let notaModificada = false;
 
-        function marcarNotaModificada() {
-            notaModificada = true;
-        }
-
-        function restablecerNota() {
-            notaModificada = false;
-            calcularTodo();
-        }
 
         // Ocultar o mostrar opción de hospitalizado según tipo de incapacidad
         function toggleOpcionesEspeciales() {
@@ -872,12 +851,7 @@
 
             document.getElementById("resMontoReintegro").innerText = `L. ${totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 
-            // Actualizar la nota de control interno si el usuario no la ha modificado
-            if (!notaModificada) {
-                const totalIHSSFmt = totalIHSS.toLocaleString('es-HN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-                const textoDefault = `En conformidad con la planilla mensual de la ENAG, el empleado recibe el 100% de su sueldo nominal completo. Por consiguiente, el empleado queda obligado a realizar el reintegro de L. ${totalIHSSFmt} (monto de subsidio emitido por el IHSS) a favor de la Tesorería de la ENAG en un plazo de 10 días tras recibir la orden de pago.`;
-                document.getElementById("notaControlInterno").value = textoDefault;
-            }
+
 
             // Dibujar la línea de tiempo visual
             dibujarCronograma(totalDias, diasCarencia, diasSubsidio);
@@ -1075,32 +1049,8 @@
 
             const finalY = doc.lastAutoTable.finalY + 10;
 
-            // Cuadro explicativo
-            const notaTexto = document.getElementById("notaControlInterno").value.trim();
-            doc.setFontSize(8.5);
-            doc.setFont('helvetica', 'normal');
-            const lineasNota = doc.splitTextToSize(notaTexto, 174);
-            const lineHeight = 4.2;
-            const rectHeight = 6 + (lineasNota.length * lineHeight);
-
-            doc.setFillColor(239, 246, 255); // Azul suave
-            doc.rect(15, finalY, 180, rectHeight, 'F');
-            doc.setDrawColor(59, 130, 246);
-            doc.line(15, finalY, 15, finalY + rectHeight);
-
-            doc.setTextColor(30, 58, 138);
-            doc.setFont('helvetica', 'bold');
-            doc.text("Nota de Control Interno (RRHH):", 18, finalY + 5);
-            doc.setFont('helvetica', 'normal');
-
-            let currentY = finalY + 9.5;
-            for (let i = 0; i < lineasNota.length; i++) {
-                doc.text(lineasNota[i], 18, currentY);
-                currentY += lineHeight;
-            }
-
             // Firmas
-            const firmaY = finalY + rectHeight + 20;
+            const firmaY = finalY + 20;
             doc.setFontSize(9.5);
             doc.setTextColor(51, 51, 51);
             doc.setDrawColor(150, 150, 150);
