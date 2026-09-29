@@ -520,8 +520,14 @@
 
         function formateaFechaPDF(fechaISO) {
             if (!fechaISO) return { d: "", m: "", a: "" };
-            const partes = fechaISO.split('-');
-            return { d: partes[2], m: partes[1], a: partes[0] };
+            let partes = fechaISO.includes('/') ? fechaISO.split('/') : fechaISO.split('-');
+            let d, m, a;
+            if (partes[0] && partes[0].length === 4) {
+                a = partes[0]; m = partes[1]; d = partes[2];
+            } else {
+                d = partes[0]; m = partes[1]; a = partes[2];
+            }
+            return { d: d || "", m: m || "", a: a || "" };
         }
 
         const getBase64FromUrl = (url) => new Promise((resolve) => {
@@ -628,9 +634,9 @@
                 doc.text("AÑO", x + 22, y + 4);
 
                 doc.setFont("helvetica", "normal");
-                doc.text(d, x + 3, y + 9);
-                doc.text(m, x + 13, y + 9);
-                doc.text(a, x + 22, y + 9);
+                doc.text(d || "", x + 3, y + 9);
+                doc.text(m || "", x + 13, y + 9);
+                doc.text(a || "", x + 22, y + 9);
             }
 
             const dateY = 71;

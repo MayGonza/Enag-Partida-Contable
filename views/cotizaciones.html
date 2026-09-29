@@ -1145,19 +1145,6 @@
             }
         }
 
-        // Historial UI y Buscador
-        function actualizarHistorialUI(datosAMostrar = cotizaciones) {
-            cotizacionesFiltradas = datosAMostrar;
-            tablaHistorial.innerHTML = '';
-
-            // Ordenar por número descendente
-            const datosOrdenados = [...datosAMostrar].sort((a, b) => Number(b.numero) - Number(a.numero));
-
-            if (datosOrdenados.length === 0) {
-                tablaHistorial.innerHTML = `<tr><td colspan="5" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
-                return;
-            }
-
         function formatFechaHoraHonduras(d) {
             if (!d) return '';
             const f = (d instanceof Date) ? d : new Date(d);
@@ -1173,6 +1160,21 @@
             const hoursStr = String(hours).padStart(2, '0');
             return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
         }
+
+        // Historial UI y Buscador
+        function actualizarHistorialUI(datosAMostrar = cotizaciones) {
+            cotizacionesFiltradas = datosAMostrar;
+            tablaHistorial.innerHTML = '';
+
+            // Ordenar por número descendente
+            const datosOrdenados = [...datosAMostrar].sort((a, b) => Number(b.numero) - Number(a.numero));
+
+            if (datosOrdenados.length === 0) {
+                tablaHistorial.innerHTML = `<tr><td colspan="5" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
+                return;
+            }
+
+
 
         datosOrdenados.forEach(c => {
             const row = tablaHistorial.insertRow();
