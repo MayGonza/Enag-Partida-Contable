@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -383,7 +383,7 @@
 
         <!-- Error Banner -->
         <div id="errorBanner" class="error-banner">
-            <span>⚠️</span>
+            <span>⚠️</span>
             <span id="errorMessage">Nombre de usuario o contraseña incorrectos.</span>
         </div>
 
@@ -426,29 +426,90 @@
         </div>
     </div>
 
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.22.2/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
     <script>
-        function handleLogin(event) {
+        // Verificar si ya hay sesión activa
+        firebase.auth().onAuthStateChanged((user) => {
+            if (user) {
+                // Si ya está logueado, redirigir al index
+                window.location.href = '../index.html';
+            }
+        });
+
+        async function handleLogin(event) {
             event.preventDefault();
             const userVal = document.getElementById('username').value.trim();
             const passVal = document.getElementById('password').value;
             const btn = document.getElementById('loginBtn');
             const banner = document.getElementById('errorBanner');
+            const errorMessage = document.getElementById('errorMessage');
 
-            // Quick loading simulation
+            banner.style.display = 'none';
             btn.disabled = true;
             btn.querySelector('span').innerText = 'Iniciando sesión...';
 
-            setTimeout(() => {
-                // For now, accept any dummy credential or allow redirect directly
-                // To make it look like a real login, we can do a mock validation:
-                // Let's accept anything for this demonstration.
+            try {
+                let email = userVal;
+                // Si el usuario no escribió un correo (no tiene @), podríamos buscar su correo en Firestore
+                // Pero lo más fácil con Firebase Auth es pedir que ingresen el correo.
+                // Como validación rápida, si no tiene @, intentamos agregar el dominio por defecto:
+                if (!email.includes('@')) {
+                    email = email + '@enag.hn'; // Asumiendo un dominio por defecto para logins cortos
+                }
+
+                const userCred = await firebase.auth().signInWithEmailAndPassword(email, passVal);
+                if (!userCred.user.emailVerified) {
+                    await firebase.auth().signOut();
+                    throw { code: 'auth/unverified-email' };
+                }
+
+                // Redirigir al inicio (index)
                 window.location.href = '../index.html';
-            }, 1000);
+
+            } catch (error) {
+                console.error("Error en login:", error);
+                btn.disabled = false;
+                btn.querySelector('span').innerText = 'Ingresar al Sistema';
+                banner.style.display = 'flex';
+                
+                if (error.code === 'auth/user-not-found' || error.code === 'auth/wrong-password' || error.code === 'auth/invalid-credential' || error.code === 'auth/invalid-login-credentials') {
+                    errorMessage.innerText = 'El correo o la contraseña son incorrectos. Verifique sus datos e intente de nuevo.';
+                } else if (error.code === 'auth/unverified-email') {
+                    errorMessage.innerText = 'Debes verificar tu correo electrónico antes de iniciar sesión. Revisa tu bandeja de entrada.';
+                } else if (error.code === 'auth/invalid-email') {
+                    errorMessage.innerText = 'El formato del correo electrónico es inválido.';
+                } else {
+                    errorMessage.innerText = 'Error al iniciar sesión: ' + error.message;
+                }
+            }
         }
 
-        function handleRecover(event) {
+        async function handleRecover(event) {
             event.preventDefault();
-            alert("Para restablecer su contraseña, por favor póngase en contacto con el Departamento de TI o Administrador del Sistema.");
+            const userVal = document.getElementById('username').value.trim();
+            
+            if (!userVal) {
+                alert("Por favor, ingrese su correo electrónico en el campo 'Usuario o Correo' primero.");
+                return;
+            }
+
+            let email = userVal;
+            if (!email.includes('@')) {
+                email = email + '@enag.hn';
+            }
+
+            try {
+                await firebase.auth().sendPasswordResetEmail(email);
+                alert(`Se ha enviado un enlace de recuperación al correo: ${email}`);
+            } catch (error) {
+                console.error("Error enviando recuperación:", error);
+                alert("No se pudo enviar el correo de recuperación. Verifique que el correo ingresado sea correcto.");
+            }
         }
     </script>
 </body>
