@@ -1269,6 +1269,8 @@
                         if (dep === 'direccion' || dep === 'ti') {
                             // Tienen acceso a todo el panel
                             document.getElementById('areasContainer').style.display = 'grid';
+                            const cardTI = document.getElementById('cardTI');
+                            if (cardTI) cardTI.style.display = 'block';
                         } else {
                             // Mostrar exclusivamente su departamento
                             mostrarSubmenu(dep);
