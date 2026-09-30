@@ -454,12 +454,18 @@
             btn.querySelector('span').innerText = 'Iniciando sesión...';
 
             try {
-                let email = userVal;
-                // Si el usuario no escribió un correo (no tiene @), podríamos buscar su correo en Firestore
-                // Pero lo más fácil con Firebase Auth es pedir que ingresen el correo.
-                // Como validación rápida, si no tiene @, intentamos agregar el dominio por defecto:
+                                let email = userVal;
                 if (!email.includes('@')) {
-                    email = email + '@enag.hn'; // Asumiendo un dominio por defecto para logins cortos
+                    try {
+                        const snapshot = await dbFirestore.collection('usuarios').where('usuario', '==', userVal).get();
+                        if (snapshot.empty) {
+                            throw { code: 'auth/user-not-found', message: 'Usuario no encontrado.' };
+                        }
+                        email = snapshot.docs[0].data().correo;
+                    } catch(error) {
+                        if (error.code === 'auth/user-not-found') throw error;
+                        console.error("No se pudo buscar el correo en Firestore:", error);
+                    }
                 }
 
                 const userCred = await firebase.auth().signInWithEmailAndPassword(email, passVal);
