@@ -498,10 +498,21 @@
                 return;
             }
 
+            
             let email = userVal;
             if (!email.includes('@')) {
-                email = email + '@enag.hn';
+                try {
+                    const snapshot = await dbFirestore.collection('usuarios').where('usuario', '==', userVal).get();
+                    if (snapshot.empty) {
+                        throw { code: 'auth/user-not-found' };
+                    }
+                    email = snapshot.docs[0].data().correo;
+                } catch(error) {
+                    if (error.code === 'auth/user-not-found') throw error;
+                    email = email + '@enag.hn';
+                }
             }
+
 
             try {
                 await firebase.auth().sendPasswordResetEmail(email);
