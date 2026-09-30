@@ -611,10 +611,17 @@
                 <div class="icon">🎯</div>
                 <h2>Comercialización</h2>
                 <p>Gestión de cotizaciones, ventas y relaciones con clientes.</p>
+            
+            <div class="card area-card" id="cardTI" onclick="solicitarAcceso('ti')" style="display:none;">
+                <div class="icon">💻</div>
+                <h2>Tecnología (TI)</h2>
+                <p>Auditoría, Bitácoras y Administración del sistema.</p>
             </div>
-        </div>
 
-        <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
+        </div>
+    </div>
+
+    <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
         <div id="menuContabilidad" class="grid-container sub-menu" style="display: none;">
             <a href="views/comprobante_retencion.html" class="card">
                 <div class="icon">📄</div>
@@ -733,6 +740,14 @@
                 <p>Gestión y generación de cotizaciones oficiales para clientes.</p>
             </a>
         </div>
+        
+        <div id="menuTI" class="grid-container sub-menu" style="display: none;">
+            <a href="views/bitacora.html" class="card">
+                <div class="icon">📝</div>
+                <h2>Bitácora de Cotizaciones</h2>
+                <p>Registro histórico de cotizaciones creadas en el sistema.</p>
+            </a>
+        </div>
         <div id="backButtonContainer" style="display: none; margin-top: 30px;">
             <button onclick="volverAlMenuPrincipal()" class="btn-back">← Volver al Menú Principal</button>
         </div>
@@ -810,7 +825,8 @@
             contabilidad: "CONTA@2026",
             rrhh: "1212",
             produccion: "", // No requiere contraseña
-            comercializacion: "" // No requiere contraseña
+            comercializacion: "", // No requiere contraseña
+            ti: "" // No requiere contraseña
         };
 
         function solicitarAcceso(area) {
@@ -826,7 +842,8 @@
             // Configurar modal
             const nombresAreas = {
                 contabilidad: "Área de Contabilidad",
-                rrhh: "Área de Recursos Humanos"
+                rrhh: "Área de Recursos Humanos",
+                ti: "Tecnología (TI)"
             };
             document.getElementById('modalTitle').innerText = "Acceso a " + nombresAreas[area];
             document.getElementById('modalDesc').innerText = "Ingrese el PIN o contraseña de acceso correspondiente.";
@@ -923,6 +940,7 @@
             document.getElementById('menuRRHH').style.display = 'none';
             document.getElementById('menuProduccion').style.display = 'none';
             document.getElementById('menuComercializacion').style.display = 'none';
+            document.getElementById('menuTI').style.display = 'none';
             document.getElementById('backButtonContainer').style.display = 'none';
 
             // Restaurar título y mostrar las áreas principales
