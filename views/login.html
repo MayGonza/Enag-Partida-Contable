@@ -437,7 +437,8 @@
         firebase.auth().onAuthStateChanged((user) => {
             if (user) {
                 // Si ya está logueado, redirigir al index
-                window.location.href = '../index.html';
+                if (window.registrarBitacora) window.registrarBitacora('Autenticación', 'Inicio de sesión', 'El usuario ingresó exitosamente al sistema.');
+                        window.location.href = '../index.html';
             }
         });
 
@@ -475,7 +476,8 @@
                 }
 
                 // Redirigir al inicio (index)
-                window.location.href = '../index.html';
+                if (window.registrarBitacora) window.registrarBitacora('Autenticación', 'Inicio de sesión', 'El usuario ingresó exitosamente al sistema.');
+                        window.location.href = '../index.html';
 
             } catch (error) {
                 console.error("Error en login:", error);

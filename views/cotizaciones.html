@@ -1098,6 +1098,11 @@
                             ...cData,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
+                        
+                        if (window.registrarBitacora) {
+                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
+                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
+                        }
                     }
                 } catch(e) { console.error("Error guardando en Firestore:", e); }
             actualizarHistorialUI();
@@ -1168,6 +1173,11 @@
                             ...cData,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
+                        
+                        if (window.registrarBitacora) {
+                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
+                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
+                        }
                     }
                 } catch(e) { console.error("Error guardando en Firestore:", e); }
                 actualizarHistorialUI();
@@ -1695,6 +1705,11 @@
                             ...cData,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
+                        
+                        if (window.registrarBitacora) {
+                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
+                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
+                        }
                     }
                 } catch(e) { console.error("Error guardando en Firestore:", e); }
                 renderHistorial();

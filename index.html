@@ -744,8 +744,8 @@
         <div id="menuTI" class="grid-container sub-menu" style="display: none;">
             <a href="views/bitacora.html" class="card">
                 <div class="icon">📝</div>
-                <h2>Bitácora de Cotizaciones</h2>
-                <p>Registro histórico de cotizaciones creadas en el sistema.</p>
+                <h2>Bitácora Global del Sistema</h2>
+                <p>Auditoría y registro de todas las acciones del sistema.</p>
             </a>
         </div>
         <div id="backButtonContainer" style="display: none; margin-top: 30px;">
@@ -1266,7 +1266,7 @@
                         const data = userDoc.data();
                         const dep = data.departamento;
                         
-                        if (dep === 'direccion' || dep === 'ti') {
+                        if (dep === 'direccion') {
                             // Tienen acceso a todo el panel
                             document.getElementById('areasContainer').style.display = 'grid';
                             const cardTI = document.getElementById('cardTI');

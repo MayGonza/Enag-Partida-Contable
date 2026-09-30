@@ -1,4 +1,57 @@
-<!DOCTYPE html>
+const fs = require('fs');
+
+// 1. Modificar firebase-config.js
+let pathFirebase = 'c:/Users/DELL/OneDrive/Desktop/Enag-Partida-Contable/Enag-Partida-Contable/js/firebase-config.js';
+let dataFirebase = fs.readFileSync(pathFirebase, 'utf8');
+
+if (!dataFirebase.includes('window.registrarBitacora')) {
+    dataFirebase += `
+
+// Función global para la Bitácora de Auditoría
+window.registrarBitacora = async function(modulo, accion, detalles) {
+    if (typeof firebase === 'undefined' || !dbFirestore) return;
+    try {
+        const currentUser = firebase.auth().currentUser;
+        let usuarioSino = "Sistema / Desconocido";
+        if (currentUser) {
+            try {
+                const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
+                if(uDoc.exists) usuarioSino = uDoc.data().usuario || currentUser.email;
+            } catch(e) { usuarioSino = currentUser.email; }
+        }
+        await dbFirestore.collection('bitacora_global').add({
+            modulo: modulo,
+            accion: accion,
+            detalles: detalles,
+            usuario: usuarioSino,
+            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+        });
+    } catch(e) { console.error("Error al registrar en bitácora", e); }
+};
+`;
+    fs.writeFileSync(pathFirebase, dataFirebase, 'utf8');
+}
+
+// 2. Modificar index.html para enrutar TI
+let pathIndex = 'c:/Users/DELL/OneDrive/Desktop/Enag-Partida-Contable/Enag-Partida-Contable/index.html';
+let dataIndex = fs.readFileSync(pathIndex, 'utf8');
+
+dataIndex = dataIndex.replace(
+    /if \(dep === 'direccion' \|\| dep === 'ti'\) \{/g,
+    `if (dep === 'direccion') {`
+);
+
+// We need to fix the menuTI to say "Bitácora Global del Sistema"
+dataIndex = dataIndex.replace(
+    /<h2>Bitácora de Cotizaciones<\/h2>\s*<p>Registro histórico de cotizaciones creadas en el sistema\.<\/p>/g,
+    `<h2>Bitácora Global del Sistema</h2>
+                <p>Auditoría y registro de todas las acciones del sistema.</p>`
+);
+fs.writeFileSync(pathIndex, dataIndex, 'utf8');
+
+// 3. Modificar bitacora.html
+let pathBitacora = 'c:/Users/DELL/OneDrive/Desktop/Enag-Partida-Contable/Enag-Partida-Contable/views/bitacora.html';
+let dataBitacora = `<!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
@@ -144,13 +197,13 @@
                     const accion = b.accion || 'Acción';
                     const detalles = b.detalles || '';
 
-                    tr.innerHTML = `
-                        <td>${fechaTxt}</td>
-                        <td style="font-weight: bold; color: var(--primary);">${usuario}</td>
-                        <td>${modulo}</td>
-                        <td style="text-align: center;"><span class="badge ${getBadgeClass(accion)}">${accion}</span></td>
-                        <td>${detalles}</td>
-                    `;
+                    tr.innerHTML = \`
+                        <td>\${fechaTxt}</td>
+                        <td style="font-weight: bold; color: var(--primary);">\${usuario}</td>
+                        <td>\${modulo}</td>
+                        <td style="text-align: center;"><span class="badge \${getBadgeClass(accion)}">\${accion}</span></td>
+                        <td>\${detalles}</td>
+                    \`;
                     tbody.appendChild(tr);
                 });
             }, (error) => {
@@ -160,4 +213,38 @@
         }
     </script>
 </body>
-</html>
+</html>`;
+fs.writeFileSync(pathBitacora, dataBitacora, 'utf8');
+
+// 4. Conectar log in a la bitacora en login.html
+let pathLogin = 'c:/Users/DELL/OneDrive/Desktop/Enag-Partida-Contable/Enag-Partida-Contable/views/login.html';
+let dataLogin = fs.readFileSync(pathLogin, 'utf8');
+if (!dataLogin.includes('registrarBitacora(')) {
+    dataLogin = dataLogin.replace(
+        /window\.location\.href = '\.\.\/index\.html';/g,
+        `if (window.registrarBitacora) window.registrarBitacora('Autenticación', 'Inicio de sesión', 'El usuario ingresó exitosamente al sistema.');
+                        window.location.href = '../index.html';`
+    );
+    fs.writeFileSync(pathLogin, dataLogin, 'utf8');
+}
+
+// 5. Conectar cotizaciones a la bitacora
+let pathCotiz = 'c:/Users/DELL/OneDrive/Desktop/Enag-Partida-Contable/Enag-Partida-Contable/views/cotizaciones.html';
+let dataCotiz = fs.readFileSync(pathCotiz, 'utf8');
+if (!dataCotiz.includes('registrarBitacora(')) {
+    dataCotiz = dataCotiz.replace(
+        /dbFirestore\.collection\('cotizaciones'\)\.doc\(String\(cData\.numero\)\)\.set\(\{[\s\S]*?timestamp: firebase\.firestore\.FieldValue\.serverTimestamp\(\)\s*\}\);/g,
+        `dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
+                            ...cData,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                        
+                        if (window.registrarBitacora) {
+                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
+                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
+                        }`
+    );
+    fs.writeFileSync(pathCotiz, dataCotiz, 'utf8');
+}
+
+console.log('Fixed Bitacora Global setup!');
