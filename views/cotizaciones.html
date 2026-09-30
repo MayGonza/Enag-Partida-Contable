@@ -1085,6 +1085,21 @@
             }
 
             localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
+                // Guardar en Firestore para la bitácora
+                try {
+                    let cData = null;
+                    if (typeof index !== 'undefined' && index !== -1 && cotizaciones[index]) {
+                        cData = cotizaciones[index];
+                    } else if (typeof nuevaCotizacion !== 'undefined') {
+                        cData = nuevaCotizacion;
+                    }
+                    if (cData && typeof dbFirestore !== 'undefined') {
+                        dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
+                            ...cData,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                } catch(e) { console.error("Error guardando en Firestore:", e); }
             actualizarHistorialUI();
         }
 
@@ -1140,6 +1155,21 @@
             if (confirm(`¿Está seguro de que desea eliminar esta cotización del historial?`)) {
                 cotizaciones = cotizaciones.filter(c => Number(c.numero) !== Number(numero));
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
+                // Guardar en Firestore para la bitácora
+                try {
+                    let cData = null;
+                    if (typeof index !== 'undefined' && index !== -1 && cotizaciones[index]) {
+                        cData = cotizaciones[index];
+                    } else if (typeof nuevaCotizacion !== 'undefined') {
+                        cData = nuevaCotizacion;
+                    }
+                    if (cData && typeof dbFirestore !== 'undefined') {
+                        dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
+                            ...cData,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                } catch(e) { console.error("Error guardando en Firestore:", e); }
                 actualizarHistorialUI();
                 sugerirNumeroCotizacion();
                 showAlert(`Cotización eliminada.`, 'success');
@@ -1652,6 +1682,21 @@
             if(index !== -1) {
                 cotizaciones[index].estado = nuevoEstado;
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
+                // Guardar en Firestore para la bitácora
+                try {
+                    let cData = null;
+                    if (typeof index !== 'undefined' && index !== -1 && cotizaciones[index]) {
+                        cData = cotizaciones[index];
+                    } else if (typeof nuevaCotizacion !== 'undefined') {
+                        cData = nuevaCotizacion;
+                    }
+                    if (cData && typeof dbFirestore !== 'undefined') {
+                        dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
+                            ...cData,
+                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+                    }
+                } catch(e) { console.error("Error guardando en Firestore:", e); }
                 renderHistorial();
             }
         }

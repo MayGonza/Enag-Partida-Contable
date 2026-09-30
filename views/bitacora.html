@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Bitácora de Cotizaciones - TI</title>
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --bg-body: #002147;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0; padding: 40px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center; background-size: 40%;
+            filter: blur(10px) opacity(0.15); z-index: -1;
+        }
+        .container {
+            max-width: 1200px; margin: auto; background: var(--card-bg);
+            padding: 35px; border-radius: 20px; box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+            border-top: 8px solid var(--primary);
+        }
+        .nav-container { max-width: 1200px; margin: 0 auto 20px auto; display: flex; justify-content: space-between; }
+        .btn-nav { text-decoration: none; padding: 10px 20px; border-radius: 8px; font-weight: bold; background: #6c757d; color: white; }
+        h1 { color: var(--primary); text-align: center; margin-bottom: 30px; }
+        
+        table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+        th, td { border: 1px solid #cbd5e1; padding: 12px; text-align: left; font-size: 0.9em; }
+        th { background: #f8fafc; color: var(--primary); font-weight: bold; }
+        tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .badge { padding: 4px 8px; border-radius: 12px; font-weight: bold; font-size: 0.8em; }
+        .badge-pendiente { background: #fef3c7; color: #92400e; }
+        .badge-aprobada { background: #d1fae5; color: #065f46; }
+        .badge-rechazada { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav">← Regresar al Menú</a>
+    </div>
+
+    <div class="container">
+        <h1>🛡️ Bitácora de Cotizaciones</h1>
+        <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Auditoría de TI - Registro histórico en tiempo real</p>
+
+        <table id="bitacoraTable">
+            <thead>
+                <tr>
+                    <th>Fecha y Hora (Creación)</th>
+                    <th>Nº Cotización</th>
+                    <th>Elaborado por</th>
+                    <th>Cliente</th>
+                    <th>Total L.</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody id="bitacoraBody">
+                <tr><td colspan="6" style="text-align: center;">Cargando registros...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await dbFirestore.collection('usuarios').doc(user.uid).get();
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        // Solo TI o Dirección pueden ver la bitácora
+                        if (userData.departamento !== 'ti' && userData.departamento !== 'direccion') {
+                            alert("Acceso denegado: Solo el departamento de TI puede ver esta bitácora.");
+                            window.location.href = '../index.html';
+                            return;
+                        }
+                        
+                        cargarBitacora();
+                    }
+                } catch(e) {
+                    console.error("Error validando usuario", e);
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function formatMoneda(valor) {
+            return Number(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatTimestamp(timestamp) {
+            if(!timestamp) return 'Fecha desconocida';
+            // Firebase timestamp to JS Date
+            const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
+            return date.toLocaleString('es-HN', {
+                year: 'numeric', month: '2-digit', day: '2-digit',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: true
+            });
+        }
+
+        function getBadgeClass(estado) {
+            if(estado === 'Aprobada') return 'badge-aprobada';
+            if(estado === 'Rechazada') return 'badge-rechazada';
+            return 'badge-pendiente';
+        }
+
+        function cargarBitacora() {
+            dbFirestore.collection('cotizaciones').orderBy('timestamp', 'desc').onSnapshot((snapshot) => {
+                const tbody = document.getElementById('bitacoraBody');
+                tbody.innerHTML = '';
+                
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align: center;">No hay cotizaciones registradas en la base de datos.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const c = doc.data();
+                    const tr = document.createElement('tr');
+                    
+                    const comercial = c.comercial || 'Desconocido';
+                    const clienteNombre = c.cliente ? c.cliente.nombre : 'Sin Cliente';
+                    const total = c.totalGeneral ? formatMoneda(c.totalGeneral) : '0.00';
+                    const estadoStr = c.estado || 'Pendiente';
+                    const fechaTxt = formatTimestamp(c.timestamp);
+
+                    tr.innerHTML = `
+                        <td>\${fechaTxt}</td>
+                        <td style="font-weight: bold; color: var(--primary);">#\${c.numero}</td>
+                        <td>\${comercial}</td>
+                        <td>\${clienteNombre}</td>
+                        <td style="font-weight: bold; text-align: right;">L. \${total}</td>
+                        <td style="text-align: center;"><span class="badge \${getBadgeClass(estadoStr)}">\${estadoStr}</span></td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }, (error) => {
+                console.error("Error cargando bitácora:", error);
+                document.getElementById('bitacoraBody').innerHTML = '<tr><td colspan="6" style="text-align: center; color: red;">Error al cargar los datos. Verifique las reglas de Firestore.</td></tr>';
+            });
+        }
+    </script>
+</body>
+</html>
