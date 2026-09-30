@@ -1605,22 +1605,7 @@
             doc.setFontSize(7.5);
             doc.text("Empresa Nacional de Artes Gráficas", 50, y + 8, { align: 'center' });
 
-            // Datos del Cliente (En lugar de firma)
-            doc.setFont('helvetica', 'bold');
-            doc.setFontSize(9);
-            doc.setTextColor(0, 33, 71);
-            doc.text("ACEPTADO POR EL CLIENTE", 130, y - 10);
-
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
-            doc.setTextColor(80, 80, 80);
-
-            const contacto = data.cliente.contacto || 'N/A';
-            const tel = data.cliente.telefono || 'N/A';
-
-            doc.text("Empresa: " + data.cliente.nombre, 130, y - 5);
-            doc.text("Contacto: " + contacto, 130, y);
-            doc.text("Teléfono: " + tel, 130, y + 5);
+            // Se eliminó la sección de ACEPTADO POR EL CLIENTE (se enviará por correo)
 
             // Nota de validez
             doc.setFont('helvetica', 'italic');
