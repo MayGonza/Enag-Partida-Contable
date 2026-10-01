@@ -906,7 +906,7 @@
             });
 
             
-            // Agregar leyenda de generacion
+            // Agregar leyenda de generacion en todas las paginas
             let userName = "Usuario Desconocido";
             if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
                 const currentUser = firebase.auth().currentUser;
@@ -918,9 +918,13 @@
                     userName = currentUser.email;
                 }
             }
-            doc.setFontSize(8);
-            doc.setTextColor(100);
-            doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 10);
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 10);
+            }
 
             const pdfBlob = doc.output('blob');
             const dataString = "\n%PARTIDA_DATA:" + btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
