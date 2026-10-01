@@ -435,7 +435,7 @@
     <script>
         // Verificar si ya hay sesión activa
         firebase.auth().onAuthStateChanged((user) => {
-            if (user) {
+            if (user && user.emailVerified) {
                 // Si ya está logueado, redirigir al index
                 if (window.registrarBitacora) window.registrarBitacora('Autenticación', 'Inicio de sesión', 'El usuario ingresó exitosamente al sistema.');
                         window.location.href = '../index.html';

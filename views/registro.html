@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -460,6 +460,9 @@
                 icon.innerText = '✔';
                 message.innerText = 'Cuenta creada. Revise su correo y verifíquelo antes de iniciar sesión.';
 
+                if (window.registrarBitacora) {
+                    await window.registrarBitacora('Administración', 'Crear Usuario', 'Se registró un nuevo usuario: ' + email + ' (' + document.getElementById('departamento').value + ')');
+                }
                 firebase.auth().languageCode = 'es'; await user.sendEmailVerification(); await firebase.auth().signOut(); setTimeout(() => { window.location.href = 'login.html'; }, 3000);
 
             } catch (error) {

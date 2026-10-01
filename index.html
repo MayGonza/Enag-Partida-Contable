@@ -1291,7 +1291,10 @@
             }
         });
         
-        function cerrarSesion() {
+        async function cerrarSesion() {
+            if (window.registrarBitacora) {
+                await window.registrarBitacora('Autenticación', 'Cerrar Sesión', 'El usuario ha cerrado su sesión en el sistema.');
+            }
             firebase.auth().signOut().then(() => {
                 window.location.href = 'views/login.html';
             });
