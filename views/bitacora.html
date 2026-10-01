@@ -136,6 +136,10 @@
         <h1>🛡️ Bitácora Global del Sistema</h1>
         <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Auditoría General de TI -
             Registro de todas las acciones del sistema</p>
+            
+        <div style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: flex-end;">
+            <input type="text" id="filtroBitacora" placeholder="Filtrar por módulo, usuario, acción..." oninput="filtrarBitacora()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 350px; font-size: 0.9em; outline: none;">
+        </div>
 
         <table id="bitacoraTable">
             <thead>
@@ -210,38 +214,66 @@
             return 'badge-default';
         }
 
+        let bitacoraData = [];
+
         function cargarBitacora() {
             dbFirestore.collection('bitacora_global').orderBy('timestamp', 'desc').limit(500).onSnapshot((snapshot) => {
                 const tbody = document.getElementById('bitacoraBody');
-                tbody.innerHTML = '';
 
                 if (snapshot.empty) {
+                    bitacoraData = [];
                     tbody.innerHTML = '<tr><td colspan="5" style="text-align: center;">No hay registros en la bitácora global.</td></tr>';
                     return;
                 }
 
+                bitacoraData = [];
                 snapshot.forEach(doc => {
-                    const b = doc.data();
-                    const tr = document.createElement('tr');
-
-                    const fechaTxt = formatTimestamp(b.timestamp);
-                    const usuario = b.usuario || 'Desconocido';
-                    const modulo = b.modulo || 'Sistema';
-                    const accion = b.accion || 'Acción';
-                    const detalles = b.detalles || '';
-
-                    tr.innerHTML = `
-                        <td>${fechaTxt}</td>
-                        <td style="font-weight: bold; color: var(--primary);">${usuario}</td>
-                        <td>${modulo}</td>
-                        <td style="text-align: center;"><span class="badge ${getBadgeClass(accion)}">${accion}</span></td>
-                        <td>${detalles}</td>
-                    `;
-                    tbody.appendChild(tr);
+                    bitacoraData.push(doc.data());
                 });
+                
+                filtrarBitacora();
             }, (error) => {
                 console.error("Error cargando bitácora:", error);
                 document.getElementById('bitacoraBody').innerHTML = '<tr><td colspan="5" style="text-align: center; color: red;">Error al cargar la bitácora. Verifique las reglas de Firestore.</td></tr>';
+            });
+        }
+
+        function filtrarBitacora() {
+            const query = (document.getElementById('filtroBitacora')?.value || '').toLowerCase().trim();
+            const tbody = document.getElementById('bitacoraBody');
+            tbody.innerHTML = '';
+            
+            const filtrados = bitacoraData.filter(b => {
+                const usuario = (b.usuario || '').toLowerCase();
+                const modulo = (b.modulo || '').toLowerCase();
+                const accion = (b.accion || '').toLowerCase();
+                const detalles = (b.detalles || '').toLowerCase();
+                
+                return usuario.includes(query) || modulo.includes(query) || accion.includes(query) || detalles.includes(query);
+            });
+            
+            if (filtrados.length === 0) {
+                 tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: var(--text-muted);">No se encontraron resultados para la búsqueda.</td></tr>';
+                 return;
+            }
+            
+            filtrados.forEach(b => {
+                const tr = document.createElement('tr');
+
+                const fechaTxt = formatTimestamp(b.timestamp);
+                const usuario = b.usuario || 'Desconocido';
+                const modulo = b.modulo || 'Sistema';
+                const accion = b.accion || 'Acción';
+                const detalles = b.detalles || '';
+
+                tr.innerHTML = `
+                    <td>${fechaTxt}</td>
+                    <td style="font-weight: bold; color: var(--primary);">${usuario}</td>
+                    <td>${modulo}</td>
+                    <td style="text-align: center;"><span class="badge ${getBadgeClass(accion)}">${accion}</span></td>
+                    <td>${detalles}</td>
+                `;
+                tbody.appendChild(tr);
             });
         }
     </script>
