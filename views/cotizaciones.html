@@ -1334,13 +1334,14 @@
                     fFormateada,
                     c.cliente.nombre,
                     c.terminos,
+                    c.estado || 'Pendiente',
                     formatMoneda(c.totalGeneral)
                 ];
             });
 
             doc.autoTable({
                 startY: 48,
-                head: [['Fecha y Hora', 'Cliente', 'Términos', 'Total']],
+                head: [['Fecha y Hora', 'Cliente', 'Términos', 'Estado', 'Total']],
                 body: bodyData,
                 theme: 'striped',
                 headStyles: {
@@ -1351,10 +1352,11 @@
                     halign: 'center'
                 },
                 columnStyles: {
-                    0: { halign: 'center', cellWidth: 40 },
-                    1: { cellWidth: 80 },
-                    2: { halign: 'center', cellWidth: 30 },
-                    3: { halign: 'right', cellWidth: 30 }
+                    0: { halign: 'center', cellWidth: 35 },
+                    1: { cellWidth: 65 },
+                    2: { halign: 'center', cellWidth: 25 },
+                    3: { halign: 'center', cellWidth: 25 },
+                    4: { halign: 'right', cellWidth: 30 }
                 },
                 styles: {
                     fontSize: 8,
@@ -1509,6 +1511,15 @@
             doc.setTextColor(100, 100, 100);
             doc.text(data.comercial, 148, titleY + 7);
 
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(80, 80, 80);
+            doc.text("Estado de cotización:", 15, titleY + 13);
+
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            const est = data.estado || 'Pendiente';
+            doc.text(est.toUpperCase(), 48, titleY + 13);
+
             // 4. Estructura de la Tabla de Conceptos
             const tableRows = [];
             data.items.forEach(item => {
@@ -1524,7 +1535,7 @@
 
             // AutoTable
             doc.autoTable({
-                startY: titleY + 13,
+                startY: titleY + 18,
                 head: [['Descripción', 'Cantidad', 'Precio unitario', 'Impuestos', 'Precio']],
                 body: tableRows,
                 theme: 'grid',
