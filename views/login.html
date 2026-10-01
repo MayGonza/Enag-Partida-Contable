@@ -422,7 +422,7 @@
         </form>
 
         <div class="register-footer">
-            ¿No tienes una cuenta? <a href="registro.html" class="register-link">Regístrate aquí</a>
+            ¿No tienes una cuenta? <a href="registro.html?v=3" class="register-link">Regístrate aquí</a>
         </div>
     </div>
 
@@ -444,7 +444,7 @@
 
         async function handleLogin(event) {
             event.preventDefault();
-            const userVal = document.getElementById('username').value.trim();
+            const userVal = document.getElementById('username').value.trim().toLowerCase();
             const passVal = document.getElementById('password').value;
             const btn = document.getElementById('loginBtn');
             const banner = document.getElementById('errorBanner');
