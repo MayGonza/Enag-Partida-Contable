@@ -1627,6 +1627,23 @@
             if (!emp) return;
 
             const doc = await generarPDFEmpleado(emp, null, false);
+            
+            // Agregar leyenda de generacion
+            let userName = "Usuario Desconocido";
+            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                const currentUser = firebase.auth().currentUser;
+                try {
+                    const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
+                    if (uDoc.exists) userName = uDoc.data().usuario || currentUser.email;
+                    else userName = currentUser.email;
+                } catch(e) {
+                    userName = currentUser.email;
+                }
+            }
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 10);
+
             doc.save(`Voucher_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
             if (window.registrarBitacora) {
                 window.registrarBitacora('Planillas', 'Generar PDF', 'Se generó un documento en el módulo Planillas');
@@ -1647,6 +1664,23 @@
             for (let i = 0; i < seleccionados.length; i++) {
                 doc = await generarPDFEmpleado(seleccionados[i], doc, i > 0);
             }
+
+            
+            // Agregar leyenda de generacion
+            let userName = "Usuario Desconocido";
+            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                const currentUser = firebase.auth().currentUser;
+                try {
+                    const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
+                    if (uDoc.exists) userName = uDoc.data().usuario || currentUser.email;
+                    else userName = currentUser.email;
+                } catch(e) {
+                    userName = currentUser.email;
+                }
+            }
+            doc.setFontSize(8);
+            doc.setTextColor(100);
+            doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 10);
 
             doc.save(`Vouchers_Pago_Seleccionados.pdf`);
             if (window.registrarBitacora) {
