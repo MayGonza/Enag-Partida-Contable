@@ -458,11 +458,19 @@
                                 let email = userVal;
                 if (!email.includes('@')) {
                     try {
-                        const snapshot = await dbFirestore.collection('usuarios').where('usuario', '==', userVal).get();
-                        if (snapshot.empty) {
+                        const snapshot = await dbFirestore.collection('usuarios').get();
+                        let foundEmail = null;
+                        snapshot.forEach(doc => {
+                            const u = doc.data().usuario;
+                            if (u && u.toLowerCase() === userVal) {
+                                foundEmail = doc.data().correo;
+                            }
+                        });
+                        
+                        if (!foundEmail) {
                             throw { code: 'auth/user-not-found', message: 'Usuario no encontrado.' };
                         }
-                        email = snapshot.docs[0].data().correo;
+                        email = foundEmail;
                     } catch(error) {
                         if (error.code === 'auth/user-not-found') throw error;
                         console.error("No se pudo buscar el correo en Firestore:", error);
