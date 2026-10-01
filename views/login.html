@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="es">
 
 <head>
@@ -471,6 +471,7 @@
 
                 const userCred = await firebase.auth().signInWithEmailAndPassword(email, passVal);
                 if (!userCred.user.emailVerified) {
+                    await userCred.user.sendEmailVerification();
                     await firebase.auth().signOut();
                     throw { code: 'auth/unverified-email' };
                 }
