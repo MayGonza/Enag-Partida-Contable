@@ -643,8 +643,10 @@
                 <input type="text" id="historialBusqueda" placeholder="Buscar por nombre de cliente..."
                     oninput="filtrarHistorial()" style="flex: 1; min-width: 200px; max-width: 400px;">
                 <div style="display: flex; align-items: center; gap: 8px;">
-                    <label for="historialFecha" style="font-size: 0.9em; white-space: nowrap; margin: 0;">Filtrar por fecha (DD/MM/YYYY):</label>
-                    <input type="text" id="historialFecha" placeholder="DD/MM/YYYY" maxlength="10" oninput="filtrarHistorial()"
+                    <label for="historialFecha" style="font-size: 0.9em; white-space: nowrap; margin: 0;">Filtrar por
+                        fecha (DD/MM/YYYY):</label>
+                    <input type="text" id="historialFecha" placeholder="DD/MM/YYYY" maxlength="10"
+                        oninput="filtrarHistorial()"
                         style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-primary); font-size: 0.9em;">
                     <button type="button" onclick="limpiarFiltroFecha()" title="Limpiar fecha"
                         style="padding: 8px 12px; border: 1px solid var(--border-color); border-radius: 8px; background: var(--input-bg); color: var(--text-muted); cursor: pointer; font-size: 0.85em;">✕</button>
@@ -658,8 +660,8 @@
                             <th>Cliente</th>
                             <th style="width: 140px;">Términos</th>
                             <th style="width: 140px;" class="align-right">Total</th>
-     <th style="width: 130px;" class="align-center">Estado</th>
-     <th style="width: 200px;" class="align-center">Acciones</th>
+                            <th style="width: 130px;" class="align-center">Estado</th>
+                            <th style="width: 200px;" class="align-center">Acciones</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -1085,26 +1087,26 @@
             }
 
             localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
-                // Guardar en Firestore para la bitácora
-                try {
-                    let cData = null;
-                    if (typeof index !== 'undefined' && index !== -1 && cotizaciones[index]) {
-                        cData = cotizaciones[index];
-                    } else if (typeof nuevaCotizacion !== 'undefined') {
-                        cData = nuevaCotizacion;
+            // Guardar en Firestore para la bitácora
+            try {
+                let cData = null;
+                if (typeof index !== 'undefined' && index !== -1 && cotizaciones[index]) {
+                    cData = cotizaciones[index];
+                } else if (typeof nuevaCotizacion !== 'undefined') {
+                    cData = nuevaCotizacion;
+                }
+                if (cData && typeof dbFirestore !== 'undefined') {
+                    dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
+                        ...cData,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+
+                    if (window.registrarBitacora) {
+                        let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
+                        window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
                     }
-                    if (cData && typeof dbFirestore !== 'undefined') {
-                        dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
-                            ...cData,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        
-                        if (window.registrarBitacora) {
-                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
-                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
-                        }
-                    }
-                } catch(e) { console.error("Error guardando en Firestore:", e); }
+                }
+            } catch (e) { console.error("Error guardando en Firestore:", e); }
             actualizarHistorialUI();
         }
 
@@ -1167,7 +1169,7 @@
                     if (window.registrarBitacora) {
                         window.registrarBitacora('Comercialización', 'Eliminar Cotización', "Se eliminó la cotización #" + numero);
                     }
-                } catch(e) { console.error("Error guardando bitácora:", e); }
+                } catch (e) { console.error("Error guardando bitácora:", e); }
                 actualizarHistorialUI();
                 sugerirNumeroCotizacion();
                 showAlert(`Cotización eliminada.`, 'success');
@@ -1205,10 +1207,10 @@
 
 
 
-        datosOrdenados.forEach(c => {
-            const row = tablaHistorial.insertRow();
+            datosOrdenados.forEach(c => {
+                const row = tablaHistorial.insertRow();
 
-            const fechaFormateada = formatFechaHoraHonduras(c.fecha);
+                const fechaFormateada = formatFechaHoraHonduras(c.fecha);
 
                 row.innerHTML = `
                     <td>${fechaFormateada}</td>
@@ -1664,7 +1666,7 @@
     <script src="../js/firebase-config.js"></script>
 
     <script>
-        // Cargar nombre del usuario autenticado
+        // Cargar nombre del usuario autenticado y cotizaciones desde Firestore
         firebase.auth().onAuthStateChanged(async (user) => {
             if (user && user.emailVerified) {
                 try {
@@ -1678,17 +1680,37 @@
                             inputComercial.style.backgroundColor = '#f1f5f9';
                         }
                     }
-                } catch(e) {
+
+                    // Cargar cotizaciones desde Firestore
+                    try {
+                        const cotizSnapshot = await dbFirestore.collection('cotizaciones').get();
+                        if (!cotizSnapshot.empty) {
+                            const loadedCotizaciones = [];
+                            cotizSnapshot.forEach(docSnap => {
+                                loadedCotizaciones.push(docSnap.data());
+                            });
+                            cotizaciones = loadedCotizaciones;
+                            localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
+
+                            // Actualizar UI y número sugerido
+                            if (typeof sugerirNumeroCotizacion === 'function') sugerirNumeroCotizacion();
+                            if (typeof actualizarHistorialUI === 'function') actualizarHistorialUI();
+                            if (typeof renderHistorial === 'function') renderHistorial();
+                        }
+                    } catch (err) {
+                        console.error("Error cargando cotizaciones desde Firestore", err);
+                    }
+                } catch (e) {
                     console.error("Error obteniendo datos del usuario", e);
                 }
             } else {
                 window.location.href = 'login.html';
             }
         });
-        
+
         function cambiarEstadoCotizacion(id, nuevoEstado) {
             const index = cotizaciones.findIndex(c => c.numero == id);
-            if(index !== -1) {
+            if (index !== -1) {
                 cotizaciones[index].estado = nuevoEstado;
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
                 // Guardar en Firestore para la bitácora
@@ -1704,13 +1726,13 @@
                             ...cData,
                             timestamp: firebase.firestore.FieldValue.serverTimestamp()
                         });
-                        
+
                         if (window.registrarBitacora) {
                             let msj = "Se actualizó el estado de la cotización #" + cData.numero + " a '" + nuevoEstado + "' (Cliente: " + (cData.cliente ? cData.cliente.nombre : 'Desconocido') + ")";
                             window.registrarBitacora('Comercialización', 'Actualizar Estado', msj);
                         }
                     }
-                } catch(e) { console.error("Error guardando en Firestore:", e); }
+                } catch (e) { console.error("Error guardando en Firestore:", e); }
                 renderHistorial();
             }
         }
