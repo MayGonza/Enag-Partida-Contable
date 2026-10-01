@@ -1160,26 +1160,14 @@
             if (confirm(`¿Está seguro de que desea eliminar esta cotización del historial?`)) {
                 cotizaciones = cotizaciones.filter(c => Number(c.numero) !== Number(numero));
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
-                // Guardar en Firestore para la bitácora
                 try {
-                    let cData = null;
-                    if (typeof index !== 'undefined' && index !== -1 && cotizaciones[index]) {
-                        cData = cotizaciones[index];
-                    } else if (typeof nuevaCotizacion !== 'undefined') {
-                        cData = nuevaCotizacion;
+                    if (typeof dbFirestore !== 'undefined') {
+                        dbFirestore.collection('cotizaciones').doc(String(numero)).delete().catch(e => console.error("Error al eliminar de Firestore:", e));
                     }
-                    if (cData && typeof dbFirestore !== 'undefined') {
-                        dbFirestore.collection('cotizaciones').doc(String(cData.numero)).set({
-                            ...cData,
-                            timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                        });
-                        
-                        if (window.registrarBitacora) {
-                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
-                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
-                        }
+                    if (window.registrarBitacora) {
+                        window.registrarBitacora('Comercialización', 'Eliminar Cotización', "Se eliminó la cotización #" + numero);
                     }
-                } catch(e) { console.error("Error guardando en Firestore:", e); }
+                } catch(e) { console.error("Error guardando bitácora:", e); }
                 actualizarHistorialUI();
                 sugerirNumeroCotizacion();
                 showAlert(`Cotización eliminada.`, 'success');
@@ -1707,8 +1695,8 @@
                         });
                         
                         if (window.registrarBitacora) {
-                            let msj = "Se creó o actualizó la cotización #" + cData.numero + " para el cliente " + (cData.cliente ? cData.cliente.nombre : 'Desconocido');
-                            window.registrarBitacora('Comercialización', 'Guardar Cotización', msj);
+                            let msj = "Se actualizó el estado de la cotización #" + cData.numero + " a '" + nuevoEstado + "' (Cliente: " + (cData.cliente ? cData.cliente.nombre : 'Desconocido') + ")";
+                            window.registrarBitacora('Comercialización', 'Actualizar Estado', msj);
                         }
                     }
                 } catch(e) { console.error("Error guardando en Firestore:", e); }
