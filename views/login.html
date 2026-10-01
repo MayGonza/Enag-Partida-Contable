@@ -484,6 +484,18 @@
                     throw { code: 'auth/unverified-email' };
                 }
 
+                // Guardar usuario en localStorage para los PDFs
+                try {
+                    const uDoc = await dbFirestore.collection('usuarios').doc(userCred.user.uid).get();
+                    if (uDoc.exists) {
+                        localStorage.setItem('enag_username', uDoc.data().usuario || email);
+                    } else {
+                        localStorage.setItem('enag_username', email);
+                    }
+                } catch(e) {
+                    localStorage.setItem('enag_username', email);
+                }
+
                 // Redirigir al inicio (index)
                 if (window.registrarBitacora) window.registrarBitacora('Autenticación', 'Inicio de sesión', 'El usuario ingresó exitosamente al sistema.');
                         window.location.href = '../index.html';
