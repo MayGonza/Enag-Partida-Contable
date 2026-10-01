@@ -1630,16 +1630,24 @@
             if (!emp) return;
             const doc = await generarPDFConstancia(emp, null, false);
             
-            // Agregar leyenda de generacion en todas las paginas
+            // Agregar leyenda de generacion en todas las paginas (Actualizado)
             let userName = "Usuario Desconocido";
-            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
-                const currentUser = firebase.auth().currentUser;
-                try {
-                    const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
-                    if (uDoc.exists) userName = uDoc.data().usuario || currentUser.email;
-                    else userName = currentUser.email;
-                } catch(e) {
-                    userName = currentUser.email;
+            if (typeof firebase !== 'undefined') {
+                const currentUser = await new Promise(resolve => {
+                    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+                        unsubscribe();
+                        resolve(user);
+                    });
+                });
+                
+                if (currentUser) {
+                    try {
+                        const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
+                        if (uDoc.exists) userName = uDoc.data().usuario || currentUser.email;
+                        else userName = currentUser.email;
+                    } catch(e) {
+                        userName = currentUser.email;
+                    }
                 }
             }
             const totalPages = doc.internal.getNumberOfPages();
@@ -1647,7 +1655,8 @@
                 doc.setPage(i);
                 doc.setFontSize(8);
                 doc.setTextColor(100);
-                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 10);
+                // Subido a -28 para que no tape el membrete inferior
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 28);
             }
 
             doc.save(`Constancia_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
@@ -1664,16 +1673,24 @@
                 doc = await generarPDFConstancia(sel[i], doc, i > 0);
             }
             
-            // Agregar leyenda de generacion en todas las paginas
+            // Agregar leyenda de generacion en todas las paginas (Actualizado)
             let userName = "Usuario Desconocido";
-            if (typeof firebase !== 'undefined' && firebase.auth().currentUser) {
-                const currentUser = firebase.auth().currentUser;
-                try {
-                    const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
-                    if (uDoc.exists) userName = uDoc.data().usuario || currentUser.email;
-                    else userName = currentUser.email;
-                } catch(e) {
-                    userName = currentUser.email;
+            if (typeof firebase !== 'undefined') {
+                const currentUser = await new Promise(resolve => {
+                    const unsubscribe = firebase.auth().onAuthStateChanged(user => {
+                        unsubscribe();
+                        resolve(user);
+                    });
+                });
+                
+                if (currentUser) {
+                    try {
+                        const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
+                        if (uDoc.exists) userName = uDoc.data().usuario || currentUser.email;
+                        else userName = currentUser.email;
+                    } catch(e) {
+                        userName = currentUser.email;
+                    }
                 }
             }
             const totalPages = doc.internal.getNumberOfPages();
@@ -1681,7 +1698,8 @@
                 doc.setPage(i);
                 doc.setFontSize(8);
                 doc.setTextColor(100);
-                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 10);
+                // Subido a -28 para que no tape el membrete inferior
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 28);
             }
 
             doc.save('Constancias_Trabajo_ENAG.pdf');
