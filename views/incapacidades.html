@@ -1063,6 +1063,10 @@
             // Guardar PDF
             const nombreArchivo = `Reintegro_IHSS_${nombre.replace(/\s+/g, '_')}.pdf`;
             doc.save(nombreArchivo);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Recursos Humanos', 'Generar PDF', 'Se generó un documento en el módulo Recursos Humanos');
+            }
+
         }
 
         // Asignar event listeners para cálculo automático inmediato

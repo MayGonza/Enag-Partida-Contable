@@ -1628,6 +1628,10 @@
 
             const doc = await generarPDFEmpleado(emp, null, false);
             doc.save(`Voucher_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', 'Se generó un documento en el módulo Planillas');
+            }
+
         }
 
         async function generarPDFsSeleccionados() {
@@ -1645,6 +1649,10 @@
             }
 
             doc.save(`Vouchers_Pago_Seleccionados.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', 'Se generó un documento en el módulo Planillas');
+            }
+
         }
     </script>
 </body>

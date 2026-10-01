@@ -912,6 +912,10 @@
             const link = document.createElement('a');
             link.href = URL.createObjectURL(finalBlob);
             link.download = `Partida_${num}.pdf`;
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Contabilidad', 'Generar PDF', 'Se generó un documento en el módulo Contabilidad');
+            }
+
             link.click();
             URL.revokeObjectURL(link.href);
         };

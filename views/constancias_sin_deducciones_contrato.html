@@ -1678,6 +1678,10 @@
                 doc = await generarPDFConstancia(sel[i], doc, i > 0);
             }
             doc.save('Constancias_Trabajo_ENAG.pdf');
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Recursos Humanos', 'Generar PDF', 'Se generó un documento en el módulo Recursos Humanos');
+            }
+
         }
 
         // ─────────────────────────────────────────────

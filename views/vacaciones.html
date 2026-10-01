@@ -1603,6 +1603,10 @@
             // Descargar
             const filename = `Solicitud_Vacaciones_${emp.nombre.replace(/\s+/g, '_')}_${fIni}.pdf`;
             doc.save(filename);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Recursos Humanos', 'Generar PDF', 'Se generó un documento en el módulo Recursos Humanos');
+            }
+
         }
 
         // Descargar Plantilla Excel Ejemplo

@@ -847,6 +847,10 @@
 
             // Guardar PDF
             doc.save("Manual_de_Usuario_ENAG.pdf");
+            if (window.registrarBitacora) {
+                window.registrarBitacora('TI', 'Generar PDF', 'Se generó un documento en el módulo TI');
+            }
+
         }
     </script>
 </body>
