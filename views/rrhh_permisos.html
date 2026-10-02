@@ -9,8 +9,10 @@
     <!-- Import Google Fonts: Outfit and Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
     <style>
         :root {
             --primary: #002147;
@@ -33,7 +35,10 @@
         body::before {
             content: "";
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: url('../assets/logo.jpeg') no-repeat center center;
             background-size: 30%;
             filter: blur(12px) opacity(0.08);
@@ -67,7 +72,9 @@
             transition: all 0.2s;
         }
 
-        .btn-nav:hover { background: #475569; }
+        .btn-nav:hover {
+            background: #475569;
+        }
 
         h1 {
             color: var(--primary);
@@ -82,7 +89,8 @@
             margin-top: 20px;
         }
 
-        th, td {
+        th,
+        td {
             border: 1px solid #e2e8f0;
             padding: 14px;
             text-align: left;
@@ -96,8 +104,10 @@
             font-family: 'Outfit', sans-serif;
         }
 
-        tr:nth-child(even) { background-color: #f8fafc; }
-        
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
         .badge {
             padding: 6px 12px;
             border-radius: 20px;
@@ -106,9 +116,20 @@
             display: inline-block;
         }
 
-        .badge-pendiente { background: #fef3c7; color: #92400e; }
-        .badge-aprobado { background: #dcfce7; color: #166534; }
-        .badge-rechazado { background: #fee2e2; color: #991b1b; }
+        .badge-pendiente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-aprobado {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rechazado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
 
         .btn-action {
             padding: 6px 12px;
@@ -137,7 +158,7 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
         }
 
         .stat-card .stat-value {
@@ -156,15 +177,29 @@
             text-align: center;
         }
 
-        .stat-blue .stat-value { color: #0284c7; }
-        .stat-yellow .stat-value { color: #ca8a04; }
-        .stat-green .stat-value { color: #16a34a; }
-        .stat-red .stat-value { color: #dc2626; }
+        .stat-blue .stat-value {
+            color: #0284c7;
+        }
+
+        .stat-yellow .stat-value {
+            color: #ca8a04;
+        }
+
+        .stat-green .stat-value {
+            color: #16a34a;
+        }
+
+        .stat-red .stat-value {
+            color: #dc2626;
+        }
 
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
             background: rgba(0, 0, 0, 0.6);
             display: none;
             justify-content: center;
@@ -179,16 +214,23 @@
             border-radius: 16px;
             width: 90%;
             max-width: 600px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
         }
 
-        .modal-card h2 { color: var(--primary); margin-top: 0; font-family: 'Outfit', sans-serif; }
+        .modal-card h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-family: 'Outfit', sans-serif;
+        }
 
         .detail-row {
             margin-bottom: 12px;
             font-size: 0.95em;
         }
-        .detail-row strong { color: var(--primary-light); }
+
+        .detail-row strong {
+            color: var(--primary-light);
+        }
 
         .resolucion-box {
             margin-top: 25px;
@@ -198,7 +240,8 @@
             border: 1px solid #e2e8f0;
         }
 
-        .form-select, .form-textarea {
+        .form-select,
+        .form-textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #cbd5e1;
@@ -214,9 +257,32 @@
             justify-content: flex-end;
         }
 
-        .btn-cancel { background: #94a3b8; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-save { background: var(--primary); color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
-        .btn-print { background: #059669; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-cancel {
+            background: #94a3b8;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: #059669;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
     </style>
 </head>
 
@@ -227,7 +293,8 @@
 
     <div class="container">
         <h1>Gestión de Solicitudes de Personal</h1>
-        <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Departamento de Recursos Humanos</p>
+        <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Departamento de Recursos
+            Humanos</p>
 
         <div class="dashboard-grid">
             <div class="stat-card stat-blue">
@@ -248,6 +315,30 @@
             </div>
         </div>
 
+        <h3 style="margin-top: 10px; color: var(--primary); font-family: 'Outfit', sans-serif;">Desglose por Tipo de Solicitud</h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Permisos</span>
+                <span class="stat-value" id="statPermisos" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Vacaciones</span>
+                <span class="stat-value" id="statVacaciones" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Incapacidades</span>
+                <span class="stat-value" id="statIncapacidades" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Constancias</span>
+                <span class="stat-value" id="statConstancias" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Justificaciones</span>
+                <span class="stat-value" id="statJustificaciones" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+        </div>
+
         <table id="solicitudesTable">
             <thead>
                 <tr>
@@ -260,7 +351,9 @@
                 </tr>
             </thead>
             <tbody id="solicitudesBody">
-                <tr><td colspan="6" style="text-align:center;">Cargando solicitudes...</td></tr>
+                <tr>
+                    <td colspan="6" style="text-align:center;">Cargando solicitudes...</td>
+                </tr>
             </tbody>
         </table>
     </div>
@@ -270,10 +363,10 @@
         <div class="modal-card">
             <h2>Detalles de Solicitud</h2>
             <div id="modalDetails"></div>
-            
+
             <div class="resolucion-box">
                 <h3 style="margin-top:0; font-size: 1.1em; color: var(--primary);">Resolución de Recursos Humanos</h3>
-                
+
                 <label style="font-weight:600; font-size:0.9em;">Estado de Solicitud:</label>
                 <select id="resEstado" class="form-select">
                     <option value="Pendiente">Pendiente</option>
@@ -315,21 +408,33 @@
 
         async function cargarSolicitudes() {
             const tbody = document.getElementById('solicitudesBody');
-            
+
             dbFirestore.collection('solicitudes_personal').orderBy('fechaCreacion', 'desc').onSnapshot((snapshot) => {
                 tbody.innerHTML = '';
-                
+
                 let countTotal = 0;
                 let countPendientes = 0;
                 let countAprobadas = 0;
                 let countRechazadas = 0;
 
-                if(snapshot.empty) {
+                let countPermisos = 0;
+                let countVacaciones = 0;
+                let countIncapacidades = 0;
+                let countConstancias = 0;
+                let countJustificaciones = 0;
+
+                if (snapshot.empty) {
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>';
                     document.getElementById('statTotal').innerText = 0;
                     document.getElementById('statPendientes').innerText = 0;
                     document.getElementById('statAprobadas').innerText = 0;
                     document.getElementById('statRechazadas').innerText = 0;
+                    
+                    document.getElementById('statPermisos').innerText = 0;
+                    document.getElementById('statVacaciones').innerText = 0;
+                    document.getElementById('statIncapacidades').innerText = 0;
+                    document.getElementById('statConstancias').innerText = 0;
+                    document.getElementById('statJustificaciones').innerText = 0;
                     return;
                 }
 
@@ -338,16 +443,22 @@
                     countTotal++;
 
                     let badgeClass = 'badge-pendiente';
-                    if(data.estado === 'Aprobado') {
+                    if (data.estado === 'Aprobado') {
                         badgeClass = 'badge-aprobado';
                         countAprobadas++;
-                    } else if(data.estado === 'No Aprobado') {
+                    } else if (data.estado === 'No Aprobado') {
                         badgeClass = 'badge-rechazado';
                         countRechazadas++;
                     } else {
                         countPendientes++;
                     }
-                    
+
+                    if(data.tipoSolicitud === 'Permiso personal' || data.tipoSolicitud === 'Permiso de trabajo') countPermisos++;
+                    else if(data.tipoSolicitud === 'Vacaciones') countVacaciones++;
+                    else if(data.tipoSolicitud === 'Incapacidad') countIncapacidades++;
+                    else if(data.tipoSolicitud === 'Constancia laboral/Boucher') countConstancias++;
+                    else if(data.tipoSolicitud === 'Justificación de ausencia') countJustificaciones++;
+
                     const fechaFormat = data.fechaCreacion ? data.fechaCreacion.toDate().toLocaleDateString('es-HN') : 'N/A';
 
                     const tr = document.createElement('tr');
@@ -369,26 +480,32 @@
                 document.getElementById('statPendientes').innerText = countPendientes;
                 document.getElementById('statAprobadas').innerText = countAprobadas;
                 document.getElementById('statRechazadas').innerText = countRechazadas;
+
+                document.getElementById('statPermisos').innerText = countPermisos;
+                document.getElementById('statVacaciones').innerText = countVacaciones;
+                document.getElementById('statIncapacidades').innerText = countIncapacidades;
+                document.getElementById('statConstancias').innerText = countConstancias;
+                document.getElementById('statJustificaciones').innerText = countJustificaciones;
             });
         }
 
         function abrirModal(id, data) {
             currentSolicitudId = id;
             currentSolicitudData = data;
-            
+
             const detailsHtml = `
                 <div class="detail-row"><strong>Empleado:</strong> ${data.nombre} (${data.puesto})</div>
                 <div class="detail-row"><strong>Depto:</strong> ${data.departamento}</div>
                 <div class="detail-row"><strong>Tipo de Solicitud:</strong> ${data.tipoSolicitud}</div>
-                <div class="detail-row"><strong>Periodo:</strong> ${data.fechaInicio} ${data.fechaFin ? ' al '+data.fechaFin : ''}</div>
+                <div class="detail-row"><strong>Periodo:</strong> ${data.fechaInicio} ${data.fechaFin ? ' al ' + data.fechaFin : ''}</div>
                 <div class="detail-row"><strong>Horas (si aplica):</strong> ${data.horaSalida || '--'} a ${data.horaRetorno || '--'}</div>
                 <div class="detail-row"><strong>Descripción:</strong> ${data.descripcion}</div>
             `;
-            
+
             document.getElementById('modalDetails').innerHTML = detailsHtml;
             document.getElementById('resEstado').value = data.estado || 'Pendiente';
             document.getElementById('resObservaciones').value = data.observacionesRRHH || '';
-            
+
             document.getElementById('resolucionModal').style.display = 'flex';
         }
 
@@ -399,17 +516,17 @@
         document.getElementById('btnSaveResolucion').addEventListener('click', async () => {
             const estado = document.getElementById('resEstado').value;
             const obs = document.getElementById('resObservaciones').value;
-            
+
             try {
                 await dbFirestore.collection('solicitudes_personal').doc(currentSolicitudId).update({
                     estado: estado,
                     observacionesRRHH: obs
                 });
-                if(window.registrarBitacora) {
+                if (window.registrarBitacora) {
                     window.registrarBitacora('Recursos Humanos', 'Resolución Solicitud', `Se cambió estado de solicitud de ${currentSolicitudData.nombre} a ${estado}`);
                 }
                 cerrarModal();
-            } catch(e) {
+            } catch (e) {
                 alert("Error al guardar: " + e.message);
             }
         });
@@ -419,34 +536,34 @@
             const data = currentSolicitudData;
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF('p', 'mm', 'letter');
-            
+
             // Header
             doc.setFont("helvetica", "bold");
             doc.setFontSize(12);
             doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS", 10, 15);
-            
+
             doc.setFontSize(14);
             doc.text("DEPARTAMENTO DE RECURSOS HUMANOS", 105, 22, { align: "center" });
             doc.text("FORMATO ÚNICO DE SOLICITUD DE PERSONAL", 105, 29, { align: "center" });
 
             doc.setFontSize(10);
-            
+
             // Cuadros de Fecha
             doc.rect(10, 38, 90, 15); // Fecha Inicio box
             doc.text("Fecha de Inicio:", 12, 43);
             doc.setFont("helvetica", "normal");
-            if(data.fechaInicio) {
+            if (data.fechaInicio) {
                 const parts = data.fechaInicio.split('-');
-                doc.text(parts[2]+"/"+parts[1]+"/"+parts[0], 12, 50); // DD/MM/YYYY
+                doc.text(parts[2] + "/" + parts[1] + "/" + parts[0], 12, 50); // DD/MM/YYYY
             }
-            
+
             doc.rect(110, 38, 95, 15); // Fecha Fin box
             doc.setFont("helvetica", "bold");
             doc.text("Fecha de finalización (si aplica):", 112, 43);
             doc.setFont("helvetica", "normal");
-            if(data.fechaFin) {
+            if (data.fechaFin) {
                 const parts = data.fechaFin.split('-');
-                doc.text(parts[2]+"/"+parts[1]+"/"+parts[0], 112, 50);
+                doc.text(parts[2] + "/" + parts[1] + "/" + parts[0], 112, 50);
             }
 
             // Cuadros Horas
@@ -455,7 +572,7 @@
             doc.text("Hora de salida (si aplica):", 12, 62);
             doc.setFont("helvetica", "normal");
             doc.text(data.horaSalida || '---', 60, 62);
-            
+
             doc.rect(110, 56, 95, 10);
             doc.setFont("helvetica", "bold");
             doc.text("Hora de retorno (si aplica):", 112, 62);
@@ -492,14 +609,14 @@
             doc.rect(10, 138, 195, 8, 'F');
             doc.setFont("helvetica", "bold");
             doc.text("Identificación del Empleado quien solicita:", 105, 143.5, { align: "center" });
-            
+
             doc.rect(10, 146, 195, 25);
-            doc.text("Nombre:", 12, 152); doc.setFont("helvetica","normal"); doc.text(data.nombre, 40, 152);
-            doc.setFont("helvetica","bold");
-            doc.text("Depto:", 12, 159); doc.setFont("helvetica","normal"); doc.text(data.departamento, 40, 159);
-            doc.setFont("helvetica","bold");
-            doc.text("Puesto:", 12, 166); doc.setFont("helvetica","normal"); doc.text(data.puesto || '---', 40, 166);
-            
+            doc.text("Nombre:", 12, 152); doc.setFont("helvetica", "normal"); doc.text(data.nombre, 40, 152);
+            doc.setFont("helvetica", "bold");
+            doc.text("Depto:", 12, 159); doc.setFont("helvetica", "normal"); doc.text(data.departamento, 40, 159);
+            doc.setFont("helvetica", "bold");
+            doc.text("Puesto:", 12, 166); doc.setFont("helvetica", "normal"); doc.text(data.puesto || '---', 40, 166);
+
             // Resolución RRHH
             doc.setFillColor(150, 150, 150);
             doc.rect(10, 176, 195, 8, 'F');
@@ -507,20 +624,20 @@
             doc.setFont("helvetica", "bold");
             doc.text("Resolución de Recursos Humanos", 105, 181.5, { align: "center" });
             doc.setTextColor(0, 0, 0);
-            
+
             doc.rect(10, 184, 195, 30);
-            doc.text("Estado:", 12, 190); doc.setFont("helvetica","normal"); doc.text(data.estado || 'Pendiente', 40, 190);
-            doc.setFont("helvetica","bold");
-            doc.text("Observaciones:", 12, 198); doc.setFont("helvetica","normal");
+            doc.text("Estado:", 12, 190); doc.setFont("helvetica", "normal"); doc.text(data.estado || 'Pendiente', 40, 190);
+            doc.setFont("helvetica", "bold");
+            doc.text("Observaciones:", 12, 198); doc.setFont("helvetica", "normal");
             const obsRRHH = document.getElementById('resObservaciones').value || data.observacionesRRHH || '---';
             const splitObs = doc.splitTextToSize(obsRRHH, 150);
             doc.text(splitObs, 40, 198);
-            
+
             // Firmas
             doc.setFont("helvetica", "bold");
             doc.line(20, 240, 90, 240);
             doc.text("Firma del Empleado", 55, 245, { align: "center" });
-            
+
             doc.line(120, 240, 190, 240);
             doc.text("Firma Recursos Humanos", 155, 245, { align: "center" });
 
@@ -540,4 +657,5 @@
         });
     </script>
 </body>
+
 </html>
