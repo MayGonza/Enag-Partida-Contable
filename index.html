@@ -585,7 +585,9 @@
 
     <div class="main-container">
         <div style="display: flex; justify-content: flex-end; margin-bottom: -20px;">
-            <button onclick="cerrarSesion()" style="background-color: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit;">Cerrar Sesión</button>
+            <button onclick="cerrarSesion()"
+                style="background-color: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit;">Cerrar
+                Sesión</button>
         </div>
         <img src="assets/logo.png" alt="ENAG Logo" class="header-logo">
         <h1 id="menuTitle">Portal Administrativo</h1>
@@ -611,17 +613,17 @@
                 <div class="icon">🎯</div>
                 <h2>Comercialización</h2>
                 <p>Gestión de cotizaciones, ventas y relaciones con clientes.</p>
-            
-            <div class="card area-card" id="cardTI" onclick="solicitarAcceso('ti')" style="display:none;">
-                <div class="icon">💻</div>
-                <h2>Tecnología (TI)</h2>
-                <p>Auditoría, Bitácoras y Administración del sistema.</p>
+
+                <div class="card area-card" id="cardTI" onclick="solicitarAcceso('ti')" style="display:none;">
+                    <div class="icon">💻</div>
+                    <h2>Tecnología (TI)</h2>
+                    <p>Auditoría, Bitácoras y Administración del sistema.</p>
+                </div>
+
             </div>
-
         </div>
-    </div>
 
-    <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
+        <!-- SUB-MENÚ: CONTABILIDAD (Oculto al inicio) -->
         <div id="menuContabilidad" class="grid-container sub-menu" style="display: none;">
             <a href="views/comprobante_retencion.html?v=5" class="card">
                 <div class="icon">📄</div>
@@ -669,6 +671,12 @@
                     </div>
                 </div>
             </div>
+
+            <a href="views/rrhh_permisos.html?v=5" class="card" style="border-left: 5px solid #d97706;">
+                <div class="icon">📝</div>
+                <h2>Solicitudes de Permisos</h2>
+                <p>Gestión de Formato Único de Solicitud de Personal (Permisos, Vacaciones, Incapacidades, etc).</p>
+            </a>
 
             <a href="views/vouchers.html?v=5" class="card">
                 <div class="icon">💵</div>
@@ -740,7 +748,7 @@
                 <p>Gestión y generación de cotizaciones oficiales para clientes.</p>
             </a>
         </div>
-        
+
         <div id="menuTI" class="grid-container sub-menu" style="display: none;">
             <a href="views/bitacora.html?v=5" class="card">
                 <div class="icon">📝</div>
@@ -1034,7 +1042,7 @@
                             localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
                         }
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
 
             // 2. Intentar archivo JSON estático (GitHub Pages)
@@ -1053,7 +1061,7 @@
                             localStorage.setItem(STORAGE_KEY_AVISOS_RH, JSON.stringify(avisos));
                         }
                     }
-                } catch (e) {}
+                } catch (e) { }
             }
 
             // 3. LocalStorage
@@ -1061,7 +1069,7 @@
                 try {
                     const cached = localStorage.getItem(STORAGE_KEY_AVISOS_RH);
                     if (cached) avisos = JSON.parse(cached);
-                } catch (e) {}
+                } catch (e) { }
             }
 
             renderizarAvisosRH(avisos);
@@ -1195,7 +1203,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(nuevoAviso)
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             // Si Firebase no está activo, actualizar vista local
             if (!guardadoEnFirebase) {
@@ -1237,7 +1245,7 @@
                     cache: 'no-store',
                     headers: { 'Cache-Control': 'no-cache' }
                 });
-            } catch (e) {}
+            } catch (e) { }
 
             // Optimistic update
             let cached = [];
@@ -1254,7 +1262,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="js/firebase-config.js"></script>
-    
+
     <script>
         // Protección de Ruta y Redirección por Departamento
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -1268,7 +1276,7 @@
                     if (userDoc.exists) {
                         const data = userDoc.data();
                         const dep = data.departamento;
-                        
+
                         if (dep === 'direccion') {
                             // Tienen acceso a todo el panel
                             document.getElementById('areasContainer').style.display = 'grid';
@@ -1277,7 +1285,7 @@
                         } else {
                             // Mostrar exclusivamente su departamento
                             mostrarSubmenu(dep);
-                            
+
                             // Ocultar botón de regresar al menú principal
                             const backBtn = document.getElementById('backButtonContainer');
                             if (backBtn) {
@@ -1290,7 +1298,7 @@
                 }
             }
         });
-        
+
         async function cerrarSesion() {
             if (window.registrarBitacora) {
                 await window.registrarBitacora('Autenticación', 'Cerrar Sesión', 'El usuario ha cerrado su sesión en el sistema.');

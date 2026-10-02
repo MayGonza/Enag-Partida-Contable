@@ -1,0 +1,458 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Solicitudes de Personal - RRHH</title>
+    <!-- Import Google Fonts: Outfit and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --accent: #d97706;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 30%;
+            filter: blur(12px) opacity(0.08);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-top: 6px solid var(--primary);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            background: #64748b;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover { background: #475569; }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th, td {
+            border: 1px solid #e2e8f0;
+            padding: 14px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        tr:nth-child(even) { background-color: #f8fafc; }
+        
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+            display: inline-block;
+        }
+
+        .badge-pendiente { background: #fef3c7; color: #92400e; }
+        .badge-aprobado { background: #dcfce7; color: #166534; }
+        .badge-rechazado { background: #fee2e2; color: #991b1b; }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.2);
+        }
+
+        .modal-card h2 { color: var(--primary); margin-top: 0; font-family: 'Outfit', sans-serif; }
+
+        .detail-row {
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+        .detail-row strong { color: var(--primary-light); }
+
+        .resolucion-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-select, .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel { background: #94a3b8; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-save { background: var(--primary); color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
+        .btn-print { background: #059669; color: white; padding: 10px 15px; border: none; border-radius: 6px; cursor: pointer; }
+    </style>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav">← Regresar al Menú</a>
+    </div>
+
+    <div class="container">
+        <h1>Gestión de Solicitudes de Personal</h1>
+        <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Departamento de Recursos Humanos</p>
+
+        <table id="solicitudesTable">
+            <thead>
+                <tr>
+                    <th>Fecha Solicitud</th>
+                    <th>Empleado</th>
+                    <th>Departamento</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="solicitudesBody">
+                <tr><td colspan="6" style="text-align:center;">Cargando solicitudes...</td></tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal Resolución -->
+    <div class="modal-overlay" id="resolucionModal">
+        <div class="modal-card">
+            <h2>Detalles de Solicitud</h2>
+            <div id="modalDetails"></div>
+            
+            <div class="resolucion-box">
+                <h3 style="margin-top:0; font-size: 1.1em; color: var(--primary);">Resolución de Recursos Humanos</h3>
+                
+                <label style="font-weight:600; font-size:0.9em;">Estado de Solicitud:</label>
+                <select id="resEstado" class="form-select">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Aprobado">Aprobado</option>
+                    <option value="No Aprobado">No Aprobado</option>
+                </select>
+
+                <label style="font-weight:600; font-size:0.9em;">Observaciones (Opcional):</label>
+                <textarea id="resObservaciones" class="form-textarea" rows="3"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-print" id="btnPrintFicha">Imprimir Ficha</button>
+                <button class="btn-save" id="btnSaveResolucion">Guardar Resolución</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+
+    <script>
+        let currentSolicitudId = null;
+        let currentSolicitudData = null;
+
+        // Protección de Ruta
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                cargarSolicitudes();
+            }
+        });
+
+        async function cargarSolicitudes() {
+            const tbody = document.getElementById('solicitudesBody');
+            
+            dbFirestore.collection('solicitudes_personal').orderBy('fechaCreacion', 'desc').onSnapshot((snapshot) => {
+                tbody.innerHTML = '';
+                if(snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>';
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    let badgeClass = 'badge-pendiente';
+                    if(data.estado === 'Aprobado') badgeClass = 'badge-aprobado';
+                    if(data.estado === 'No Aprobado') badgeClass = 'badge-rechazado';
+                    
+                    const fechaFormat = data.fechaCreacion ? data.fechaCreacion.toDate().toLocaleDateString('es-HN') : 'N/A';
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fechaFormat}</td>
+                        <td>${data.nombre}</td>
+                        <td>${data.departamento}</td>
+                        <td>${data.tipoSolicitud}</td>
+                        <td><span class="badge ${badgeClass}">${data.estado}</span></td>
+                        <td>
+                            <button class="btn-action" onclick='abrirModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>Gestionar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            });
+        }
+
+        function abrirModal(id, data) {
+            currentSolicitudId = id;
+            currentSolicitudData = data;
+            
+            const detailsHtml = `
+                <div class="detail-row"><strong>Empleado:</strong> ${data.nombre} (${data.puesto})</div>
+                <div class="detail-row"><strong>Depto:</strong> ${data.departamento}</div>
+                <div class="detail-row"><strong>Tipo de Solicitud:</strong> ${data.tipoSolicitud}</div>
+                <div class="detail-row"><strong>Periodo:</strong> ${data.fechaInicio} ${data.fechaFin ? ' al '+data.fechaFin : ''}</div>
+                <div class="detail-row"><strong>Horas (si aplica):</strong> ${data.horaSalida || '--'} a ${data.horaRetorno || '--'}</div>
+                <div class="detail-row"><strong>Descripción:</strong> ${data.descripcion}</div>
+            `;
+            
+            document.getElementById('modalDetails').innerHTML = detailsHtml;
+            document.getElementById('resEstado').value = data.estado || 'Pendiente';
+            document.getElementById('resObservaciones').value = data.observacionesRRHH || '';
+            
+            document.getElementById('resolucionModal').style.display = 'flex';
+        }
+
+        function cerrarModal() {
+            document.getElementById('resolucionModal').style.display = 'none';
+        }
+
+        document.getElementById('btnSaveResolucion').addEventListener('click', async () => {
+            const estado = document.getElementById('resEstado').value;
+            const obs = document.getElementById('resObservaciones').value;
+            
+            try {
+                await dbFirestore.collection('solicitudes_personal').doc(currentSolicitudId).update({
+                    estado: estado,
+                    observacionesRRHH: obs
+                });
+                if(window.registrarBitacora) {
+                    window.registrarBitacora('Recursos Humanos', 'Resolución Solicitud', `Se cambió estado de solicitud de ${currentSolicitudData.nombre} a ${estado}`);
+                }
+                cerrarModal();
+            } catch(e) {
+                alert("Error al guardar: " + e.message);
+            }
+        });
+
+        // Impresión Ficha
+        document.getElementById('btnPrintFicha').addEventListener('click', () => {
+            const data = currentSolicitudData;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+            
+            // Header
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS", 10, 15);
+            
+            doc.setFontSize(14);
+            doc.text("DEPARTAMENTO DE RECURSOS HUMANOS", 105, 22, { align: "center" });
+            doc.text("FORMATO ÚNICO DE SOLICITUD DE PERSONAL", 105, 29, { align: "center" });
+
+            doc.setFontSize(10);
+            
+            // Cuadros de Fecha
+            doc.rect(10, 38, 90, 15); // Fecha Inicio box
+            doc.text("Fecha de Inicio:", 12, 43);
+            doc.setFont("helvetica", "normal");
+            if(data.fechaInicio) {
+                const parts = data.fechaInicio.split('-');
+                doc.text(parts[2]+"/"+parts[1]+"/"+parts[0], 12, 50); // DD/MM/YYYY
+            }
+            
+            doc.rect(110, 38, 95, 15); // Fecha Fin box
+            doc.setFont("helvetica", "bold");
+            doc.text("Fecha de finalización (si aplica):", 112, 43);
+            doc.setFont("helvetica", "normal");
+            if(data.fechaFin) {
+                const parts = data.fechaFin.split('-');
+                doc.text(parts[2]+"/"+parts[1]+"/"+parts[0], 112, 50);
+            }
+
+            // Cuadros Horas
+            doc.rect(10, 56, 90, 10);
+            doc.setFont("helvetica", "bold");
+            doc.text("Hora de salida (si aplica):", 12, 62);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.horaSalida || '---', 60, 62);
+            
+            doc.rect(110, 56, 95, 10);
+            doc.setFont("helvetica", "bold");
+            doc.text("Hora de retorno (si aplica):", 112, 62);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.horaRetorno || '---', 165, 62);
+
+            // Tipo de Solicitud (Banner)
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 72, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.text("Marque con una 'X' la Solicitud que corresponda", 105, 77.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+
+            doc.rect(10, 80, 195, 15);
+            doc.setFont("helvetica", "bold");
+            doc.text("Tipo de Solicitud:", 12, 85);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.tipoSolicitud, 12, 91);
+
+            // Descripción
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 100, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("Describa de forma clara su solicitud:", 105, 105.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+            doc.rect(10, 108, 195, 25);
+            doc.setFont("helvetica", "normal");
+            const splitDesc = doc.splitTextToSize(data.descripcion, 190);
+            doc.text(splitDesc, 12, 114);
+
+            // Identificación
+            doc.setFillColor(220, 220, 220);
+            doc.rect(10, 138, 195, 8, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.text("Identificación del Empleado quien solicita:", 105, 143.5, { align: "center" });
+            
+            doc.rect(10, 146, 195, 25);
+            doc.text("Nombre:", 12, 152); doc.setFont("helvetica","normal"); doc.text(data.nombre, 40, 152);
+            doc.setFont("helvetica","bold");
+            doc.text("Depto:", 12, 159); doc.setFont("helvetica","normal"); doc.text(data.departamento, 40, 159);
+            doc.setFont("helvetica","bold");
+            doc.text("Puesto:", 12, 166); doc.setFont("helvetica","normal"); doc.text(data.puesto || '---', 40, 166);
+            
+            // Resolución RRHH
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 176, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("Resolución de Recursos Humanos", 105, 181.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+            
+            doc.rect(10, 184, 195, 30);
+            doc.text("Estado:", 12, 190); doc.setFont("helvetica","normal"); doc.text(data.estado || 'Pendiente', 40, 190);
+            doc.setFont("helvetica","bold");
+            doc.text("Observaciones:", 12, 198); doc.setFont("helvetica","normal");
+            const obsRRHH = document.getElementById('resObservaciones').value || data.observacionesRRHH || '---';
+            const splitObs = doc.splitTextToSize(obsRRHH, 150);
+            doc.text(splitObs, 40, 198);
+            
+            // Firmas
+            doc.setFont("helvetica", "bold");
+            doc.line(20, 240, 90, 240);
+            doc.text("Firma del Empleado", 55, 245, { align: "center" });
+            
+            doc.line(120, 240, 190, 240);
+            doc.text("Firma Recursos Humanos", 155, 245, { align: "center" });
+
+            // Importante
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 255, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.text("IMPORTANTE", 105, 260.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+            doc.rect(10, 263, 195, 12);
+            doc.setFontSize(8);
+            doc.text("- Toda solicitud debe presentarse con al menos 2 días de anticipación.", 12, 268);
+            doc.text("- Recursos Humanos se reserva el derecho de requerir documentación adicional.", 12, 272);
+
+            // Open PDF
+            window.open(doc.output('bloburl'), '_blank');
+        });
+    </script>
+</body>
+</html>

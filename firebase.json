@@ -3,6 +3,7 @@
     "rules": "firestore.rules"
   },
   "hosting": {
+    "site": "sistemagestionenag",
     "public": ".",
     "ignore": [
       "firebase.json",

@@ -408,12 +408,24 @@
         async function handleRegister(event) {
             event.preventDefault();
             
-            const fullName = document.getElementById('fullName').value.trim();
-            const username = document.getElementById('username').value.trim().toLowerCase();
-            const email = document.getElementById('email').value.trim();
-            const department = document.getElementById('department').value;
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
+            const fullNameEl = document.getElementById('fullName');
+            if(!fullNameEl) { alert("Falta fullName"); return; }
+            const fullName = fullNameEl.value.trim();
+            const usernameEl = document.getElementById('username');
+            if(!usernameEl) { alert("Falta username"); return; }
+            const username = usernameEl.value.trim().toLowerCase();
+            const emailEl = document.getElementById('email');
+            if(!emailEl) { alert("Falta email"); return; }
+            const email = emailEl.value.trim();
+            const departmentEl = document.getElementById('department');
+            if(!departmentEl) { alert("Falta department"); return; }
+            const department = departmentEl.value;
+            const passwordEl = document.getElementById('password');
+            if(!passwordEl) { alert("Falta password"); return; }
+            const password = passwordEl.value;
+            const confirmPasswordEl = document.getElementById('confirmPassword');
+            if(!confirmPasswordEl) { alert("Falta confirmPassword"); return; }
+            const confirmPassword = confirmPasswordEl.value;
             
             const btn = document.getElementById('registerBtn');
             const banner = document.getElementById('alertBanner');
@@ -479,7 +491,7 @@
                 } else if (error.code === 'auth/weak-password') {
                     message.innerText = 'La contraseña debe tener al menos 6 caracteres.';
                 } else {
-                    message.innerText = 'Error al registrar: ' + error.message;
+                    message.innerText = 'Error al registrar: ' + error.message + ' | Stack: ' + (error.stack || ''); console.error(error);
                 }
             }
         }

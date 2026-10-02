@@ -1327,9 +1327,9 @@
                 doc.setTextColor(100, 100, 100);
                 doc.text("No hay cotizaciones para mostrar en el historial.", pageWidth / 2, 60, { align: "center" });
                 doc.save("Reporte_Historial_Cotizaciones.pdf");
-            if (window.registrarBitacora) {
-                window.registrarBitacora('Comercialización', 'Generar PDF', 'Se generó un documento en el módulo Comercialización');
-            }
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Comercialización', 'Generar PDF', 'Se generó un documento en el módulo Comercialización');
+                }
 
                 return;
             }

@@ -39,7 +39,7 @@ window.registrarBitacora = async function(modulo, accion, detalles) {
         if (currentUser) {
             try {
                 const uDoc = await dbFirestore.collection('usuarios').doc(currentUser.uid).get();
-                if(uDoc.exists) usuarioSino = uDoc.data().usuario || currentUser.email;
+                if(uDoc.exists) { usuarioSino = uDoc.data().usuario || currentUser.email; } else { usuarioSino = currentUser.email || 'Desconocido'; }
             } catch(e) { usuarioSino = currentUser.email; }
         }
         await dbFirestore.collection('bitacora_global').add({
@@ -51,3 +51,24 @@ window.registrarBitacora = async function(modulo, accion, detalles) {
         });
     } catch(e) { console.error("Error al registrar en bitácora", e); }
 };
+
+
+// Sincronizar nombre de usuario globalmente
+if (typeof firebase !== 'undefined' && firebase.auth) {
+    firebase.auth().onAuthStateChanged(async (user) => {
+        if (user && dbFirestore) {
+            try {
+                const uDoc = await dbFirestore.collection('usuarios').doc(user.uid).get();
+                if (uDoc.exists) {
+                    localStorage.setItem('enag_username', uDoc.data().usuario || user.email);
+                } else {
+                    localStorage.setItem('enag_username', user.email);
+                }
+            } catch(e) {
+                localStorage.setItem('enag_username', user.email);
+            }
+        } else if (!user) {
+            localStorage.removeItem('enag_username');
+        }
+    });
+}

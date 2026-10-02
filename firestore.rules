@@ -7,6 +7,11 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null;
     }
+    // Permitir a cualquier empleado enviar solicitudes (create público)
+    match /solicitudes_personal/{solicitudId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+    }
     
     // Para todas las demás colecciones (cotizaciones, bitacora_global, etc.)
     match /{document=**} {
