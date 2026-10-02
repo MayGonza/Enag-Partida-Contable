@@ -120,6 +120,47 @@
             font-weight: 500;
         }
 
+        /* Dashboard Stats */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            margin: 10px 0;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.9em;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .stat-blue .stat-value { color: #0284c7; }
+        .stat-yellow .stat-value { color: #ca8a04; }
+        .stat-green .stat-value { color: #16a34a; }
+        .stat-red .stat-value { color: #dc2626; }
+
         /* Modal Styles */
         .modal-overlay {
             position: fixed;
@@ -187,6 +228,25 @@
     <div class="container">
         <h1>Gestión de Solicitudes de Personal</h1>
         <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Departamento de Recursos Humanos</p>
+
+        <div class="dashboard-grid">
+            <div class="stat-card stat-blue">
+                <span class="stat-label">Total Solicitudes</span>
+                <span class="stat-value" id="statTotal">0</span>
+            </div>
+            <div class="stat-card stat-yellow">
+                <span class="stat-label">Pendientes</span>
+                <span class="stat-value" id="statPendientes">0</span>
+            </div>
+            <div class="stat-card stat-green">
+                <span class="stat-label">Aprobadas</span>
+                <span class="stat-value" id="statAprobadas">0</span>
+            </div>
+            <div class="stat-card stat-red">
+                <span class="stat-label">No Aprobadas</span>
+                <span class="stat-value" id="statRechazadas">0</span>
+            </div>
+        </div>
 
         <table id="solicitudesTable">
             <thead>
@@ -258,16 +318,35 @@
             
             dbFirestore.collection('solicitudes_personal').orderBy('fechaCreacion', 'desc').onSnapshot((snapshot) => {
                 tbody.innerHTML = '';
+                
+                let countTotal = 0;
+                let countPendientes = 0;
+                let countAprobadas = 0;
+                let countRechazadas = 0;
+
                 if(snapshot.empty) {
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>';
+                    document.getElementById('statTotal').innerText = 0;
+                    document.getElementById('statPendientes').innerText = 0;
+                    document.getElementById('statAprobadas').innerText = 0;
+                    document.getElementById('statRechazadas').innerText = 0;
                     return;
                 }
 
                 snapshot.forEach(doc => {
                     const data = doc.data();
+                    countTotal++;
+
                     let badgeClass = 'badge-pendiente';
-                    if(data.estado === 'Aprobado') badgeClass = 'badge-aprobado';
-                    if(data.estado === 'No Aprobado') badgeClass = 'badge-rechazado';
+                    if(data.estado === 'Aprobado') {
+                        badgeClass = 'badge-aprobado';
+                        countAprobadas++;
+                    } else if(data.estado === 'No Aprobado') {
+                        badgeClass = 'badge-rechazado';
+                        countRechazadas++;
+                    } else {
+                        countPendientes++;
+                    }
                     
                     const fechaFormat = data.fechaCreacion ? data.fechaCreacion.toDate().toLocaleDateString('es-HN') : 'N/A';
 
@@ -284,6 +363,12 @@
                     `;
                     tbody.appendChild(tr);
                 });
+
+                // Update Dashboard
+                document.getElementById('statTotal').innerText = countTotal;
+                document.getElementById('statPendientes').innerText = countPendientes;
+                document.getElementById('statAprobadas').innerText = countAprobadas;
+                document.getElementById('statRechazadas').innerText = countRechazadas;
             });
         }
 
