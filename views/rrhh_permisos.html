@@ -337,6 +337,10 @@
                 <span class="stat-label" style="font-size: 0.75em;">Justificaciones</span>
                 <span class="stat-value" id="statJustificaciones" style="font-size: 1.8em; color: var(--primary);">0</span>
             </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Otros</span>
+                <span class="stat-value" id="statOtros" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
         </div>
 
         <table id="solicitudesTable">
@@ -422,6 +426,7 @@
                 let countIncapacidades = 0;
                 let countConstancias = 0;
                 let countJustificaciones = 0;
+                let countOtros = 0;
 
                 if (snapshot.empty) {
                     tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>';
@@ -435,6 +440,7 @@
                     document.getElementById('statIncapacidades').innerText = 0;
                     document.getElementById('statConstancias').innerText = 0;
                     document.getElementById('statJustificaciones').innerText = 0;
+                    document.getElementById('statOtros').innerText = 0;
                     return;
                 }
 
@@ -458,6 +464,7 @@
                     else if(data.tipoSolicitud === 'Incapacidad') countIncapacidades++;
                     else if(data.tipoSolicitud === 'Constancia laboral/Boucher') countConstancias++;
                     else if(data.tipoSolicitud === 'Justificación de ausencia') countJustificaciones++;
+                    else countOtros++;
 
                     const fechaFormat = data.fechaCreacion ? data.fechaCreacion.toDate().toLocaleDateString('es-HN') : 'N/A';
 
@@ -486,6 +493,7 @@
                 document.getElementById('statIncapacidades').innerText = countIncapacidades;
                 document.getElementById('statConstancias').innerText = countConstancias;
                 document.getElementById('statJustificaciones').innerText = countJustificaciones;
+                document.getElementById('statOtros').innerText = countOtros;
             });
         }
 
