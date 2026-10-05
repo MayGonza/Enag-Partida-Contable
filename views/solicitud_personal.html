@@ -234,6 +234,207 @@
             border-radius: 4px 8px 8px 4px;
         }
 
+        /* ===== Documentación de respaldo ===== */
+        .label-hint {
+            text-transform: none;
+            font-weight: 400;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+        }
+
+        .dropzone {
+            border: 2px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 28px 20px;
+            text-align: center;
+            background: linear-gradient(180deg, #f8fafc 0%, #f1f5f9 100%);
+            cursor: pointer;
+            transition: var(--transition);
+            outline: none;
+        }
+
+        .dropzone:hover,
+        .dropzone:focus-visible,
+        .dropzone.dragover {
+            border-color: var(--primary);
+            background: linear-gradient(180deg, #f0f6ff 0%, #e6efff 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(0, 33, 71, 0.08);
+        }
+
+        .dropzone.disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .dropzone-icon {
+            width: 54px;
+            height: 54px;
+            margin: 0 auto 12px;
+            border-radius: 50%;
+            background: rgba(0, 33, 71, 0.08);
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+        }
+
+        .dropzone:hover .dropzone-icon,
+        .dropzone.dragover .dropzone-icon {
+            background: var(--primary);
+            color: #fff;
+            transform: scale(1.06);
+        }
+
+        .dropzone-title {
+            font-family: 'Outfit', sans-serif;
+            font-weight: 600;
+            color: var(--primary);
+            font-size: 1rem;
+            margin-bottom: 4px;
+        }
+
+        .dropzone-title u {
+            color: var(--accent);
+            text-decoration-thickness: 2px;
+        }
+
+        .dropzone-hint {
+            font-size: 0.82rem;
+            color: var(--text-muted);
+        }
+
+        .adjunto-sugerencia {
+            display: none;
+            margin-top: 10px;
+            padding: 10px 14px;
+            border-radius: 8px;
+            background: #fff7ed;
+            border: 1px solid #fed7aa;
+            color: #9a3412;
+            font-size: 0.85rem;
+        }
+
+        .file-error {
+            display: none;
+            margin-top: 10px;
+            font-size: 0.85rem;
+            color: #b91c1c;
+        }
+
+        .file-list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 14px;
+        }
+
+        .file-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 14px;
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            animation: file-in 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+            transition: var(--transition);
+        }
+
+        .file-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+        }
+
+        @keyframes file-in {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-thumb {
+            width: 44px;
+            height: 44px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #e2e8f0;
+        }
+
+        .file-thumb-pdf {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #b91c1c;
+            font-weight: 700;
+            font-size: 0.7rem;
+            font-family: 'Outfit', sans-serif;
+            letter-spacing: 0.5px;
+        }
+
+        .file-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .file-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--text-main);
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .file-size {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            margin-top: 2px;
+        }
+
+        .file-ok {
+            font-size: 0.72rem;
+            color: #15803d;
+            background: #dcfce7;
+            padding: 1px 8px;
+            border-radius: 10px;
+            margin-left: 6px;
+        }
+
+        .file-remove {
+            background: none;
+            border: none;
+            color: #94a3b8;
+            cursor: pointer;
+            font-size: 1.3rem;
+            line-height: 1;
+            padding: 6px 9px;
+            border-radius: 8px;
+            transition: var(--transition);
+        }
+
+        .file-remove:hover {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .file-processing {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-top: 10px;
+            display: none;
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -308,6 +509,32 @@
                         placeholder="Escriba los detalles de su solicitud aquí..." required></textarea>
                 </div>
 
+                <div class="form-group form-group-full">
+                    <label class="form-label" for="inputAdjuntos">Documentación de respaldo
+                        <span class="label-hint">(opcional · hasta 3 archivos)</span></label>
+
+                    <div class="dropzone" id="dropzone" tabindex="0" role="button"
+                        aria-label="Adjuntar documentación de respaldo">
+                        <div class="dropzone-icon">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                <polyline points="17 8 12 3 7 8" />
+                                <line x1="12" y1="3" x2="12" y2="15" />
+                            </svg>
+                        </div>
+                        <div class="dropzone-title">Arrastre sus archivos aquí o <u>haga clic para seleccionar</u></div>
+                        <div class="dropzone-hint">PDF o imágenes (JPG, PNG). Las fotos se optimizan automáticamente ·
+                            PDF máx. 700 KB</div>
+                    </div>
+                    <input type="file" id="inputAdjuntos" accept="application/pdf,image/*" multiple hidden>
+
+                    <div class="adjunto-sugerencia" id="adjuntoSugerencia"></div>
+                    <div class="file-processing" id="fileProcessing">⏳ Procesando archivo...</div>
+                    <div class="file-error" id="fileError"></div>
+                    <div class="file-list" id="fileList"></div>
+                </div>
+
                 <div class="form-group form-group-full" style="margin-top: 15px;">
                     <h3
                         style="font-size: 1.1em; color: var(--primary); margin-bottom: 5px; border-bottom: 1px solid #e2e8f0; padding-bottom: 5px;">
@@ -357,12 +584,207 @@
     <script src="../js/firebase-config.js"></script>
 
     <script>
+        // ===================== Documentación de respaldo =====================
+        // Los archivos se guardan como base64 en Firestore (subcolección "adjuntos").
+        // Cada documento de Firestore admite máx. 1 MB, por eso se limita el tamaño final.
+        const MAX_ARCHIVOS = 3;
+        const MAX_BYTES_ARCHIVO = 700 * 1024;
+        let adjuntos = []; // { nombre, tipo, tamano, data }
+        let procesandoArchivos = 0;
+
+        const dropzone = document.getElementById('dropzone');
+        const inputAdjuntos = document.getElementById('inputAdjuntos');
+
+        function formatearTamano(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        function escapeHtml(texto) {
+            const div = document.createElement('div');
+            div.textContent = texto;
+            return div.innerHTML;
+        }
+
+        function bytesDeDataURL(dataUrl) {
+            return Math.round((dataUrl.length - dataUrl.indexOf(',') - 1) * 3 / 4);
+        }
+
+        function leerComoDataURL(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = () => reject(new Error('No se pudo leer el archivo.'));
+                reader.readAsDataURL(file);
+            });
+        }
+
+        function cargarImagen(src) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = () => resolve(img);
+                img.onerror = () => reject(new Error('Formato de imagen no compatible. Use JPG o PNG.'));
+                img.src = src;
+            });
+        }
+
+        // Redimensiona y comprime la imagen a JPEG hasta que quepa en el límite
+        async function comprimirImagen(file) {
+            const original = await leerComoDataURL(file);
+            const img = await cargarImagen(original);
+            let maxDim = 1800;
+            let calidad = 0.82;
+
+            for (let intento = 0; intento < 8; intento++) {
+                const escala = Math.min(1, maxDim / Math.max(img.width, img.height));
+                const canvas = document.createElement('canvas');
+                canvas.width = Math.round(img.width * escala);
+                canvas.height = Math.round(img.height * escala);
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#ffffff';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+                const data = canvas.toDataURL('image/jpeg', calidad);
+                const tamano = bytesDeDataURL(data);
+                if (tamano <= MAX_BYTES_ARCHIVO) {
+                    return { data, tamano, tipo: 'image/jpeg' };
+                }
+                calidad = Math.max(0.5, calidad - 0.08);
+                maxDim = Math.round(maxDim * 0.85);
+            }
+            throw new Error('La imagen es demasiado grande incluso después de optimizarla.');
+        }
+
+        function mostrarErrorArchivo(msg) {
+            const el = document.getElementById('fileError');
+            el.innerText = msg ? '⚠️ ' + msg : '';
+            el.style.display = msg ? 'block' : 'none';
+        }
+
+        function actualizarEstadoDropzone() {
+            dropzone.classList.toggle('disabled', adjuntos.length >= MAX_ARCHIVOS);
+            document.getElementById('fileProcessing').style.display = procesandoArchivos > 0 ? 'block' : 'none';
+        }
+
+        function renderAdjuntos() {
+            const lista = document.getElementById('fileList');
+            lista.innerHTML = '';
+            adjuntos.forEach((a, i) => {
+                const item = document.createElement('div');
+                item.className = 'file-item';
+                const thumb = a.tipo.startsWith('image/')
+                    ? `<img class="file-thumb" src="${a.data}" alt="Vista previa">`
+                    : `<div class="file-thumb file-thumb-pdf">PDF</div>`;
+                item.innerHTML = `
+                    ${thumb}
+                    <div class="file-meta">
+                        <div class="file-name" title="${escapeHtml(a.nombre)}">${escapeHtml(a.nombre)}</div>
+                        <div class="file-size">${formatearTamano(a.tamano)}<span class="file-ok">Listo</span></div>
+                    </div>
+                    <button type="button" class="file-remove" id="btnQuitarAdjunto${i}" title="Quitar archivo" aria-label="Quitar archivo">×</button>
+                `;
+                item.querySelector('.file-remove').addEventListener('click', () => {
+                    adjuntos.splice(i, 1);
+                    mostrarErrorArchivo('');
+                    renderAdjuntos();
+                });
+                lista.appendChild(item);
+            });
+            actualizarEstadoDropzone();
+        }
+
+        async function procesarArchivos(fileList) {
+            mostrarErrorArchivo('');
+            for (const file of Array.from(fileList)) {
+                if (adjuntos.length + procesandoArchivos >= MAX_ARCHIVOS) {
+                    mostrarErrorArchivo(`Solo se permiten ${MAX_ARCHIVOS} archivos por solicitud.`);
+                    break;
+                }
+
+                const esPdf = file.type === 'application/pdf';
+                const esImagen = file.type.startsWith('image/');
+                if (!esPdf && !esImagen) {
+                    mostrarErrorArchivo(`"${file.name}" no es un PDF ni una imagen.`);
+                    continue;
+                }
+
+                procesandoArchivos++;
+                actualizarEstadoDropzone();
+                try {
+                    if (esPdf) {
+                        if (file.size > MAX_BYTES_ARCHIVO) {
+                            throw new Error(`El PDF "${file.name}" pesa ${formatearTamano(file.size)}. El máximo es 700 KB; puede tomarle una foto o comprimirlo.`);
+                        }
+                        const data = await leerComoDataURL(file);
+                        adjuntos.push({ nombre: file.name, tipo: 'application/pdf', tamano: file.size, data });
+                    } else {
+                        const r = await comprimirImagen(file);
+                        const nombre = file.name.replace(/\.[^.]+$/, '') + '.jpg';
+                        adjuntos.push({ nombre, tipo: r.tipo, tamano: r.tamano, data: r.data });
+                    }
+                } catch (err) {
+                    mostrarErrorArchivo(err.message);
+                } finally {
+                    procesandoArchivos--;
+                    renderAdjuntos();
+                }
+            }
+        }
+
+        dropzone.addEventListener('click', () => {
+            if (adjuntos.length < MAX_ARCHIVOS) inputAdjuntos.click();
+        });
+        dropzone.addEventListener('keydown', (e) => {
+            if ((e.key === 'Enter' || e.key === ' ') && adjuntos.length < MAX_ARCHIVOS) {
+                e.preventDefault();
+                inputAdjuntos.click();
+            }
+        });
+        inputAdjuntos.addEventListener('change', () => {
+            procesarArchivos(inputAdjuntos.files);
+            inputAdjuntos.value = '';
+        });
+        ['dragenter', 'dragover'].forEach(ev => dropzone.addEventListener(ev, (e) => {
+            e.preventDefault();
+            if (adjuntos.length < MAX_ARCHIVOS) dropzone.classList.add('dragover');
+        }));
+        ['dragleave', 'drop'].forEach(ev => dropzone.addEventListener(ev, (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+        }));
+        dropzone.addEventListener('drop', (e) => {
+            if (e.dataTransfer && e.dataTransfer.files.length) procesarArchivos(e.dataTransfer.files);
+        });
+
+        // Sugerencia según el tipo de solicitud
+        const SUGERENCIAS = {
+            'Incapacidad': '💡 Se recomienda adjuntar la constancia o incapacidad médica.',
+            'Justificación de ausencia': '💡 Se recomienda adjuntar el comprobante que justifique la ausencia.',
+            'Permiso de trabajo': '💡 Si aplica, adjunte la convocatoria, oficio o citación correspondiente.'
+        };
+        document.querySelectorAll('input[name="tipoSolicitud"]').forEach(radio => {
+            radio.addEventListener('change', () => {
+                const el = document.getElementById('adjuntoSugerencia');
+                const texto = SUGERENCIAS[radio.value];
+                el.innerText = texto || '';
+                el.style.display = texto ? 'block' : 'none';
+            });
+        });
+
+        // ===================== Envío de la solicitud =====================
         async function enviarSolicitud(event) {
             event.preventDefault();
 
             const btn = document.getElementById('submitBtn');
             const banner = document.getElementById('alertBanner');
             const message = document.getElementById('alertMessage');
+
+            if (procesandoArchivos > 0) {
+                mostrarErrorArchivo('Espere a que terminen de procesarse los archivos.');
+                return;
+            }
 
             btn.disabled = true;
             btn.querySelector('span').innerText = 'Enviando...';
@@ -398,16 +820,39 @@
                     puesto,
                     estado: 'Pendiente', // Resolución de RRHH por defecto
                     observacionesRRHH: '',
-                    fechaCreacion: firebase.firestore.FieldValue.serverTimestamp()
+                    fechaCreacion: firebase.firestore.FieldValue.serverTimestamp(),
+                    // Solo metadatos; el contenido va en la subcolección "adjuntos"
+                    adjuntos: adjuntos.map(a => ({ nombre: a.nombre, tipo: a.tipo, tamano: a.tamano })),
+                    cantidadAdjuntos: adjuntos.length
                 };
 
-                await dbFirestore.collection('solicitudes_personal').add(solicitud);
+                // Escritura atómica: la solicitud y sus adjuntos se guardan juntos o no se guarda nada
+                const solicitudRef = dbFirestore.collection('solicitudes_personal').doc();
+                const batch = dbFirestore.batch();
+                batch.set(solicitudRef, solicitud);
+                adjuntos.forEach(a => {
+                    batch.set(solicitudRef.collection('adjuntos').doc(), {
+                        nombre: a.nombre,
+                        tipo: a.tipo,
+                        tamano: a.tamano,
+                        data: a.data,
+                        fechaSubida: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                });
+                await batch.commit();
 
                 banner.classList.add('alert-success');
                 banner.style.display = 'flex';
-                message.innerText = '✅ Su solicitud ha sido enviada exitosamente a Recursos Humanos.';
+                message.innerText = adjuntos.length
+                    ? `✅ Su solicitud y ${adjuntos.length} documento(s) de respaldo fueron enviados exitosamente a Recursos Humanos.`
+                    : '✅ Su solicitud ha sido enviada exitosamente a Recursos Humanos.';
 
                 document.getElementById('solicitudForm').reset();
+                adjuntos = [];
+                renderAdjuntos();
+                mostrarErrorArchivo('');
+                document.getElementById('adjuntoSugerencia').style.display = 'none';
+                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 console.error("Error al enviar solicitud:", error);
                 banner.style.display = 'flex';

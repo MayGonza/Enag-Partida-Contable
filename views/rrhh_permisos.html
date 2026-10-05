@@ -214,7 +214,141 @@
             border-radius: 16px;
             width: 90%;
             max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== Documentación de respaldo ===== */
+        .clip-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-left: 6px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.78em;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .adjuntos-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .adjuntos-box h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.05em;
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .adjuntos-vacio {
+            color: #94a3b8;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        .adjunto-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .adjunto-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .adjunto-thumb {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #e2e8f0;
+            cursor: zoom-in;
+        }
+
+        .adjunto-thumb-pdf {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #b91c1c;
+            font-weight: 700;
+            font-size: 0.72em;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+        }
+
+        .adjunto-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .adjunto-nombre {
+            font-weight: 500;
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .adjunto-tamano {
+            font-size: 0.78em;
+            color: #64748b;
+        }
+
+        .btn-adjunto {
+            padding: 7px 12px;
+            border-radius: 7px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.82em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-adjunto:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .skeleton {
+            height: 66px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+        }
+
+        @keyframes shimmer {
+            from {
+                background-position: 200% 0;
+            }
+
+            to {
+                background-position: -200% 0;
+            }
         }
 
         .modal-card h2 {
@@ -368,6 +502,11 @@
             <h2>Detalles de Solicitud</h2>
             <div id="modalDetails"></div>
 
+            <div class="adjuntos-box" id="adjuntosBox">
+                <h3>📎 Documentación de respaldo</h3>
+                <div id="adjuntosContenido"></div>
+            </div>
+
             <div class="resolucion-box">
                 <h3 style="margin-top:0; font-size: 1.1em; color: var(--primary);">Resolución de Recursos Humanos</h3>
 
@@ -400,6 +539,20 @@
     <script>
         let currentSolicitudId = null;
         let currentSolicitudData = null;
+        let currentAdjuntos = [];
+
+        // Escapa texto ingresado por el empleado (el formulario es público)
+        function esc(valor) {
+            const div = document.createElement('div');
+            div.textContent = valor == null ? '' : String(valor);
+            return div.innerHTML;
+        }
+
+        function formatearTamano(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
 
         // Protección de Ruta
         firebase.auth().onAuthStateChanged(async (user) => {
@@ -468,13 +621,18 @@
 
                     const fechaFormat = data.fechaCreacion ? data.fechaCreacion.toDate().toLocaleDateString('es-HN') : 'N/A';
 
+                    const numAdjuntos = data.cantidadAdjuntos || (Array.isArray(data.adjuntos) ? data.adjuntos.length : 0);
+                    const clip = numAdjuntos > 0
+                        ? `<span class="clip-badge" title="${numAdjuntos} documento(s) de respaldo">📎 ${numAdjuntos}</span>`
+                        : '';
+
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
                         <td>${fechaFormat}</td>
-                        <td>${data.nombre}</td>
-                        <td>${data.departamento}</td>
-                        <td>${data.tipoSolicitud}</td>
-                        <td><span class="badge ${badgeClass}">${data.estado}</span></td>
+                        <td>${esc(data.nombre)}</td>
+                        <td>${esc(data.departamento)}</td>
+                        <td>${esc(data.tipoSolicitud)}${clip}</td>
+                        <td><span class="badge ${badgeClass}">${esc(data.estado)}</span></td>
                         <td>
                             <button class="btn-action" onclick='abrirModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>Gestionar</button>
                         </td>
@@ -502,12 +660,12 @@
             currentSolicitudData = data;
 
             const detailsHtml = `
-                <div class="detail-row"><strong>Empleado:</strong> ${data.nombre} (${data.puesto})</div>
-                <div class="detail-row"><strong>Depto:</strong> ${data.departamento}</div>
-                <div class="detail-row"><strong>Tipo de Solicitud:</strong> ${data.tipoSolicitud}</div>
-                <div class="detail-row"><strong>Periodo:</strong> ${data.fechaInicio} ${data.fechaFin ? ' al ' + data.fechaFin : ''}</div>
-                <div class="detail-row"><strong>Horas (si aplica):</strong> ${data.horaSalida || '--'} a ${data.horaRetorno || '--'}</div>
-                <div class="detail-row"><strong>Descripción:</strong> ${data.descripcion}</div>
+                <div class="detail-row"><strong>Empleado:</strong> ${esc(data.nombre)} (${esc(data.puesto)})</div>
+                <div class="detail-row"><strong>Depto:</strong> ${esc(data.departamento)}</div>
+                <div class="detail-row"><strong>Tipo de Solicitud:</strong> ${esc(data.tipoSolicitud)}</div>
+                <div class="detail-row"><strong>Periodo:</strong> ${esc(data.fechaInicio)} ${data.fechaFin ? ' al ' + esc(data.fechaFin) : ''}</div>
+                <div class="detail-row"><strong>Horas (si aplica):</strong> ${esc(data.horaSalida || '--')} a ${esc(data.horaRetorno || '--')}</div>
+                <div class="detail-row"><strong>Descripción:</strong> ${esc(data.descripcion)}</div>
             `;
 
             document.getElementById('modalDetails').innerHTML = detailsHtml;
@@ -515,6 +673,94 @@
             document.getElementById('resObservaciones').value = data.observacionesRRHH || '';
 
             document.getElementById('resolucionModal').style.display = 'flex';
+            cargarAdjuntos(id, data);
+        }
+
+        // Carga bajo demanda de la documentación de respaldo (subcolección "adjuntos")
+        async function cargarAdjuntos(id, data) {
+            const cont = document.getElementById('adjuntosContenido');
+            currentAdjuntos = [];
+            const esperados = data.cantidadAdjuntos || (Array.isArray(data.adjuntos) ? data.adjuntos.length : 0);
+
+            if (!esperados) {
+                cont.innerHTML = '<div class="adjuntos-vacio">El empleado no adjuntó documentación de respaldo.</div>';
+                return;
+            }
+
+            cont.innerHTML = '<div class="skeleton"></div>'.repeat(esperados);
+
+            try {
+                const snap = await dbFirestore.collection('solicitudes_personal').doc(id).collection('adjuntos').get();
+                if (currentSolicitudId !== id) return; // se cambió de solicitud mientras cargaba
+
+                snap.forEach(d => currentAdjuntos.push({ id: d.id, ...d.data() }));
+
+                if (!currentAdjuntos.length) {
+                    cont.innerHTML = '<div class="adjuntos-vacio">No se encontraron los archivos adjuntos.</div>';
+                    return;
+                }
+
+                cont.innerHTML = currentAdjuntos.map((a, i) => {
+                    // Solo se muestra miniatura si el contenido es un JPEG base64 legítimo
+                    const esImagen = (a.tipo || '').startsWith('image/');
+                    const imagenValida = esImagen && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(a.data || '');
+                    const thumb = imagenValida
+                        ? `<img class="adjunto-thumb" src="${a.data}" alt="Vista previa" onclick="verAdjunto(${i})">`
+                        : `<div class="adjunto-thumb adjunto-thumb-pdf" onclick="verAdjunto(${i})">${esImagen ? 'IMG' : 'PDF'}</div>`;
+                    return `
+                        <div class="adjunto-item">
+                            ${thumb}
+                            <div class="adjunto-meta">
+                                <div class="adjunto-nombre" title="${esc(a.nombre)}">${esc(a.nombre)}</div>
+                                <div class="adjunto-tamano">${esImagen ? 'Imagen' : 'Documento PDF'} · ${formatearTamano(a.tamano)}</div>
+                            </div>
+                            <button class="btn-adjunto" id="btnVerAdjunto${i}" onclick="verAdjunto(${i})">Ver</button>
+                            <button class="btn-adjunto" id="btnDescargarAdjunto${i}" onclick="descargarAdjunto(${i})">Descargar</button>
+                        </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Error al cargar adjuntos:', e);
+                cont.innerHTML = `<div class="adjuntos-vacio">⚠️ Error al cargar los documentos: ${esc(e.message)}</div>`;
+            }
+        }
+
+        // Convierte el base64 a Blob para abrirlo en otra pestaña (los navegadores bloquean data: URLs)
+        function adjuntoABlobUrl(a) {
+            const base64 = a.data.split(',')[1];
+            const binario = atob(base64);
+            const bytes = new Uint8Array(binario.length);
+            for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
+            return URL.createObjectURL(new Blob([bytes], { type: a.tipo }));
+        }
+
+        function registrarAccesoAdjunto(accion, a) {
+            if (window.registrarBitacora && currentSolicitudData) {
+                window.registrarBitacora('Recursos Humanos', accion,
+                    `${accion}: "${a.nombre}" de la solicitud de ${currentSolicitudData.nombre} (${currentSolicitudData.tipoSolicitud})`);
+            }
+        }
+
+        function verAdjunto(i) {
+            const a = currentAdjuntos[i];
+            if (!a) return;
+            const url = adjuntoABlobUrl(a);
+            window.open(url, '_blank');
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            registrarAccesoAdjunto('Visualización de documento de respaldo', a);
+        }
+
+        function descargarAdjunto(i) {
+            const a = currentAdjuntos[i];
+            if (!a) return;
+            const url = adjuntoABlobUrl(a);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = a.nombre || 'documento';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+            registrarAccesoAdjunto('Descarga de documento de respaldo', a);
         }
 
         function cerrarModal() {

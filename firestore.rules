@@ -11,6 +11,17 @@ service cloud.firestore {
     match /solicitudes_personal/{solicitudId} {
       allow create: if true;
       allow read, update, delete: if request.auth != null;
+
+      // Documentación de respaldo (base64). Create público solo junto con la
+      // solicitud (mismo batch), únicamente PDF/JPEG y con tamaño limitado.
+      match /adjuntos/{adjuntoId} {
+        allow create: if !exists(/databases/$(database)/documents/solicitudes_personal/$(solicitudId))
+                      && existsAfter(/databases/$(database)/documents/solicitudes_personal/$(solicitudId))
+                      && request.resource.data.tipo in ['application/pdf', 'image/jpeg']
+                      && request.resource.data.data is string
+                      && request.resource.data.data.size() < 1000000;
+        allow read, update, delete: if request.auth != null;
+      }
     }
     
     // Para todas las demás colecciones (cotizaciones, bitacora_global, etc.)
