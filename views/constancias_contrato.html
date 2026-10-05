@@ -1713,7 +1713,7 @@
 
             doc.save('Constancias_Trabajo_ENAG.pdf');
             if (window.registrarBitacora) {
-                window.registrarBitacora('Recursos Humanos', 'Generar PDF', 'Se generó un documento en el módulo Recursos Humanos');
+                window.registrarBitacora('Recursos Humanos', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Constancia con Deducciones (Contrato) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Constancias con Deducciones (Contrato) por lote (${seleccionados.length} empleados)` : 'Se generó Constancia'));
             }
 
         }

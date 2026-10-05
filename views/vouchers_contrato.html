@@ -1680,7 +1680,7 @@
 
             doc.save(`Voucher_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
             if (window.registrarBitacora) {
-                window.registrarBitacora('Planillas', 'Generar PDF', 'Se generó un documento en el módulo Planillas');
+                window.registrarBitacora('Planillas', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Voucher (Contrato) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Vouchers (Contrato) por lote (${seleccionados.length} empleados)` : 'Se generó Voucher (Contrato)'));
             }
 
         }
@@ -1717,7 +1717,7 @@
 
             doc.save(`Vouchers_Pago_Seleccionados.pdf`);
             if (window.registrarBitacora) {
-                window.registrarBitacora('Planillas', 'Generar PDF', 'Se generó un documento en el módulo Planillas');
+                window.registrarBitacora('Planillas', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Voucher (Contrato) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Vouchers (Contrato) por lote (${seleccionados.length} empleados)` : 'Se generó Voucher (Contrato)'));
             }
 
         }

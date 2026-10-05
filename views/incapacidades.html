@@ -1080,7 +1080,7 @@
 
             doc.save(nombreArchivo);
             if (window.registrarBitacora) {
-                window.registrarBitacora('Recursos Humanos', 'Generar PDF', 'Se generó un documento en el módulo Recursos Humanos');
+                window.registrarBitacora('Recursos Humanos', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Formulario de Incapacidad para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Formularios de Incapacidad por lote (${seleccionados.length} empleados)` : 'Se generó Formulario de Incapacidad'));
             }
 
         }

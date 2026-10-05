@@ -1676,7 +1676,7 @@
 
             doc.save('Constancias_Trabajo_ENAG.pdf');
             if (window.registrarBitacora) {
-                window.registrarBitacora('Recursos Humanos', 'Generar PDF', 'Se generó un documento en el módulo Recursos Humanos');
+                window.registrarBitacora('Recursos Humanos', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Constancia Simple (Acuerdo) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Constancias Simples (Acuerdo) por lote (${seleccionados.length} empleados)` : 'Se generó Constancia'));
             }
 
         }
