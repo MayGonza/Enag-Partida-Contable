@@ -779,11 +779,11 @@
                     observacionesRRHH: obs
                 });
                 
-                batch.update(dbFirestore.collection('consulta_solicitudes').doc(currentSolicitudId), {
+                batch.set(dbFirestore.collection('consulta_solicitudes').doc(currentSolicitudId), {
                     estado: estado,
                     observacionesRRHH: obs,
                     fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
-                });
+                }, { merge: true });
 
                 await batch.commit();
 
