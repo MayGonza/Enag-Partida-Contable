@@ -23,6 +23,20 @@ service cloud.firestore {
         allow read, update, delete: if request.auth != null;
       }
     }
+
+    // Consulta pública del estado (QR del comprobante). Solo lectura por ID exacto
+    // (get), nunca listado. Contiene únicamente datos no sensibles.
+    match /consulta_solicitudes/{solicitudId} {
+      allow get: if true;
+      allow list: if request.auth != null;
+      allow create: if (request.auth != null)
+                    || (!exists(/databases/$(database)/documents/solicitudes_personal/$(solicitudId))
+                        && existsAfter(/databases/$(database)/documents/solicitudes_personal/$(solicitudId))
+                        && request.resource.data.keys().hasOnly(['nombre', 'departamento', 'tipoSolicitud', 'fechaInicio', 'fechaFin', 'estado', 'observacionesRRHH', 'fechaCreacion', 'fechaActualizacion', 'cantidadAdjuntos'])
+                        && request.resource.data.estado == 'Pendiente'
+                        && request.resource.data.observacionesRRHH == '');
+      allow update, delete: if request.auth != null;
+    }
     
     // Para todas las demás colecciones (cotizaciones, bitacora_global, etc.)
     match /{document=**} {

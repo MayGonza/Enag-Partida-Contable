@@ -435,6 +435,202 @@
             display: none;
         }
 
+        /* ===== Comprobante con QR ===== */
+        .receipt {
+            text-align: center;
+            animation: card-appear 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+
+        .receipt[hidden] {
+            display: none;
+        }
+
+        .receipt-check {
+            width: 76px;
+            height: 76px;
+            margin: 0 auto 14px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #16a34a, #22c55e);
+            color: #fff;
+            font-size: 2.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 0 10px rgba(34, 197, 94, 0.12), 0 12px 24px rgba(22, 163, 74, 0.25);
+            animation: pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) both 0.15s;
+        }
+
+        @keyframes pop {
+            from {
+                transform: scale(0);
+            }
+
+            to {
+                transform: scale(1);
+            }
+        }
+
+        .receipt-title {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.6rem;
+            color: var(--primary);
+            margin: 0 0 6px;
+        }
+
+        .receipt-sub {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 520px;
+            margin: 0 auto 26px;
+            line-height: 1.5;
+        }
+
+        .receipt-ticket {
+            display: flex;
+            align-items: center;
+            gap: 26px;
+            text-align: left;
+            padding: 24px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 2px dashed #cbd5e1;
+            position: relative;
+        }
+
+        .receipt-qr {
+            flex-shrink: 0;
+            padding: 10px;
+            background: #fff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 6px 16px rgba(0, 33, 71, 0.08);
+            line-height: 0;
+        }
+
+        .receipt-qr canvas {
+            width: 168px;
+            height: 168px;
+            image-rendering: pixelated;
+        }
+
+        .receipt-info {
+            flex: 1;
+            min-width: 0;
+            display: grid;
+            gap: 10px;
+        }
+
+        .ri-label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: var(--text-muted);
+            font-weight: 600;
+        }
+
+        .ri-value {
+            font-weight: 500;
+            color: var(--text-main);
+            word-break: break-word;
+        }
+
+        .ri-folio {
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+            letter-spacing: 1px;
+        }
+
+        .ri-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            background: #fef3c7;
+            color: #92400e;
+            font-weight: 600;
+            font-size: 0.85rem;
+        }
+
+        .receipt-code {
+            margin-top: 16px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            word-break: break-all;
+        }
+
+        .receipt-code code {
+            font-family: ui-monospace, 'Consolas', monospace;
+            background: #f1f5f9;
+            color: var(--primary);
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.9rem;
+        }
+
+        .receipt-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .receipt-actions .btn-submit {
+            grid-column: 1 / -1;
+            margin-top: 0;
+        }
+
+        .btn-outline {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 13px;
+            border-radius: 12px;
+            border: 1.5px solid #cbd5e1;
+            background: #fff;
+            color: var(--primary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.98rem;
+            text-decoration: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-outline:hover {
+            border-color: var(--primary);
+            background: #f0f6ff;
+            transform: translateY(-2px);
+        }
+
+        .btn-text {
+            margin-top: 18px;
+            background: none;
+            border: none;
+            color: var(--accent);
+            font-weight: 600;
+            font-size: 0.92rem;
+            cursor: pointer;
+            text-decoration: underline;
+            text-underline-offset: 4px;
+        }
+
+        .btn-text:hover {
+            color: var(--accent-hover);
+        }
+
+        @media (max-width: 600px) {
+            .receipt-ticket {
+                flex-direction: column;
+                text-align: center;
+            }
+
+            .receipt-actions {
+                grid-template-columns: 1fr;
+            }
+        }
+
         @media (max-width: 768px) {
             .form-grid {
                 grid-template-columns: 1fr;
@@ -451,7 +647,7 @@
             <p class="subtitle">Departamento de Recursos Humanos - ENAG</p>
         </div>
 
-        <div class="info-box">
+        <div class="info-box" id="infoBox">
             <strong>Importante:</strong> Toda solicitud debe presentarse con al menos 2 días de anticipación, salvo
             casos de emergencia debidamente justificados.
         </div>
@@ -576,12 +772,57 @@
                 <span>Enviar Solicitud a RRHH</span>
             </button>
         </form>
+
+        <!-- Comprobante (se muestra tras enviar la solicitud) -->
+        <section class="receipt" id="comprobantePanel" hidden aria-live="polite">
+            <div class="receipt-check">✓</div>
+            <h3 class="receipt-title">¡Solicitud enviada!</h3>
+            <p class="receipt-sub">Guarde su comprobante. Escaneando el código QR podrá consultar en cualquier
+                momento el <strong>estado</strong> de su solicitud y las <strong>observaciones</strong> de Recursos
+                Humanos.</p>
+
+            <div class="receipt-ticket">
+                <div class="receipt-qr" id="receiptQr"></div>
+                <div class="receipt-info">
+                    <div>
+                        <div class="ri-label">Folio</div>
+                        <div class="ri-folio" id="rFolio">—</div>
+                    </div>
+                    <div>
+                        <div class="ri-label">Empleado</div>
+                        <div class="ri-value" id="rNombre">—</div>
+                    </div>
+                    <div>
+                        <div class="ri-label">Tipo de solicitud</div>
+                        <div class="ri-value" id="rTipo">—</div>
+                    </div>
+                    <div>
+                        <div class="ri-label">Estado</div>
+                        <span class="ri-badge">⏳ Pendiente de revisión</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="receipt-code">Código de consulta: <code id="rCodigo"></code></div>
+
+            <div class="receipt-actions">
+                <button type="button" class="btn-submit" id="btnDescargarComprobante">
+                    <span>⬇ Descargar comprobante (PDF)</span>
+                </button>
+                <a class="btn-outline" id="linkVerEstado" href="#" target="_blank" rel="noopener">Ver estado ahora</a>
+                <button type="button" class="btn-outline" id="btnCopiarEnlace">Copiar enlace</button>
+            </div>
+
+            <button type="button" class="btn-text" id="btnNuevaSolicitud">Enviar otra solicitud</button>
+        </section>
     </div>
 
     <!-- Firebase SDK Compat v10 -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/qrcode.js"></script>
 
     <script>
         // ===================== Documentación de respaldo =====================
@@ -826,7 +1067,7 @@
                     cantidadAdjuntos: adjuntos.length
                 };
 
-                // Escritura atómica: la solicitud y sus adjuntos se guardan juntos o no se guarda nada
+                // Escritura atómica: la solicitud, sus adjuntos y el registro público de consulta
                 const solicitudRef = dbFirestore.collection('solicitudes_personal').doc();
                 const batch = dbFirestore.batch();
                 batch.set(solicitudRef, solicitud);
@@ -839,20 +1080,34 @@
                         fechaSubida: firebase.firestore.FieldValue.serverTimestamp()
                     });
                 });
+                // Registro público (solo datos no sensibles) que se consulta con el QR
+                batch.set(dbFirestore.collection('consulta_solicitudes').doc(solicitudRef.id), {
+                    nombre,
+                    departamento,
+                    tipoSolicitud,
+                    fechaInicio,
+                    fechaFin,
+                    estado: 'Pendiente',
+                    observacionesRRHH: '',
+                    cantidadAdjuntos: adjuntos.length,
+                    fechaCreacion: firebase.firestore.FieldValue.serverTimestamp(),
+                    fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+                });
                 await batch.commit();
 
-                banner.classList.add('alert-success');
-                banner.style.display = 'flex';
-                message.innerText = adjuntos.length
-                    ? `✅ Su solicitud y ${adjuntos.length} documento(s) de respaldo fueron enviados exitosamente a Recursos Humanos.`
-                    : '✅ Su solicitud ha sido enviada exitosamente a Recursos Humanos.';
+                mostrarComprobante({
+                    id: solicitudRef.id,
+                    fechaInicio, fechaFin, horaSalida, horaRetorno,
+                    tipoSolicitud, nombre, departamento, noPuesto, puesto,
+                    cantidadAdjuntos: adjuntos.length,
+                    fechaEnvio: new Date()
+                });
 
                 document.getElementById('solicitudForm').reset();
                 adjuntos = [];
                 renderAdjuntos();
                 mostrarErrorArchivo('');
                 document.getElementById('adjuntoSugerencia').style.display = 'none';
-                window.scrollTo({ top: 0, behavior: 'smooth' });
             } catch (error) {
                 console.error("Error al enviar solicitud:", error);
                 banner.style.display = 'flex';
@@ -862,6 +1117,243 @@
                 btn.querySelector('span').innerText = 'Enviar Solicitud a RRHH';
             }
         }
+
+        // ===================== Comprobante con QR =====================
+        let comprobanteActual = null;
+
+        function folioDe(id) {
+            return 'SP-' + id.substring(0, 8).toUpperCase();
+        }
+
+        function urlEstado(id) {
+            return new URL('estado_solicitud.html?id=' + encodeURIComponent(id), window.location.href).href;
+        }
+
+        function fechaCorta(iso) {
+            if (!iso) return '';
+            const p = iso.split('-');
+            return p.length === 3 ? `${p[2]}/${p[1]}/${p[0]}` : iso;
+        }
+
+        function crearQR(texto) {
+            const qr = qrcode(0, 'M'); // versión automática, corrección de errores media
+            qr.addData(texto);
+            qr.make();
+            return qr;
+        }
+
+        function dibujarQREnCanvas(qr, escala) {
+            const n = qr.getModuleCount();
+            const margen = 2;
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = (n + margen * 2) * escala;
+            const ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.fillStyle = '#002147';
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    if (qr.isDark(r, c)) ctx.fillRect((c + margen) * escala, (r + margen) * escala, escala, escala);
+                }
+            }
+            return canvas;
+        }
+
+        function mostrarComprobante(info) {
+            info.folio = folioDe(info.id);
+            info.url = urlEstado(info.id);
+            comprobanteActual = info;
+
+            const qrBox = document.getElementById('receiptQr');
+            qrBox.innerHTML = '';
+            qrBox.appendChild(dibujarQREnCanvas(crearQR(info.url), 8));
+
+            document.getElementById('rFolio').textContent = info.folio;
+            document.getElementById('rNombre').textContent = info.nombre;
+            document.getElementById('rTipo').textContent = info.tipoSolicitud;
+            document.getElementById('rCodigo').textContent = info.id;
+            document.getElementById('linkVerEstado').href = info.url;
+
+            document.getElementById('solicitudForm').hidden = true;
+            document.getElementById('infoBox').style.display = 'none';
+            document.getElementById('alertBanner').style.display = 'none';
+            document.getElementById('comprobantePanel').hidden = false;
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function cargarLogo() {
+            return new Promise(resolve => {
+                const img = new Image();
+                img.onload = () => {
+                    try {
+                        const c = document.createElement('canvas');
+                        c.width = img.width; c.height = img.height;
+                        c.getContext('2d').drawImage(img, 0, 0);
+                        resolve(c.toDataURL('image/jpeg', 0.9));
+                    } catch (e) { resolve(null); }
+                };
+                img.onerror = () => resolve(null);
+                img.src = '../assets/logo.jpeg';
+            });
+        }
+
+        async function descargarComprobantePDF() {
+            const info = comprobanteActual;
+            if (!info) return;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+            const W = doc.internal.pageSize.getWidth();
+            const azul = [0, 33, 71];
+
+            // Encabezado
+            doc.setFillColor(...azul);
+            doc.rect(0, 0, W, 32, 'F');
+            doc.setFillColor(217, 119, 6);
+            doc.rect(0, 32, W, 1.5, 'F');
+            const logo = await cargarLogo();
+            let xTitulo = 15;
+            if (logo) {
+                doc.addImage(logo, 'JPEG', 12, 6, 20, 20);
+                xTitulo = 37;
+            }
+            doc.setTextColor(255, 255, 255);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text('EMPRESA NACIONAL DE ARTES GRÁFICAS', xTitulo, 15);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.text('Departamento de Recursos Humanos', xTitulo, 22);
+
+            // Título
+            doc.setTextColor(...azul);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(15);
+            doc.text('COMPROBANTE DE SOLICITUD DE PERSONAL', W / 2, 47, { align: 'center' });
+
+            // Franja de folio
+            doc.setFillColor(241, 245, 249);
+            doc.roundedRect(15, 53, W - 30, 14, 3, 3, 'F');
+            doc.setFontSize(12);
+            doc.text('Folio: ' + info.folio, 20, 62);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(71, 85, 105);
+            const envio = info.fechaEnvio.toLocaleString('es-HN', { dateStyle: 'medium', timeStyle: 'short' });
+            doc.text('Fecha de envío: ' + envio, W - 20, 62, { align: 'right' });
+
+            // Detalles (columna izquierda)
+            const filas = [
+                ['Empleado', info.nombre],
+                ['Puesto', info.puesto + (info.noPuesto ? '  (No. ' + info.noPuesto + ')' : '')],
+                ['Departamento', info.departamento],
+                ['Tipo de solicitud', info.tipoSolicitud],
+                ['Periodo', fechaCorta(info.fechaInicio) + (info.fechaFin ? ' al ' + fechaCorta(info.fechaFin) : '')],
+                ['Horario (si aplica)', (info.horaSalida || '--') + ' a ' + (info.horaRetorno || '--')],
+                ['Documentación de respaldo', info.cantidadAdjuntos ? info.cantidadAdjuntos + ' documento(s) adjunto(s)' : 'Sin documentos adjuntos'],
+                ['Estado al momento del envío', 'PENDIENTE DE REVISIÓN']
+            ];
+            let y = 80;
+            filas.forEach(([label, valor]) => {
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(8);
+                doc.setTextColor(100, 116, 139);
+                doc.text(label.toUpperCase(), 15, y);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(11);
+                doc.setTextColor(15, 23, 42);
+                const lineas = doc.splitTextToSize(String(valor || '---'), 105);
+                doc.text(lineas, 15, y + 5.5);
+                y += 7 + lineas.length * 5;
+            });
+
+            // QR (vectorial, columna derecha)
+            const qr = crearQR(info.url);
+            const n = qr.getModuleCount();
+            const tam = 58;
+            const qx = W - 15 - tam - 8, qy = 76;
+            doc.setDrawColor(203, 213, 225);
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(qx - 4, qy - 4, tam + 8, tam + 8, 3, 3, 'FD');
+            const celda = tam / n;
+            doc.setFillColor(...azul);
+            for (let r = 0; r < n; r++) {
+                for (let c = 0; c < n; c++) {
+                    if (qr.isDark(r, c)) doc.rect(qx + c * celda, qy + r * celda, celda + 0.02, celda + 0.02, 'F');
+                }
+            }
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(...azul);
+            doc.text('Escanee para consultar el estado', qx + tam / 2, qy + tam + 11, { align: 'center' });
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(100, 116, 139);
+            doc.text('y las observaciones de RRHH', qx + tam / 2, qy + tam + 15.5, { align: 'center' });
+
+            // Código de consulta y enlace
+            y = Math.max(y, qy + tam + 24) + 4;
+            doc.setDrawColor(203, 213, 225);
+            doc.setLineDashPattern([1.5, 1.5], 0);
+            doc.roundedRect(15, y, W - 30, 24, 3, 3, 'S');
+            doc.setLineDashPattern([], 0);
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(...azul);
+            doc.text('CÓDIGO DE CONSULTA:', 20, y + 8);
+            doc.setFont('courier', 'bold');
+            doc.setFontSize(12);
+            doc.text(info.id, 62, y + 8);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(71, 85, 105);
+            doc.text(doc.splitTextToSize('Consulta en línea: ' + info.url, W - 40), 20, y + 15);
+
+            // Nota
+            y += 32;
+            doc.setFillColor(254, 243, 199);
+            doc.roundedRect(15, y, W - 30, 18, 3, 3, 'F');
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(146, 64, 14);
+            doc.text('IMPORTANTE', 20, y + 6.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8.5);
+            doc.text(doc.splitTextToSize('Este comprobante acredita únicamente la recepción de su solicitud por Recursos Humanos y no constituye una aprobación. Consulte el estado actualizado escaneando el código QR.', W - 40), 20, y + 11.5);
+
+            // Pie
+            doc.setFontSize(7.5);
+            doc.setTextColor(148, 163, 184);
+            doc.text('Documento generado automáticamente por el Sistema de Gestión ENAG', W / 2, 270, { align: 'center' });
+
+            doc.save(`Comprobante_${info.folio}.pdf`);
+        }
+
+        document.getElementById('btnDescargarComprobante').addEventListener('click', descargarComprobantePDF);
+
+        document.getElementById('btnCopiarEnlace').addEventListener('click', async (e) => {
+            if (!comprobanteActual) return;
+            const btn = e.currentTarget;
+            try {
+                await navigator.clipboard.writeText(comprobanteActual.url);
+            } catch (err) {
+                const tmp = document.createElement('textarea');
+                tmp.value = comprobanteActual.url;
+                document.body.appendChild(tmp);
+                tmp.select();
+                document.execCommand('copy');
+                tmp.remove();
+            }
+            btn.textContent = '✓ Enlace copiado';
+            setTimeout(() => { btn.textContent = 'Copiar enlace'; }, 2000);
+        });
+
+        document.getElementById('btnNuevaSolicitud').addEventListener('click', () => {
+            comprobanteActual = null;
+            document.getElementById('comprobantePanel').hidden = true;
+            document.getElementById('solicitudForm').hidden = false;
+            document.getElementById('infoBox').style.display = '';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 </body>
 
