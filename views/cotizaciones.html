@@ -1328,7 +1328,7 @@
                 doc.text("No hay cotizaciones para mostrar en el historial.", pageWidth / 2, 60, { align: "center" });
                 doc.save("Reporte_Historial_Cotizaciones.pdf");
                 if (window.registrarBitacora) {
-                    window.registrarBitacora('Comercialización', 'Generar PDF', 'Se generó un documento en el módulo Comercialización');
+                    window.registrarBitacora('Comercialización', 'Generar Reporte PDF', 'Se generó el PDF de Historial de Cotizaciones.');
                 }
 
                 return;
@@ -1380,7 +1380,7 @@
 
             doc.save("Reporte_Historial_Cotizaciones.pdf");
             if (window.registrarBitacora) {
-                window.registrarBitacora('Comercialización', 'Generar PDF', 'Se generó un documento en el módulo Comercialización');
+                window.registrarBitacora('Comercialización', 'Generar Reporte PDF', 'Se generó el PDF de Historial de Cotizaciones.');
             }
 
         }
@@ -1639,7 +1639,7 @@
             const nombreClienteArchivo = (data.cliente.nombre || "Cliente").trim().replace(/[^a-zA-Z0-9-_]/g, "_");
             doc.save(`Cotizacion_${nombreClienteArchivo}_ENAG.pdf`);
             if (window.registrarBitacora) {
-                window.registrarBitacora('Comercialización', 'Generar PDF', 'Se generó un documento en el módulo Comercialización');
+                window.registrarBitacora('Comercialización', 'Generar Cotización PDF', `Se generó una cotización PDF para el cliente: ${data.cliente.nombre}`);
             }
 
         }
