@@ -487,8 +487,54 @@
             <div class="grid-layout">
                 <div class="form-group span-2">
                     <label for="clienteNombre">Cliente / Empresa: <span class="required">*</span></label>
-                    <input type="text" id="clienteNombre" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL"
+                    <input type="text" id="clienteNombre" list="listaInstituciones" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL"
                         oninput="this.value = this.value.toUpperCase()" required>
+                    <datalist id="listaInstituciones">
+                        <!-- Secretarías de Estado -->
+                        <option value="SECRETARÍA DE SALUD (SESAL)">
+                        <option value="SECRETARÍA DE EDUCACIÓN (SEDUC)">
+                        <option value="SECRETARÍA DE FINANZAS (SEFIN)">
+                        <option value="SECRETARÍA DE SEGURIDAD">
+                        <option value="SECRETARÍA DE DEFENSA NACIONAL (SEDENA)">
+                        <option value="SECRETARÍA DE GOBERNACIÓN, JUSTICIA Y DESCENTRALIZACIÓN (SGJD)">
+                        <option value="SECRETARÍA DE RELACIONES EXTERIORES Y COOPERACIÓN INTERNACIONAL (SRECI)">
+                        <option value="SECRETARÍA DE INFRAESTRUCTURA Y TRANSPORTE (SIT)">
+                        <option value="SECRETARÍA DE ENERGÍA (SEN)">
+                        <option value="SECRETARÍA DE AGRICULTURA Y GANADERÍA (SAG)">
+                        <option value="SECRETARÍA DE RECURSOS NATURALES Y AMBIENTE (SERNA)">
+                        <option value="SECRETARÍA DE TRABAJO Y SEGURIDAD SOCIAL (STSS)">
+                        <option value="SECRETARÍA DE DESARROLLO ECONÓMICO (SDE)">
+                        <option value="SECRETARÍA DE TURISMO (IHT / SETUR)">
+                        <option value="SECRETARÍA DE LA PRESIDENCIA">
+                        <option value="SECRETARÍA DE DERECHOS HUMANOS (SEDH)">
+                        
+                        <!-- Instituciones Descentralizadas, Autónomas y Empresas Estatales -->
+                        <option value="EMPRESA NACIONAL DE ENERGÍA ELÉCTRICA (ENEE)">
+                        <option value="EMPRESA NACIONAL PORTUARIA (ENP)">
+                        <option value="EMPRESA HONDUREÑA DE TELECOMUNICACIONES (HONDUTEL)">
+                        <option value="SERVICIO AUTÓNOMO NACIONAL DE ACUEDUCTOS Y ALCANTARILLADOS (SANAA)">
+                        <option value="BANCO CENTRAL DE HONDURAS (BCH)">
+                        <option value="BANCO HONDUREÑO PARA LA PRODUCCIÓN Y LA VIVIENDA (BANHPROVI)">
+                        <option value="BANCO NACIONAL DE DESARROLLO AGRÍCOLA (BANADESA)">
+                        <option value="COMISIÓN NACIONAL DE BANCOS Y SEGUROS (CNBS)">
+                        <option value="EMPRESA DE CORREOS DE HONDURAS (HONDUCOR)">
+                        <option value="SUPLIDORA NACIONAL DE PRODUCTOS BÁSICOS (BANASUPRO)">
+                        <option value="FERROCARRIL NACIONAL DE HONDURAS (FNH)">
+                        <option value="INSTITUTO HONDUREÑO DE MERCADEO AGRÍCOLA (IHMA)">
+                        <option value="INSTITUTO HONDUREÑO DE SEGURIDAD SOCIAL (IHSS)">
+                        <option value="UNIVERSIDAD NACIONAL AUTÓNOMA DE HONDURAS (UNAH)">
+                        <option value="UNIVERSIDAD NACIONAL DE CIENCIAS FORESTALES (UNACIFOR)">
+                        <option value="REGISTRO NACIONAL DE LAS PERSONAS (RNP)">
+                        <option value="INSTITUTO DE LA PROPIEDAD (IP)">
+                        <option value="COMISIÓN PERMANENTE DE CONTINGENCIAS (COPECO)">
+                        <option value="DIRECCIÓN POLICIAL DE INVESTIGACIONES (DPI)">
+                        <option value="INSTITUTO NACIONAL DE CONSERVACIÓN Y DESARROLLO FORESTAL (ICF)">
+                        <option value="SERVICIO DE ADMINISTRACIÓN DE RENTAS (SAR)">
+                        <option value="ADMINISTRACIÓN ADUANERA DE HONDURAS (ADUANAS)">
+                        <option value="INSTITUTO NACIONAL DE MIGRACIÓN (INM)">
+                        <option value="TRIBUNAL SUPERIOR DE CUENTAS (TSC)">
+                        <option value="MINISTERIO PÚBLICO (MP)">
+                    </datalist>
                 </div>
                 <div class="form-group">
                     <label for="clienteRtn">RTN: <span class="required">*</span></label>
