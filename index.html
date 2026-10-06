@@ -1277,6 +1277,13 @@
                         const data = userDoc.data();
                         const dep = data.departamento;
 
+                        const deptosOrden = ['correccion', 'diseno_grafico', 'control_calidad', 'sub_gerencia_produccion', 'ctp', 'almacen', 'offset_guillotina', 'digital'];
+                        
+                        if (deptosOrden.includes(dep)) {
+                            window.location.href = 'views/orden_produccion.html';
+                            return;
+                        }
+                        
                         if (dep === 'direccion') {
                             // Tienen acceso a todo el panel
                             document.getElementById('areasContainer').style.display = 'grid';
