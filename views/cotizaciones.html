@@ -661,6 +661,7 @@
                             <th style="width: 140px;">Términos</th>
                             <th style="width: 140px;" class="align-right">Total</th>
                             <th style="width: 130px;" class="align-center">Estado</th>
+                            <th style="width: 120px;" class="align-center">Vigencia</th>
                             <th style="width: 200px;" class="align-center">Acciones</th>
                         </tr>
                     </thead>
@@ -1201,7 +1202,7 @@
             const datosOrdenados = [...datosAMostrar].sort((a, b) => Number(b.numero) - Number(a.numero));
 
             if (datosOrdenados.length === 0) {
-                tablaHistorial.innerHTML = `<tr><td colspan="5" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
+                tablaHistorial.innerHTML = `<tr><td colspan="7" class="align-center" style="color: var(--text-muted);">No se encontraron cotizaciones en el historial.</td></tr>`;
                 return;
             }
 
@@ -1211,6 +1212,21 @@
                 const row = tablaHistorial.insertRow();
 
                 const fechaFormateada = formatFechaHoraHonduras(c.fecha);
+
+                // Semáforo de vigencia (15 días)
+                const cotDate = new Date(c.fecha);
+                const hoy = new Date();
+                const diffTime = Math.abs(hoy - cotDate);
+                const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+                
+                let vigenciaBadge = '';
+                if (diffDays >= 15) {
+                    vigenciaBadge = '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#ef4444; margin-right:4px; vertical-align:middle;"></span><span style="color:#ef4444; font-size:0.85em; font-weight:bold;">Vencida</span>';
+                } else if (diffDays >= 7) {
+                    vigenciaBadge = '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#f59e0b; margin-right:4px; vertical-align:middle;"></span><span style="color:#b45309; font-size:0.85em; font-weight:bold;">Por Vencer</span>';
+                } else {
+                    vigenciaBadge = '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#10b981; margin-right:4px; vertical-align:middle;"></span><span style="color:#047857; font-size:0.85em; font-weight:bold;">Vigente</span>';
+                }
 
                 row.innerHTML = `
                     <td>${fechaFormateada}</td>
@@ -1224,6 +1240,7 @@
                             <option value="Rechazada" ${c.estado === 'Rechazada' ? 'selected' : ''}>❌ Rechazada</option>
                         </select>
                     </td>
+                    <td class="align-center">${vigenciaBadge}</td>
                     <td class="align-center">
                         <button class="btn-history-action btn-history-load" onclick="cargarCotizacionDesdeHistorial(${c.numero})">Cargar</button>
                         <button class="btn-history-action btn-history-pdf" onclick="generarPDFDirecto(${c.numero})">PDF</button>
