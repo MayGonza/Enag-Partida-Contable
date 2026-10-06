@@ -270,7 +270,7 @@
             cursor: pointer;
             font-weight: bold;
         }
-
+    
         /* Kanban / Dashboard Styles */
         .dashboard-container {
             max-width: 1100px;
@@ -349,37 +349,14 @@
             font-weight: bold;
             text-transform: uppercase;
         }
-
+        
         /* Status Colors */
-        .status-cotizada {
-            background: #fef08a;
-            color: #854d0e;
-        }
-
-        .status-ingresada {
-            background: #e0f2fe;
-            color: #0369a1;
-        }
-
-        .status-preprensa {
-            background: #dbeafe;
-            color: #1e40af;
-        }
-
-        .status-impresion {
-            background: #fce7f3;
-            color: #be185d;
-        }
-
-        .status-encuadernacion {
-            background: #ffedd5;
-            color: #c2410c;
-        }
-
-        .status-entregada {
-            background: #dcfce7;
-            color: #166534;
-        }
+        .status-cotizada { background: #fef08a; color: #854d0e; }
+        .status-ingresada { background: #e0f2fe; color: #0369a1; }
+        .status-preprensa { background: #dbeafe; color: #1e40af; }
+        .status-impresion { background: #fce7f3; color: #be185d; }
+        .status-encuadernacion { background: #ffedd5; color: #c2410c; }
+        .status-entregada { background: #dcfce7; color: #166534; }
 
         .tracking-panel {
             margin-top: 20px;
@@ -388,14 +365,12 @@
             border: 1px solid #e2e8f0;
             border-radius: 12px;
         }
-
         .tracking-steps {
             display: flex;
             justify-content: space-between;
             position: relative;
             margin-bottom: 20px;
         }
-
         .tracking-steps::before {
             content: "";
             position: absolute;
@@ -406,7 +381,6 @@
             background: #e2e8f0;
             z-index: 1;
         }
-
         .step {
             position: relative;
             z-index: 2;
@@ -416,7 +390,6 @@
             gap: 8px;
             flex: 1;
         }
-
         .step-circle {
             width: 32px;
             height: 32px;
@@ -430,34 +403,25 @@
             color: #cbd5e1;
             transition: all 0.3s;
         }
-
         .step.active .step-circle {
             border-color: #3b82f6;
             background: #3b82f6;
             color: white;
             box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
         }
-
         .step.completed .step-circle {
             border-color: #10b981;
             background: #10b981;
             color: white;
         }
-
         .step-label {
             font-size: 0.8em;
             font-weight: 600;
             color: #64748b;
             text-align: center;
         }
-
-        .step.active .step-label {
-            color: #2563eb;
-        }
-
-        .step.completed .step-label {
-            color: #059669;
-        }
+        .step.active .step-label { color: #2563eb; }
+        .step.completed .step-label { color: #059669; }
 
         .btn-advance {
             background-color: #3b82f6;
@@ -471,15 +435,9 @@
             font-size: 1em;
             transition: all 0.3s;
         }
+        .btn-advance:hover { background-color: #2563eb; }
+        .btn-advance:disabled { background-color: #94a3b8; cursor: not-allowed; }
 
-        .btn-advance:hover {
-            background-color: #2563eb;
-        }
-
-        .btn-advance:disabled {
-            background-color: #94a3b8;
-            cursor: not-allowed;
-        }
     </style>
 </head>
 
@@ -497,22 +455,18 @@
         </button>
     </div>
 
-
+    
     <div class="dashboard-container">
         <div class="dashboard-header">
             <h3>📋 Órdenes Pendientes (Aprobadas por Cliente)</h3>
-            <button class="btn-generate" onclick="cargarOrdenes()"
-                style="margin-left:0; background-color:#64748b; padding:8px 15px; font-size:0.85em;">🔄
-                Actualizar</button>
+            <button class="btn-generate" onclick="cargarOrdenes()" style="margin-left:0; background-color:#64748b; padding:8px 15px; font-size:0.85em;">🔄 Actualizar</button>
         </div>
         <div class="orders-grid" id="ordersGrid">
-            <div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">Cargando órdenes desde
-                el sistema...</div>
+            <div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">Cargando órdenes desde el sistema...</div>
         </div>
 
         <div class="tracking-panel" id="trackingPanel" style="display: none;">
-            <h4 style="margin-top:0; color:#0f172a; border-bottom:1px solid #eee; padding-bottom:10px;">Gestión de
-                Estado (Tracking)</h4>
+            <h4 style="margin-top:0; color:#0f172a; border-bottom:1px solid #eee; padding-bottom:10px;">Gestión de Estado (Tracking)</h4>
             <div class="tracking-steps" id="trackingSteps">
                 <div class="step" data-phase="Ingresada">
                     <div class="step-circle">1</div>
@@ -535,8 +489,7 @@
                     <div class="step-label">Entregada</div>
                 </div>
             </div>
-            <button id="btnAdvancePhase" class="btn-advance" onclick="avanzarFase()">Avanzar al siguiente
-                departamento</button>
+            <button id="btnAdvancePhase" class="btn-advance" onclick="avanzarFase()">Avanzar al siguiente departamento</button>
         </div>
     </div>
 
@@ -735,7 +688,7 @@
 
     <script>
         // Init rows
-
+        
         let ordenesGlobal = [];
         let ordenSeleccionadaId = null;
 
@@ -745,19 +698,19 @@
             if (typeof dbFirestore === 'undefined') return;
             const grid = document.getElementById('ordersGrid');
             grid.innerHTML = '<div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">Cargando...</div>';
-
+            
             try {
                 // Obtener cotizaciones aprobadas
                 const snapshot = await dbFirestore.collection('cotizaciones').where('estado', '==', 'Aprobada').get();
                 ordenesGlobal = [];
                 snapshot.forEach(doc => {
                     const data = doc.data();
-                    if (!data.faseProduccion) data.faseProduccion = 'Ingresada'; // Default
+                    if(!data.faseProduccion) data.faseProduccion = 'Ingresada'; // Default
                     ordenesGlobal.push({ id: doc.id, ...data });
                 });
 
                 // Ordenar por numero
-                ordenesGlobal.sort((a, b) => b.numero - a.numero);
+                ordenesGlobal.sort((a,b) => b.numero - a.numero);
 
                 dibujarGrid();
             } catch (e) {
@@ -789,8 +742,8 @@
         function dibujarGrid() {
             const grid = document.getElementById('ordersGrid');
             grid.innerHTML = '';
-
-            if (ordenesGlobal.length === 0) {
+            
+            if(ordenesGlobal.length === 0) {
                 grid.innerHTML = '<div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">No hay órdenes aprobadas pendientes.</div>';
                 return;
             }
@@ -799,7 +752,7 @@
                 const card = document.createElement('div');
                 card.className = `order-card ${ordenSeleccionadaId === orden.id ? 'active' : ''}`;
                 card.onclick = () => seleccionarOrden(orden.id);
-
+                
                 const claseEstado = 'status-' + orden.faseProduccion.toLowerCase().replace(/[^a-z0-9]/g, '');
 
                 card.innerHTML = `
@@ -814,15 +767,15 @@
         function seleccionarOrden(id) {
             ordenSeleccionadaId = id;
             dibujarGrid(); // Update active class
-
+            
             const orden = ordenesGlobal.find(o => o.id === id);
-            if (!orden) return;
+            if(!orden) return;
 
             // Fill form
             document.getElementById('noOrden').value = orden.numero || '';
             document.getElementById('cliente').value = orden.cliente?.nombre || '';
-
-            if (orden.fecha) {
+            
+            if(orden.fecha) {
                 const d = new Date(orden.fecha);
                 const dia = String(d.getDate()).padStart(2, '0');
                 const mes = String(d.getMonth() + 1).padStart(2, '0');
@@ -833,7 +786,7 @@
             // Fill table (Trabajo)
             const tbodyTrabajo = document.getElementById('tbodyTrabajo');
             tbodyTrabajo.innerHTML = '';
-            if (orden.items && orden.items.length > 0) {
+            if(orden.items && orden.items.length > 0) {
                 orden.items.forEach(item => {
                     const tr = document.createElement('tr');
                     tr.innerHTML = `
@@ -857,9 +810,9 @@
 
         function actualizarTrackingUI(faseActual) {
             document.getElementById('trackingPanel').style.display = 'block';
-
+            
             let idxActual = fases.indexOf(faseActual);
-            if (idxActual === -1) idxActual = 0;
+            if(idxActual === -1) idxActual = 0;
 
             const steps = document.querySelectorAll('.tracking-steps .step');
             steps.forEach((step, index) => {
@@ -882,15 +835,15 @@
         }
 
         async function avanzarFase() {
-            if (!ordenSeleccionadaId) return;
+            if(!ordenSeleccionadaId) return;
             const orden = ordenesGlobal.find(o => o.id === ordenSeleccionadaId);
             let idxActual = fases.indexOf(orden.faseProduccion);
-            if (idxActual === -1) idxActual = 0;
+            if(idxActual === -1) idxActual = 0;
 
-            if (idxActual >= fases.length - 1) return; // Ya terminó
+            if(idxActual >= fases.length - 1) return; // Ya terminó
 
             const nuevaFase = fases[idxActual + 1];
-
+            
             try {
                 // Update Firestore
                 await dbFirestore.collection('cotizaciones').doc(ordenSeleccionadaId).update({
@@ -910,28 +863,8 @@
                 dibujarGrid();
                 alert(`✅ La orden ha avanzado exitosamente al departamento: ${nuevaFase}`);
 
-            } catch (e) {
+            } catch(e) {
                 console.error("Error al avanzar fase", e);
-                
-                // Fallback: guardar en localStorage si falló la nube
-                try {
-                    const localData = localStorage.getItem('enag_cotizaciones');
-                    if (localData) {
-                        const localCotizaciones = JSON.parse(localData);
-                        const index = localCotizaciones.findIndex(c => String(c.numero) === ordenSeleccionadaId);
-                        if (index !== -1) {
-                            localCotizaciones[index].faseProduccion = nuevaFase;
-                            localStorage.setItem('enag_cotizaciones', JSON.stringify(localCotizaciones));
-                            
-                            orden.faseProduccion = nuevaFase;
-                            actualizarTrackingUI(nuevaFase);
-                            dibujarGrid();
-                            alert(`✅ [MODO LOCAL] La orden ha avanzado exitosamente al departamento: ${nuevaFase}`);
-                            return;
-                        }
-                    }
-                } catch(err){}
-                
                 alert("Hubo un error al guardar el cambio. Revisa tu conexión.");
             }
         }
@@ -939,7 +872,7 @@
         // Init load
         document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
-                if (typeof dbFirestore !== 'undefined') {
+                if(typeof dbFirestore !== 'undefined') {
                     cargarOrdenes();
                 } else {
                     // Try waiting a bit more for firebase to load
