@@ -488,7 +488,7 @@
                 <div class="form-group span-2">
                     <label for="clienteNombre">Cliente / Empresa: <span class="required">*</span></label>
                     <input type="text" id="clienteNombre" list="listaInstituciones" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL"
-                        oninput="this.value = this.value.toUpperCase()" required>
+                        oninput="this.value = this.value.toUpperCase()" onchange="autoCompletarDatosCliente()" required>
                     <datalist id="listaInstituciones">
                         <!-- Secretarías de Estado -->
                         <option value="SECRETARÍA DE SALUD (SESAL)">
@@ -1237,6 +1237,30 @@
             hours = hours ? hours : 12;
             const hoursStr = String(hours).padStart(2, '0');
             return `${day}/${month}/${year} ${hoursStr}:${minutes} ${ampm}`;
+        }
+
+        // Autocompletado inteligente de clientes basado en historial
+        function autoCompletarDatosCliente() {
+            const nombreIngresado = document.getElementById('clienteNombre').value.trim().toUpperCase();
+            if (!nombreIngresado) return;
+
+            // Buscar en el historial si ya existe una cotización con este cliente
+            const clienteHistorico = cotizaciones.find(c => c.cliente && c.cliente.nombre && c.cliente.nombre.trim().toUpperCase() === nombreIngresado);
+
+            if (clienteHistorico && clienteHistorico.cliente) {
+                // Autocompletar solo si los campos actuales están vacíos (para no sobreescribir lo que el usuario haya empezado a teclear)
+                const rtnField = document.getElementById('clienteRtn');
+                const contactoField = document.getElementById('clienteContacto');
+                const telField = document.getElementById('clienteTelefono');
+                const dirField = document.getElementById('clienteDireccion');
+                const correoField = document.getElementById('clienteCorreo');
+
+                if (!rtnField.value && clienteHistorico.cliente.rtn) rtnField.value = clienteHistorico.cliente.rtn;
+                if (!contactoField.value && clienteHistorico.cliente.contacto) contactoField.value = clienteHistorico.cliente.contacto;
+                if (!telField.value && clienteHistorico.cliente.telefono) telField.value = clienteHistorico.cliente.telefono;
+                if (!dirField.value && clienteHistorico.cliente.direccion) dirField.value = clienteHistorico.cliente.direccion;
+                if (!correoField.value && clienteHistorico.cliente.correo) correoField.value = clienteHistorico.cliente.correo;
+            }
         }
 
         // Historial UI y Buscador
