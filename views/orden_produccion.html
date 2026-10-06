@@ -443,7 +443,7 @@
 
 <body>
     <div class="nav-container">
-        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <button onclick="cerrarSesion()" class="btn-nav btn-nav-menu" style="background-color: #ef4444; color: white; border: none; cursor: pointer; height: 35px; line-height: 1;">🚪 Cerrar Sesión</button>
         <button onclick="generarPDF()" class="btn-generate">
             <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
                 <path
@@ -1302,6 +1302,17 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
 
+
+    <script>
+        async function cerrarSesion() {
+            if (window.registrarBitacora) {
+                await window.registrarBitacora('Autenticación', 'Cerrar Sesión', 'El usuario ha cerrado su sesión desde Orden de Producción.');
+            }
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
 </body>
 
 </html>
