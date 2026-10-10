@@ -138,6 +138,31 @@
             color: #64748b;
             margin-top: 10px;
         }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .grid-forms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
     </style>
 </head>
 
@@ -152,11 +177,41 @@
         <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Administración de configuraciones globales - Solo TI</p>
 
         <div class="param-card">
-            <h2>Gestión de Sesiones</h2>
-            <div class="form-group">
-                <label for="paramInactividad">Tiempo de Inactividad (Minutos)</label>
-                <input type="number" id="paramInactividad" min="1" value="5" placeholder="Ej: 5">
-                <div class="helper-text">Los usuarios serán desconectados automáticamente si no interactúan con el sistema durante esta cantidad de minutos.</div>
+            <h2>Gestión de Sesiones y Accesos</h2>
+            <div class="grid-forms">
+                <div class="form-group">
+                    <label for="paramInactividad">Tiempo de Inactividad (Minutos)</label>
+                    <input type="number" id="paramInactividad" min="1" value="5" placeholder="Ej: 5">
+                    <div class="helper-text">Desconexión automática por inactividad.</div>
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="paramSesionMultiple">
+                        <label for="paramSesionMultiple">Permitir Sesiones Simultáneas</label>
+                    </div>
+                    <div class="helper-text" style="margin-top: -5px;">Si se activa, el mismo usuario podrá tener abierta la sesión en múltiples dispositivos al mismo tiempo (ej. PC y Celular).</div>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 30px 0;">
+
+            <h2>Cotizaciones y Facturación</h2>
+            <div class="grid-forms">
+                <div class="form-group">
+                    <label for="paramVigenciaCotizacion">Vigencia de Cotizaciones (Días)</label>
+                    <input type="number" id="paramVigenciaCotizacion" min="1" value="15" placeholder="Ej: 15">
+                    <div class="helper-text">Días hasta que una cotización cambie a estado rojo (vencida).</div>
+                </div>
+                <div class="form-group">
+                    <label for="paramAlertaNaranja">Alerta de Vigencia (Días)</label>
+                    <input type="number" id="paramAlertaNaranja" min="1" value="7" placeholder="Ej: 7">
+                    <div class="helper-text">Días desde su creación para que el semáforo cambie a color naranja.</div>
+                </div>
+                <div class="form-group">
+                    <label for="paramIsv">Impuesto Sobre Ventas (ISV %)</label>
+                    <input type="number" id="paramIsv" min="0" max="100" value="15" placeholder="Ej: 15">
+                    <div class="helper-text">Porcentaje de impuesto a aplicar por defecto en el sistema.</div>
+                </div>
             </div>
             
             <button type="button" class="btn-save" onclick="guardarParametros()">Guardar Cambios</button>
@@ -207,24 +262,45 @@
                     if (data.tiempoInactividad) {
                         document.getElementById('paramInactividad').value = data.tiempoInactividad;
                     }
+                    if (data.permitirSesionMultiple !== undefined) {
+                        document.getElementById('paramSesionMultiple').checked = data.permitirSesionMultiple;
+                    }
+                    if (data.vigenciaCotizacion) {
+                        document.getElementById('paramVigenciaCotizacion').value = data.vigenciaCotizacion;
+                    }
+                    if (data.alertaNaranjaCotizacion) {
+                        document.getElementById('paramAlertaNaranja').value = data.alertaNaranjaCotizacion;
+                    }
+                    if (data.isv) {
+                        document.getElementById('paramIsv').value = data.isv;
+                    }
                 }
             });
         }
 
         async function guardarParametros() {
-            const min = parseInt(document.getElementById('paramInactividad').value, 10);
-            if (!min || min < 1) {
-                alert("Por favor ingrese un tiempo válido (mínimo 1 minuto).");
+            const minInact = parseInt(document.getElementById('paramInactividad').value, 10);
+            const vigencia = parseInt(document.getElementById('paramVigenciaCotizacion').value, 10);
+            const alertaNar = parseInt(document.getElementById('paramAlertaNaranja').value, 10);
+            const isv = parseFloat(document.getElementById('paramIsv').value);
+            const multSesion = document.getElementById('paramSesionMultiple').checked;
+
+            if (!minInact || minInact < 1 || !vigencia || !alertaNar || isv === NaN) {
+                alert("Por favor ingrese valores válidos en todos los campos numéricos.");
                 return;
             }
             try {
                 await dbFirestore.collection('parametros').doc('sistema').set({
-                    tiempoInactividad: min,
+                    tiempoInactividad: minInact,
+                    permitirSesionMultiple: multSesion,
+                    vigenciaCotizacion: vigencia,
+                    alertaNaranjaCotizacion: alertaNar,
+                    isv: isv,
                     actualizadoPor: firebase.auth().currentUser.email,
                     actualizadoEn: firebase.firestore.FieldValue.serverTimestamp()
                 }, { merge: true });
                 if (window.registrarBitacora) {
-                    window.registrarBitacora('Configuración', 'Actualizar Parámetros', `Se cambió el tiempo de inactividad a ${min} minutos.`);
+                    window.registrarBitacora('Configuración', 'Actualizar Parámetros', `Se actualizaron los parámetros globales del sistema.`);
                 }
                 alert("Parámetros actualizados exitosamente.");
             } catch (e) {

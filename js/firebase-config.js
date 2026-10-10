@@ -58,6 +58,7 @@ let sessionUnsubscribe = null;
 
 // Sincronizar nombre de usuario globalmente y controlar sesión única
 if (typeof firebase !== 'undefined' && firebase.auth) {
+    window.ENAG_PARAMETROS = window.ENAG_PARAMETROS || {};
     firebase.auth().onAuthStateChanged(async (user) => {
         if (user && dbFirestore) {
             // Control de Sesión Única
@@ -70,6 +71,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
                         const currentLocalSessionId = localStorage.getItem('enag_session_id');
                         // Si hay un session_id en Firestore y no coincide con el local
                         if (dbSessionId && currentLocalSessionId && dbSessionId !== currentLocalSessionId) {
+                            if (window.ENAG_PARAMETROS.permitirSesionMultiple) return; // Permitir múltiple
                             if (window.enag_session_prompt_active) return;
                             window.enag_session_prompt_active = true;
                             
@@ -136,9 +138,13 @@ if (typeof firebase !== 'undefined') {
         if (typeof dbFirestore !== 'undefined' && dbFirestore) {
             clearInterval(paramInterval);
             dbFirestore.collection('parametros').doc('sistema').onSnapshot((doc) => {
-                if (doc.exists && doc.data().tiempoInactividad) {
-                    TIEMPO_INACTIVIDAD = doc.data().tiempoInactividad * 60 * 1000;
-                    resetInactividad();
+                if (doc.exists) {
+                    const data = doc.data();
+                    window.ENAG_PARAMETROS = data;
+                    if (data.tiempoInactividad) {
+                        TIEMPO_INACTIVIDAD = data.tiempoInactividad * 60 * 1000;
+                        resetInactividad();
+                    }
                 }
             });
         }
