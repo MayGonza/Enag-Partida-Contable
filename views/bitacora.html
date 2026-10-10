@@ -138,27 +138,20 @@
             Registro de todas las acciones del sistema</p>
 
         <div style="margin-bottom: 20px; display: flex; gap: 10px; justify-content: flex-end;">
-            <label for="filtroFecha" style="font-size: 0.9em; white-space: nowrap; margin: 0; align-self: center;">Filtrar por fecha (DD/MM/YYYY):</label>
-            <input type="text" id="filtroFecha" placeholder="DD/MM/YYYY" maxlength="10" oninput="filtrarBitacora()" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 120px; font-size: 0.9em; outline: none;">
-            <button type="button" onclick="limpiarFiltroFechaBitacora()" title="Limpiar fecha" style="padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; cursor: pointer; font-size: 0.85em;">✕</button>
+            <label for="filtroFecha"
+                style="font-size: 0.9em; white-space: nowrap; margin: 0; align-self: center;">Filtrar por fecha
+                (DD/MM/YYYY):</label>
+            <input type="text" id="filtroFecha" placeholder="DD/MM/YYYY" maxlength="10" oninput="filtrarBitacora()"
+                style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 120px; font-size: 0.9em; outline: none;">
+            <button type="button" onclick="limpiarFiltroFechaBitacora()" title="Limpiar fecha"
+                style="padding: 10px 12px; border: 1px solid #cbd5e1; border-radius: 8px; background: #f8fafc; cursor: pointer; font-size: 0.85em;">✕</button>
 
             <input type="text" id="filtroBitacora" placeholder="Filtrar por módulo, usuario, acción..."
                 oninput="filtrarBitacora()"
                 style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 350px; font-size: 0.9em; outline: none;">
         </div>
 
-        <!-- Parámetros del Sistema (TI) -->
-        <div style="background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 12px; padding: 20px; margin-bottom: 30px;">
-            <h2 style="margin-top: 0; color: var(--primary); font-size: 1.2rem;">⚙️ Configuración de Parámetros del Sistema</h2>
-            <div style="display: flex; gap: 20px; align-items: flex-end;">
-                <div>
-                    <label for="paramInactividad" style="display: block; font-weight: bold; margin-bottom: 5px; font-size: 0.9rem;">Tiempo de Inactividad (Minutos)</label>
-                    <input type="number" id="paramInactividad" style="padding: 10px; border-radius: 8px; border: 1px solid #cbd5e1; width: 220px; font-size: 1rem; outline: none;" min="1" value="5">
-                </div>
-                <button type="button" onclick="guardarParametros()" style="background: var(--primary); color: white; border: none; padding: 11px 20px; border-radius: 8px; font-weight: bold; cursor: pointer;">Guardar Cambios</button>
-            </div>
-            <p style="font-size: 0.8rem; color: #64748b; margin-top: 10px; margin-bottom: 0;">Los usuarios serán desconectados automáticamente si no interactúan con el sistema en este periodo de tiempo.</p>
-        </div>
+
 
         <table id="bitacoraTable">
             <thead>
@@ -205,7 +198,6 @@
                             window.location.href = '../index.html';
                             return;
                         }
-                        cargarParametros();
                         cargarBitacora();
                     }
                 } catch (e) {
@@ -264,39 +256,6 @@
             filtrarBitacora();
         }
 
-        function cargarParametros() {
-            dbFirestore.collection('parametros').doc('sistema').onSnapshot((doc) => {
-                if (doc.exists) {
-                    const data = doc.data();
-                    if (data.tiempoInactividad) {
-                        document.getElementById('paramInactividad').value = data.tiempoInactividad;
-                    }
-                }
-            });
-        }
-
-        async function guardarParametros() {
-            const min = parseInt(document.getElementById('paramInactividad').value, 10);
-            if (!min || min < 1) {
-                alert("Por favor ingrese un tiempo válido (mínimo 1 minuto).");
-                return;
-            }
-            try {
-                await dbFirestore.collection('parametros').doc('sistema').set({
-                    tiempoInactividad: min,
-                    actualizadoPor: firebase.auth().currentUser.email,
-                    actualizadoEn: firebase.firestore.FieldValue.serverTimestamp()
-                }, { merge: true });
-                if (window.registrarBitacora) {
-                    window.registrarBitacora('Configuración', 'Actualizar Parámetros', `Se cambió el tiempo de inactividad a ${min} minutos.`);
-                }
-                alert("Parámetros actualizados exitosamente.");
-            } catch (e) {
-                console.error("Error guardando parámetros:", e);
-                alert("Hubo un error al guardar los parámetros.");
-            }
-        }
-
         function filtrarBitacora() {
             const query = (document.getElementById('filtroBitacora')?.value || '').toLowerCase().trim();
             const fechaFiltro = (document.getElementById('filtroFecha')?.value || '').trim();
@@ -310,7 +269,7 @@
                 const detalles = (b.detalles || '').toLowerCase();
 
                 const coincideTexto = usuario.includes(query) || modulo.includes(query) || accion.includes(query) || detalles.includes(query);
-                
+
                 let coincideFecha = true;
                 if (fechaFiltro && b.timestamp) {
                     const dateObj = b.timestamp.toDate ? b.timestamp.toDate() : new Date(b.timestamp);
