@@ -70,16 +70,34 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
                         const dbSessionId = doc.data().session_id;
                         // Si hay un session_id en Firestore y no coincide con el local
                         if (dbSessionId && localSessionId && dbSessionId !== localSessionId) {
-                            alert("Se ha iniciado sesión en otro dispositivo. Se cerrará esta sesión por seguridad.");
-                            firebase.auth().signOut().then(() => {
-                                localStorage.removeItem('enag_session_id');
-                                const path = window.location.pathname;
-                                if (path.includes('/views/')) {
-                                    window.location.href = 'login.html';
-                                } else {
-                                    window.location.href = 'views/login.html';
-                                }
-                            });
+                            if (window.enag_session_prompt_active) return;
+                            window.enag_session_prompt_active = true;
+                            
+                            const mantener = confirm("Se ha iniciado sesión con tu cuenta en otro lugar.\n\n¿Deseas mantener tu sesión iniciada en ESTE dispositivo?\n\n- [Aceptar]: Mantener sesión aquí (cerrará la del otro lado).\n- [Cancelar]: Cerrar sesión en este dispositivo.");
+                            
+                            if (mantener) {
+                                // Recuperar la sesión para este dispositivo
+                                dbFirestore.collection('usuarios').doc(user.uid).set({
+                                    session_id: localSessionId,
+                                    ultimoAcceso: firebase.firestore.FieldValue.serverTimestamp()
+                                }, { merge: true }).then(() => {
+                                    window.enag_session_prompt_active = false;
+                                }).catch(() => {
+                                    window.enag_session_prompt_active = false;
+                                });
+                            } else {
+                                // Ceder la sesión al otro dispositivo
+                                firebase.auth().signOut().then(() => {
+                                    window.enag_session_prompt_active = false;
+                                    localStorage.removeItem('enag_session_id');
+                                    const path = window.location.pathname;
+                                    if (path.includes('/views/')) {
+                                        window.location.href = 'login.html';
+                                    } else {
+                                        window.location.href = 'views/login.html';
+                                    }
+                                });
+                            }
                         }
                     }
                 });
@@ -107,16 +125,16 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
 }
 
 // =========================================================
-// Control de Inactividad (15 minutos)
+// Control de Inactividad (5 minutos)
 // =========================================================
 let inactividadTimer;
-const TIEMPO_INACTIVIDAD = 15 * 60 * 1000; // 15 minutos en milisegundos
+const TIEMPO_INACTIVIDAD = 5 * 60 * 1000; // 5 minutos en milisegundos
 
 function resetInactividad() {
     clearTimeout(inactividadTimer);
     inactividadTimer = setTimeout(() => {
         if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
-            alert("Tu sesión ha expirado por inactividad prolongada (15 minutos). Por favor, vuelve a iniciar sesión.");
+            alert("Tu sesión ha expirado por inactividad prolongada (5 minutos). Por favor, vuelve a iniciar sesión.");
             firebase.auth().signOut().then(() => {
                 localStorage.removeItem('enag_session_id');
                 const path = window.location.pathname;
