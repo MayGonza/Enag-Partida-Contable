@@ -97,14 +97,16 @@ let sessionUnsubscribe = null;
                 }
             };
             
-            window.enagConfirm = function(msg) {
+            window.enagConfirm = function(msg, allowOutsideClick = true) {
                 return Swal.fire({
                     title: 'Confirmación',
                     text: msg,
                     icon: 'warning',
                     showCancelButton: true,
                     confirmButtonText: 'Sí, continuar',
-                    cancelButtonText: 'Cancelar'
+                    cancelButtonText: 'Cancelar',
+                    allowOutsideClick: allowOutsideClick,
+                    allowEscapeKey: allowOutsideClick
                 }).then(r => r.isConfirmed);
             };
         };
@@ -132,7 +134,7 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
                             window.enag_session_prompt_active = true;
                             
                             if (window.enagConfirm) {
-                                window.enagConfirm("Se ha iniciado sesión con tu cuenta en otro lugar.\n\n¿Deseas mantener tu sesión iniciada en ESTE dispositivo?\n\n- [Aceptar]: Mantener sesión aquí (cerrará la del otro lado).\n- [Cancelar]: Cerrar sesión en este dispositivo.").then(mantener => {
+                                window.enagConfirm("Se ha iniciado sesión con tu cuenta en otro lugar.\n\n¿Deseas mantener tu sesión iniciada en ESTE dispositivo?\n\n- [Aceptar]: Mantener sesión aquí (cerrará la del otro lado).\n- [Cancelar]: Cerrar sesión en este dispositivo.", false).then(mantener => {
                                     if (mantener) {
                                         // Recuperar la sesión para este dispositivo
                                         dbFirestore.collection('usuarios').doc(user.uid).set({
