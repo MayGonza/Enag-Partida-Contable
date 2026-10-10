@@ -185,6 +185,19 @@
             transition: var(--transition);
         }
 
+        .toggle-password {
+            position: absolute;
+            right: 16px;
+            color: var(--text-muted);
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            user-select: none;
+        }
+        .toggle-password:hover {
+            color: var(--primary-color);
+        }
+
         .form-input {
             width: 100%;
             padding: 14px 16px 14px 48px;
@@ -402,7 +415,8 @@
                 <label for="password" class="form-label">Contraseña</label>
                 <div class="input-wrapper">
                     <span class="input-icon">🔑</span>
-                    <input type="password" id="password" class="form-input" placeholder="••••••••••••" required>
+                    <input type="password" id="password" class="form-input" placeholder="••••••••••••" style="padding-right: 48px;" required>
+                    <span class="toggle-password" onclick="togglePasswordVisibility()" title="Mostrar/Ocultar Contraseña">👁️</span>
                 </div>
             </div>
 
@@ -433,6 +447,19 @@
     <script src="../js/firebase-config.js"></script>
 
     <script>
+        // Toggle password visibility
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleIcon = document.querySelector('.toggle-password');
+            if (passwordInput.type === 'password') {
+                passwordInput.type = 'text';
+                toggleIcon.textContent = '🙈';
+            } else {
+                passwordInput.type = 'password';
+                toggleIcon.textContent = '👁️';
+            }
+        }
+
         // Verificar si ya hay sesión activa
         firebase.auth().onAuthStateChanged((user) => {
             if (user && user.emailVerified) {
