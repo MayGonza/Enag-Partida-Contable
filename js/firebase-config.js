@@ -125,16 +125,32 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
 }
 
 // =========================================================
-// Control de Inactividad (5 minutos)
+// Control de Inactividad (Dinámico desde DB)
 // =========================================================
 let inactividadTimer;
-const TIEMPO_INACTIVIDAD = 5 * 60 * 1000; // 5 minutos en milisegundos
+let TIEMPO_INACTIVIDAD = 5 * 60 * 1000; // Valor por defecto 5 minutos
+
+// Suscribirse a los parámetros de Firestore
+if (typeof firebase !== 'undefined') {
+    const paramInterval = setInterval(() => {
+        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+            clearInterval(paramInterval);
+            dbFirestore.collection('parametros').doc('sistema').onSnapshot((doc) => {
+                if (doc.exists && doc.data().tiempoInactividad) {
+                    TIEMPO_INACTIVIDAD = doc.data().tiempoInactividad * 60 * 1000;
+                    resetInactividad();
+                }
+            });
+        }
+    }, 1000);
+}
 
 function resetInactividad() {
     clearTimeout(inactividadTimer);
     inactividadTimer = setTimeout(() => {
         if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
-            alert("Tu sesión ha expirado por inactividad prolongada (5 minutos). Por favor, vuelve a iniciar sesión.");
+            const minutos = Math.round(TIEMPO_INACTIVIDAD / (60 * 1000));
+            alert(`Tu sesión ha expirado por inactividad prolongada (${minutos} minutos). Por favor, vuelve a iniciar sesión.`);
             firebase.auth().signOut().then(() => {
                 localStorage.removeItem('enag_session_id');
                 const path = window.location.pathname;
