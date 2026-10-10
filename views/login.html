@@ -461,8 +461,9 @@
         }
 
         // Verificar si ya hay sesión activa
+        let isLoggingIn = false;
         firebase.auth().onAuthStateChanged((user) => {
-            if (user && user.emailVerified) {
+            if (user && user.emailVerified && !isLoggingIn) {
                 // Si ya está logueado, redirigir al index
                 if (window.registrarBitacora) window.registrarBitacora('Autenticación', 'Inicio de sesión', 'El usuario ingresó exitosamente al sistema.');
                         window.location.href = '../index.html';
@@ -471,6 +472,7 @@
 
         async function handleLogin(event) {
             event.preventDefault();
+            isLoggingIn = true;
             const userVal = document.getElementById('username').value.trim().toLowerCase();
             const passVal = document.getElementById('password').value;
             const btn = document.getElementById('loginBtn');

@@ -61,15 +61,15 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
     firebase.auth().onAuthStateChanged(async (user) => {
         if (user && dbFirestore) {
             // Control de Sesión Única
-            const localSessionId = localStorage.getItem('enag_session_id');
             if (sessionUnsubscribe) sessionUnsubscribe();
             
             sessionUnsubscribe = dbFirestore.collection('usuarios').doc(user.uid)
                 .onSnapshot((doc) => {
                     if (doc.exists) {
                         const dbSessionId = doc.data().session_id;
+                        const currentLocalSessionId = localStorage.getItem('enag_session_id');
                         // Si hay un session_id en Firestore y no coincide con el local
-                        if (dbSessionId && localSessionId && dbSessionId !== localSessionId) {
+                        if (dbSessionId && currentLocalSessionId && dbSessionId !== currentLocalSessionId) {
                             if (window.enag_session_prompt_active) return;
                             window.enag_session_prompt_active = true;
                             
