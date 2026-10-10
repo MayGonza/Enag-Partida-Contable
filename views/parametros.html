@@ -241,8 +241,14 @@
                     if (doc.exists) {
                         const userData = doc.data();
                         if (userData.departamento !== 'ti' && userData.departamento !== 'direccion') {
-                            alert("Acceso denegado: Solo el departamento de TI puede ver esta configuración.");
-                            window.location.href = '../index.html';
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({title: 'Acceso denegado', text: 'Solo el departamento de TI puede ver esta configuración.', icon: 'error'}).then(() => {
+                                    window.location.href = '../index.html';
+                                });
+                            } else {
+                                alert("Acceso denegado: Solo el departamento de TI puede ver esta configuración.");
+                                window.location.href = '../index.html';
+                            }
                             return;
                         }
                         cargarParametros();

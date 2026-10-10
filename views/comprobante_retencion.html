@@ -915,7 +915,7 @@
 
     // Función para limpiar todo el formulario y reestablecer la tabla de retenciones
     function limpiarFormulario() {
-        if (confirm('¿Está seguro de que desea limpiar todos los campos del formulario?')) {
+        if ((window.enagConfirm && await window.enagConfirm('¿Está seguro de que desea limpiar todos los campos del formulario?')) || (!window.enagConfirm && confirm('¿Está seguro de que desea limpiar todos los campos del formulario?'))) {
             document.getElementById('retencionForm').reset();
             tbody.innerHTML = '';
             agregarFila();

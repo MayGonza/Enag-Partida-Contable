@@ -56,6 +56,62 @@ window.registrarBitacora = async function(modulo, accion, detalles) {
 // Variables para control de sesión única
 let sessionUnsubscribe = null;
 
+// =========================================================
+// Inyección de SweetAlert2 y Redefinición de Alertas
+// =========================================================
+(function() {
+    if (typeof window !== 'undefined' && !document.getElementById('sweetalert-script')) {
+        const swalScript = document.createElement('script');
+        swalScript.id = 'sweetalert-script';
+        swalScript.src = 'https://cdn.jsdelivr.net/npm/sweetalert2@11';
+        
+        // Estilos globales para que Swal combine con ENAG
+        const swalStyle = document.createElement('style');
+        swalStyle.innerHTML = `
+            .swal2-confirm { background-color: #002147 !important; }
+            .swal2-cancel { background-color: #d33 !important; }
+        `;
+        document.head.appendChild(swalStyle);
+
+        swalScript.onload = () => {
+            const originalAlert = window.alert;
+            window.alert = function(msg) {
+                if (typeof Swal !== 'undefined') {
+                    let iconType = 'info';
+                    const lowerMsg = (msg || '').toString().toLowerCase();
+                    if (lowerMsg.includes('éxito') || lowerMsg.includes('exitosamente') || lowerMsg.includes('✅')) {
+                        iconType = 'success';
+                    } else if (lowerMsg.includes('error') || lowerMsg.includes('denegado') || lowerMsg.includes('falló') || lowerMsg.includes('descuadrada') || lowerMsg.includes('falta')) {
+                        iconType = 'error';
+                    } else if (lowerMsg.includes('aviso') || lowerMsg.includes('por favor') || lowerMsg.includes('⚠️')) {
+                        iconType = 'warning';
+                    }
+                    Swal.fire({
+                        title: 'Sistema ENAG',
+                        text: msg,
+                        icon: iconType,
+                        confirmButtonText: 'Aceptar'
+                    });
+                } else {
+                    originalAlert(msg);
+                }
+            };
+            
+            window.enagConfirm = function(msg) {
+                return Swal.fire({
+                    title: 'Confirmación',
+                    text: msg,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonText: 'Sí, continuar',
+                    cancelButtonText: 'Cancelar'
+                }).then(r => r.isConfirmed);
+            };
+        };
+        document.head.appendChild(swalScript);
+    }
+})();
+
 // Sincronizar nombre de usuario globalmente y controlar sesión única
 if (typeof firebase !== 'undefined' && firebase.auth) {
     window.ENAG_PARAMETROS = window.ENAG_PARAMETROS || {};
@@ -75,30 +131,57 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
                             if (window.enag_session_prompt_active) return;
                             window.enag_session_prompt_active = true;
                             
-                            const mantener = confirm("Se ha iniciado sesión con tu cuenta en otro lugar.\n\n¿Deseas mantener tu sesión iniciada en ESTE dispositivo?\n\n- [Aceptar]: Mantener sesión aquí (cerrará la del otro lado).\n- [Cancelar]: Cerrar sesión en este dispositivo.");
-                            
-                            if (mantener) {
-                                // Recuperar la sesión para este dispositivo
-                                dbFirestore.collection('usuarios').doc(user.uid).set({
-                                    session_id: localSessionId,
-                                    ultimoAcceso: firebase.firestore.FieldValue.serverTimestamp()
-                                }, { merge: true }).then(() => {
-                                    window.enag_session_prompt_active = false;
-                                }).catch(() => {
-                                    window.enag_session_prompt_active = false;
-                                });
-                            } else {
-                                // Ceder la sesión al otro dispositivo
-                                firebase.auth().signOut().then(() => {
-                                    window.enag_session_prompt_active = false;
-                                    localStorage.removeItem('enag_session_id');
-                                    const path = window.location.pathname;
-                                    if (path.includes('/views/')) {
-                                        window.location.href = 'login.html';
+                            if (window.enagConfirm) {
+                                window.enagConfirm("Se ha iniciado sesión con tu cuenta en otro lugar.\n\n¿Deseas mantener tu sesión iniciada en ESTE dispositivo?\n\n- [Aceptar]: Mantener sesión aquí (cerrará la del otro lado).\n- [Cancelar]: Cerrar sesión en este dispositivo.").then(mantener => {
+                                    if (mantener) {
+                                        // Recuperar la sesión para este dispositivo
+                                        dbFirestore.collection('usuarios').doc(user.uid).set({
+                                            session_id: localSessionId,
+                                            ultimoAcceso: firebase.firestore.FieldValue.serverTimestamp()
+                                        }, { merge: true }).then(() => {
+                                            window.enag_session_prompt_active = false;
+                                        }).catch(() => {
+                                            window.enag_session_prompt_active = false;
+                                        });
                                     } else {
-                                        window.location.href = 'views/login.html';
+                                        // Ceder la sesión al otro dispositivo
+                                        firebase.auth().signOut().then(() => {
+                                            window.enag_session_prompt_active = false;
+                                            localStorage.removeItem('enag_session_id');
+                                            const path = window.location.pathname;
+                                            if (path.includes('/views/')) {
+                                                window.location.href = 'login.html';
+                                            } else {
+                                                window.location.href = 'views/login.html';
+                                            }
+                                        });
                                     }
                                 });
+                            } else {
+                                const mantener = confirm("Se ha iniciado sesión con tu cuenta en otro lugar.\n\n¿Deseas mantener tu sesión iniciada en ESTE dispositivo?");
+                                if (mantener) {
+                                    // Recuperar la sesión para este dispositivo
+                                    dbFirestore.collection('usuarios').doc(user.uid).set({
+                                        session_id: localSessionId,
+                                        ultimoAcceso: firebase.firestore.FieldValue.serverTimestamp()
+                                    }, { merge: true }).then(() => {
+                                        window.enag_session_prompt_active = false;
+                                    }).catch(() => {
+                                        window.enag_session_prompt_active = false;
+                                    });
+                                } else {
+                                    // Ceder la sesión al otro dispositivo
+                                    firebase.auth().signOut().then(() => {
+                                        window.enag_session_prompt_active = false;
+                                        localStorage.removeItem('enag_session_id');
+                                        const path = window.location.pathname;
+                                        if (path.includes('/views/')) {
+                                            window.location.href = 'login.html';
+                                        } else {
+                                            window.location.href = 'views/login.html';
+                                        }
+                                    });
+                                }
                             }
                         }
                     }
@@ -156,16 +239,34 @@ function resetInactividad() {
     inactividadTimer = setTimeout(() => {
         if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
             const minutos = Math.round(TIEMPO_INACTIVIDAD / (60 * 1000));
-            alert(`Tu sesión ha expirado por inactividad prolongada (${minutos} minutos). Por favor, vuelve a iniciar sesión.`);
-            firebase.auth().signOut().then(() => {
-                localStorage.removeItem('enag_session_id');
-                const path = window.location.pathname;
-                if (path.includes('/views/')) {
-                    window.location.href = 'login.html';
-                } else {
-                    window.location.href = 'views/login.html';
-                }
-            });
+            const msg = `Tu sesión ha expirado por inactividad prolongada (${minutos} minutos). Por favor, vuelve a iniciar sesión.`;
+            
+            const doLogout = () => {
+                firebase.auth().signOut().then(() => {
+                    localStorage.removeItem('enag_session_id');
+                    const path = window.location.pathname;
+                    if (path.includes('/views/')) {
+                        window.location.href = 'login.html';
+                    } else {
+                        window.location.href = 'views/login.html';
+                    }
+                });
+            };
+
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    title: 'Sesión Expirada',
+                    text: msg,
+                    icon: 'warning',
+                    allowOutsideClick: false,
+                    confirmButtonText: 'Entendido'
+                }).then(() => {
+                    doLogout();
+                });
+            } else {
+                alert(msg);
+                doLogout();
+            }
         }
     }, TIEMPO_INACTIVIDAD);
 }

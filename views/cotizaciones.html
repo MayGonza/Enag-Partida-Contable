@@ -1207,7 +1207,7 @@
         }
 
         function eliminarCotizacion(numero) {
-            if (confirm(`¿Está seguro de que desea eliminar esta cotización del historial?`)) {
+            if ((window.enagConfirm && await window.enagConfirm(`¿Está seguro de que desea eliminar esta cotización del historial?`)) || (!window.enagConfirm && confirm(`¿Está seguro de que desea eliminar esta cotización del historial?`))) {
                 cotizaciones = cotizaciones.filter(c => Number(c.numero) !== Number(numero));
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));
                 try {

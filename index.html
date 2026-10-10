@@ -1228,7 +1228,7 @@
         }
 
         async function eliminarAvisoRH(id) {
-            if (!confirm("¿Deseas eliminar este aviso de Recursos Humanos?")) {
+            if (window.enagConfirm) { if (!(await window.enagConfirm("¿Deseas eliminar este aviso de Recursos Humanos?"))) { return; } } else if (!confirm("¿Deseas eliminar este aviso de Recursos Humanos?")) {
                 return;
             }
 
