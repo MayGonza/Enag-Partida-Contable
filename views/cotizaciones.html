@@ -487,8 +487,9 @@
             <div class="grid-layout">
                 <div class="form-group span-2">
                     <label for="clienteNombre">Cliente / Empresa: <span class="required">*</span></label>
-                    <input type="text" id="clienteNombre" list="listaInstituciones" placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL"
-                        oninput="this.value = this.value.toUpperCase()" onchange="autoCompletarDatosCliente()" required>
+                    <input type="text" id="clienteNombre" list="listaInstituciones"
+                        placeholder="NOMBRE DEL CLIENTE O RAZÓN SOCIAL" oninput="this.value = this.value.toUpperCase()"
+                        onchange="autoCompletarDatosCliente()" required>
                     <datalist id="listaInstituciones">
                         <!-- Secretarías de Estado -->
                         <option value="SECRETARÍA DE SALUD (SESAL)">
@@ -507,8 +508,8 @@
                         <option value="SECRETARÍA DE TURISMO (IHT / SETUR)">
                         <option value="SECRETARÍA DE LA PRESIDENCIA">
                         <option value="SECRETARÍA DE DERECHOS HUMANOS (SEDH)">
-                        
-                        <!-- Instituciones Descentralizadas, Autónomas y Empresas Estatales -->
+
+                            <!-- Instituciones Descentralizadas, Autónomas y Empresas Estatales -->
                         <option value="EMPRESA NACIONAL DE ENERGÍA ELÉCTRICA (ENEE)">
                         <option value="EMPRESA NACIONAL PORTUARIA (ENP)">
                         <option value="EMPRESA HONDUREÑA DE TELECOMUNICACIONES (HONDUTEL)">
@@ -1307,8 +1308,8 @@
                         const diffTime = hoy.getTime() - fDate.getTime();
                         diffDays = diffTime > 0 ? Math.floor(diffTime / (1000 * 60 * 60 * 24)) : 0;
                     }
-                } catch(e) { console.error('Error calculando vigencia', e); }
-                
+                } catch (e) { console.error('Error calculando vigencia', e); }
+
                 let vigenciaBadge = '';
                 if (diffDays >= 15) {
                     vigenciaBadge = '<span style="display:inline-block; width:10px; height:10px; border-radius:50%; background-color:#ef4444; margin-right:4px; vertical-align:middle;"></span><span style="color:#ef4444; font-size:0.85em; font-weight:bold;">Vencida</span>';

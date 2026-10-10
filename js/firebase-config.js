@@ -53,10 +53,38 @@ window.registrarBitacora = async function(modulo, accion, detalles) {
 };
 
 
-// Sincronizar nombre de usuario globalmente
+// Variables para control de sesión única
+let sessionUnsubscribe = null;
+
+// Sincronizar nombre de usuario globalmente y controlar sesión única
 if (typeof firebase !== 'undefined' && firebase.auth) {
     firebase.auth().onAuthStateChanged(async (user) => {
         if (user && dbFirestore) {
+            // Control de Sesión Única
+            const localSessionId = localStorage.getItem('enag_session_id');
+            if (sessionUnsubscribe) sessionUnsubscribe();
+            
+            sessionUnsubscribe = dbFirestore.collection('usuarios').doc(user.uid)
+                .onSnapshot((doc) => {
+                    if (doc.exists) {
+                        const dbSessionId = doc.data().session_id;
+                        // Si hay un session_id en Firestore y no coincide con el local
+                        if (dbSessionId && localSessionId && dbSessionId !== localSessionId) {
+                            alert("Se ha iniciado sesión en otro dispositivo. Se cerrará esta sesión por seguridad.");
+                            firebase.auth().signOut().then(() => {
+                                localStorage.removeItem('enag_session_id');
+                                const path = window.location.pathname;
+                                if (path.includes('/views/')) {
+                                    window.location.href = 'login.html';
+                                } else {
+                                    window.location.href = 'views/login.html';
+                                }
+                            });
+                        }
+                    }
+                });
+
+            // Guardar nombre de usuario local
             try {
                 const uDoc = await dbFirestore.collection('usuarios').doc(user.uid).get();
                 if (uDoc.exists) {
@@ -69,6 +97,45 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
             }
         } else if (!user) {
             localStorage.removeItem('enag_username');
+            localStorage.removeItem('enag_session_id');
+            if (sessionUnsubscribe) {
+                sessionUnsubscribe();
+                sessionUnsubscribe = null;
+            }
         }
     });
 }
+
+// =========================================================
+// Control de Inactividad (15 minutos)
+// =========================================================
+let inactividadTimer;
+const TIEMPO_INACTIVIDAD = 15 * 60 * 1000; // 15 minutos en milisegundos
+
+function resetInactividad() {
+    clearTimeout(inactividadTimer);
+    inactividadTimer = setTimeout(() => {
+        if (typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+            alert("Tu sesión ha expirado por inactividad prolongada (15 minutos). Por favor, vuelve a iniciar sesión.");
+            firebase.auth().signOut().then(() => {
+                localStorage.removeItem('enag_session_id');
+                const path = window.location.pathname;
+                if (path.includes('/views/')) {
+                    window.location.href = 'login.html';
+                } else {
+                    window.location.href = 'views/login.html';
+                }
+            });
+        }
+    }, TIEMPO_INACTIVIDAD);
+}
+
+// Escuchar eventos para resetear el temporizador si el usuario interactúa con la pantalla
+window.addEventListener('mousemove', resetInactividad);
+window.addEventListener('keydown', resetInactividad);
+window.addEventListener('click', resetInactividad);
+window.addEventListener('scroll', resetInactividad);
+
+// Iniciar temporizador al cargar la página
+resetInactividad();
+

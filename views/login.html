@@ -484,15 +484,28 @@
                     throw { code: 'auth/unverified-email' };
                 }
 
-                // Guardar usuario en localStorage para los PDFs
+                // Generar y guardar el token de sesión única
+                const sessionId = 'sess_' + new Date().getTime() + '_' + Math.random().toString(36).substr(2, 9);
+                localStorage.setItem('enag_session_id', sessionId);
+
+                // Guardar usuario en localStorage para los PDFs y actualizar sesión
                 try {
-                    const uDoc = await dbFirestore.collection('usuarios').doc(userCred.user.uid).get();
+                    const userRef = dbFirestore.collection('usuarios').doc(userCred.user.uid);
+                    const uDoc = await userRef.get();
+                    
+                    // Actualizar el session_id en la base de datos para control de sesión única
+                    await userRef.set({
+                        session_id: sessionId,
+                        ultimoAcceso: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+
                     if (uDoc.exists) {
                         localStorage.setItem('enag_username', uDoc.data().usuario || email);
                     } else {
                         localStorage.setItem('enag_username', email);
                     }
                 } catch(e) {
+                    console.error("Error al actualizar sesión en Firestore:", e);
                     localStorage.setItem('enag_username', email);
                 }
 
