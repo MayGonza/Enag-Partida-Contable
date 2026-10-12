@@ -304,7 +304,8 @@
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
                     <label class="destacado-label">Fecha (DD/MM/YYYY): <span class="required">*</span></label>
-                    <input type="text" id="fecha" class="destacado-input" placeholder="DD/MM/YYYY" maxlength="10" required>
+                    <input type="text" id="fecha" class="destacado-input" placeholder="DD/MM/YYYY" maxlength="10"
+                        required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Número de Partida: <span class="required">*</span></label>
@@ -905,14 +906,14 @@
                 formData.rows.push({ objeto, cuenta, debe, haber, isFixed, isTax, comentario });
             });
 
-            
+
             // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
             let userName = localStorage.getItem('enag_username');
             if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
                 userName = firebase.auth().currentUser.email;
             }
             if (!userName) userName = "Usuario Desconocido";
-            
+
             const totalPages = doc.internal.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
                 doc.setPage(i);
@@ -1233,7 +1234,7 @@
             calcularTotales();
         }
 
-        function limpiarFormulario() {
+        async function limpiarFormulario() {
             if ((window.enagConfirm && await window.enagConfirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) || (!window.enagConfirm && confirm('¿Está seguro de que desea limpiar todos los campos de la partida?'))) {
                 document.getElementById('partidaForm').reset();
                 tabla.innerHTML = '';
@@ -1298,7 +1299,7 @@
                 const y = hoy.getFullYear();
                 fechaElem.value = `${d}/${m}/${y}`;
             }
-            fechaElem.addEventListener('input', function(e) {
+            fechaElem.addEventListener('input', function (e) {
                 let v = e.target.value.replace(/\D/g, '');
                 if (v.length > 8) v = v.substring(0, 8);
                 if (v.length >= 5) {

@@ -857,17 +857,20 @@
 
             if (val === 'OTRO') {
                 prodField.style.display = 'block';
+                prodField.required = true;
                 prodField.value = '';
                 prodField.focus();
                 unitField.value = '';
                 impField.value = 'ISV 15%';
             } else if (val === '') {
                 prodField.style.display = 'none';
+                prodField.required = false;
                 prodField.value = '';
                 unitField.value = '';
                 impField.value = 'ISV 15%';
             } else {
                 prodField.style.display = 'none';
+                prodField.required = false;
                 prodField.value = val;
 
                 const prod = PRODUCTOS_PREDEFINIDOS.find(p => p.desc === val);
@@ -916,7 +919,8 @@
             selectHTML += `<option value="OTRO" ${otroSelected}>Otro / Personalizado</option></select>`;
 
             const inputStyle = esOtro ? 'display: block; margin-top: 5px;' : 'display: none; margin-top: 5px;';
-            const inputHTML = `<input type="text" class="prod-field" value="${prod}" placeholder="Nombre del producto..." style="${inputStyle}" required>`;
+            const inputRequired = esOtro ? 'required' : '';
+            const inputHTML = `<input type="text" class="prod-field" value="${prod}" placeholder="Nombre del producto..." style="${inputStyle}" ${inputRequired}>`;
 
             cellProd.innerHTML = selectHTML + inputHTML;
             cellDesc.innerHTML = `<input type="text" class="desc-field" value="${desc}" placeholder="Detalle o descripción del ítem...">`;
@@ -1206,7 +1210,7 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
-        function eliminarCotizacion(numero) {
+        async function eliminarCotizacion(numero) {
             if ((window.enagConfirm && await window.enagConfirm(`¿Está seguro de que desea eliminar esta cotización del historial?`)) || (!window.enagConfirm && confirm(`¿Está seguro de que desea eliminar esta cotización del historial?`))) {
                 cotizaciones = cotizaciones.filter(c => Number(c.numero) !== Number(numero));
                 localStorage.setItem('enag_cotizaciones', JSON.stringify(cotizaciones));

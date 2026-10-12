@@ -1221,7 +1221,7 @@
             calcularTotales();
         }
 
-        function limpiarFormulario() {
+        async function limpiarFormulario() {
             if ((window.enagConfirm && await window.enagConfirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) || (!window.enagConfirm && confirm('¿Está seguro de que desea limpiar todos los campos de la partida?'))) {
                 document.getElementById('partidaForm').reset();
                 tabla.innerHTML = '';
