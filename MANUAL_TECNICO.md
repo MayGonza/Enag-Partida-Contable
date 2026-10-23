@@ -83,7 +83,9 @@ El sistema adopta un modelo arquitectónico **Serverless & Jamstack** desacoplad
 | **Lógica** | JavaScript Vanilla ES6+ (Async/Await) | Manipulación reactiva de DOM, cálculos financieros y suscripciones en tiempo real |
 | **Generación PDF** | jsPDF v2.5.1 + AutoTable v3.5.25 | Creación client-side de documentos oficiales, comprobantes, cartas y reportes tabulares |
 | **Lectura Planillas** | SheetJS (xlsx.full.min.js) | Parseo en el cliente de libros de cálculo `.xls` y `.xlsx` para procesamiento masivo |
-| **Generación QR** | qrcode.js | Renderizado de códigos QR de validación institucional en constancias laborales |
+| **Generación QR** | qrcode.js | Renderizado de códigos QR de validación institucional en constancias y bienes |
+| **Código de Barras** | JsBarcode.all.min.js | Generador client-side de códigos de barras Code 128 para etiquetas de inventario |
+| **Escáner Cámara** | html5-qrcode.min.js | Decodificador en tiempo real de QR y códigos de barras vía webcam o móvil |
 | **Selector Fechas** | flatpickr.min.js | Datepicker localizado con soporte de calendario de Honduras |
 
 ### 3.2. Backend y Servicios en la Nube
@@ -120,10 +122,14 @@ Enag-Partida-Contable/
 │   ├── jspdf-autotable.min.js    # Motor de tablas jsPDF AutoTable
 │   ├── xlsx.full.min.js          # Parser de planillas Excel
 │   ├── qrcode.js                 # Generador de códigos QR
+│   ├── JsBarcode.all.min.js      # Generador de códigos de barra Code 128
+│   ├── html5-qrcode.min.js       # Escáner de códigos de barra y QR con cámara
 │   ├── flatpickr.min.js          # Control de selección de fechas
 │   ├── honduras-datepicker.js    # Localización y reglas de días inhábiles
 │   └── soporte.js                # Módulo de emisión y sincronización de tickets TI
 ├── views/                        # Vistas modulares del sistema (HTML)
+│   ├── bienes_nacionales.html    # Control y registro de Bienes Nacionales e impresión de etiquetas
+│   ├── consulta_bien.html        # Consulta pública responsiva de bien al escanear QR
 │   ├── bitacora.html             # Consulta y auditoría de eventos del sistema
 │   ├── comercializacion.html     # Menú de enlace al módulo de cotizaciones
 │   ├── comprobante_retencion.html# Comprobantes de retención SAR (1% y 12.5%)

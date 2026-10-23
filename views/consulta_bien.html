@@ -1,0 +1,830 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Consulta Oficial de Bien Nacional — ENAG</title>
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-hover: #003366;
+            --primary-light: #e6eef7;
+            --accent: #d97706;
+            --success: #059669;
+            --success-light: #ecfdf5;
+            --warning: #f59e0b;
+            --danger: #dc2626;
+            --slate-800: #1e293b;
+            --slate-600: #475569;
+            --slate-400: #94a3b8;
+            --slate-200: #e2e8f0;
+            --slate-100: #f1f5f9;
+            --slate-50: #f8fafc;
+            --radius-md: 12px;
+            --radius-lg: 20px;
+            --shadow-md: 0 4px 15px rgba(0, 33, 71, 0.1);
+            --shadow-xl: 0 20px 45px rgba(0, 0, 0, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Roboto, sans-serif;
+            background-color: #002147;
+            color: #1e293b;
+            min-height: 100vh;
+            padding: 20px 15px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 50%;
+            filter: blur(14px) opacity(0.12);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .main-card {
+            max-width: 650px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.98);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            border-top: 8px solid var(--primary);
+            overflow: hidden;
+            margin-bottom: 25px;
+            animation: slideUp 0.4s ease-out;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Top Government Bar */
+        .gov-banner {
+            background: #f8fafc;
+            border-bottom: 2px solid var(--slate-200);
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 15px;
+        }
+
+        .gov-header-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .gov-logo {
+            max-width: 65px;
+            height: auto;
+        }
+
+        .gov-title-group h2 {
+            font-size: 0.95em;
+            color: var(--primary);
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.5px;
+            line-height: 1.2;
+        }
+
+        .gov-title-group p {
+            font-size: 0.78em;
+            color: var(--slate-600);
+            font-weight: 600;
+        }
+
+        .status-pill-verified {
+            background: var(--success-light);
+            color: var(--success);
+            border: 1px solid #a7f3d0;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: 700;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+
+        /* Hero Banner of the Asset */
+        .asset-hero {
+            padding: 24px 22px;
+            text-align: center;
+            background: linear-gradient(180deg, #f8fafc 0%, #ffffff 100%);
+            border-bottom: 1px solid var(--slate-200);
+        }
+
+        .asset-code-tag {
+            background: var(--primary);
+            color: white;
+            font-family: 'Consolas', 'Courier New', monospace;
+            font-size: 1.35em;
+            font-weight: 900;
+            padding: 6px 18px;
+            border-radius: 8px;
+            display: inline-block;
+            letter-spacing: 1.5px;
+            box-shadow: 0 4px 10px rgba(0, 33, 71, 0.2);
+            margin-bottom: 12px;
+        }
+
+        .asset-main-name {
+            font-size: 1.35em;
+            color: var(--slate-800);
+            font-weight: 800;
+            margin-bottom: 6px;
+            line-height: 1.3;
+        }
+
+        .asset-main-category {
+            display: inline-block;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.85em;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        /* Asset Photo Box */
+        .asset-photo-wrapper {
+            margin: 18px auto 6px auto;
+            max-width: 280px;
+            height: 180px;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            border: 2px solid var(--slate-200);
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .asset-photo-wrapper img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .asset-photo-placeholder {
+            font-size: 3.5em;
+            color: var(--slate-400);
+        }
+
+        /* Specifications Grid */
+        .specs-section {
+            padding: 22px;
+        }
+
+        .specs-title {
+            font-size: 0.88em;
+            text-transform: uppercase;
+            font-weight: 800;
+            color: var(--primary);
+            letter-spacing: 0.5px;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .specs-list {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+        }
+
+        .spec-item {
+            background: var(--slate-50);
+            border: 1px solid var(--slate-200);
+            border-radius: 8px;
+            padding: 10px 14px;
+        }
+
+        .spec-item.full {
+            grid-column: 1 / -1;
+        }
+
+        .spec-label {
+            font-size: 0.75em;
+            text-transform: uppercase;
+            color: var(--slate-600);
+            font-weight: 700;
+            margin-bottom: 3px;
+        }
+
+        .spec-value {
+            font-size: 0.95em;
+            color: var(--slate-800);
+            font-weight: 700;
+            word-break: break-word;
+        }
+
+        .spec-value.highlight-green {
+            color: var(--success);
+        }
+
+        .spec-value.highlight-blue {
+            color: var(--primary);
+        }
+
+        /* Custodian Card */
+        .custodian-card {
+            background: #f0fdf4;
+            border: 1.5px solid #bbf7d0;
+            border-radius: var(--radius-md);
+            padding: 16px;
+            margin-top: 14px;
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .custodian-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: #dcfce7;
+            color: #15803d;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.6em;
+            flex-shrink: 0;
+        }
+
+        .custodian-info h4 {
+            color: #166534;
+            font-size: 1.05em;
+            font-weight: 800;
+            margin-bottom: 2px;
+        }
+
+        .custodian-info p {
+            color: #15803d;
+            font-size: 0.85em;
+            font-weight: 600;
+        }
+
+        /* Actions Footer */
+        .card-actions {
+            padding: 18px 22px;
+            background: #fafbfc;
+            border-top: 1px solid var(--slate-200);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .btn-action {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.95em;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.25s;
+            text-decoration: none;
+            font-family: inherit;
+        }
+
+        .btn-action-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-action-primary:hover {
+            background: var(--primary-hover);
+        }
+
+        .btn-action-outline {
+            background: white;
+            color: var(--slate-800);
+            border: 1.5px solid var(--slate-200);
+        }
+
+        .btn-action-outline:hover {
+            background: var(--slate-100);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Empty / Error State */
+        .error-card {
+            padding: 40px 24px;
+            text-align: center;
+            display: none;
+        }
+
+        .error-icon {
+            font-size: 3.5em;
+            margin-bottom: 12px;
+        }
+
+        .error-card h3 {
+            color: var(--danger);
+            font-size: 1.25em;
+            margin-bottom: 8px;
+        }
+
+        .error-card p {
+            color: var(--slate-600);
+            font-size: 0.9em;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* Camera Scanner Modal for Mobile */
+        .scanner-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s;
+            padding: 20px;
+        }
+
+        .scanner-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .scanner-container {
+            width: 100%;
+            max-width: 440px;
+            background: white;
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            box-shadow: var(--shadow-xl);
+            padding: 20px;
+            text-align: center;
+        }
+
+        #scanner-reader {
+            width: 100%;
+            border-radius: var(--radius-md);
+            overflow: hidden;
+            background: #000;
+            min-height: 260px;
+        }
+
+        /* Footer Credits */
+        .footer-credits {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.8em;
+            text-align: center;
+            line-height: 1.5;
+        }
+
+        .footer-credits a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 480px) {
+            .specs-list {
+                grid-template-columns: 1fr;
+            }
+
+            .gov-banner {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+
+            .asset-main-name {
+                font-size: 1.15em;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Main Card Container -->
+    <div class="main-card" id="mainContainer">
+
+        <!-- Government Banner -->
+        <div class="gov-banner">
+            <div class="gov-header-left">
+                <img src="../assets/logo.png" alt="ENAG" class="gov-logo">
+                <div class="gov-title-group">
+                    <h2>República de Honduras</h2>
+                    <p>Empresa Nacional de Artes Gráficas (ENAG)</p>
+                </div>
+            </div>
+            <div>
+                <span class="status-pill-verified" id="badgeVerificado">
+                    <span>🛡️</span> Verificado
+                </span>
+            </div>
+        </div>
+
+        <!-- Asset Details Container -->
+        <div id="assetContent">
+            <!-- Hero Section -->
+            <div class="asset-hero">
+                <div class="asset-code-tag" id="txtCodigo">ENAG-BN-...</div>
+                <h1 class="asset-main-name" id="txtDenominacion">Cargando datos del bien...</h1>
+                <span class="asset-main-category" id="txtCategoria">Categoría</span>
+
+                <!-- Photo or Category Icon -->
+                <div class="asset-photo-wrapper">
+                    <img id="imgFotoBien" src="" alt="Fotografía del Bien" style="display: none;">
+                    <div id="placeholderFoto" class="asset-photo-placeholder">📦</div>
+                </div>
+            </div>
+
+            <!-- Specifications Section -->
+            <div class="specs-section">
+                <div class="specs-title">
+                    <span>📋</span> Especificaciones Técnicas Oficiales
+                </div>
+
+                <div class="specs-list">
+                    <div class="spec-item">
+                        <div class="spec-label">Marca</div>
+                        <div class="spec-value" id="txtMarca">—</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Modelo</div>
+                        <div class="spec-value" id="txtModelo">—</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Número de Serie</div>
+                        <div class="spec-value highlight-blue" id="txtSerie">—</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Estado Físico</div>
+                        <div class="spec-value highlight-green" id="txtEstado">—</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Color / Material</div>
+                        <div class="spec-value" id="txtColor">—</div>
+                    </div>
+                    <div class="spec-item">
+                        <div class="spec-label">Fecha de Incorporación</div>
+                        <div class="spec-value" id="txtFecha">—</div>
+                    </div>
+                    <div class="spec-item full">
+                        <div class="spec-label">Ubicación Física</div>
+                        <div class="spec-value" id="txtUbicacion">—</div>
+                    </div>
+                </div>
+
+                <!-- Custodian Card -->
+                <div class="custodian-card">
+                    <div class="custodian-avatar">👤</div>
+                    <div class="custodian-info">
+                        <h4 id="txtCustodio">Funcionario Custodio</h4>
+                        <p id="txtCustodioCargo">Cargo del Empleado</p>
+                        <p style="font-size: 0.8em; color: #166534; margin-top: 2px;" id="txtDepartamento">Departamento</p>
+                    </div>
+                </div>
+
+                <!-- Observaciones if any -->
+                <div id="boxObservaciones" style="margin-top: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 0.85em; display: none;">
+                    <strong style="color: var(--primary);">Observaciones:</strong>
+                    <p id="txtObservaciones" style="margin-top: 4px; color: #475569;"></p>
+                </div>
+            </div>
+
+            <!-- Actions Footer -->
+            <div class="card-actions">
+                <button type="button" class="btn-action btn-action-primary" onclick="abrirEscanerMovil()">
+                    <span>📷</span> Escanear Otro Bien con la Cámara
+                </button>
+                <a href="bienes_nacionales.html" class="btn-action btn-action-outline">
+                    <span>🏛️</span> Ir al Módulo de Gestión Completo
+                </a>
+            </div>
+        </div>
+
+        <!-- Error Card (When asset is not found) -->
+        <div class="error-card" id="errorCard">
+            <div class="error-icon">⚠️</div>
+            <h3>Bien Nacional No Encontrado</h3>
+            <p id="errorMsg">El código escaneado no corresponde a ningún bien registrado actualmente en el inventario oficial de la Empresa Nacional de Artes Gráficas.</p>
+            <div style="display: flex; flex-direction: column; gap: 10px;">
+                <button type="button" class="btn-action btn-action-primary" onclick="abrirEscanerMovil()">
+                    <span>📷</span> Intentar Escanear Nuevamente
+                </button>
+                <a href="bienes_nacionales.html" class="btn-action btn-action-outline">
+                    <span>🏛️</span> Ir al Inventario General
+                </a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Scanner Overlay for Mobile -->
+    <div id="scannerOverlay" class="scanner-overlay">
+        <div class="scanner-container">
+            <h3 style="color: var(--primary); margin-bottom: 10px; font-size: 1.15em;">
+                <span>📷</span> Escanear Etiqueta de Bien
+            </h3>
+            <p style="font-size: 0.85em; color: var(--slate-600); margin-bottom: 12px;">
+                Enfoque el código QR o código de barras del bien.
+            </p>
+            <div id="scanner-reader"></div>
+            <button type="button" class="btn-action btn-action-outline" onclick="cerrarEscanerMovil()" style="margin-top: 14px;">
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <div class="footer-credits">
+        Sistema Oficial de Bienes Nacionales • Empresa Nacional de Artes Gráficas (ENAG)<br>
+        Tegucigalpa, M.D.C., Honduras 2026
+    </div>
+
+    <!-- Scripts -->
+    <!-- html5-qrcode para escanear en celular -->
+    <script src="../js/html5-qrcode.min.js"></script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+        const STORAGE_KEY = 'enag_bienes_nacionales';
+        let scannerInstancia = null;
+
+        document.addEventListener('DOMContentLoaded', async () => {
+            const params = new URLSearchParams(window.location.search);
+            const codigo = params.get('id');
+
+            if (codigo) {
+                await buscarYMostrarBien(codigo.trim());
+            } else {
+                mostrarError("No se proporcionó ningún código de bien en el enlace.");
+            }
+        });
+
+        // Buscar el bien en Firebase, LocalStorage o catálogo de demostración
+        async function buscarYMostrarBien(codigo) {
+            let bienEncontrado = null;
+
+            // 1. Intentar buscar en Firebase Firestore
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const docRef = await dbFirestore.collection('bienes_nacionales').doc(codigo).get();
+                    if (docRef.exists) {
+                        bienEncontrado = docRef.data();
+                    }
+                } catch (e) {
+                    console.warn("Error consultando Firestore:", e);
+                }
+            }
+
+            // 2. Si no se encontró en Firestore, buscar en LocalStorage
+            if (!bienEncontrado) {
+                const localStr = localStorage.getItem(STORAGE_KEY);
+                if (localStr) {
+                    try {
+                        const lista = JSON.parse(localStr);
+                        bienEncontrado = lista.find(b => b.codigo.toUpperCase() === codigo.toUpperCase());
+                    } catch (e) {}
+                }
+            }
+
+            // 3. Fallback al catálogo de muestra de la ENAG
+            if (!bienEncontrado) {
+                const demo = [
+                    {
+                        codigo: "ENAG-BN-2026-0001",
+                        categoria: "Maquinaria y Equipo Gráfico",
+                        denominacion: "Prensa Offset Heidelberg Speedmaster SM 52",
+                        marca: "Heidelberg",
+                        modelo: "Speedmaster SM 52-2",
+                        serie: "HDB-549102-SM",
+                        color: "Gris Industrial / Metal",
+                        departamento: "Talleres Gráficos / Prensa",
+                        ubicacion: "Nave Principal - Taller 1",
+                        custodio: "Juan Ramón Barahona",
+                        custodioCargo: "Jefe de Talleres Gráficos",
+                        estado: "Excelente",
+                        fecha: "2026-01-15",
+                        valor: 450000.00,
+                        proveedor: "Heidelberg Americas Corp. - Fac #00124",
+                        observaciones: "Unidad bicromática de pliegos, operativa y calibrada para tirajes de La Gaceta."
+                    },
+                    {
+                        codigo: "ENAG-BN-2026-0002",
+                        categoria: "Equipo de Cómputo y Telecomunicaciones",
+                        denominacion: "Servidor Rackeable Dell PowerEdge R750",
+                        marca: "Dell",
+                        modelo: "PowerEdge R750 Xeon Silver",
+                        serie: "DEL-849201-SRV",
+                        color: "Negro / Plata",
+                        departamento: "Tecnología (TI)",
+                        ubicacion: "Centro de Datos / Rack 01",
+                        custodio: "Ing. Michael Gonzales",
+                        custodioCargo: "Administrador de Sistemas",
+                        estado: "Excelente",
+                        fecha: "2026-02-10",
+                        valor: 125000.00,
+                        proveedor: "Sistemas Digitales de Honduras - Fac #9021",
+                        observaciones: "Servidor de base de datos y alojamiento del sistema integral institucional."
+                    },
+                    {
+                        codigo: "ENAG-BN-2026-0003",
+                        categoria: "Maquinaria y Equipo Gráfico",
+                        denominacion: "Guillotina Hidráulica Programable Polar 115",
+                        marca: "Polar",
+                        modelo: "Polar Mohr 115 PLUS",
+                        serie: "POL-772910-HD",
+                        color: "Gris / Azul",
+                        departamento: "Encuadernación y Acabados",
+                        ubicacion: "Taller de Acabados - Área de Corte",
+                        custodio: "Mario Edgardo Santos",
+                        custodioCargo: "Operador Maestro de Corte",
+                        estado: "Bueno",
+                        fecha: "2025-11-20",
+                        valor: 280000.00,
+                        proveedor: "Artes Gráficas Globales S.A.",
+                        observaciones: "Guillotina de 115cm con colchón de aire y pantalla óptica de seguridad."
+                    },
+                    {
+                        codigo: "ENAG-BN-2026-0004",
+                        categoria: "Equipo de Cómputo y Telecomunicaciones",
+                        denominacion: "Computadora All-in-One HP ProOne 440 G9",
+                        marca: "HP",
+                        modelo: "ProOne 440 G9 24 pulg Core i7",
+                        serie: "HP-5CD1928391",
+                        color: "Negro",
+                        departamento: "Contabilidad",
+                        ubicacion: "Edificio Central - Of. 204",
+                        custodio: "Lic. Carlos Mendoza",
+                        custodioCargo: "Contador General",
+                        estado: "Bueno",
+                        fecha: "2026-01-22",
+                        valor: 28500.00,
+                        proveedor: "Tecnología Avanzada de Honduras",
+                        observaciones: "Equipo asignado al procesamiento contable y retenciones de impuestos SAR."
+                    }
+                ];
+                bienEncontrado = demo.find(b => b.codigo.toUpperCase() === codigo.toUpperCase());
+            }
+
+            if (bienEncontrado) {
+                renderizarBien(bienEncontrado);
+            } else {
+                mostrarError(`El bien con código "${codigo}" no fue encontrado en la base de datos.`);
+            }
+        }
+
+        // Mostrar los datos en pantalla
+        function renderizarBien(b) {
+            document.getElementById('assetContent').style.display = 'block';
+            document.getElementById('errorCard').style.display = 'none';
+
+            document.getElementById('txtCodigo').textContent = b.codigo;
+            document.getElementById('txtDenominacion').textContent = b.denominacion;
+            document.getElementById('txtCategoria').textContent = b.categoria;
+            document.getElementById('txtMarca').textContent = b.marca || 'N/A';
+            document.getElementById('txtModelo').textContent = b.modelo || 'N/A';
+            document.getElementById('txtSerie').textContent = b.serie || 'S/N';
+            document.getElementById('txtEstado').textContent = b.estado;
+            document.getElementById('txtColor').textContent = b.color || 'N/A';
+            document.getElementById('txtFecha').textContent = formatearFechaHonduras(b.fecha);
+            document.getElementById('txtUbicacion').textContent = (b.departamento || '') + (b.ubicacion ? ` • ${b.ubicacion}` : '');
+
+            document.getElementById('txtCustodio').textContent = b.custodio || 'Sin Asignar';
+            document.getElementById('txtCustodioCargo').textContent = b.custodioCargo || 'Funcionario Responsable';
+            document.getElementById('txtDepartamento').textContent = b.departamento || 'ENAG';
+
+            // Fotografía o Icono
+            if (b.foto) {
+                document.getElementById('imgFotoBien').src = b.foto;
+                document.getElementById('imgFotoBien').style.display = 'block';
+                document.getElementById('placeholderFoto').style.display = 'none';
+            } else {
+                let icono = '📦';
+                if (b.categoria && b.categoria.includes('Cómputo')) icono = '💻';
+                else if (b.categoria && b.categoria.includes('Gráfico')) icono = '🏭';
+                else if (b.categoria && b.categoria.includes('Mobiliario')) icono = '🪑';
+                else if (b.categoria && b.categoria.includes('Vehículo')) icono = '🚗';
+                document.getElementById('placeholderFoto').textContent = icono;
+                document.getElementById('placeholderFoto').style.display = 'block';
+                document.getElementById('imgFotoBien').style.display = 'none';
+            }
+
+            // Observaciones
+            if (b.observaciones) {
+                document.getElementById('txtObservaciones').textContent = b.observaciones;
+                document.getElementById('boxObservaciones').style.display = 'block';
+            } else {
+                document.getElementById('boxObservaciones').style.display = 'none';
+            }
+        }
+
+        function mostrarError(mensaje) {
+            document.getElementById('assetContent').style.display = 'none';
+            document.getElementById('errorCard').style.display = 'block';
+            document.getElementById('errorMsg').textContent = mensaje;
+        }
+
+        function formatearFechaHonduras(isoStr) {
+            if (!isoStr) return 'N/A';
+            const partes = isoStr.split('-');
+            if (partes.length === 3) return `${partes[2]}/${partes[1]}/${partes[0]}`;
+            return isoStr;
+        }
+
+        // Escáner Móvil usando cámara del teléfono
+        async function abrirEscanerMovil() {
+            document.getElementById('scannerOverlay').classList.add('active');
+
+            if (typeof Html5Qrcode !== 'undefined') {
+                try {
+                    scannerInstancia = new Html5Qrcode("scanner-reader");
+                    const config = { fps: 12, qrbox: { width: 220, height: 220 } };
+
+                    await scannerInstancia.start(
+                        { facingMode: "environment" },
+                        config,
+                        (decodedText) => {
+                            // Éxito
+                            cerrarEscanerMovil();
+                            let cod = decodedText.trim();
+                            if (cod.includes('?id=')) {
+                                try {
+                                    const u = new URL(cod, window.location.origin);
+                                    cod = u.searchParams.get('id') || cod;
+                                } catch (e) {
+                                    const m = cod.match(/id=([^&]+)/);
+                                    if (m) cod = decodeURIComponent(m[1]);
+                                }
+                            }
+                            window.location.search = `?id=${encodeURIComponent(cod)}`;
+                        },
+                        (err) => {}
+                    );
+                } catch (e) {
+                    console.warn("No se pudo iniciar cámara en móvil:", e);
+                    alert("No se pudo acceder a la cámara. Por favor verifique los permisos de su navegador.");
+                    cerrarEscanerMovil();
+                }
+            }
+        }
+
+        async function cerrarEscanerMovil() {
+            if (scannerInstancia) {
+                try {
+                    await scannerInstancia.stop();
+                    scannerInstancia.clear();
+                } catch (e) {}
+                scannerInstancia = null;
+            }
+            document.getElementById('scannerOverlay').classList.remove('active');
+        }
+    </script>
+
+</body>
+
+</html>

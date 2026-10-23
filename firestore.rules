@@ -38,6 +38,12 @@ service cloud.firestore {
       allow update, delete: if request.auth != null;
     }
     
+    // Consulta pública de Bienes Nacionales (para escaneo de etiquetas QR / Barra)
+    match /bienes_nacionales/{bienId} {
+      allow get: if true;
+      allow list, create, update, delete: if request.auth != null;
+    }
+    
     // Para todas las demás colecciones (cotizaciones, bitacora_global, etc.)
     match /{document=**} {
       allow read, write: if request.auth != null;
