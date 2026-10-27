@@ -445,6 +445,9 @@
 <body>
     <div class="nav-container">
         <a href="../index.html" class="btn-nav btn-nav-menu">← Volver al Menú Principal</a>
+        <a href="detector_espacio.html" class="btn-nav" style="background-color: #10b981; color: white;">
+            <span>📏</span> Detector de Espacio (Calcular Texto)
+        </a>
     </div>
 
     <div class="container">
@@ -816,11 +819,32 @@
                 cotizaciones = JSON.parse(localData);
             }
 
-            // Generar N° de cotización autoincrementado
+                        // Generar N° de cotización autoincrementado
             sugerirNumeroCotizacion();
 
-            // Agregar primera fila vacía
-            agregarFila();
+            // Verificar si viene un ítem transferido desde el Detector de Espacio
+            const transferRaw = sessionStorage.getItem('enag_item_transferido');
+            if (transferRaw) {
+                try {
+                    const item = JSON.parse(transferRaw);
+                    sessionStorage.removeItem('enag_item_transferido');
+                    agregarFila(item.producto, item.descripcion, item.cantidad, item.precio, item.impuesto);
+                    if (item.tipoDescuento) {
+                        const selectDesc = document.getElementById('tipoDescuento');
+                        if (selectDesc) {
+                            selectDesc.value = item.tipoDescuento;
+                            actualizarDescuentoForm();
+                        }
+                    }
+                    showAlert(`✨ Concepto cargado automáticamente desde el Detector de Espacio: ${item.producto}`);
+                } catch (err) {
+                    console.error("Error al procesar ítem transferido", err);
+                    agregarFila();
+                }
+            } else {
+                // Agregar primera fila vacía
+                agregarFila();
+            }
 
             // Dibujar historial
             actualizarHistorialUI();
