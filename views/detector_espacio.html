@@ -774,67 +774,103 @@
             height: 920px;
         }
 
-        /* Cabecera del Diario Oficial estilo Tabloide ENAG */
+        /* Barra de Control del Membrete Oficial */
+        .membrete-controls-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            margin-bottom: 12px;
+            padding: 8px 12px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            flex-wrap: wrap;
+        }
+
+        .membrete-ctrl-group {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .ctrl-label {
+            font-size: 0.78em;
+            font-weight: 700;
+            color: #475569;
+        }
+
+        .select-membrete-tool {
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 4px 8px;
+            font-size: 0.82em;
+            background: #ffffff;
+            color: #0f172a;
+            font-weight: 700;
+            cursor: pointer;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .select-membrete-tool:focus {
+            border-color: var(--primary);
+        }
+
+        /* Membrete Oficial del Diario La Gaceta (ENAG) */
         .gaceta-masthead {
-            text-align: center;
-            border-top: 3px double #1c1917;
-            border-bottom: 3px double #1c1917;
-            padding: 6px 4px 6px 4px;
+            position: relative;
+            width: 100%;
             margin-bottom: 10px;
             flex-shrink: 0;
-            background: #fdfcf7;
-            position: relative;
+            background: #ffffff;
+            border-radius: 2px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
             z-index: 10;
         }
 
-        .gaceta-masthead-topline {
+        .gaceta-masthead-img {
+            width: 100%;
+            height: auto;
+            display: block;
+            image-rendering: -webkit-optimize-contrast;
+            image-rendering: crisp-edges;
+        }
+
+        /* Capa superpuesta para fecha dinámica opcional */
+        .gaceta-masthead-date-overlay {
+            position: absolute;
+            bottom: 13.3%;
+            left: 0;
+            width: 100%;
+            height: 6.8%;
+            background: #eaeaea;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            padding: 0 1.2%;
             font-family: 'Times New Roman', serif;
-            font-size: 0.65em;
-            font-weight: 700;
-            letter-spacing: 1px;
-            color: #44403c;
-            border-bottom: 1px solid #78716c;
-            padding-bottom: 3px;
-            margin-bottom: 5px;
-            text-transform: uppercase;
+            font-size: 0.58em;
+            font-weight: 800;
+            color: #111;
+            border-top: 1px solid #111;
+            border-bottom: 1px solid #111;
+            box-sizing: border-box;
+            letter-spacing: 0.2px;
         }
 
-        .gaceta-masthead-title {
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 2.1em;
-            font-weight: 900;
-            letter-spacing: 4px;
-            color: #0c0a09;
-            margin: 0;
-            line-height: 1.05;
-            text-transform: uppercase;
+        .gaceta-masthead-date-overlay.sin-seccion {
+            bottom: 0%;
+            height: 8%;
         }
 
-        .gaceta-masthead-sub {
-            font-family: 'Times New Roman', serif;
-            font-size: 0.72em;
-            font-weight: 700;
-            color: #292524;
-            margin: 3px 0 0 0;
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-        }
-
-        .gaceta-masthead-meta {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-family: 'Times New Roman', serif;
-            font-size: 0.62em;
-            color: #57534e;
-            border-top: 1px solid #78716c;
-            padding-top: 3px;
-            margin-top: 5px;
-            text-transform: uppercase;
-            font-weight: 600;
+        @media (max-width: 600px) {
+            .gaceta-masthead-date-overlay {
+                font-size: 0.46em;
+                padding: 0 3px;
+            }
         }
 
         /* Columnas de texto Tabloide */
@@ -1464,6 +1500,35 @@
                         </button>
                     </div>
 
+                    <!-- Controles Interactivos del Membrete Oficial -->
+                    <div class="membrete-controls-bar">
+                        <div class="membrete-ctrl-group">
+                            <span class="ctrl-label">🏛️ Membrete Oficial:</span>
+                            <div class="preview-btn-group">
+                                <button type="button" class="btn-size-toggle active" id="btnSecA"
+                                    onclick="cambiarSeccionMembrete('seccion_a')" title="Sección A (Decretos y Leyes Oficiales)">
+                                    Sección A
+                                </button>
+                                <button type="button" class="btn-size-toggle" id="btnSecB"
+                                    onclick="cambiarSeccionMembrete('seccion_b')" title="Sección B (Avisos Legales)">
+                                    Sección B (Avisos)
+                                </button>
+                                <button type="button" class="btn-size-toggle" id="btnSecNone"
+                                    onclick="cambiarSeccionMembrete('sin_seccion')" title="Encabezado sin franja de sección">
+                                    Sin Sección
+                                </button>
+                            </div>
+                        </div>
+                        <div class="membrete-ctrl-group">
+                            <span class="ctrl-label">📅 Fecha:</span>
+                            <select id="selectFechaMembrete" class="select-membrete-tool"
+                                onchange="cambiarModoFechaMembrete(this.value)" title="Cambiar fecha del membrete">
+                                <option value="oficial" selected>Edición Oficial (27 Abr 2026)</option>
+                                <option value="hoy">Fecha de Hoy (Dinámica)</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div class="gaceta-page page-size-tabloide" id="gacetaPage">
                         <!-- Líneas guía de corte en formato Tabloide -->
                         <div class="cutline" style="top: 20%;" title="1/5 de Página Tabloide (20%) — Tarifa: L. 800.00">
@@ -1490,17 +1555,13 @@
                             <span id="gacetaFillBadge" class="gaceta-fill-label">0% ocupado</span>
                         </div>
 
-                        <!-- Encabezado Oficial del Diario La Gaceta (ENAG) -->
-                        <div class="gaceta-masthead">
-                            <div class="gaceta-masthead-topline">
-                                <span>REPÚBLICA DE HONDURAS • TEGUCIGALPA, M. D. C.</span>
-                                <span>AÑO CXLVIII • EDICIÓN OFICIAL</span>
-                            </div>
-                            <p class="gaceta-masthead-title">La Gaceta</p>
-                            <p class="gaceta-masthead-sub">DIARIO OFICIAL DE LA REPÚBLICA DE HONDURAS</p>
-                            <div class="gaceta-masthead-meta">
-                                <span>SECCIÓN DE AVISOS LEGALES, DECRETOS Y ACUERDOS</span>
-                                <span>PAPEL TABLOIDE OFICIAL (11" × 17" • 279 × 432 MM)</span>
+                        <!-- Membrete Oficial Auténtico del Diario La Gaceta (ENAG) -->
+                        <div class="gaceta-masthead" id="gacetaMasthead" title="Membrete Oficial Diario La Gaceta — Empresa Nacional de Artes Gráficas">
+                            <img id="imgMembreteGaceta" src="../assets/membrete_gaceta_oficial.png" alt="Membrete Oficial Diario La Gaceta" class="gaceta-masthead-img">
+                            <div id="overlayFechaDinamica" class="gaceta-masthead-date-overlay" style="display: none;">
+                                <span class="meta-left">AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
+                                <span class="meta-center" id="textoFechaDinamica">LUNES 27 DE ABRIL DEL 2026.</span>
+                                <span class="meta-right">NUM. 37,127</span>
                             </div>
                         </div>
 
@@ -1652,7 +1713,9 @@
             sangria: 4,
             interlineado: 1.0,
             justificado: true, // Texto justificado activo por defecto (ambos márgenes alineados)
-            tamanoMaqueta: 'tabloide' // 'compacto', 'tabloide', 'tall'
+            tamanoMaqueta: 'tabloide', // 'compacto', 'tabloide', 'tall'
+            tipoSeccion: 'seccion_a', // 'seccion_a', 'seccion_b', 'sin_seccion'
+            modoFecha: 'oficial' // 'oficial' o 'hoy'
         };
 
         // Inicialización
@@ -1680,6 +1743,8 @@
                     if (calibracion.sangria === undefined) calibracion.sangria = 4;
                     if (calibracion.interlineado === undefined) calibracion.interlineado = 1.0;
                     if (calibracion.justificado === undefined) calibracion.justificado = true;
+                    if (calibracion.tipoSeccion === undefined) calibracion.tipoSeccion = 'seccion_a';
+                    if (calibracion.modoFecha === undefined) calibracion.modoFecha = 'oficial';
 
                     if (document.getElementById('calibTipoPapel')) {
                         document.getElementById('calibTipoPapel').value = calibracion.tipoPapel;
@@ -1698,6 +1763,7 @@
                     actualizarSelectInterlineadoUI(calibracion.interlineado);
                     aplicarEstilosVisualesEditor();
                     cambiarTamanoMaqueta(calibracion.tamanoMaqueta || 'tabloide');
+                    actualizarControlesMembreteUI();
                 } catch (e) {
                     console.error("Error al cargar calibración", e);
                 }
@@ -1709,6 +1775,7 @@
                 actualizarSelectInterlineadoUI(calibracion.interlineado);
                 aplicarEstilosVisualesEditor();
                 cambiarTamanoMaqueta('tabloide');
+                actualizarControlesMembreteUI();
             }
         }
 
@@ -1759,7 +1826,9 @@
                 sangria: 4,
                 interlineado: 1.0,
                 justificado: true,
-                tamanoMaqueta: 'tabloide'
+                tamanoMaqueta: 'tabloide',
+                tipoSeccion: 'seccion_a',
+                modoFecha: 'oficial'
             };
             if (document.getElementById('calibTipoPapel')) {
                 document.getElementById('calibTipoPapel').value = 'tabloide';
@@ -1778,9 +1847,91 @@
             actualizarSelectInterlineadoUI(1.0);
             aplicarEstilosVisualesEditor();
             cambiarTamanoMaqueta('tabloide');
+            actualizarControlesMembreteUI();
             localStorage.removeItem('enag_calibracion_publicaciones');
             showToast("Calibración restablecida a valores oficiales (Tabloide 11\" × 17\")", "info");
             analizarTexto();
+        }
+
+        // FUNCIONES DEL MEMBRETE OFICIAL DE LA GACETA
+        function obtenerRutaMembreteActual() {
+            if (calibracion.tipoSeccion === 'seccion_b') {
+                return '../assets/membrete_gaceta_seccion_b.png';
+            } else if (calibracion.tipoSeccion === 'sin_seccion') {
+                return '../assets/membrete_gaceta_cabecera.png';
+            }
+            return '../assets/membrete_gaceta_oficial.png';
+        }
+
+        function cambiarSeccionMembrete(tipo) {
+            calibracion.tipoSeccion = tipo;
+            const img = document.getElementById('imgMembreteGaceta');
+            if (img) {
+                img.src = obtenerRutaMembreteActual();
+            }
+            actualizarControlesMembreteUI();
+            localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
+
+            const nombres = {
+                'seccion_a': 'Sección A (Decretos y Leyes Oficiales)',
+                'seccion_b': 'Sección B (Avisos Legales)',
+                'sin_seccion': 'Encabezado sin franja de sección'
+            };
+            showToast(`Membrete oficial: ${nombres[tipo] || tipo}`, "info");
+        }
+
+        function cambiarModoFechaMembrete(modo) {
+            calibracion.modoFecha = modo;
+            actualizarControlesMembreteUI();
+            localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
+
+            if (modo === 'hoy') {
+                showToast(`Fecha del membrete actualizada a fecha de hoy (${formatearFechaOficialGaceta()})`, "success");
+            } else {
+                showToast("Fecha restaurada a la Edición Oficial original (27 de abril 2026)", "info");
+            }
+        }
+
+        function formatearFechaOficialGaceta(d = new Date()) {
+            const dias = ['DOMINGO', 'LUNES', 'MARTES', 'MIÉRCOLES', 'JUEVES', 'VIERNES', 'SÁBADO'];
+            const meses = ['ENERO', 'FEBRERO', 'MARZO', 'ABRIL', 'MAYO', 'JUNIO', 'JULIO', 'AGOSTO', 'SEPTIEMBRE', 'OCTUBRE', 'NOVIEMBRE', 'DICIEMBRE'];
+            const diaSem = dias[d.getDay()];
+            const diaNum = d.getDate();
+            const mesNom = meses[d.getMonth()];
+            const anio = d.getFullYear();
+            return `${diaSem} ${diaNum} DE ${mesNom} DEL ${anio}.`;
+        }
+
+        function actualizarControlesMembreteUI() {
+            const btnSecA = document.getElementById('btnSecA');
+            const btnSecB = document.getElementById('btnSecB');
+            const btnSecNone = document.getElementById('btnSecNone');
+            const selectFecha = document.getElementById('selectFechaMembrete');
+            const overlayFecha = document.getElementById('overlayFechaDinamica');
+            const textoFecha = document.getElementById('textoFechaDinamica');
+            const img = document.getElementById('imgMembreteGaceta');
+
+            if (img) img.src = obtenerRutaMembreteActual();
+
+            if (btnSecA) btnSecA.classList.toggle('active', calibracion.tipoSeccion === 'seccion_a');
+            if (btnSecB) btnSecB.classList.toggle('active', calibracion.tipoSeccion === 'seccion_b');
+            if (btnSecNone) btnSecNone.classList.toggle('active', calibracion.tipoSeccion === 'sin_seccion');
+
+            if (selectFecha) selectFecha.value = calibracion.modoFecha || 'oficial';
+
+            if (overlayFecha) {
+                if (calibracion.modoFecha === 'hoy') {
+                    overlayFecha.style.display = 'flex';
+                    if (calibracion.tipoSeccion === 'sin_seccion') {
+                        overlayFecha.classList.add('sin-seccion');
+                    } else {
+                        overlayFecha.classList.remove('sin-seccion');
+                    }
+                    if (textoFecha) textoFecha.textContent = formatearFechaOficialGaceta();
+                } else {
+                    overlayFecha.style.display = 'none';
+                }
+            }
         }
 
         function cambiarTamanoMaqueta(tamano) {
@@ -1837,18 +1988,21 @@
                     : '<p style="color: #94a3b8; font-style: italic;">[Continúa en columna 1...]</p>';
             }
 
+            const rutaMembrete = obtenerRutaMembreteActual();
+            const esFechaHoy = calibracion.modoFecha === 'hoy';
+            const fechaStr = formatearFechaOficialGaceta(new Date());
+            const esSinSeccion = calibracion.tipoSeccion === 'sin_seccion';
+
             sheet.innerHTML = `
-                <div class="gaceta-masthead" style="margin-bottom: 24px; padding: 14px 10px;">
-                    <div class="gaceta-masthead-topline" style="font-size: 0.88em; padding-bottom: 6px; margin-bottom: 8px;">
-                        <span>REPÚBLICA DE HONDURAS • TEGUCIGALPA, M. D. C.</span>
-                        <span>AÑO CXLVIII • DIARIO OFICIAL LA GACETA • SECCIÓN DE AVISOS Y DECRETOS</span>
-                    </div>
-                    <p class="gaceta-masthead-title" style="font-size: 3.2em; letter-spacing: 6px;">La Gaceta</p>
-                    <p class="gaceta-masthead-sub" style="font-size: 1.05em; letter-spacing: 2px;">DIARIO OFICIAL DE LA REPÚBLICA DE HONDURAS</p>
-                    <div class="gaceta-masthead-meta" style="font-size: 0.85em; padding-top: 6px; margin-top: 8px;">
-                        <span>EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)</span>
-                        <span>FORMATO TABLOIDE OFICIAL (11" × 17" • 279 × 432 MM)</span>
-                    </div>
+                <div class="gaceta-masthead-modal" style="margin-bottom: 22px; position: relative; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden;">
+                    <img src="${rutaMembrete}" alt="Membrete Oficial Diario La Gaceta" style="width: 100%; height: auto; display: block;">
+                    ${esFechaHoy ? `
+                        <div style="position: absolute; bottom: ${esSinSeccion ? '0%' : '13.3%'}; left: 0; width: 100%; height: 6.8%; background: #eaeaea; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-family: 'Times New Roman', serif; font-size: 12.5px; font-weight: 800; color: #111; border-top: 1px solid #111; border-bottom: 1px solid #111; box-sizing: border-box; letter-spacing: 0.3px;">
+                            <span>AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
+                            <span>${fechaStr}</span>
+                            <span>NUM. 37,127</span>
+                        </div>
+                    ` : ''}
                 </div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex: 1;">
                     <div style="border-right: 1.5px solid #d6d3d1; padding-right: 22px;">

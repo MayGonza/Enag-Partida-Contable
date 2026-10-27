@@ -470,7 +470,8 @@
     <div class="container">
         <div class="form-header">
             <h2>Cálculo de Incapacidades y Subsidios IHSS (ENAG)</h2>
-            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal</p>
+            <p style="color: #666; margin: 5px 0 0 0; font-size: 0.95em;">Gestión de Desglose de Incapacidad Temporal
+            </p>
         </div>
 
         <div id="alertError" class="alert-error"></div>
@@ -1062,14 +1063,14 @@
 
             // Guardar PDF
             const nombreArchivo = `Reintegro_IHSS_${nombre.replace(/\s+/g, '_')}.pdf`;
-            
+
             // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
             let userName = localStorage.getItem('enag_username');
             if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
                 userName = firebase.auth().currentUser.email;
             }
             if (!userName) userName = "Usuario Desconocido";
-            
+
             const totalPages = doc.internal.getNumberOfPages();
             for (let i = 1; i <= totalPages; i++) {
                 doc.setPage(i);
