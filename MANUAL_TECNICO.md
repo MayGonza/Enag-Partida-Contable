@@ -128,7 +128,7 @@ Enag-Partida-Contable/
 │   ├── honduras-datepicker.js    # Localización y reglas de días inhábiles
 │   └── soporte.js                # Módulo de emisión y sincronización de tickets TI
 ├── views/                        # Vistas modulares del sistema (HTML)
-│   ├── bienes_nacionales.html    # Control y registro de Bienes Nacionales e impresión de etiquetas
+│   ├── bienes_nacionales.html    # Control y registro de Bienes Nacionales, fichas por usuario y etiquetas QR/Barras
 │   ├── consulta_bien.html        # Consulta pública responsiva de bien al escanear QR
 │   ├── bitacora.html             # Consulta y auditoría de eventos del sistema
 │   ├── comercializacion.html     # Menú de enlace al módulo de cotizaciones

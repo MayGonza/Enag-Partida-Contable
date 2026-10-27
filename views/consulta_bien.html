@@ -78,6 +78,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -376,11 +377,11 @@
             width: 100%;
             height: 100%;
             background: rgba(0, 0, 0, 0.85);
-            display: flex;
+            display: none;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            z-index: 9999;
+            z-index: 99999;
             opacity: 0;
             pointer-events: none;
             transition: opacity 0.3s;
@@ -388,8 +389,9 @@
         }
 
         .scanner-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+            display: flex !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
 
         .scanner-container {
@@ -521,11 +523,15 @@
                         <h4 id="txtCustodio">Funcionario Custodio</h4>
                         <p id="txtCustodioCargo">Cargo del Empleado</p>
                         <p style="font-size: 0.8em; color: #166534; margin-top: 2px;" id="txtDepartamento">Departamento</p>
+                        <a id="linkVerBienesCustodio" href="bienes_nacionales.html" style="display: none; align-items: center; gap: 4px; margin-top: 8px; font-size: 0.82em; font-weight: 700; color: var(--primary); text-decoration: underline;">
+                            📋 Ver ficha con todos los bienes asignados a este custodio →
+                        </a>
                     </div>
                 </div>
 
                 <!-- Observaciones if any -->
-                <div id="boxObservaciones" style="margin-top: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 0.85em; display: none;">
+                <div id="boxObservaciones"
+                    style="margin-top: 15px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px; font-size: 0.85em; display: none;">
                     <strong style="color: var(--primary);">Observaciones:</strong>
                     <p id="txtObservaciones" style="margin-top: 4px; color: #475569;"></p>
                 </div>
@@ -545,11 +551,26 @@
         <!-- Error Card (When asset is not found) -->
         <div class="error-card" id="errorCard">
             <div class="error-icon">⚠️</div>
-            <h3>Bien Nacional No Encontrado</h3>
-            <p id="errorMsg">El código escaneado no corresponde a ningún bien registrado actualmente en el inventario oficial de la Empresa Nacional de Artes Gráficas.</p>
+            <h3>Consulta Oficial de Bien Nacional</h3>
+            <p id="errorMsg">El código escaneado no corresponde a ningún bien registrado actualmente en el inventario
+                oficial de la Empresa Nacional de Artes Gráficas.</p>
+
+            <div style="margin: 15px 0 20px 0;">
+                <label
+                    style="display: block; font-size: 0.82em; font-weight: 700; color: var(--primary); margin-bottom: 6px;">Escriba
+                    el código oficial para consultar:</label>
+                <div style="display: flex; gap: 8px;">
+                    <input type="text" id="inputManualCode" class="form-control" placeholder="Ej: ENAG-BN-2026-0001"
+                        style="flex: 1; padding: 10px 12px; border: 1.5px solid var(--slate-300); border-radius: 8px; font-family: monospace; font-weight: bold;"
+                        onkeydown="if(event.key==='Enter') buscarManualDesdeInput()">
+                    <button type="button" class="btn-action btn-action-primary" style="padding: 10px 18px;"
+                        onclick="buscarManualDesdeInput()">Buscar</button>
+                </div>
+            </div>
+
             <div style="display: flex; flex-direction: column; gap: 10px;">
                 <button type="button" class="btn-action btn-action-primary" onclick="abrirEscanerMovil()">
-                    <span>📷</span> Intentar Escanear Nuevamente
+                    <span>📷</span> Escanear con Cámara del Celular
                 </button>
                 <a href="bienes_nacionales.html" class="btn-action btn-action-outline">
                     <span>🏛️</span> Ir al Inventario General
@@ -569,7 +590,8 @@
                 Enfoque el código QR o código de barras del bien.
             </p>
             <div id="scanner-reader"></div>
-            <button type="button" class="btn-action btn-action-outline" onclick="cerrarEscanerMovil()" style="margin-top: 14px;">
+            <button type="button" class="btn-action btn-action-outline" onclick="cerrarEscanerMovil()"
+                style="margin-top: 14px;">
                 Cancelar
             </button>
         </div>
@@ -599,40 +621,38 @@
             const codigo = params.get('id');
 
             if (codigo) {
-                await buscarYMostrarBien(codigo.trim());
+                await buscarYMostrarBien(codigo);
             } else {
-                mostrarError("No se proporcionó ningún código de bien en el enlace.");
+                mostrarError("Por favor escanee el código QR o ingrese el código oficial del bien para verificar su estado.");
             }
         });
 
-        // Buscar el bien en Firebase, LocalStorage o catálogo de demostración
+        function buscarManualDesdeInput() {
+            const input = document.getElementById('inputManualCode');
+            if (!input) return;
+            const val = input.value.trim();
+            if (!val) {
+                alert("Por favor ingrese un código para consultar.");
+                return;
+            }
+            window.location.search = `?id=${encodeURIComponent(val.toUpperCase())}`;
+        }
+
+        // Buscar el bien en LocalStorage, catálogo demo o Firebase Firestore
         async function buscarYMostrarBien(codigo) {
             let bienEncontrado = null;
+            const codLimpio = (codigo || '').trim().toUpperCase();
 
-            // 1. Intentar buscar en Firebase Firestore
-            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+            // 1. Revisar inmediatamente LocalStorage para respuesta instantánea (< 5ms)
+            const localStr = localStorage.getItem(STORAGE_KEY);
+            if (localStr) {
                 try {
-                    const docRef = await dbFirestore.collection('bienes_nacionales').doc(codigo).get();
-                    if (docRef.exists) {
-                        bienEncontrado = docRef.data();
-                    }
-                } catch (e) {
-                    console.warn("Error consultando Firestore:", e);
-                }
+                    const lista = JSON.parse(localStr);
+                    bienEncontrado = lista.find(b => b.codigo && b.codigo.toUpperCase() === codLimpio);
+                } catch (e) { }
             }
 
-            // 2. Si no se encontró en Firestore, buscar en LocalStorage
-            if (!bienEncontrado) {
-                const localStr = localStorage.getItem(STORAGE_KEY);
-                if (localStr) {
-                    try {
-                        const lista = JSON.parse(localStr);
-                        bienEncontrado = lista.find(b => b.codigo.toUpperCase() === codigo.toUpperCase());
-                    } catch (e) {}
-                }
-            }
-
-            // 3. Fallback al catálogo de muestra de la ENAG
+            // 2. Si no está en LocalStorage, revisar catálogo de demostración de la ENAG
             if (!bienEncontrado) {
                 const demo = [
                     {
@@ -708,12 +728,31 @@
                         observaciones: "Equipo asignado al procesamiento contable y retenciones de impuestos SAR."
                     }
                 ];
-                bienEncontrado = demo.find(b => b.codigo.toUpperCase() === codigo.toUpperCase());
+                bienEncontrado = demo.find(b => b.codigo.toUpperCase() === codLimpio);
             }
 
+            // Si se encontró en caché local o demo, renderizar de inmediato
             if (bienEncontrado) {
                 renderizarBien(bienEncontrado);
-            } else {
+            }
+
+            // 3. Consultar Firebase Firestore con timeout defensivo de 3 segundos
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const fetchDoc = dbFirestore.collection('bienes_nacionales').doc(codLimpio).get();
+                    const timeoutP = new Promise((_, rej) => setTimeout(() => rej(new Error('timeout')), 3000));
+                    const docRef = await Promise.race([fetchDoc, timeoutP]);
+                    if (docRef && docRef.exists) {
+                        bienEncontrado = docRef.data();
+                        renderizarBien(bienEncontrado);
+                        return;
+                    }
+                } catch (e) {
+                    console.warn("Consulta Firestore diferida:", e.message || e);
+                }
+            }
+
+            if (!bienEncontrado) {
                 mostrarError(`El bien con código "${codigo}" no fue encontrado en la base de datos.`);
             }
         }
@@ -737,6 +776,16 @@
             document.getElementById('txtCustodio').textContent = b.custodio || 'Sin Asignar';
             document.getElementById('txtCustodioCargo').textContent = b.custodioCargo || 'Funcionario Responsable';
             document.getElementById('txtDepartamento').textContent = b.departamento || 'ENAG';
+
+            const linkCust = document.getElementById('linkVerBienesCustodio');
+            if (linkCust) {
+                if (b.custodio && b.custodio.trim() !== '' && b.custodio !== 'Sin Asignar') {
+                    linkCust.href = `bienes_nacionales.html?custodio=${encodeURIComponent(b.custodio.trim())}`;
+                    linkCust.style.display = 'inline-flex';
+                } else {
+                    linkCust.style.display = 'none';
+                }
+            }
 
             // Fotografía o Icono
             if (b.foto) {
@@ -778,7 +827,12 @@
 
         // Escáner Móvil usando cámara del teléfono
         async function abrirEscanerMovil() {
-            document.getElementById('scannerOverlay').classList.add('active');
+            const overlay = document.getElementById('scannerOverlay');
+            if (overlay) {
+                overlay.style.display = 'flex';
+                void overlay.offsetHeight;
+                overlay.classList.add('active');
+            }
 
             if (typeof Html5Qrcode !== 'undefined') {
                 try {
@@ -803,7 +857,7 @@
                             }
                             window.location.search = `?id=${encodeURIComponent(cod)}`;
                         },
-                        (err) => {}
+                        (err) => { }
                     );
                 } catch (e) {
                     console.warn("No se pudo iniciar cámara en móvil:", e);
@@ -818,10 +872,18 @@
                 try {
                     await scannerInstancia.stop();
                     scannerInstancia.clear();
-                } catch (e) {}
+                } catch (e) { }
                 scannerInstancia = null;
             }
-            document.getElementById('scannerOverlay').classList.remove('active');
+            const overlay = document.getElementById('scannerOverlay');
+            if (overlay) {
+                overlay.classList.remove('active');
+                setTimeout(() => {
+                    if (!overlay.classList.contains('active')) {
+                        overlay.style.display = 'none';
+                    }
+                }, 200);
+            }
         }
     </script>
 

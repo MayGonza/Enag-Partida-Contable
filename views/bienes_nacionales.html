@@ -556,6 +556,12 @@
             color: #0284c7;
         }
 
+        .btn-icon.user-btn:hover {
+            background: #eef2ff;
+            color: #4338ca;
+            border-color: #4338ca;
+        }
+
         .btn-icon.edit-btn:hover {
             background: var(--warning-light);
             color: var(--warning);
@@ -587,22 +593,24 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 33, 71, 0.65);
+            background: rgba(0, 33, 71, 0.75);
             backdrop-filter: blur(8px);
-            display: flex;
+            -webkit-backdrop-filter: blur(8px);
+            display: none;
             align-items: center;
             justify-content: center;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.3s ease;
-            z-index: 1000;
+            transition: opacity 0.25s ease;
+            z-index: 10000;
             padding: 20px;
             overflow-y: auto;
         }
 
         .modal-overlay.active {
-            opacity: 1;
-            pointer-events: auto;
+            display: flex !important;
+            opacity: 1 !important;
+            pointer-events: auto !important;
         }
 
         .modal-card {
@@ -873,10 +881,34 @@
             flex-shrink: 0;
         }
 
-        .label-qr-canvas {
-            border: 1px solid #ddd;
-            background: white;
+        .label-qr-box {
+            width: 76px;
+            height: 76px;
+            background: #ffffff;
+            border: 1px solid #000000;
             padding: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-sizing: border-box;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .label-qr-box svg {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .physical-label.size-compact .label-qr-box {
+            width: 58px;
+            height: 58px;
+        }
+
+        .physical-label.size-large .label-qr-box {
+            width: 95px;
+            height: 95px;
         }
 
         .label-info-column {
@@ -1003,6 +1035,155 @@
             color: #002147;
         }
 
+        /* Enlace interactivo al custodio en la tabla */
+        .custodio-link-btn {
+            color: #002147;
+            font-weight: 700;
+            font-size: 0.95em;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        .custodio-link-btn:hover {
+            background: #e6eef7;
+            color: #003366;
+            text-decoration: underline;
+        }
+
+        /* Estilos del Módulo Ficha de Bienes por Custodio/Usuario */
+        .user-selector-bar {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .user-selector-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+            min-width: 280px;
+        }
+
+        .user-selector-group label {
+            font-weight: 700;
+            font-size: 0.9em;
+            color: var(--primary);
+            white-space: nowrap;
+        }
+
+        .user-selector-group select {
+            flex: 1;
+            padding: 9px 12px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            font-weight: 600;
+            font-size: 0.92em;
+            color: #1e293b;
+            background: white;
+            cursor: pointer;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .user-summary-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(190px, 1fr));
+            gap: 12px;
+            margin-bottom: 22px;
+        }
+
+        .user-summary-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 2px 4px rgba(0, 33, 71, 0.04);
+            border-left: 4px solid var(--primary);
+        }
+
+        .user-summary-card .icon-box {
+            width: 42px;
+            height: 42px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3em;
+            background: #f0f4f8;
+            color: var(--primary);
+            flex-shrink: 0;
+        }
+
+        .user-summary-card .info-box {
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .user-summary-card .card-title {
+            font-size: 0.72em;
+            text-transform: uppercase;
+            font-weight: 700;
+            color: #64748b;
+            letter-spacing: 0.5px;
+        }
+
+        .user-summary-card .card-val {
+            font-size: 1.05em;
+            font-weight: 800;
+            color: #002147;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .ficha-user-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+            font-size: 0.86em;
+        }
+
+        .ficha-user-table th, .ficha-user-table td {
+            border: 1px solid #cbd5e1;
+            padding: 8px 10px;
+            text-align: left;
+        }
+
+        .ficha-user-table th {
+            background: #002147;
+            color: white;
+            font-weight: 700;
+            font-size: 0.88em;
+            text-align: center;
+        }
+
+        .ficha-user-table tfoot td {
+            background: #f1f5f9;
+            font-weight: 800;
+            color: #002147;
+        }
+
+        .ficha-user-table tbody tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
         /* Camera Scanner Modal Styles */
         #scanner-video-region {
             width: 100%;
@@ -1024,69 +1205,127 @@
             text-align: center;
         }
 
-        /* Batch Sheet Container for Printing */
-        #batch-print-container {
-            display: none;
+        /* ========================================================
+           PRINT MEDIA QUERIES (IMPRESIÓN LIMPIA DE ETIQUETAS Y FICHAS)
+           ======================================================== */
+        #print-zone {
+            display: none !important;
         }
 
-        /* ========================================================
-           PRINT MEDIA QUERIES (IMPRESIÓN LIMPIA DE ETIQUETAS)
-           ======================================================== */
         @media print {
-            body {
-                background: white !important;
-                padding: 0 !important;
+            /* 1. Márgenes limpios y fondo blanco */
+            @page {
+                margin: 0;
+                size: auto;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                color: #000000 !important;
                 margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: auto !important;
             }
 
             body::before {
                 display: none !important;
             }
 
-            .top-navbar, .container, .modal-overlay, #scannerModal, #formModal, #fichaModal {
+            /* 2. Ocultar todos los elementos de la interfaz interactiva */
+            .top-navbar,
+            .container,
+            .modal-overlay,
+            #scannerModal,
+            #formModal,
+            #etiquetaModal,
+            #fichaModal,
+            #fichaUsuarioModal,
+            #batch-print-container,
+            .swal2-container {
                 display: none !important;
             }
 
-            /* Contenedor de impresión individual activo */
-            body.printing-single #printable-single-label {
+            /* 3. Mostrar exclusivamente la zona de impresión designada */
+            #print-zone {
                 display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                margin: 0;
-                padding: 0;
-                width: 100%;
-                background: white;
+                position: absolute !important;
+                left: 0 !important;
+                top: 0 !important;
+                width: 100% !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                background: #ffffff !important;
             }
 
-            /* Contenedor de impresión múltiple activo */
-            body.printing-batch #batch-print-container {
-                display: block !important;
-                position: absolute;
-                left: 0;
-                top: 0;
-                width: 100%;
-                background: white;
-                margin: 0;
-                padding: 10mm;
+            /* Impresión de etiqueta individual */
+            .print-single-wrapper {
+                display: flex !important;
+                align-items: flex-start !important;
+                justify-content: flex-start !important;
+                padding: 2mm !important;
+                margin: 0 !important;
             }
 
-            .batch-grid-sheet {
+            .print-single-wrapper .physical-label {
+                box-shadow: none !important;
+                border: 2px solid #000000 !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin: 0 !important;
+            }
+
+            /* Impresión de lote de etiquetas (Grid) */
+            .print-batch-wrapper {
+                display: block !important;
+                width: 100% !important;
+                padding: 6mm !important;
+            }
+
+            .print-batch-grid {
                 display: grid !important;
                 grid-template-columns: repeat(2, 1fr) !important;
                 gap: 8mm !important;
                 page-break-inside: auto !important;
             }
 
-            .physical-label {
+            .print-batch-grid .physical-label {
                 box-shadow: none !important;
-                border: 1.5px solid #000 !important;
+                border: 1.5px solid #000000 !important;
                 page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin: 0 !important;
             }
 
-            @page {
-                margin: 0;
-                size: auto;
+            /* Impresión de Ficha Técnica Oficial y Ficha por Usuario */
+            .print-ficha-wrapper {
+                display: block !important;
+                width: 100% !important;
+                padding: 8mm 12mm !important;
+                background: #ffffff !important;
+            }
+
+            .print-ficha-wrapper .ficha-document {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                width: 100% !important;
+            }
+
+            .print-ficha-user-wrapper .ficha-user-table {
+                font-size: 8pt !important;
+                page-break-inside: auto !important;
+            }
+
+            .print-ficha-user-wrapper .ficha-user-table tr {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .print-ficha-user-wrapper .signatures-grid {
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+                margin-top: 35px !important;
             }
         }
 
@@ -1143,6 +1382,9 @@
             <div class="header-actions">
                 <button type="button" class="btn btn-outline" onclick="abrirModalEscaner()" title="Escanear con cámara o pistola lectora">
                     <span>📷</span> Escanear QR / Barra
+                </button>
+                <button type="button" class="btn btn-outline" onclick="abrirModalFichaUsuario()" title="Ver ficha y acta oficial de todos los bienes asignados por funcionario/custodio">
+                    <span>👥</span> Fichas por Custodio (<span id="countCustodiosBadge">0</span>)
                 </button>
                 <button type="button" class="btn btn-outline" onclick="imprimirEtiquetasSeleccionadas()" id="btnBatchPrint" title="Imprimir etiquetas de bienes seleccionados">
                     <span>🖨️</span> Imprimir Selección (<span id="countSelectedBadge">0</span>)
@@ -1269,7 +1511,7 @@
                         <th>Custodio y Ubicación</th>
                         <th>Estado</th>
                         <th>Valor (L.)</th>
-                        <th style="width: 140px; text-align: center;">Acciones</th>
+                        <th style="width: 175px; text-align: center;">Acciones</th>
                     </tr>
                 </thead>
                 <tbody id="tbodyBienes">
@@ -1507,7 +1749,7 @@
                             <!-- Cuerpo: QR + Info -->
                             <div class="label-body-grid">
                                 <div class="label-qr-column">
-                                    <canvas id="qrCanvasEtiqueta" class="label-qr-canvas"></canvas>
+                                    <div id="qrBoxEtiqueta" class="label-qr-box"></div>
                                     <span style="font-size: 7px; font-weight: bold; margin-top: 2px;">ESCANEÉ AQUÍ</span>
                                 </div>
                                 <div class="label-info-column">
@@ -1532,17 +1774,26 @@
                     </div>
                 </div>
 
-                <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px; border-radius: 8px; font-size: 0.85em; color: #0369a1;">
-                    <strong>ℹ️ Al escanear este código QR:</strong> Cualquier teléfono o lector abrirá la ficha pública de verificación del bien con sus datos oficiales y estado activo.
+                <div style="background: #f0f9ff; border: 1px solid #bae6fd; padding: 12px; border-radius: 8px; font-size: 0.85em; color: #0369a1; margin-bottom: 10px;">
+                    <strong>ℹ️ Al escanear este código QR con cualquier teléfono celular:</strong><br>
+                    Abrirá inmediatamente la ficha pública oficial de verificación del bien.<br>
+                    <div style="margin-top: 5px; font-size: 0.82em; word-break: break-all; color: #002147; font-family: Consolas, monospace; background: #e0f2fe; padding: 4px 8px; border-radius: 4px;">
+                        🔗 <span id="txtUrlQrMostrada"></span>
+                    </div>
                 </div>
             </div>
-            <div class="modal-footer">
+            <div class="modal-footer" style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
                 <button type="button" class="btn btn-outline" onclick="abrirConsultaDesdeEtiqueta()" title="Probar vista que ve el celular al escanear">
                     <span>📱</span> Probar Escaneo Móvil
                 </button>
-                <button type="button" class="btn btn-primary" onclick="ejecutarImpresionIndividual()">
-                    <span>🖨️</span> Imprimir Etiqueta
-                </button>
+                <div style="display: flex; gap: 8px;">
+                    <button type="button" class="btn btn-outline" onclick="imprimirEtiquetaEnVentanaNueva()" title="Abrir en ventana emergente limpia para impresoras térmicas (Zebra/Xprinter)">
+                        <span>🗗</span> Ventana Térmica
+                    </button>
+                    <button type="button" class="btn btn-primary" onclick="ejecutarImpresionIndividual()" title="Imprimir etiqueta">
+                        <span>🖨️</span> Imprimir Etiqueta
+                    </button>
+                </div>
             </div>
         </div>
     </div>
@@ -1569,7 +1820,7 @@
                             </div>
                         </div>
                         <div style="text-align: right;">
-                            <canvas id="fichaQrCanvas" style="border: 1px solid #cbd5e1; padding: 2px;"></canvas>
+                            <div id="fichaQrBox" class="label-qr-box" style="width: 82px; height: 82px; margin-left: auto;"></div>
                             <div style="font-size: 0.72em; font-weight: bold; color: #002147; margin-top: 3px;" id="fichaQrText"></div>
                         </div>
                     </div>
@@ -1711,10 +1962,198 @@
         </div>
     </div>
 
-    <!-- Contenedor oculto para impresión por lotes (Batch Print) -->
-    <div id="batch-print-container">
-        <div id="batchGridSheet" class="batch-grid-sheet"></div>
+    <!-- ========================================================
+         MODAL 5: FICHA Y ACTA DE BIENES ASIGNADOS POR USUARIO / CUSTODIO
+         ======================================================== -->
+    <div id="fichaUsuarioModal" class="modal-overlay">
+        <div class="modal-card" style="max-width: 980px;">
+            <div class="modal-header">
+                <h3><span>👥</span> Ficha y Acta de Bienes Asignados por Funcionario</h3>
+                <button type="button" class="modal-close-btn" onclick="cerrarModal('fichaUsuarioModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <!-- Selector del custodio y acciones rápidas (No imprimible) -->
+                <div class="user-selector-bar">
+                    <div class="user-selector-group">
+                        <label for="selectFichaCustodio">👤 Funcionario Custodio:</label>
+                        <select id="selectFichaCustodio" class="form-control" onchange="seleccionarCustodioFicha(this.value)">
+                            <!-- Opciones cargadas dinámicamente -->
+                        </select>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn btn-outline btn-sm" onclick="exportarFichaUsuarioExcel()" title="Descargar lista de este funcionario en Excel">
+                            <span>📊</span> Excel
+                        </button>
+                        <button type="button" class="btn btn-primary btn-sm" onclick="descargarFichaUsuarioPDF()" title="Descargar Acta y Ficha Oficial en PDF">
+                            <span>📄</span> PDF Oficial
+                        </button>
+                        <button type="button" class="btn btn-accent btn-sm" onclick="imprimirFichaUsuario()" title="Imprimir Ficha Oficial">
+                            <span>🖨️</span> Imprimir Ficha
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Tarjetas métricas rápidas del custodio -->
+                <div class="user-summary-cards">
+                    <div class="user-summary-card">
+                        <div class="icon-box">👤</div>
+                        <div class="info-box">
+                            <span class="card-title">Funcionario Responsable</span>
+                            <span class="card-val" id="cardUsrNombre">—</span>
+                        </div>
+                    </div>
+                    <div class="user-summary-card">
+                        <div class="icon-box">💼</div>
+                        <div class="info-box">
+                            <span class="card-title">Cargo / Puesto</span>
+                            <span class="card-val" id="cardUsrCargo">—</span>
+                        </div>
+                    </div>
+                    <div class="user-summary-card">
+                        <div class="icon-box">📦</div>
+                        <div class="info-box">
+                            <span class="card-title">Total Bienes Asignados</span>
+                            <span class="card-val" id="cardUsrTotalBienes">0</span>
+                        </div>
+                    </div>
+                    <div class="user-summary-card">
+                        <div class="icon-box">💰</div>
+                        <div class="info-box">
+                            <span class="card-title">Valor Total en Custodia</span>
+                            <span class="card-val" style="color: #059669;" id="cardUsrValorTotal">L. 0.00</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DOCUMENTO OFICIAL IMPRIMIBLE -->
+                <div class="ficha-document" id="fichaUsuarioImprimible">
+                    <!-- Membrete Oficial -->
+                    <div class="ficha-header">
+                        <div style="display: flex; align-items: center; gap: 15px;">
+                            <img src="../assets/logo.png" alt="ENAG" style="width: 75px; height: auto;">
+                            <div>
+                                <h2 style="font-size: 1.15em; color: #002147; text-transform: uppercase; margin: 0;">República de Honduras</h2>
+                                <h3 style="font-size: 0.98em; color: #334155; margin: 2px 0;">Empresa Nacional de Artes Gráficas (ENAG)</h3>
+                                <p style="font-size: 0.82em; color: #64748b; font-weight: 600; margin: 0;">Dirección de Administración y Finanzas • Departamento de Bienes Nacionales</p>
+                            </div>
+                        </div>
+                        <div style="text-align: right; font-size: 0.82em; color: #334155; line-height: 1.4;">
+                            <div><strong>FOLIO:</strong> <span id="fuFolio">ACTA-BN-2026-000</span></div>
+                            <div><strong>FECHA:</strong> <span id="fuFechaEmision">--/--/----</span></div>
+                            <div style="color: #059669; font-weight: bold;">DOCUMENTO OFICIAL</div>
+                        </div>
+                    </div>
+
+                    <!-- Título del documento -->
+                    <div style="text-align: center; margin-bottom: 18px;">
+                        <h3 style="font-size: 1.1em; color: #002147; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px;">
+                            ACTA GENERAL DE ASIGNACIÓN Y HOJA DE RESPONSABILIDAD DE BIENES NACIONALES
+                        </h3>
+                        <p style="font-size: 0.83em; color: #64748b; margin: 0;">
+                            Inventario Oficial de Activos Fijos del Estado Asignados a Cargo de Funcionario / Empleado
+                        </p>
+                    </div>
+
+                    <!-- Datos del Funcionario Responsable -->
+                    <table class="ficha-table" style="margin-bottom: 15px;">
+                        <tr>
+                            <th style="width: 22%;">Funcionario Custodio:</th>
+                            <td style="width: 28%;"><strong id="fuNombre" style="color: #002147; font-size: 1.05em;"></strong></td>
+                            <th style="width: 22%;">Cargo / Puesto:</th>
+                            <td style="width: 28%;" id="fuCargo"></td>
+                        </tr>
+                        <tr>
+                            <th>Departamento / Área:</th>
+                            <td id="fuDepartamento"></td>
+                            <th>Ubicación Principal:</th>
+                            <td id="fuUbicacion"></td>
+                        </tr>
+                        <tr>
+                            <th>Total Bienes a Cargo:</th>
+                            <td><strong id="fuTotalBienesTxt" style="color: #002147;"></strong></td>
+                            <th>Valor Total en Custodia:</th>
+                            <td><strong id="fuValorTotalTxt" style="color: #059669; font-size: 1.05em;"></strong></td>
+                        </tr>
+                    </table>
+
+                    <!-- Tabla Detallada de Bienes Asignados -->
+                    <div style="overflow-x: auto;">
+                        <table class="ficha-user-table" id="tablaBienesCustodio">
+                            <thead>
+                                <tr>
+                                    <th style="width: 35px;">#</th>
+                                    <th style="width: 140px;">Código Inventario</th>
+                                    <th>Denominación del Bien</th>
+                                    <th>Categoría</th>
+                                    <th>Marca / Modelo</th>
+                                    <th>N° Serie</th>
+                                    <th style="width: 80px; text-align: center;">Estado</th>
+                                    <th>Ubicación</th>
+                                    <th style="width: 100px; text-align: right;">Valor (L.)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tbodyBienesCustodio">
+                                <!-- Filas generadas dinámicamente -->
+                            </tbody>
+                            <tfoot>
+                                <tr>
+                                    <td colspan="8" style="text-align: right; font-weight: bold; padding: 10px;">
+                                        TOTAL GENERAL EN CUSTODIA (<span id="fuFooterTotalCount">0</span> BIENES):
+                                    </td>
+                                    <td style="text-align: right; font-weight: 800; color: #059669; font-size: 1.05em; padding: 10px;" id="fuFooterTotalValor">
+                                        L. 0.00
+                                    </td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+
+                    <!-- Cláusula de Responsabilidad -->
+                    <div style="border: 1px solid #cbd5e1; background: #f8fafc; padding: 12px 14px; border-radius: 6px; font-size: 0.77em; color: #334155; line-height: 1.45; text-align: justify; margin: 18px 0 25px 0;">
+                        <strong>CLÁUSULA DE RESPONSABILIDAD Y CUSTODIA INDIVIDUAL DE BIENES NACIONALES:</strong>
+                        El suscrito funcionario/empleado declara recibir a su entera satisfacción, bajo su directa guarda, conservación y uso oficial los bienes nacionales del Estado detallados en el cuadro precedente. Se compromete solemnemente a velar por su debido cuidado, seguridad y destino exclusivo para las labores oficiales de la Empresa Nacional de Artes Gráficas (ENAG), conforme a las Disposiciones Generales del Presupuesto, la Ley Orgánica de Bienes Nacionales y las Normas de Control Interno del Tribunal Superior de Cuentas (TSC). Queda terminantemente prohibido el traslado, préstamo, cesión o salida del bien fuera de las instalaciones sin la respectiva autorización formal por escrito de la Jefatura de Bienes Nacionales. En caso de daño por negligencia comprobada, extravío o hurto no notificado formalmente, se procederá conforme a la legislación aplicable deduciendo las responsabilidades administrativas y civiles correspondientes.
+                    </div>
+
+                    <!-- Firmas Oficiales en 3 columnas -->
+                    <div class="signatures-grid" style="margin-top: 35px;">
+                        <div class="sig-box">
+                            <div class="sig-title" id="fuFirmaNombre">Funcionario Custodio</div>
+                            <div style="font-size: 0.8em; color: #475569; margin-top: 2px;" id="fuFirmaCargo">Funcionario Responsable</div>
+                            <div style="font-size: 0.75em; color: #64748b; margin-top: 4px;">DNI: _______________________</div>
+                            <div style="font-size: 0.75em; color: #94a3b8; margin-top: 2px;">Firma y Huella de Recepción</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-title">Encargado de Bienes Nacionales</div>
+                            <div style="font-size: 0.8em; color: #475569; margin-top: 2px;">Depto. de Bienes Nacionales</div>
+                            <div style="font-size: 0.75em; color: #64748b; margin-top: 4px;">ENAG • DGBN</div>
+                            <div style="font-size: 0.75em; color: #94a3b8; margin-top: 2px;">Firma y Sello Oficial</div>
+                        </div>
+                        <div class="sig-box">
+                            <div class="sig-title">Gerencia Administrativa y Financiera</div>
+                            <div style="font-size: 0.8em; color: #475569; margin-top: 2px;">Dirección Administrativa</div>
+                            <div style="font-size: 0.75em; color: #64748b; margin-top: 4px;">Visto Bueno Institucional</div>
+                            <div style="font-size: 0.75em; color: #94a3b8; margin-top: 2px;">Firma y Sello de Autorización</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline" onclick="cerrarModal('fichaUsuarioModal')">Cerrar</button>
+                <button type="button" class="btn btn-outline" onclick="exportarFichaUsuarioExcel()">
+                    <span>📊</span> Exportar a Excel
+                </button>
+                <button type="button" class="btn btn-primary" onclick="descargarFichaUsuarioPDF()">
+                    <span>📄</span> Descargar PDF Oficial
+                </button>
+                <button type="button" class="btn btn-accent" onclick="imprimirFichaUsuario()">
+                    <span>🖨️</span> Imprimir Ficha
+                </button>
+            </div>
+        </div>
     </div>
+
+    <!-- Zona Universal de Impresión Limpia (Single Label, Batch Print & Ficha Técnica) -->
+    <div id="print-zone" class="print-zone"></div>
 
 
     <!-- ========================================================
@@ -1747,12 +2186,15 @@
          LÓGICA DEL SISTEMA DE BIENES NACIONALES
          ======================================================== -->
     <script>
-        // Clave en LocalStorage
+        // Constantes globales de configuración
         const STORAGE_KEY = 'enag_bienes_nacionales';
+        const URL_PRODUCCION_ENAG = "https://sistemagestionenag.web.app";
 
         // Estado global en memoria
         let listaBienes = [];
         let bienSeleccionadoActual = null;
+        let custodioSeleccionadoActual = null;
+        let listaCustodiosCache = [];
         let bienesSeleccionadosIds = new Set();
         let html5QrScannerInstancia = null;
         let editandoIndex = -1;
@@ -1774,11 +2216,12 @@
             }
         }
 
-        // Revisar si viene parámetro ?id=... o ?accion=nuevo en la URL
+        // Revisar si viene parámetro ?id=..., ?accion=nuevo o ?custodio=... en la URL
         function revisarParametroURL() {
             const params = new URLSearchParams(window.location.search);
             const id = params.get('id');
             const accion = params.get('accion');
+            const custodio = params.get('custodio');
 
             if (id) {
                 const bien = listaBienes.find(b => b.codigo.toUpperCase() === id.toUpperCase());
@@ -1795,46 +2238,57 @@
                 }
             } else if (accion === 'nuevo') {
                 abrirModalRegistro();
+            } else if (custodio) {
+                abrirModalFichaUsuario(decodeURIComponent(custodio));
             }
         }
 
-        // Carga inicial de datos (Firestore con fallback a LocalStorage y Demo Data)
+        // Carga de datos optimista (inmediata desde LocalStorage/Demo, sincronización background con Firestore)
         async function cargarBienes() {
             let datos = [];
 
-            // 1. Intentar cargar desde Firebase Firestore si está disponible
-            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+            // 1. Cargar inmediatamente desde LocalStorage
+            const localStr = localStorage.getItem(STORAGE_KEY);
+            if (localStr) {
                 try {
-                    const snap = await dbFirestore.collection('bienes_nacionales').orderBy('fecha', 'desc').get();
-                    if (!snap.empty) {
-                        datos = snap.docs.map(doc => ({ idDoc: doc.id, ...doc.data() }));
-                    }
+                    datos = JSON.parse(localStr);
                 } catch (e) {
-                    console.warn("No se pudo conectar a Firestore, cargando datos locales:", e);
+                    console.error("Error al parsear datos locales", e);
                 }
             }
 
-            // 2. Si no hay en Firestore, revisar LocalStorage
-            if (!datos || datos.length === 0) {
-                const localStr = localStorage.getItem(STORAGE_KEY);
-                if (localStr) {
-                    try {
-                        datos = JSON.parse(localStr);
-                    } catch (e) {
-                        console.error("Error al parsear datos locales", e);
-                    }
-                }
-            }
-
-            // 3. Si aún está vacío, cargar catálogo de demostración de la ENAG
+            // 2. Si no hay datos en LocalStorage, cargar catálogo de demostración de la ENAG
             if (!datos || datos.length === 0) {
                 datos = obtenerDatosEjemploENAG();
                 guardarEnStorageLocal(datos);
             }
 
+            // Renderizar inmediatamente para evitar cualquier retraso
             listaBienes = datos;
             renderizarTabla(listaBienes);
             actualizarMetricas(listaBienes);
+            actualizarBadgesCustodios();
+
+            // 3. Sincronizar en segundo plano con Firestore (con timeout defensivo de 3.5 segundos)
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const fetchPromise = dbFirestore.collection('bienes_nacionales').orderBy('fecha', 'desc').get();
+                    const timeoutPromise = new Promise((_, reject) => setTimeout(() => reject(new Error('Firestore timeout')), 3500));
+                    const snap = await Promise.race([fetchPromise, timeoutPromise]);
+                    if (snap && !snap.empty) {
+                        const remotos = snap.docs.map(doc => ({ idDoc: doc.id, ...doc.data() }));
+                        if (remotos && remotos.length > 0) {
+                            listaBienes = remotos;
+                            guardarEnStorageLocal(listaBienes);
+                            renderizarTabla(listaBienes);
+                            actualizarMetricas(listaBienes);
+                            actualizarBadgesCustodios();
+                        }
+                    }
+                } catch (e) {
+                    console.warn("Sincronización en segundo plano:", e.message || e);
+                }
+            }
         }
 
         // Catálogo de ejemplo con bienes representativos de la ENAG
@@ -2019,7 +2473,9 @@
                     </td>
                     <td>
                         <div class="asset-title-block">
-                            <strong style="color: #002147; font-size: 0.95em;">👤 ${escapeHTML(b.custodio)}</strong>
+                            <a href="javascript:void(0)" class="custodio-link-btn" title="Ver ficha con todos los bienes asignados a ${escapeHTML(b.custodio)}" onclick="abrirModalFichaUsuario('${escapeHTML(b.custodio)}')">
+                                👤 ${escapeHTML(b.custodio)}
+                            </a>
                             <span class="asset-subtitle">📍 ${escapeHTML(b.departamento || 'Sin asignar')}</span>
                         </div>
                     </td>
@@ -2034,8 +2490,11 @@
                             <button type="button" class="btn-icon tag-btn" title="Imprimir Etiqueta (QR + Barra)" onclick="abrirModalEtiqueta('${b.codigo}')">
                                 🏷️
                             </button>
-                            <button type="button" class="btn-icon view-btn" title="Ver Ficha Técnica Oficial" onclick="abrirModalFicha('${b.codigo}')">
+                            <button type="button" class="btn-icon view-btn" title="Ver Ficha Técnica Individual del Bien" onclick="abrirModalFicha('${b.codigo}')">
                                 📄
+                            </button>
+                            <button type="button" class="btn-icon user-btn" title="Ver Ficha de Todos los Bienes Asignados de este Custodio" onclick="abrirModalFichaUsuario('${escapeHTML(b.custodio)}')">
+                                👥
                             </button>
                             <button type="button" class="btn-icon edit-btn" title="Editar datos del bien" onclick="abrirModalEditar('${b.codigo}')">
                                 ✏️
@@ -2332,6 +2791,7 @@
             cerrarModal('formModal');
             filtrarBienes();
             actualizarMetricas(listaBienes);
+            actualizarBadgesCustodios();
 
             // Preguntar si desea imprimir la etiqueta ahora mismo
             if (typeof Swal !== 'undefined') {
@@ -2375,6 +2835,7 @@
 
             filtrarBienes();
             actualizarMetricas(listaBienes);
+            actualizarBadgesCustodios();
         }
 
         function guardarEnStorageLocal(datos) {
@@ -2389,99 +2850,243 @@
         // MODAL DE ETIQUETA (PREVIEW Y RENDERIZADO QR / BARRA)
         // ========================================================
         function abrirModalEtiqueta(codigo) {
-            const bien = listaBienes.find(b => b.codigo === codigo);
-            if (!bien) return;
-
-            bienSeleccionadoActual = bien;
-
-            // Rellenar datos en la etiqueta física
-            document.getElementById('lblCodigo').textContent = bien.codigo;
-            document.getElementById('lblDenominacion').textContent = (bien.denominacion || '').toUpperCase();
-            document.getElementById('lblSerie').textContent = bien.serie || 'S/N';
-            document.getElementById('lblCustodio').textContent = bien.custodio || 'Sin Asignar';
-            document.getElementById('lblUbicacion').textContent = bien.departamento || 'ENAG';
-
-            // 1. Generar Código de Barras (Code 128) usando JsBarcode
             try {
-                JsBarcode("#barcodeSvgEtiqueta", bien.codigo, {
-                    format: "CODE128",
-                    width: 1.8,
-                    height: 38,
-                    displayValue: false, // El código ya está visible arriba
-                    lineColor: "#000000",
-                    margin: 0
-                });
-            } catch (e) {
-                console.error("Error generando código de barras:", e);
+                if (!codigo) {
+                    alert("Código de bien no especificado.");
+                    return;
+                }
+
+                const codBuscado = (codigo || '').trim().toUpperCase();
+                let bien = listaBienes.find(b => (b.codigo || '').toUpperCase() === codBuscado);
+
+                // Fallback 1: Buscar en LocalStorage si aún no estaba en listaBienes
+                if (!bien) {
+                    try {
+                        const localData = JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]');
+                        bien = localData.find(b => (b.codigo || '').toUpperCase() === codBuscado);
+                    } catch (e) {}
+                }
+
+                // Fallback 2: Buscar en catálogo de demostración
+                if (!bien) {
+                    const demo = obtenerDatosEjemploENAG();
+                    bien = demo.find(b => (b.codigo || '').toUpperCase() === codBuscado);
+                }
+
+                if (!bien) {
+                    console.warn("Bien no encontrado para etiqueta:", codigo);
+                    alert("⚠️ No se encontró la información del bien: " + codigo);
+                    return;
+                }
+
+                bienSeleccionadoActual = bien;
+
+                // Rellenar datos en la etiqueta física (con verificación de elementos)
+                const elCod = document.getElementById('lblCodigo');
+                const elDen = document.getElementById('lblDenominacion');
+                const elSer = document.getElementById('lblSerie');
+                const elCus = document.getElementById('lblCustodio');
+                const elUbi = document.getElementById('lblUbicacion');
+
+                if (elCod) elCod.textContent = bien.codigo || '';
+                if (elDen) elDen.textContent = (bien.denominacion || '').toUpperCase();
+                if (elSer) elSer.textContent = bien.serie || 'S/N';
+                if (elCus) elCus.textContent = bien.custodio || 'Sin Asignar';
+                if (elUbi) elUbi.textContent = bien.departamento ? (bien.departamento + (bien.ubicacion ? ' • ' + bien.ubicacion : '')) : (bien.ubicacion || 'ENAG');
+
+                // 1. Generar Código de Barras (Code 128) usando JsBarcode (Vectorial SVG)
+                try {
+                    if (typeof JsBarcode === 'function') {
+                        JsBarcode("#barcodeSvgEtiqueta", bien.codigo, {
+                            format: "CODE128",
+                            width: 1.8,
+                            height: 38,
+                            displayValue: false,
+                            lineColor: "#000000",
+                            margin: 0
+                        });
+                    }
+                } catch (e) {
+                    console.error("Error generando código de barras:", e);
+                }
+
+                // 2. Generar Código QR Vectorial (SVG) con margen ISO de 4 módulos
+                const targetUrl = construirUrlConsulta(bien.codigo);
+                renderizarQREnElemento(targetUrl, 'qrBoxEtiqueta');
+
+                // Mostrar el texto de la URL en la ficha informativa
+                const txtUrlEl = document.getElementById('txtUrlQrMostrada');
+                if (txtUrlEl) {
+                    txtUrlEl.textContent = targetUrl;
+                }
+
+                abrirModal('etiquetaModal');
+            } catch (err) {
+                console.error("Error al abrir modal de etiqueta:", err);
+                alert("Ocurrió un error al preparar la etiqueta: " + err.message);
             }
-
-            // 2. Generar Código QR que apunta a la consulta pública
-            // URL completa para que cualquier móvil lo escanee
-            const targetUrl = construirUrlConsulta(bien.codigo);
-            renderizarQRCanvas(targetUrl, 'qrCanvasEtiqueta', 75);
-
-            abrirModal('etiquetaModal');
         }
 
         // Construir la URL completa para el código QR
         function construirUrlConsulta(codigo) {
+            if (!codigo) return URL_PRODUCCION_ENAG;
+            const codLimpio = encodeURIComponent(codigo.trim().toUpperCase());
+
+            const protocol = window.location.protocol;
+            const hostname = window.location.hostname;
             const origin = window.location.origin;
-            const path = window.location.pathname;
-            // Reemplazar bienes_nacionales.html por consulta_bien.html
-            const basePath = path.substring(0, path.lastIndexOf('/')) + '/consulta_bien.html';
-            return `${origin}${basePath}?id=${encodeURIComponent(codigo)}`;
+
+            // Si se ejecuta en local (file://, localhost, 127.0.0.1 o null)
+            const esLocal = protocol === 'file:' ||
+                            hostname === 'localhost' ||
+                            hostname === '127.0.0.1' ||
+                            origin === 'null' ||
+                            hostname === '';
+
+            if (esLocal) {
+                // Al escanear una etiqueta física con un teléfono celular real,
+                // el teléfono debe conectarse a la URL de producción accesible por internet
+                return `${URL_PRODUCCION_ENAG}/views/consulta_bien.html?id=${codLimpio}`;
+            } else {
+                // Si ya está alojado en producción o hosting web
+                return `${origin}/views/consulta_bien.html?id=${codLimpio}`;
+            }
         }
 
-        // Generar QR en Canvas usando la librería qrcode.js
-        function renderizarQRCanvas(texto, canvasId, pixelSize) {
+        // Generar QR en formato SVG vectorial estándar
+        function renderizarQREnElemento(texto, containerId) {
             try {
                 const qr = qrcode(0, 'M');
                 qr.addData(texto);
                 qr.make();
-                const n = qr.getModuleCount();
-                const canvas = document.getElementById(canvasId);
-                if (!canvas) return;
+                const container = document.getElementById(containerId);
+                if (!container) return;
 
-                canvas.width = canvas.height = pixelSize;
-                const ctx = canvas.getContext('2d');
-                const margin = 2;
-                const scale = pixelSize / (n + margin * 2);
+                // SVG nativo con quiet zone de 4 módulos (norma ISO) y nitidez absoluta
+                const svgString = qr.createSvgTag({
+                    cellSize: 3,
+                    margin: 4,
+                    scalable: true,
+                    alt: "Código QR Oficial ENAG"
+                });
 
-                ctx.fillStyle = '#ffffff';
-                ctx.fillRect(0, 0, pixelSize, pixelSize);
-                ctx.fillStyle = '#002147';
-
-                for (let r = 0; r < n; r++) {
-                    for (let c = 0; c < n; c++) {
-                        if (qr.isDark(r, c)) {
-                            ctx.fillRect((c + margin) * scale, (r + margin) * scale, Math.ceil(scale), Math.ceil(scale));
-                        }
-                    }
-                }
+                container.innerHTML = svgString;
             } catch (e) {
-                console.error("Error al renderizar QR en canvas", e);
+                console.error("Error al renderizar QR SVG:", e);
+                // Fallback a canvas en caso de requerirse
+                const container = document.getElementById(containerId);
+                if (container && container.tagName && container.tagName.toLowerCase() === 'canvas') {
+                    try {
+                        const qr = qrcode(0, 'M');
+                        qr.addData(texto);
+                        qr.make();
+                        const n = qr.getModuleCount();
+                        const m = 4;
+                        const cellSize = 3;
+                        const total = (n + m * 2) * cellSize;
+                        container.width = container.height = total;
+                        const ctx = container.getContext('2d');
+                        ctx.fillStyle = '#ffffff';
+                        ctx.fillRect(0, 0, total, total);
+                        ctx.fillStyle = '#000000';
+                        for (let r = 0; r < n; r++) {
+                            for (let c = 0; c < n; c++) {
+                                if (qr.isDark(r, c)) {
+                                    ctx.fillRect((c + m) * cellSize, (r + m) * cellSize, cellSize, cellSize);
+                                }
+                            }
+                        }
+                    } catch (err2) {}
+                }
             }
         }
 
         function cambiarTamanoEtiqueta(tamanoClass) {
             const etiqueta = document.getElementById('etiquetaFisica');
-            etiqueta.className = `physical-label ${tamanoClass}`;
+            if (etiqueta) {
+                etiqueta.className = `physical-label ${tamanoClass}`;
+            }
         }
 
         function abrirConsultaDesdeEtiqueta() {
             if (!bienSeleccionadoActual) return;
-            const url = `consulta_bien.html?id=${encodeURIComponent(bienSeleccionadoActual.codigo)}`;
+            // Abre la vista de consulta relativa para prueba directa en este navegador
+            const url = `consulta_bien.html?id=${encodeURIComponent(bienSeleccionadoActual.codigo.trim().toUpperCase())}`;
             window.open(url, '_blank');
         }
 
-        // Impresión individual limpia
+        // ========================================================
+        // IMPRESIÓN INDIVIDUAL LIMPIA (SIN PÁGINAS EN BLANCO)
+        // ========================================================
         function ejecutarImpresionIndividual() {
-            document.body.classList.add('printing-single');
+            if (!bienSeleccionadoActual) return;
+            const printZone = document.getElementById('print-zone');
+            const etiquetaFisica = document.getElementById('etiquetaFisica');
+            if (!printZone || !etiquetaFisica) return;
+
+            // Clonar la etiqueta tal cual está configurada con su SVG de QR y Barcode
+            const clone = etiquetaFisica.cloneNode(true);
+            clone.id = 'etiquetaFisica_print';
+
+            printZone.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'print-single-wrapper';
+            wrapper.appendChild(clone);
+            printZone.appendChild(wrapper);
+
+            // Disparar diálogo del navegador de forma limpia
             window.print();
-            // Limpiar clase después de la ventana de diálogo
+        }
+
+        // Impresión en ventana emergente independiente (Ideal para impresoras de etiquetas térmicas)
+        function imprimirEtiquetaEnVentanaNueva() {
+            if (!bienSeleccionadoActual) return;
+            const etiquetaFisica = document.getElementById('etiquetaFisica');
+            if (!etiquetaFisica) return;
+
+            const printWin = window.open('', '_blank', 'width=520,height=380,resizable=yes,scrollbars=yes');
+            if (!printWin) {
+                alert("Por favor permita las ventanas emergentes (popups) para abrir la ventana de impresión térmica.");
+                return;
+            }
+
+            printWin.document.title = 'Etiqueta_' + (bienSeleccionadoActual.codigo || 'Bien');
+
+            // Clonar estilos activos a la ventana emergente
+            document.querySelectorAll('style, link[rel="stylesheet"]').forEach(el => {
+                try {
+                    printWin.document.head.appendChild(el.cloneNode(true));
+                } catch (e) {}
+            });
+
+            // Estilos específicos de impresión térmica
+            const thermalStyle = printWin.document.createElement('style');
+            thermalStyle.textContent = `
+                @page { margin: 0; size: auto; }
+                body {
+                    background: #ffffff !important;
+                    margin: 0 !important;
+                    padding: 8px !important;
+                    display: flex;
+                    align-items: flex-start;
+                    justify-content: flex-start;
+                }
+                .physical-label {
+                    box-shadow: none !important;
+                    border: 2px solid #000000 !important;
+                    margin: 0 !important;
+                }
+            `;
+            printWin.document.head.appendChild(thermalStyle);
+
+            // Inyectar etiqueta física limpia en el body de la nueva ventana
+            printWin.document.body.innerHTML = '';
+            printWin.document.body.appendChild(etiquetaFisica.cloneNode(true));
+
             setTimeout(() => {
-                document.body.classList.remove('printing-single');
-            }, 1000);
+                printWin.focus();
+                printWin.print();
+            }, 300);
         }
 
         // ========================================================
@@ -2520,15 +3125,22 @@
         }
 
         function generarHojaEtiquetasLote(bienes) {
-            const container = document.getElementById('batchGridSheet');
-            container.innerHTML = '';
+            const printZone = document.getElementById('print-zone');
+            if (!printZone) return;
+
+            printZone.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'print-batch-wrapper';
+
+            const grid = document.createElement('div');
+            grid.className = 'print-batch-grid';
 
             bienes.forEach((bien, i) => {
                 const card = document.createElement('div');
                 card.className = 'physical-label size-standard';
-                card.style.margin = '4px';
+                card.style.margin = '0';
 
-                const qrCanvasId = `batch_qr_${i}`;
+                const qrBoxId = `batch_qr_${i}`;
                 const barSvgId = `batch_bar_${i}`;
 
                 card.innerHTML = `
@@ -2544,7 +3156,7 @@
                     </div>
                     <div class="label-body-grid">
                         <div class="label-qr-column">
-                            <canvas id="${qrCanvasId}" class="label-qr-canvas"></canvas>
+                            <div id="${qrBoxId}" class="label-qr-box"></div>
                             <span style="font-size: 7px; font-weight: bold; margin-top: 2px;">ESCANEÉ AQUÍ</span>
                         </div>
                         <div class="label-info-column">
@@ -2563,32 +3175,33 @@
                     </div>
                 `;
 
-                container.appendChild(card);
-
-                // Renderizar códigos
-                setTimeout(() => {
-                    const targetUrl = construirUrlConsulta(bien.codigo);
-                    renderizarQRCanvas(targetUrl, qrCanvasId, 70);
-                    try {
-                        JsBarcode(`#${barSvgId}`, bien.codigo, {
-                            format: "CODE128",
-                            width: 1.5,
-                            height: 32,
-                            displayValue: false,
-                            margin: 0
-                        });
-                    } catch (e) {}
-                }, 10);
+                grid.appendChild(card);
             });
 
-            // Disparar diálogo de impresión tras breve pausa de renderizado
+            wrapper.appendChild(grid);
+            printZone.appendChild(wrapper);
+
+            // Renderizar SVGs para cada tarjeta del lote
+            bienes.forEach((bien, i) => {
+                const qrBoxId = `batch_qr_${i}`;
+                const barSvgId = `batch_bar_${i}`;
+                const targetUrl = construirUrlConsulta(bien.codigo);
+                renderizarQREnElemento(targetUrl, qrBoxId);
+                try {
+                    JsBarcode(`#${barSvgId}`, bien.codigo, {
+                        format: "CODE128",
+                        width: 1.5,
+                        height: 32,
+                        displayValue: false,
+                        margin: 0
+                    });
+                } catch (e) {}
+            });
+
+            // Disparar diálogo de impresión
             setTimeout(() => {
-                document.body.classList.add('printing-batch');
                 window.print();
-                setTimeout(() => {
-                    document.body.classList.remove('printing-batch');
-                }, 1000);
-            }, 300);
+            }, 180);
         }
 
         // ========================================================
@@ -2619,14 +3232,27 @@
             document.getElementById('fchFirmaCustodio').textContent = bien.custodio || 'Funcionario Custodio';
             document.getElementById('fichaQrText').textContent = bien.codigo;
 
-            // QR en la ficha
+            // QR vectorial en la ficha técnica oficial
             const url = construirUrlConsulta(bien.codigo);
-            renderizarQRCanvas(url, 'fichaQrCanvas', 90);
+            renderizarQREnElemento(url, 'fichaQrBox');
 
             abrirModal('fichaModal');
         }
 
         function imprimirFichaDocumento() {
+            const printZone = document.getElementById('print-zone');
+            const ficha = document.getElementById('fichaImprimible');
+            if (!printZone || !ficha) return;
+
+            const clone = ficha.cloneNode(true);
+            clone.id = 'fichaImprimible_print';
+
+            printZone.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'print-ficha-wrapper';
+            wrapper.appendChild(clone);
+            printZone.appendChild(wrapper);
+
             window.print();
         }
 
@@ -2883,16 +3509,504 @@
         }
 
         // ========================================================
+        // GESTIÓN DE FICHAS DE BIENES ASIGNADOS POR USUARIO/CUSTODIO
+        // ========================================================
+        async function obtenerListaCustodiosUnicos() {
+            // Asegurar que listaBienes tenga datos
+            if (!listaBienes || listaBienes.length === 0) {
+                const localStr = typeof localStorage !== 'undefined' ? localStorage.getItem(STORAGE_KEY) : null;
+                if (localStr) {
+                    try { listaBienes = JSON.parse(localStr); } catch (e) {}
+                }
+                if (!listaBienes || listaBienes.length === 0) {
+                    listaBienes = obtenerDatosEjemploENAG();
+                }
+            }
+
+            const mapa = new Map();
+
+            // 1. Recorrer lista de bienes en memoria
+            listaBienes.forEach(b => {
+                const nombre = (b.custodio || '').trim();
+                if (!nombre || nombre.toLowerCase() === 'sin asignar') return;
+
+                if (!mapa.has(nombre)) {
+                    mapa.set(nombre, {
+                        nombre: nombre,
+                        cargo: b.custodioCargo || 'Funcionario Responsable',
+                        departamento: b.departamento || 'ENAG',
+                        ubicacion: b.ubicacion || 'Edificio Central',
+                        bienes: [],
+                        totalBienes: 0,
+                        totalValor: 0
+                    });
+                }
+
+                const entry = mapa.get(nombre);
+                entry.bienes.push(b);
+                entry.totalBienes++;
+                entry.totalValor += Number(b.valor || 0);
+
+                if (b.custodioCargo && entry.cargo === 'Funcionario Responsable') {
+                    entry.cargo = b.custodioCargo;
+                }
+                if (b.departamento && entry.departamento === 'ENAG') {
+                    entry.departamento = b.departamento;
+                }
+                if (b.ubicacion && entry.ubicacion === 'Edificio Central') {
+                    entry.ubicacion = b.ubicacion;
+                }
+            });
+
+            // 2. Si hay conexión a Firestore, enriquecer con la colección de usuarios
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const snap = await dbFirestore.collection('usuarios').get();
+                    if (snap && !snap.empty) {
+                        snap.forEach(doc => {
+                            const u = doc.data();
+                            const uNombre = (u.nombre || u.usuario || '').trim();
+                            if (uNombre) {
+                                if (mapa.has(uNombre)) {
+                                    const entry = mapa.get(uNombre);
+                                    if (u.departamento) entry.departamento = u.departamento;
+                                    if (u.cargo) entry.cargo = u.cargo;
+                                } else {
+                                    // Usuario registrado sin bienes asignados aún
+                                    mapa.set(uNombre, {
+                                        nombre: uNombre,
+                                        cargo: u.cargo || 'Funcionario',
+                                        departamento: u.departamento || 'ENAG',
+                                        ubicacion: 'Edificio Central',
+                                        bienes: [],
+                                        totalBienes: 0,
+                                        totalValor: 0
+                                    });
+                                }
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.warn("No se pudieron cargar usuarios adicionales de Firestore:", e.message || e);
+                }
+            }
+
+            listaCustodiosCache = Array.from(mapa.values()).sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+            return listaCustodiosCache;
+        }
+
+        function actualizarBadgesCustodios() {
+            const setCustodios = new Set();
+            listaBienes.forEach(b => {
+                const nombre = (b.custodio || '').trim();
+                if (nombre && nombre.toLowerCase() !== 'sin asignar') {
+                    setCustodios.add(nombre);
+                }
+            });
+            const badge = document.getElementById('countCustodiosBadge');
+            if (badge) {
+                badge.textContent = setCustodios.size;
+            }
+        }
+
+        async function abrirModalFichaUsuario(nombreCustodio) {
+            const custodios = await obtenerListaCustodiosUnicos();
+            const select = document.getElementById('selectFichaCustodio');
+            select.innerHTML = '';
+
+            if (custodios.length === 0) {
+                select.innerHTML = '<option value="">No hay funcionarios registrados</option>';
+                custodioSeleccionadoActual = null;
+                renderizarFichaCustodioVacia();
+                abrirModal('fichaUsuarioModal');
+                return;
+            }
+
+            custodios.forEach(c => {
+                const opt = document.createElement('option');
+                opt.value = c.nombre;
+                const valorFmt = 'L. ' + Number(c.totalValor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+                opt.textContent = `${c.nombre} (${c.totalBienes} activo${c.totalBienes !== 1 ? 's' : ''} — ${valorFmt})`;
+                select.appendChild(opt);
+            });
+
+            let objetivo = nombreCustodio;
+            if (!objetivo || !custodios.some(c => c.nombre.toLowerCase() === objetivo.toLowerCase())) {
+                objetivo = custodios[0].nombre;
+            }
+
+            select.value = objetivo;
+            seleccionarCustodioFicha(objetivo);
+            abrirModal('fichaUsuarioModal');
+        }
+
+        function seleccionarCustodioFicha(nombreCustodio) {
+            if (!nombreCustodio) return;
+            const c = listaCustodiosCache.find(item => item.nombre.toLowerCase() === nombreCustodio.toLowerCase()) || {
+                nombre: nombreCustodio,
+                cargo: 'Funcionario Responsable',
+                departamento: 'ENAG',
+                ubicacion: 'Edificio Central',
+                bienes: [],
+                totalBienes: 0,
+                totalValor: 0
+            };
+
+            // Asegurar sincronización exacta con listaBienes en memoria
+            c.bienes = listaBienes.filter(b => (b.custodio || '').trim().toLowerCase() === c.nombre.toLowerCase());
+            c.totalBienes = c.bienes.length;
+            c.totalValor = c.bienes.reduce((sum, b) => sum + Number(b.valor || 0), 0);
+
+            custodioSeleccionadoActual = c;
+
+            // Fecha y Folio
+            const hoy = new Date();
+            const fechaStr = hoy.toLocaleDateString('es-HN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const folio = `ACTA-BN-${hoy.getFullYear()}-${Math.abs(hashString(c.nombre)).toString().substring(0, 4).padStart(4, '0')}`;
+            const valorTotalFormatted = 'L. ' + Number(c.totalValor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+            // Tarjetas de Resumen
+            document.getElementById('cardUsrNombre').textContent = c.nombre;
+            document.getElementById('cardUsrCargo').textContent = c.cargo || 'Funcionario Responsable';
+            document.getElementById('cardUsrTotalBienes').textContent = `${c.totalBienes} activo(s)`;
+            document.getElementById('cardUsrValorTotal').textContent = valorTotalFormatted;
+
+            // Datos del Documento Imprimible
+            document.getElementById('fuFolio').textContent = folio;
+            document.getElementById('fuFechaEmision').textContent = fechaStr;
+            document.getElementById('fuNombre').textContent = c.nombre;
+            document.getElementById('fuCargo').textContent = c.cargo || 'Funcionario Responsable';
+            document.getElementById('fuDepartamento').textContent = c.departamento || 'ENAG';
+            document.getElementById('fuUbicacion').textContent = c.ubicacion || 'Edificio Central ENAG';
+            document.getElementById('fuTotalBienesTxt').textContent = `${c.totalBienes} activo(s)`;
+            document.getElementById('fuValorTotalTxt').textContent = valorTotalFormatted;
+
+            document.getElementById('fuFirmaNombre').textContent = c.nombre;
+            document.getElementById('fuFirmaCargo').textContent = c.cargo || 'Funcionario Custodio Responsable';
+
+            // Filas de la tabla
+            const tbody = document.getElementById('tbodyBienesCustodio');
+            tbody.innerHTML = '';
+
+            if (c.bienes.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="9" style="text-align: center; padding: 24px; color: #64748b;">
+                            <em>El funcionario seleccionado no tiene activos asignados bajo su custodia en este momento.</em>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                c.bienes.forEach((b, idx) => {
+                    const tr = document.createElement('tr');
+                    let estadoClass = "status-bueno";
+                    const estLower = (b.estado || '').toLowerCase();
+                    if (estLower.includes('excelente')) estadoClass = 'status-excelente';
+                    else if (estLower.includes('regular')) estadoClass = 'status-regular';
+                    else if (estLower.includes('malo')) estadoClass = 'status-malo';
+                    else if (estLower.includes('reparación')) estadoClass = 'status-reparacion';
+                    else if (estLower.includes('descargo')) estadoClass = 'status-descargo';
+
+                    const valorItem = 'L. ' + Number(b.valor || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+
+                    tr.innerHTML = `
+                        <td style="text-align: center; font-weight: 700; color: #64748b;">${idx + 1}</td>
+                        <td><strong style="color: #002147; font-family: monospace;">${escapeHTML(b.codigo)}</strong></td>
+                        <td>
+                            <strong>${escapeHTML(b.denominacion)}</strong>
+                            ${b.observaciones ? `<div style="font-size: 0.85em; color: #64748b; margin-top: 2px;">${escapeHTML(b.observaciones)}</div>` : ''}
+                        </td>
+                        <td><span style="font-size: 0.9em; color: #475569;">${escapeHTML(b.categoria)}</span></td>
+                        <td>${escapeHTML(b.marca || 'S/M')}${b.modelo ? ' / ' + escapeHTML(b.modelo) : ''}</td>
+                        <td style="font-family: monospace; font-size: 0.9em;">${escapeHTML(b.serie || 'S/N')}</td>
+                        <td style="text-align: center;">
+                            <span class="status-badge ${estadoClass}" style="font-size: 0.75em; padding: 2px 8px;">● ${escapeHTML(b.estado)}</span>
+                        </td>
+                        <td style="font-size: 0.9em; color: #475569;">${escapeHTML(b.ubicacion || b.departamento || 'ENAG')}</td>
+                        <td style="text-align: right; font-weight: 700; color: #059669; white-space: nowrap;">${valorItem}</td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+            }
+
+            document.getElementById('fuFooterTotalCount').textContent = c.totalBienes;
+            document.getElementById('fuFooterTotalValor').textContent = valorTotalFormatted;
+        }
+
+        function renderizarFichaCustodioVacia() {
+            document.getElementById('cardUsrNombre').textContent = '—';
+            document.getElementById('cardUsrCargo').textContent = '—';
+            document.getElementById('cardUsrTotalBienes').textContent = '0';
+            document.getElementById('cardUsrValorTotal').textContent = 'L. 0.00';
+            document.getElementById('fuNombre').textContent = '—';
+            document.getElementById('fuCargo').textContent = '—';
+            document.getElementById('fuDepartamento').textContent = '—';
+            document.getElementById('fuUbicacion').textContent = '—';
+            document.getElementById('fuTotalBienesTxt').textContent = '0';
+            document.getElementById('fuValorTotalTxt').textContent = 'L. 0.00';
+            document.getElementById('fuFirmaNombre').textContent = 'Funcionario Custodio';
+            document.getElementById('fuFirmaCargo').textContent = '';
+            document.getElementById('tbodyBienesCustodio').innerHTML = `
+                <tr>
+                    <td colspan="9" style="text-align: center; padding: 24px; color: #64748b;">
+                        <em>No se encontraron bienes asignados para mostrar.</em>
+                    </td>
+                </tr>
+            `;
+            document.getElementById('fuFooterTotalCount').textContent = '0';
+            document.getElementById('fuFooterTotalValor').textContent = 'L. 0.00';
+        }
+
+        function imprimirFichaUsuario() {
+            const printZone = document.getElementById('print-zone');
+            const ficha = document.getElementById('fichaUsuarioImprimible');
+            if (!printZone || !ficha) return;
+
+            const clone = ficha.cloneNode(true);
+            clone.id = 'fichaUsuarioImprimible_print';
+
+            printZone.innerHTML = '';
+            const wrapper = document.createElement('div');
+            wrapper.className = 'print-ficha-wrapper print-ficha-user-wrapper';
+            wrapper.appendChild(clone);
+            printZone.appendChild(wrapper);
+
+            window.print();
+        }
+
+        function descargarFichaUsuarioPDF() {
+            if (!custodioSeleccionadoActual || typeof jspdf === 'undefined') {
+                alert("Generando vista imprimible de la ficha...");
+                imprimirFichaUsuario();
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF({
+                orientation: 'landscape',
+                unit: 'mm',
+                format: 'letter'
+            });
+
+            const cus = custodioSeleccionadoActual;
+            const hoy = new Date();
+            const fechaStr = hoy.toLocaleDateString('es-HN', { day: '2-digit', month: '2-digit', year: 'numeric' });
+            const folio = `ACTA-BN-${hoy.getFullYear()}-${Math.abs(hashString(cus.nombre || 'CUSTODIO')).toString().substring(0, 4).padStart(4, '0')}`;
+
+            // 1. Barra superior institucional
+            doc.setFillColor(0, 33, 71);
+            doc.rect(0, 0, 279, 18, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(12);
+            doc.setFont('helvetica', 'bold');
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS — ENAG", 139.5, 8, { align: 'center' });
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'normal');
+            doc.text("DIRECCIÓN DE ADMINISTRACIÓN Y FINANZAS • DEPARTAMENTO DE BIENES NACIONALES • REPÚBLICA DE HONDURAS", 139.5, 14, { align: 'center' });
+
+            // 2. Título del acta
+            doc.setTextColor(0, 33, 71);
+            doc.setFontSize(13);
+            doc.setFont('helvetica', 'bold');
+            doc.text("ACTA GENERAL DE ASIGNACIÓN Y HOJA DE RESPONSABILIDAD DE BIENES NACIONALES", 139.5, 27, { align: 'center' });
+            doc.setFontSize(8.5);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(90, 90, 90);
+            doc.text(`Inventario Oficial de Activos Fijos Asignados a Cargo de Funcionario / Empleado • Folio: ${folio} • Fecha: ${fechaStr}`, 139.5, 32, { align: 'center' });
+
+            // 3. Tabla informativa del funcionario
+            const valorTotalFormatted = 'L. ' + Number(cus.totalValor || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+            const infoFuncionario = [
+                ['Funcionario Custodio:', cus.nombre || 'Sin Asignar', 'Cargo / Puesto:', cus.cargo || 'Funcionario Responsable'],
+                ['Departamento / Área:', cus.departamento || 'ENAG', 'Ubicación Principal:', cus.ubicacion || 'Edificio Central ENAG'],
+                ['Total Bienes a Cargo:', `${cus.totalBienes} activo(s) asignado(s)`, 'Valor Total en Custodia:', valorTotalFormatted]
+            ];
+
+            doc.autoTable({
+                startY: 36,
+                body: infoFuncionario,
+                theme: 'plain',
+                styles: { fontSize: 8.5, cellPadding: 2, textColor: [30, 41, 59] },
+                columnStyles: {
+                    0: { fontStyle: 'bold', textColor: [0, 33, 71], width: 45 },
+                    1: { width: 90 },
+                    2: { fontStyle: 'bold', textColor: [0, 33, 71], width: 45 },
+                    3: { width: 71, fontStyle: 'bold', textColor: [5, 150, 105] }
+                }
+            });
+
+            // 4. Tabla de bienes asignados
+            const columnasBienes = ['#', 'Código Inventario', 'Denominación / Descripción', 'Categoría', 'Marca / Modelo', 'N° Serie', 'Estado', 'Ubicación', 'Valor (L.)'];
+            const filasBienes = (cus.bienes || []).map((b, idx) => [
+                idx + 1,
+                b.codigo,
+                b.denominacion,
+                b.categoria,
+                `${b.marca || 'S/M'}${b.modelo ? ' / ' + b.modelo : ''}`,
+                b.serie || 'S/N',
+                b.estado,
+                b.ubicacion || b.departamento || 'ENAG',
+                Number(b.valor || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+            ]);
+
+            doc.autoTable({
+                startY: doc.lastAutoTable.finalY + 4,
+                head: [columnasBienes],
+                body: filasBienes,
+                foot: [['', '', `TOTAL GENERAL: ${cus.totalBienes} BIENES ASIGNADOS`, '', '', '', '', 'TOTAL:', valorTotalFormatted]],
+                theme: 'grid',
+                headStyles: { fillColor: [0, 33, 71], textColor: [255, 255, 255], fontStyle: 'bold', fontSize: 8, halign: 'center' },
+                footStyles: { fillColor: [241, 245, 249], textColor: [0, 33, 71], fontStyle: 'bold', fontSize: 8.5 },
+                columnStyles: {
+                    0: { halign: 'center', width: 10 },
+                    1: { fontStyle: 'bold', width: 32 },
+                    2: { width: 62 },
+                    3: { width: 34 },
+                    4: { width: 34 },
+                    5: { width: 25 },
+                    6: { halign: 'center', width: 20 },
+                    7: { width: 25 },
+                    8: { halign: 'right', fontStyle: 'bold', width: 24 }
+                },
+                styles: { fontSize: 7.5, cellPadding: 2.2 },
+                alternateRowStyles: { fillColor: [248, 250, 252] }
+            });
+
+            // 5. Cláusula legal de responsabilidad
+            let finalY = doc.lastAutoTable.finalY + 6;
+            if (finalY > 165) {
+                doc.addPage('letter', 'landscape');
+                finalY = 20;
+            }
+
+            doc.setFontSize(7);
+            doc.setTextColor(70, 70, 70);
+            doc.setFont('helvetica', 'normal');
+            const clausulaLegal = "CLÁUSULA DE RESPONSABILIDAD Y CUSTODIA INDIVIDUAL DE BIENES NACIONALES: El funcionario o empleado arriba suscrito declara que recibe formalmente a entera satisfacción y bajo su directa guarda y custodia los bienes nacionales inventariados en el presente cuadro. Se compromete solemnemente a velar por su adecuado uso, conservación y salvaguarda exclusiva para fines oficiales y de servicio público de la Empresa Nacional de Artes Gráficas (ENAG). Queda terminantemente prohibido su traslado fuera de la institución, cesión o préstamo a terceros sin autorización formal previa de la Jefatura de Bienes Nacionales. En caso de daño por negligencia, pérdida o extravío no justificado, se deducirán las responsabilidades legales conforme a la Ley Orgánica de Bienes Nacionales y disposiciones del Tribunal Superior de Cuentas (TSC).";
+            doc.text(clausulaLegal, 14, finalY, { maxWidth: 251, align: 'justify' });
+
+            // 6. Firmas oficiales en 3 columnas
+            let firmasY = finalY + 24;
+            if (firmasY > 190) {
+                doc.addPage('letter', 'landscape');
+                firmasY = 40;
+            }
+
+            doc.setDrawColor(60, 60, 60);
+            doc.setLineWidth(0.4);
+
+            doc.line(25, firmasY, 85, firmasY);
+            doc.line(110, firmasY, 170, firmasY);
+            doc.line(195, firmasY, 255, firmasY);
+
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 33, 71);
+            doc.text(cus.nombre || "Funcionario Custodio", 55, firmasY + 4, { align: 'center' });
+            doc.text("Encargado Bienes Nacionales", 140, firmasY + 4, { align: 'center' });
+            doc.text("Gerencia Administrativa y Financiera", 225, firmasY + 4, { align: 'center' });
+
+            doc.setFontSize(7);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 100, 100);
+            doc.text("Firma y DNI de Recepción", 55, firmasY + 8, { align: 'center' });
+            doc.text("Firma y Sello Oficial • DGBN", 140, firmasY + 8, { align: 'center' });
+            doc.text("Visto Bueno Institucional", 225, firmasY + 8, { align: 'center' });
+
+            // Pie de página institucional
+            doc.setFontSize(6.5);
+            doc.setTextColor(140, 140, 140);
+            doc.text(`Empresa Nacional de Artes Gráficas (ENAG) • Tegucigalpa, M.D.C., Honduras • Generado el ${fechaStr}`, 139.5, 205, { align: 'center' });
+
+            const nombreArchivo = `Ficha_Bienes_Asignados_${(cus.nombre || 'Custodio').replace(/[^a-zA-Z0-9]/g, '_')}.pdf`;
+            doc.save(nombreArchivo);
+        }
+
+        function exportarFichaUsuarioExcel() {
+            if (!custodioSeleccionadoActual || typeof XLSX === 'undefined') {
+                alert("No se pudo iniciar la exportación a Excel.");
+                return;
+            }
+
+            const cus = custodioSeleccionadoActual;
+            const filasExcel = (cus.bienes || []).map((b, idx) => ({
+                'N°': idx + 1,
+                'Código Inventario': b.codigo,
+                'Denominación del Bien': b.denominacion,
+                'Categoría': b.categoria,
+                'Marca': b.marca || '',
+                'Modelo': b.modelo || '',
+                'N° de Serie': b.serie || '',
+                'Color / Material': b.color || '',
+                'Estado de Conservación': b.estado,
+                'Departamento': b.departamento || '',
+                'Ubicación Física': b.ubicacion || '',
+                'Funcionario Custodio': cus.nombre || '',
+                'Cargo Custodio': cus.cargo || '',
+                'Fecha de Asignación': b.fecha || '',
+                'Valor de Adquisición (L.)': Number(b.valor || 0),
+                'Proveedor / Factura': b.proveedor || '',
+                'Observaciones': b.observaciones || ''
+            }));
+
+            if (filasExcel.length === 0) {
+                filasExcel.push({
+                    'N°': 1,
+                    'Funcionario Custodio': cus.nombre,
+                    'Cargo': cus.cargo,
+                    'Departamento': cus.departamento,
+                    'Observaciones': 'Este funcionario no tiene bienes asignados actualmente.'
+                });
+            }
+
+            const wb = XLSX.utils.book_new();
+            const ws = XLSX.utils.json_to_sheet(filasExcel);
+            XLSX.utils.book_append_sheet(wb, ws, "Bienes_Asignados");
+
+            const fechaStr = new Date().toISOString().split('T')[0];
+            const nombreArchivo = `Bienes_Asignados_${(cus.nombre || 'Custodio').replace(/[^a-zA-Z0-9]/g, '_')}_${fechaStr}.xlsx`;
+            XLSX.writeFile(wb, nombreArchivo);
+        }
+
+        function hashString(str) {
+            let hash = 0;
+            for (let i = 0; i < str.length; i++) {
+                hash = ((hash << 5) - hash) + str.charCodeAt(i);
+                hash |= 0;
+            }
+            return hash;
+        }
+
+        // ========================================================
         // UTILIDADES Y MODALES
         // ========================================================
         function abrirModal(id) {
             const m = document.getElementById(id);
-            if (m) m.classList.add('active');
+            if (!m) return;
+            // Ocultar cualquier otro modal que pueda estar abierto
+            document.querySelectorAll('.modal-overlay').forEach(el => {
+                if (el !== m) {
+                    el.classList.remove('active');
+                    el.style.display = 'none';
+                }
+            });
+            m.style.display = 'flex';
+            void m.offsetHeight; // Forzar reflow del DOM
+            m.classList.add('active');
+            document.body.style.overflow = 'hidden';
         }
 
         function cerrarModal(id) {
             const m = document.getElementById(id);
-            if (m) m.classList.remove('active');
+            if (m) {
+                m.classList.remove('active');
+                setTimeout(() => {
+                    if (!m.classList.contains('active')) {
+                        m.style.display = 'none';
+                    }
+                }, 200);
+            }
+            document.body.style.overflow = '';
         }
 
         function formatearFechaHonduras(isoStr) {
