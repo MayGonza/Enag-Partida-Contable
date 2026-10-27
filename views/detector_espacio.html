@@ -349,15 +349,21 @@
             box-shadow: 0 0 0 4px rgba(0, 33, 71, 0.1);
         }
 
-        /* Chips de métricas */
+        /* Chips de métricas ampliado a 6 métricas de imprenta */
         .metrics-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
+            grid-template-columns: repeat(6, 1fr);
             gap: 10px;
             margin-top: 14px;
         }
 
-        @media (max-width: 600px) {
+        @media (max-width: 1050px) {
+            .metrics-grid {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        @media (max-width: 580px) {
             .metrics-grid {
                 grid-template-columns: repeat(2, 1fr);
             }
@@ -873,7 +879,7 @@
             }
         }
 
-        /* Columnas de texto Tabloide */
+        /* Columnas de texto Tabloide con soporte dinámico para 1, 2 y 3 columnas */
         .gaceta-columns {
             flex: 1;
             display: grid;
@@ -887,6 +893,21 @@
             z-index: 8;
         }
 
+        .gaceta-columns.cols-1 {
+            grid-template-columns: 1fr;
+            gap: 0;
+        }
+
+        .gaceta-columns.cols-2 {
+            grid-template-columns: 1fr 1fr;
+            gap: 18px;
+        }
+
+        .gaceta-columns.cols-3 {
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 12px;
+        }
+
         .gaceta-columns::-webkit-scrollbar {
             width: 5px;
         }
@@ -897,7 +918,7 @@
         }
 
         .gaceta-column {
-            font-family: 'Georgia', 'Times New Roman', serif;
+            font-family: 'Times New Roman', 'Georgia', serif;
             font-size: 10px;
             /* Tamaño ampliado y nítido para legibilidad de imprenta */
             line-height: 1.38;
@@ -911,9 +932,15 @@
             user-select: text;
         }
 
-        .gaceta-column:first-child {
+        .gaceta-columns.cols-2 .gaceta-column:first-child {
             border-right: 1px solid #e7e5e4;
             padding-right: 12px;
+        }
+
+        .gaceta-columns.cols-3 .gaceta-column:nth-child(1),
+        .gaceta-columns.cols-3 .gaceta-column:nth-child(2) {
+            border-right: 1px solid #e7e5e4;
+            padding-right: 8px;
         }
 
         .page-size-compact .gaceta-column {
@@ -932,6 +959,109 @@
             text-justify: inter-word;
             hyphens: auto;
             -webkit-hyphens: auto;
+        }
+
+        /* Cintillo de Folio Oficial para Páginas Interiores (Páginas 2+) */
+        .gaceta-interior-header {
+            border-top: 2px solid #111;
+            border-bottom: 1px solid #111;
+            padding: 5px 8px;
+            margin-bottom: 12px;
+            font-family: 'Times New Roman', serif;
+            font-size: 11px;
+            font-weight: 700;
+            color: #111;
+            background: #ffffff;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.05);
+            flex-shrink: 0;
+            z-index: 10;
+        }
+
+        .interior-header-line {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .interior-sec {
+            text-transform: uppercase;
+            font-weight: 800;
+            letter-spacing: 0.6px;
+        }
+
+        .interior-center {
+            font-size: 10.5px;
+            letter-spacing: 0.2px;
+        }
+
+        .interior-folio {
+            font-weight: 800;
+            font-size: 11.5px;
+        }
+
+        .gaceta-interior-footer {
+            border-top: 1px solid #d6d3d1;
+            padding-top: 4px;
+            margin-top: 8px;
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            font-size: 9.5px;
+            color: #78716c;
+            font-style: italic;
+            flex-shrink: 0;
+        }
+
+        .pagination-bar {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 6px 14px;
+            margin-bottom: 10px;
+        }
+
+        .btn-page-nav {
+            background: #002147;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.82em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-page-nav:hover:not(:disabled) {
+            background: #0284c7;
+            transform: translateY(-1px);
+        }
+
+        .btn-page-nav:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            color: #94a3b8;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-size: 0.85em;
+            font-weight: 800;
+            color: #002147;
+        }
+
+        /* Filete Tipográfico Tradicional de Imprenta Oficial */
+        .gaceta-adornment {
+            text-align: center;
+            font-family: 'Times New Roman', serif;
+            color: #44403c;
+            margin: 6px 0;
+            font-size: 11px;
+            letter-spacing: 3px;
+            opacity: 0.75;
         }
 
         /* Capa de relleno / sombreado dinámico de espacio ocupado */
@@ -1202,6 +1332,10 @@
                                 <span>Aviso de Herencia / Título</span>
                                 <span class="sample-tag">~1/4 Pág</span>
                             </div>
+                            <div class="sample-option" onclick="cargarMuestra('marca')">
+                                <span>Marca de Fábrica (3 cols)</span>
+                                <span class="sample-tag">Marcas / L. 3,814</span>
+                            </div>
                             <div class="sample-option" onclick="cargarMuestra('licitacion')">
                                 <span>Licitación Pública (SIT/SESAL)</span>
                                 <span class="sample-tag">~1/2 Pág</span>
@@ -1209,6 +1343,10 @@
                             <div class="sample-option" onclick="cargarMuestra('acuerdo')">
                                 <span>Acuerdo Ministerial</span>
                                 <span class="sample-tag">~1 Página</span>
+                            </div>
+                            <div class="sample-option" onclick="cargarMuestra('decreto_extenso')">
+                                <span>Decreto Legislativo Extenso</span>
+                                <span class="sample-tag">Multi-Pág (2+ Págs)</span>
                             </div>
                         </div>
                     </div>
@@ -1218,7 +1356,8 @@
                     </button>
 
                     <button type="button" class="btn-tool btn-tool-accent" id="btnToggleJustificado"
-                        onclick="toggleJustificadoTexto()" title="Texto Justificado activo (clic para alinear a la izquierda)">
+                        onclick="toggleJustificadoTexto()"
+                        title="Texto Justificado activo (clic para alinear a la izquierda)">
                         <span>≡</span> <span id="labelJustificado">Texto Justificado ✓</span>
                     </button>
 
@@ -1307,6 +1446,14 @@
                         <div id="valParrafos" class="metric-value">0</div>
                         <div class="metric-label">Párrafos</div>
                     </div>
+                    <div class="metric-card">
+                        <div id="valAlturaPapel" class="metric-value">0 cm</div>
+                        <div class="metric-label">Altura Papel</div>
+                    </div>
+                    <div class="metric-card">
+                        <div id="valAnchoColumna" class="metric-value">11.5 cm</div>
+                        <div class="metric-label">Ancho Col.</div>
+                    </div>
                 </div>
 
                 <!-- Barra de Capacidad de Página y Margen Seguro -->
@@ -1350,10 +1497,18 @@
                                 onchange="guardarCalibracion()">
                         </div>
                         <div class="calib-group">
-                            <label for="calibColumnas">Columnas estándar por página:</label>
+                            <label for="calibColumnas">Columnas por página:</label>
                             <select id="calibColumnas" onchange="guardarCalibracion()">
+                                <option value="1">1 Columna (Vertical Continua)</option>
                                 <option value="2" selected>2 Columnas (Estándar La Gaceta)</option>
-                                <option value="3">3 Columnas (Edición Especial)</option>
+                                <option value="3">3 Columnas (Marcas y Patentes / Edictos)</option>
+                            </select>
+                        </div>
+                        <div class="calib-group">
+                            <label for="calibModoDistribucion">Distribución de Maqueta:</label>
+                            <select id="calibModoDistribucion" onchange="guardarCalibracion()">
+                                <option value="balanceado" selected>Equilibrado en Columnas (Ancho)</option>
+                                <option value="columna_unica">Columna Individual (Hacia abajo)</option>
                             </select>
                         </div>
                         <div class="calib-group">
@@ -1400,6 +1555,21 @@
                         <div class="breakdown-row">
                             <span style="color: #64748b;">Tarifa Oficial (Acuerdo 249-2010):</span>
                             <strong id="tarifaPrecioBase">L. 0.00</strong>
+                        </div>
+
+                        <!-- Selector de Categoría Comercial de Publicación -->
+                        <div style="margin: 4px 0 6px 0;">
+                            <label for="tipoPublicacion"
+                                style="font-size: 0.82em; font-weight: bold; color: #475569;">Tipo de Publicación
+                                Oficial:</label>
+                            <select id="tipoPublicacion" class="select-descuento"
+                                onchange="cambiarTipoPublicacion(this.value)">
+                                <option value="texto" selected>📜 Publicación de Texto General (Acuerdo 249-2010)
+                                </option>
+                                <option value="marcas">🏷️ Marcas y Patentes (3 Publicaciones de Ley — Tarifa Especial)
+                                </option>
+                                <option value="junta_agua">💧 Junta de Agua (Exento por Ley — L. 0.00)</option>
+                            </select>
                         </div>
 
                         <!-- Selector de Descuentos Legislados -->
@@ -1500,13 +1670,14 @@
                         </button>
                     </div>
 
-                    <!-- Controles Interactivos del Membrete Oficial -->
+                    <!-- Controles Interactivos de Columnas, Membrete y Fecha Oficial -->
                     <div class="membrete-controls-bar">
                         <div class="membrete-ctrl-group">
-                            <span class="ctrl-label">🏛️ Membrete Oficial:</span>
+                            <span class="ctrl-label">🏛️ Membrete:</span>
                             <div class="preview-btn-group">
                                 <button type="button" class="btn-size-toggle active" id="btnSecA"
-                                    onclick="cambiarSeccionMembrete('seccion_a')" title="Sección A (Decretos y Leyes Oficiales)">
+                                    onclick="cambiarSeccionMembrete('seccion_a')"
+                                    title="Sección A (Decretos y Leyes Oficiales)">
                                     Sección A
                                 </button>
                                 <button type="button" class="btn-size-toggle" id="btnSecB"
@@ -1514,8 +1685,28 @@
                                     Sección B (Avisos)
                                 </button>
                                 <button type="button" class="btn-size-toggle" id="btnSecNone"
-                                    onclick="cambiarSeccionMembrete('sin_seccion')" title="Encabezado sin franja de sección">
+                                    onclick="cambiarSeccionMembrete('sin_seccion')"
+                                    title="Encabezado sin franja de sección">
                                     Sin Sección
+                                </button>
+                            </div>
+                        </div>
+                        <div class="membrete-ctrl-group">
+                            <span class="ctrl-label">📰 Columnas:</span>
+                            <div class="preview-btn-group">
+                                <button type="button" class="btn-size-toggle active" id="btnCols2"
+                                    onclick="cambiarColumnasDiagramacion(2)"
+                                    title="2 Columnas (Estándar Diario La Gaceta)">
+                                    2 Cols (Estándar)
+                                </button>
+                                <button type="button" class="btn-size-toggle" id="btnCols1"
+                                    onclick="cambiarColumnasDiagramacion(1)" title="1 Columna (Vertical continua)">
+                                    1 Col
+                                </button>
+                                <button type="button" class="btn-size-toggle" id="btnCols3"
+                                    onclick="cambiarColumnasDiagramacion(3)"
+                                    title="3 Columnas (Marcas y Patentes / Edictos)">
+                                    3 Cols (Marcas)
                                 </button>
                             </div>
                         </div>
@@ -1529,25 +1720,34 @@
                         </div>
                     </div>
 
+                    <!-- Barra de Paginación para Documentos Multi-Página -->
+                    <div id="paginationBar" class="pagination-bar" style="display: none;">
+                        <button type="button" class="btn-page-nav" id="btnPrevPage" onclick="cambiarPaginaPrevia(-1)">◀
+                            Pág. Anterior</button>
+                        <span id="labelNumeroPagina" class="page-indicator">Página 1 de 1</span>
+                        <button type="button" class="btn-page-nav" id="btnNextPage"
+                            onclick="cambiarPaginaPrevia(1)">Pág. Siguiente ▶</button>
+                    </div>
+
                     <div class="gaceta-page page-size-tabloide" id="gacetaPage">
-                        <!-- Líneas guía de corte en formato Tabloide -->
+                        <!-- Líneas guía de corte en formato Tabloide con medidas en centímetros -->
                         <div class="cutline" style="top: 20%;" title="1/5 de Página Tabloide (20%) — Tarifa: L. 800.00">
-                            <span class="cutline-label">1/5 Pág Tabloide (20%)</span>
+                            <span class="cutline-label">1/5 Pág Tabloide (20%) • ~7.6 cm</span>
                         </div>
                         <div class="cutline" style="top: 25%;"
                             title="1/4 de Página Tabloide (25%) — Tarifa: L. 1,200.00">
-                            <span class="cutline-label">1/4 Pág Tabloide (25%)</span>
+                            <span class="cutline-label">1/4 Pág Tabloide (25%) • ~9.5 cm</span>
                         </div>
                         <div class="cutline" style="top: 33.33%;"
                             title="1/3 de Página Tabloide (33.3%) — Tarifa: L. 1,400.00">
-                            <span class="cutline-label">1/3 Pág Tabloide (33.3%)</span>
+                            <span class="cutline-label">1/3 Pág Tabloide (33.3%) • ~12.7 cm</span>
                         </div>
                         <div class="cutline" style="top: 50%;" title="1/2 Página Tabloide (50%) — Tarifa: L. 1,800.00">
-                            <span class="cutline-label">1/2 Pág Tabloide (50%)</span>
+                            <span class="cutline-label">1/2 Pág Tabloide (50%) • ~19.0 cm</span>
                         </div>
                         <div class="cutline" style="top: 66.67%;"
                             title="2/3 de Página Tabloide (66.7%) — Tarifa: L. 2,800.00">
-                            <span class="cutline-label">2/3 Pág Tabloide (66.7%)</span>
+                            <span class="cutline-label">2/3 Pág Tabloide (66.7%) • ~25.3 cm</span>
                         </div>
 
                         <!-- Capa animada de ocupación dinámica en la página Tabloide -->
@@ -1556,8 +1756,10 @@
                         </div>
 
                         <!-- Membrete Oficial Auténtico del Diario La Gaceta (ENAG) -->
-                        <div class="gaceta-masthead" id="gacetaMasthead" title="Membrete Oficial Diario La Gaceta — Empresa Nacional de Artes Gráficas">
-                            <img id="imgMembreteGaceta" src="../assets/membrete_gaceta_oficial.png" alt="Membrete Oficial Diario La Gaceta" class="gaceta-masthead-img">
+                        <div class="gaceta-masthead" id="gacetaMasthead"
+                            title="Membrete Oficial Diario La Gaceta — Empresa Nacional de Artes Gráficas">
+                            <img id="imgMembreteGaceta" src="../assets/membrete_gaceta_oficial.png"
+                                alt="Membrete Oficial Diario La Gaceta" class="gaceta-masthead-img">
                             <div id="overlayFechaDinamica" class="gaceta-masthead-date-overlay" style="display: none;">
                                 <span class="meta-left">AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
                                 <span class="meta-center" id="textoFechaDinamica">LUNES 27 DE ABRIL DEL 2026.</span>
@@ -1565,8 +1767,19 @@
                             </div>
                         </div>
 
+                        <!-- Cintillo Oficial para Páginas Interiores (Páginas 2+) -->
+                        <div class="gaceta-interior-header" id="gacetaInteriorHeader" style="display: none;">
+                            <div class="interior-header-line">
+                                <span id="interiorHeaderSec" class="interior-sec">Sección A</span>
+                                <span class="interior-center"><em>La Gaceta</em> &nbsp;•&nbsp; REPÚBLICA DE HONDURAS -
+                                    TEGUCIGALPA, M. D. C., <span id="interiorHeaderFecha">27 DE ABRIL DEL 2026</span>
+                                    &nbsp;•&nbsp; NUM. 37,127</span>
+                                <span id="interiorHeaderFolio" class="interior-folio">Pág. A. 2</span>
+                            </div>
+                        </div>
+
                         <!-- Columnas de texto tipográfico simulado Tabloide -->
-                        <div class="gaceta-columns" id="gacetaColumns">
+                        <div class="gaceta-columns cols-2" id="gacetaColumns">
                             <div class="gaceta-column" id="gacetaCol1">
                                 [El texto ingresado fluirá automáticamente en las columnas del pliego tabloide para que
                                 verifique
@@ -1575,6 +1788,15 @@
                             <div class="gaceta-column" id="gacetaCol2">
                                 [Segunda columna del pliego tabloide...]
                             </div>
+                            <div class="gaceta-column" id="gacetaCol3" style="display: none;">
+                                [Tercera columna del pliego tabloide...]
+                            </div>
+                        </div>
+
+                        <!-- Pie de Página Institucional para Páginas Interiores -->
+                        <div class="gaceta-interior-footer" id="gacetaInteriorFooter" style="display: none;">
+                            <span>Empresa Nacional de Artes Gráficas (E.N.A.G.) &nbsp;•&nbsp; PBX: 2230-1120 / 2230-2525
+                                &nbsp;•&nbsp; Tegucigalpa, M.D.C., Honduras</span>
                         </div>
                     </div>
                 </div>
@@ -1628,7 +1850,9 @@
                 precio: 800.00,
                 fraccion: 0.20,
                 maxPalabrasFactor: 0.20, // ~360 palabras en tabloide
-                nombreCorto: '1/5 de Página Tabloide'
+                nombreCorto: '1/5 de Página Tabloide',
+                alturaEstimadaCm: 7.6,
+                alturaColumnaUnicaCm: 15.2
             },
             {
                 id: '1/4',
@@ -1636,7 +1860,9 @@
                 precio: 1200.00,
                 fraccion: 0.25,
                 maxPalabrasFactor: 0.25, // ~450 palabras en tabloide
-                nombreCorto: '1/4 de Página Tabloide'
+                nombreCorto: '1/4 de Página Tabloide',
+                alturaEstimadaCm: 9.5,
+                alturaColumnaUnicaCm: 19.0
             },
             {
                 id: '1/3',
@@ -1644,7 +1870,9 @@
                 precio: 1400.00,
                 fraccion: 0.3333,
                 maxPalabrasFactor: 0.3333, // ~600 palabras en tabloide
-                nombreCorto: '1/3 de Página Tabloide'
+                nombreCorto: '1/3 de Página Tabloide',
+                alturaEstimadaCm: 12.7,
+                alturaColumnaUnicaCm: 25.3
             },
             {
                 id: '1/2',
@@ -1652,7 +1880,9 @@
                 precio: 1800.00,
                 fraccion: 0.50,
                 maxPalabrasFactor: 0.50, // ~900 palabras en tabloide
-                nombreCorto: '1/2 Página Tabloide'
+                nombreCorto: '1/2 Página Tabloide',
+                alturaEstimadaCm: 19.0,
+                alturaColumnaUnicaCm: 38.0
             },
             {
                 id: '2/3',
@@ -1660,7 +1890,9 @@
                 precio: 2800.00,
                 fraccion: 0.6667,
                 maxPalabrasFactor: 0.6667, // ~1200 palabras en tabloide
-                nombreCorto: '2/3 de Página Tabloide'
+                nombreCorto: '2/3 de Página Tabloide',
+                alturaEstimadaCm: 25.3,
+                alturaColumnaUnicaCm: 50.6
             },
             {
                 id: '1',
@@ -1668,9 +1900,27 @@
                 precio: 3200.00,
                 fraccion: 1.00,
                 maxPalabrasFactor: 1.00, // ~1800 palabras en tabloide
-                nombreCorto: '1 Página Tabloide Completa'
+                nombreCorto: '1 Página Tabloide Completa',
+                alturaEstimadaCm: 38.0,
+                alturaColumnaUnicaCm: 76.0
             }
         ];
+
+        // TARIFAS ESPECIALES DE MARCAS Y PATENTES (3 PUBLICACIONES DE LEY)
+        const TARIFAS_MARCAS_PATENTES = {
+            '1/5': {
+                desc: '1/5 DE PÁGINA ( MARCAS Y PATENTES -3 PUBLICACIONES)',
+                precio: 3814.00,
+                nombreCorto: '1/5 Pág. Marcas y Patentes (3 pub.)',
+                alturaEstimadaCm: 7.6
+            },
+            '1/4': {
+                desc: '1/4 DE PÁGINA (MARCAS Y PATENTES- 3 PUBLICACIONES )',
+                precio: 3928.00,
+                nombreCorto: '1/4 Pág. Marcas y Patentes (3 pub.)',
+                alturaEstimadaCm: 9.5
+            }
+        };
 
         const DESCUENTOS_VALORES = {
             '0': 0,
@@ -1700,7 +1950,9 @@
             impuestoPorcentaje: 15,
             valorImpuesto: 0,
             totalGeneral: 0,
-            resumenTexto: ""
+            resumenTexto: "",
+            alturaEstimadaCm: 0,
+            anchoColumnaCm: 11.5
         };
 
         // Parámetros de Calibración
@@ -1708,7 +1960,9 @@
             tipoPapel: 'tabloide', // 'tabloide' (11"x17") o 'carta' (8.5"x11")
             palabrasPorPagina: 1800, // 1800 palabras en Tabloide oficial (antes 1050 para carta)
             charsPorLinea: 45, // 45 caracteres promedio por línea de columna tabloide
-            columnas: 2,
+            columnas: 2, // 1, 2 o 3 columnas
+            modoDistribucion: 'balanceado', // 'balanceado' (horizontal) o 'columna_unica' (vertical)
+            tipoPublicacion: 'texto', // 'texto', 'marcas', 'junta_agua'
             margenSeguridad: 10,
             sangria: 4,
             interlineado: 1.0,
@@ -1717,6 +1971,10 @@
             tipoSeccion: 'seccion_a', // 'seccion_a', 'seccion_b', 'sin_seccion'
             modoFecha: 'oficial' // 'oficial' o 'hoy'
         };
+
+        // Estado de Paginación de la Maqueta
+        let paginaActualPrevia = 1;
+        let totalPaginasPrevia = 1;
 
         // Inicialización
         window.addEventListener('DOMContentLoaded', () => {
@@ -1745,13 +2003,24 @@
                     if (calibracion.justificado === undefined) calibracion.justificado = true;
                     if (calibracion.tipoSeccion === undefined) calibracion.tipoSeccion = 'seccion_a';
                     if (calibracion.modoFecha === undefined) calibracion.modoFecha = 'oficial';
+                    if (calibracion.columnas === undefined) calibracion.columnas = 2;
+                    if (calibracion.modoDistribucion === undefined) calibracion.modoDistribucion = 'balanceado';
+                    if (calibracion.tipoPublicacion === undefined) calibracion.tipoPublicacion = 'texto';
 
                     if (document.getElementById('calibTipoPapel')) {
                         document.getElementById('calibTipoPapel').value = calibracion.tipoPapel;
                     }
                     document.getElementById('calibPalabrasPorPagina').value = calibracion.palabrasPorPagina;
                     document.getElementById('calibCharsPorLinea').value = calibracion.charsPorLinea;
-                    document.getElementById('calibColumnas').value = calibracion.columnas;
+                    if (document.getElementById('calibColumnas')) {
+                        document.getElementById('calibColumnas').value = calibracion.columnas;
+                    }
+                    if (document.getElementById('calibModoDistribucion')) {
+                        document.getElementById('calibModoDistribucion').value = calibracion.modoDistribucion;
+                    }
+                    if (document.getElementById('tipoPublicacion')) {
+                        document.getElementById('tipoPublicacion').value = calibracion.tipoPublicacion;
+                    }
                     document.getElementById('calibMargenSeguridad').value = calibracion.margenSeguridad;
                     if (document.getElementById('calibSangria')) {
                         document.getElementById('calibSangria').value = calibracion.sangria;
@@ -1761,6 +2030,7 @@
                     }
                     actualizarSelectSangriaUI(calibracion.sangria);
                     actualizarSelectInterlineadoUI(calibracion.interlineado);
+                    actualizarBotonesColumnasUI();
                     aplicarEstilosVisualesEditor();
                     cambiarTamanoMaqueta(calibracion.tamanoMaqueta || 'tabloide');
                     actualizarControlesMembreteUI();
@@ -1773,6 +2043,7 @@
                 }
                 actualizarSelectSangriaUI(calibracion.sangria);
                 actualizarSelectInterlineadoUI(calibracion.interlineado);
+                actualizarBotonesColumnasUI();
                 aplicarEstilosVisualesEditor();
                 cambiarTamanoMaqueta('tabloide');
                 actualizarControlesMembreteUI();
@@ -1786,31 +2057,91 @@
             calibracion.palabrasPorPagina = parseInt(document.getElementById('calibPalabrasPorPagina').value) || 1800;
             calibracion.charsPorLinea = parseInt(document.getElementById('calibCharsPorLinea').value) || 45;
             calibracion.columnas = parseInt(document.getElementById('calibColumnas').value) || 2;
+            if (document.getElementById('calibModoDistribucion')) {
+                calibracion.modoDistribucion = document.getElementById('calibModoDistribucion').value || 'balanceado';
+            }
+            if (document.getElementById('tipoPublicacion')) {
+                calibracion.tipoPublicacion = document.getElementById('tipoPublicacion').value || 'texto';
+            }
             calibracion.margenSeguridad = parseInt(document.getElementById('calibMargenSeguridad').value) || 10;
             calibracion.sangria = parseInt(document.getElementById('calibSangria').value) || 0;
             calibracion.interlineado = parseFloat(document.getElementById('calibInterlineado').value) || 1.0;
 
             actualizarSelectSangriaUI(calibracion.sangria);
             actualizarSelectInterlineadoUI(calibracion.interlineado);
+            actualizarBotonesColumnasUI();
             aplicarEstilosVisualesEditor();
             localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
             showToast("Ajustes de calibración de imprenta actualizados y guardados", "info");
             analizarTexto();
         }
 
+        function cambiarColumnasDiagramacion(num) {
+            calibracion.columnas = parseInt(num) || 2;
+            if (calibracion.columnas === 3) {
+                calibracion.charsPorLinea = 32;
+            } else if (calibracion.columnas === 1) {
+                calibracion.charsPorLinea = 75;
+            } else {
+                calibracion.charsPorLinea = 45;
+            }
+            const inputChars = document.getElementById('calibCharsPorLinea');
+            if (inputChars) inputChars.value = calibracion.charsPorLinea;
+            const selCols = document.getElementById('calibColumnas');
+            if (selCols) selCols.value = calibracion.columnas;
+
+            actualizarBotonesColumnasUI();
+            localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
+            showToast(`Diagramación: ${calibracion.columnas} ${calibracion.columnas === 1 ? 'Columna' : 'Columnas'}`, 'info');
+            analizarTexto();
+        }
+
+        function actualizarBotonesColumnasUI() {
+            const btnCols1 = document.getElementById('btnCols1');
+            const btnCols2 = document.getElementById('btnCols2');
+            const btnCols3 = document.getElementById('btnCols3');
+            if (btnCols1) btnCols1.classList.toggle('active', calibracion.columnas === 1);
+            if (btnCols2) btnCols2.classList.toggle('active', calibracion.columnas === 2);
+            if (btnCols3) btnCols3.classList.toggle('active', calibracion.columnas === 3);
+        }
+
+        function cambiarTipoPublicacion(tipo) {
+            calibracion.tipoPublicacion = tipo;
+            const sel = document.getElementById('tipoPublicacion');
+            if (sel) sel.value = tipo;
+            localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
+
+            const nombres = {
+                'texto': 'Texto General (Acuerdo 249-2010)',
+                'marcas': 'Marcas y Patentes (3 Publicaciones de Ley)',
+                'junta_agua': 'Junta de Agua (Exento de Pago)'
+            };
+            showToast(`Categoría oficial: ${nombres[tipo] || tipo}`, 'info');
+            analizarTexto();
+        }
+
+        function cambiarPaginaPrevia(delta) {
+            const nueva = paginaActualPrevia + delta;
+            if (nueva >= 1 && nueva <= totalPaginasPrevia) {
+                paginaActualPrevia = nueva;
+                const rawText = document.getElementById('textoPublicacion').value;
+                actualizarMaquetaGaceta(rawText, Math.min(analisisActual.porcentajePagina, 100));
+            }
+        }
+
         function cambiarFormatoPapel(tipo) {
             calibracion.tipoPapel = tipo;
             if (tipo === 'tabloide') {
                 calibracion.palabrasPorPagina = 1800;
-                calibracion.charsPorLinea = 45;
+                calibracion.charsPorLinea = calibracion.columnas === 3 ? 32 : (calibracion.columnas === 1 ? 75 : 45);
                 document.getElementById('calibPalabrasPorPagina').value = 1800;
-                document.getElementById('calibCharsPorLinea').value = 45;
+                document.getElementById('calibCharsPorLinea').value = calibracion.charsPorLinea;
                 showToast("Formato ajustado a TABLOIDE OFICIAL (11\" × 17\" • 279 × 432 mm)", "success");
             } else {
                 calibracion.palabrasPorPagina = 1050;
-                calibracion.charsPorLinea = 40;
+                calibracion.charsPorLinea = calibracion.columnas === 3 ? 28 : (calibracion.columnas === 1 ? 65 : 40);
                 document.getElementById('calibPalabrasPorPagina').value = 1050;
-                document.getElementById('calibCharsPorLinea').value = 40;
+                document.getElementById('calibCharsPorLinea').value = calibracion.charsPorLinea;
                 showToast("Formato ajustado a CARTA REDUCIDO (8.5\" × 11\" • 216 × 279 mm)", "info");
             }
             guardarCalibracion();
@@ -1822,6 +2153,8 @@
                 palabrasPorPagina: 1800,
                 charsPorLinea: 45,
                 columnas: 2,
+                modoDistribucion: 'balanceado',
+                tipoPublicacion: 'texto',
                 margenSeguridad: 10,
                 sangria: 4,
                 interlineado: 1.0,
@@ -1830,12 +2163,23 @@
                 tipoSeccion: 'seccion_a',
                 modoFecha: 'oficial'
             };
+            paginaActualPrevia = 1;
+            totalPaginasPrevia = 1;
+
             if (document.getElementById('calibTipoPapel')) {
                 document.getElementById('calibTipoPapel').value = 'tabloide';
             }
             document.getElementById('calibPalabrasPorPagina').value = 1800;
             document.getElementById('calibCharsPorLinea').value = 45;
-            document.getElementById('calibColumnas').value = 2;
+            if (document.getElementById('calibColumnas')) {
+                document.getElementById('calibColumnas').value = 2;
+            }
+            if (document.getElementById('calibModoDistribucion')) {
+                document.getElementById('calibModoDistribucion').value = 'balanceado';
+            }
+            if (document.getElementById('tipoPublicacion')) {
+                document.getElementById('tipoPublicacion').value = 'texto';
+            }
             document.getElementById('calibMargenSeguridad').value = 10;
             if (document.getElementById('calibSangria')) {
                 document.getElementById('calibSangria').value = 4;
@@ -1845,6 +2189,7 @@
             }
             actualizarSelectSangriaUI(4);
             actualizarSelectInterlineadoUI(1.0);
+            actualizarBotonesColumnasUI();
             aplicarEstilosVisualesEditor();
             cambiarTamanoMaqueta('tabloide');
             actualizarControlesMembreteUI();
@@ -1977,42 +2322,83 @@
 
             const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: 13.5px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
-            const balance = balancearTextoEnColumnas(rawText);
-            let col1Html = '<p style="color: #94a3b8; font-style: italic;">[Sin texto ingresado en el editor]</p>';
-            let col2Html = '<p style="color: #94a3b8; font-style: italic;">[Segunda columna del pliego tabloide]</p>';
-
-            if (balance.col1.length > 0 || balance.col2.length > 0) {
-                col1Html = balance.col1.map(p => `<p ${estiloP}>${p}</p>`).join('');
-                col2Html = balance.col2.length > 0 
-                    ? balance.col2.map(p => `<p ${estiloP}>${p}</p>`).join('') 
-                    : '<p style="color: #94a3b8; font-style: italic;">[Continúa en columna 1...]</p>';
-            }
+            const textoPagina = obtenerTextoParaPagina(rawText, paginaActualPrevia, totalPaginasPrevia);
+            const balance = balancearTextoEnColumnas(textoPagina, calibracion.columnas, calibracion.modoDistribucion);
 
             const rutaMembrete = obtenerRutaMembreteActual();
             const esFechaHoy = calibracion.modoFecha === 'hoy';
             const fechaStr = formatearFechaOficialGaceta(new Date());
             const esSinSeccion = calibracion.tipoSeccion === 'sin_seccion';
+            const secLetra = calibracion.tipoSeccion === 'seccion_b' ? 'B' : 'A';
+            const secNombre = calibracion.tipoSeccion === 'seccion_b' ? 'Sección B' : 'Sección A';
 
-            sheet.innerHTML = `
-                <div class="gaceta-masthead-modal" style="margin-bottom: 22px; position: relative; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden;">
-                    <img src="${rutaMembrete}" alt="Membrete Oficial Diario La Gaceta" style="width: 100%; height: auto; display: block;">
-                    ${esFechaHoy ? `
-                        <div style="position: absolute; bottom: ${esSinSeccion ? '0%' : '13.3%'}; left: 0; width: 100%; height: 6.8%; background: #eaeaea; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-family: 'Times New Roman', serif; font-size: 12.5px; font-weight: 800; color: #111; border-top: 1px solid #111; border-bottom: 1px solid #111; box-sizing: border-box; letter-spacing: 0.3px;">
-                            <span>AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
-                            <span>${fechaStr}</span>
-                            <span>NUM. 37,127</span>
-                        </div>
-                    ` : ''}
-                </div>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex: 1;">
-                    <div style="border-right: 1.5px solid #d6d3d1; padding-right: 22px;">
-                        ${col1Html}
+            // Cabecera: Página 1 (Membrete oficial) vs Páginas Interiores (Folio)
+            let headerHtml = '';
+            if (paginaActualPrevia > 1) {
+                headerHtml = `
+                    <div style="border-bottom: 2px solid #111; padding-bottom: 6px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: baseline; font-family: 'Times New Roman', serif; font-size: 14px; font-weight: 700; color: #111; letter-spacing: 0.5px;">
+                        <span>${secNombre}</span>
+                        <span style="font-size: 16px; font-weight: 900; letter-spacing: 2px;">La Gaceta &nbsp;•&nbsp; REPÚBLICA DE HONDURAS &nbsp;•&nbsp; TEGUCIGALPA, M. D. C.</span>
+                        <span style="background: #111; color: #fff; padding: 2px 8px; border-radius: 2px;">Pág. ${secLetra}. ${paginaActualPrevia}</span>
                     </div>
-                    <div>
-                        ${col2Html}
+                `;
+            } else {
+                headerHtml = `
+                    <div class="gaceta-masthead-modal" style="margin-bottom: 22px; position: relative; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden;">
+                        <img src="${rutaMembrete}" alt="Membrete Oficial Diario La Gaceta" style="width: 100%; height: auto; display: block;">
+                        ${esFechaHoy ? `
+                            <div style="position: absolute; bottom: ${esSinSeccion ? '0%' : '13.3%'}; left: 0; width: 100%; height: 6.8%; background: #eaeaea; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-family: 'Times New Roman', serif; font-size: 12.5px; font-weight: 800; color: #111; border-top: 1px solid #111; border-bottom: 1px solid #111; box-sizing: border-box; letter-spacing: 0.3px;">
+                                <span>AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
+                                <span>${fechaStr}</span>
+                                <span>NUM. 37,127</span>
+                            </div>
+                        ` : ''}
                     </div>
+                `;
+            }
+
+            // Contenido según número de columnas
+            let colsHtml = '';
+            const numCols = calibracion.columnas || 2;
+
+            if (numCols === 1) {
+                const c1 = balance.col1.length > 0 ? balance.col1.map(p => formatearParrafoConJerarquia(p, estiloP)).join('') : '<p style="color: #94a3b8; font-style: italic;">[Sin texto ingresado en el editor]</p>';
+                colsHtml = `
+                    <div style="display: block; flex: 1; padding: 0 10px;">
+                        ${c1}
+                    </div>
+                `;
+            } else if (numCols === 3) {
+                const c1 = balance.col1.length > 0 ? balance.col1.map(p => formatearParrafoConJerarquia(p, estiloP)).join('') : '<p style="color: #94a3b8; font-style: italic;">[Columna 1]</p>';
+                const c2 = balance.col2.length > 0 ? balance.col2.map(p => formatearParrafoConJerarquia(p, estiloP)).join('') : '<p style="color: #94a3b8; font-style: italic;">[Columna 2]</p>';
+                const c3 = balance.col3.length > 0 ? balance.col3.map(p => formatearParrafoConJerarquia(p, estiloP)).join('') : '<p style="color: #94a3b8; font-style: italic;">[Columna 3]</p>';
+                colsHtml = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; flex: 1;">
+                        <div style="border-right: 1.5px solid #d6d3d1; padding-right: 14px;">${c1}</div>
+                        <div style="border-right: 1.5px solid #d6d3d1; padding-right: 14px;">${c2}</div>
+                        <div>${c3}</div>
+                    </div>
+                `;
+            } else {
+                const c1 = balance.col1.length > 0 ? balance.col1.map(p => formatearParrafoConJerarquia(p, estiloP)).join('') : '<p style="color: #94a3b8; font-style: italic;">[Sin texto ingresado en el editor]</p>';
+                const c2 = balance.col2.length > 0 ? balance.col2.map(p => formatearParrafoConJerarquia(p, estiloP)).join('') : '<p style="color: #94a3b8; font-style: italic;">[Segunda columna del pliego tabloide]</p>';
+                colsHtml = `
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 32px; flex: 1;">
+                        <div style="border-right: 1.5px solid #d6d3d1; padding-right: 22px;">${c1}</div>
+                        <div>${c2}</div>
+                    </div>
+                `;
+            }
+
+            // Pie de página interior si página > 1
+            const footerHtml = paginaActualPrevia > 1 ? `
+                <div style="margin-top: 25px; padding-top: 8px; border-top: 1px solid #111; display: flex; justify-content: space-between; font-family: 'Times New Roman', serif; font-size: 11px; font-weight: 700; color: #333;">
+                    <span>DIARIO OFICIAL LA GACETA — EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)</span>
+                    <span>Pág. ${secLetra}. ${paginaActualPrevia}</span>
                 </div>
-            `;
+            ` : '';
+
+            sheet.innerHTML = headerHtml + colsHtml + footerHtml;
 
             modal.classList.add('active');
             document.body.style.overflow = 'hidden';
@@ -2362,21 +2748,142 @@
             return parrafos;
         }
 
-        // BALANCEADOR EQUITATIVO DE TEXTO EN 2 COLUMNAS (TABLOIDE LA GACETA)
-        function balancearTextoEnColumnas(texto) {
-            if (!texto || !texto.trim()) return { col1: [], col2: [] };
-
+        // BALANCEADOR EQUITATIVO DE TEXTO EN COLUMNAS (TABLOIDE LA GACETA)
+        function obtenerTextoParaPagina(texto, pag, totalPags) {
+            if (!texto || !texto.trim() || totalPags <= 1) return texto;
             const parrafos = segmentarTextoEnParrafos(texto);
-            if (parrafos.length === 0) return { col1: [], col2: [] };
+            if (parrafos.length === 0) return '';
+            const porPag = Math.ceil(parrafos.length / totalPags);
+            const inicio = (pag - 1) * porPag;
+            const fin = Math.min(inicio + porPag, parrafos.length);
+            const slice = parrafos.slice(inicio, fin);
+            return slice.join('\n\n');
+        }
 
-            const totalCaracteres = parrafos.reduce((acc, p) => acc + p.length, 0);
+        function formatearParrafoConJerarquia(p, estiloP) {
+            if (!p) return '';
+            const trimmed = p.trim();
+            // Filetes decorativos oficiales
+            if (/^[—–-]{2,}\s*[◆♦*•]\s*[—–-]{2,}$/.test(trimmed)) {
+                return `<div class="gaceta-adornment">${trimmed}</div>`;
+            }
+            // Títulos oficiales destacados
+            if (/^(?:ACUERDO EJECUTIVO|DECRETO|RESOLUCIÓN|CERTIFICACIÓN|AVISO|EDICTO|AVISO DE DECLARATORIA|SOLICITUD DE REGISTRO|DIRECCIÓN GENERAL)\b/i.test(trimmed) && trimmed.length < 130) {
+                return `<p style="text-align: center; font-weight: 800; font-family: 'Times New Roman', serif; font-size: 1.05em; text-transform: uppercase; margin: 10px 0 6px 0; letter-spacing: 0.5px; line-height: 1.25;">${trimmed}</p>`;
+            }
+            // Cláusulas de encabezado legal
+            if (/^(?:CONSIDERANDO:|POR TANTO[;:]?|DECRETA:|ACUERDA:|RESUELVE:)$/i.test(trimmed)) {
+                return `<p style="text-align: center; font-weight: 800; font-family: 'Times New Roman', serif; font-size: 0.98em; margin: 8px 0 4px 0; letter-spacing: 1px;">${trimmed}</p>`;
+            }
+            // Artículos con número resaltado
+            if (/^ART[IÍ]CULO\s+\d+[\.\-:]/i.test(trimmed)) {
+                const matches = trimmed.match(/^(ART[IÍ]CULO\s+\d+[\.\-:]\s*)([\s\S]*)$/i);
+                if (matches) {
+                    return `<p ${estiloP}><strong>${matches[1]}</strong>${matches[2]}</p>`;
+                }
+            }
+            // Cierres y firmas
+            if (/^(?:COMUN[IÍ]QUESE Y PUBL[IÍ]QUESE|DADO EN\b)/i.test(trimmed)) {
+                return `<p style="text-align: center; font-weight: 700; font-family: 'Times New Roman', serif; font-size: 0.95em; margin: 10px 0 5px 0;">${trimmed}</p>`;
+            }
+            return `<p ${estiloP}>${trimmed}</p>`;
+        }
 
-            // Si el texto es breve (< 160 caracteres) cabe en la primera columna
-            if (totalCaracteres < 160 && parrafos.length <= 1) {
-                return { col1: parrafos, col2: [] };
+        function balancearTextoEnColumnas(texto, numCols = 2, modo = 'balanceado') {
+            if (!texto || !texto.trim()) {
+                return { col1: [], col2: [], col3: [] };
             }
 
-            // Si solo tenemos 1 párrafo largo, dividirlo por oraciones o por palabras
+            const parrafos = segmentarTextoEnParrafos(texto);
+            if (parrafos.length === 0) return { col1: [], col2: [], col3: [] };
+
+            // 1 sola columna
+            if (numCols === 1) {
+                return { col1: parrafos, col2: [], col3: [] };
+            }
+
+            // Modo columna única sucesiva (llena columna por columna)
+            if (modo === 'columna_unica') {
+                const limiteCharsCol = (calibracion.tipoPapel === 'tabloide' ? 2400 : 1400) / numCols;
+                let col1 = [], col2 = [], col3 = [];
+                let count1 = 0, count2 = 0;
+
+                parrafos.forEach(p => {
+                    if (count1 < limiteCharsCol) {
+                        col1.push(p);
+                        count1 += p.length;
+                    } else if (numCols === 3 && count2 < limiteCharsCol) {
+                        col2.push(p);
+                        count2 += p.length;
+                    } else if (numCols === 3) {
+                        col3.push(p);
+                    } else {
+                        col2.push(p);
+                        count2 += p.length;
+                    }
+                });
+                return { col1, col2, col3 };
+            }
+
+            // Modo balanceado a 3 Columnas (Marcas y Patentes)
+            if (numCols === 3) {
+                const totalChars = parrafos.reduce((acc, p) => acc + p.length, 0);
+                if (parrafos.length <= 2 && totalChars < 180) {
+                    return { col1: parrafos, col2: [], col3: [] };
+                }
+
+                let unidades = [...parrafos];
+                if (unidades.length === 1 && unidades[0].length > 150) {
+                    const p = unidades[0];
+                    const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
+                    if (oraciones.length >= 3) {
+                        unidades = oraciones;
+                    } else {
+                        const palabras = p.split(/\s+/);
+                        const tercio = Math.ceil(palabras.length / 3);
+                        unidades = [
+                            palabras.slice(0, tercio).join(' '),
+                            palabras.slice(tercio, tercio * 2).join(' '),
+                            palabras.slice(tercio * 2).join(' ')
+                        ];
+                    }
+                }
+
+                const tercioMeta = totalChars / 3;
+                let col1 = [], col2 = [], col3 = [];
+                let acum1 = 0, acum2 = 0;
+                let target = 1;
+
+                unidades.forEach(u => {
+                    if (target === 1) {
+                        col1.push(u);
+                        acum1 += u.length;
+                        if (acum1 >= tercioMeta && col1.length >= 1) target = 2;
+                    } else if (target === 2) {
+                        col2.push(u);
+                        acum2 += u.length;
+                        if (acum2 >= tercioMeta && col2.length >= 1) target = 3;
+                    } else {
+                        col3.push(u);
+                    }
+                });
+
+                if (col2.length === 0 && col1.length >= 2) {
+                    col2.push(col1.pop());
+                }
+                if (col3.length === 0 && col2.length >= 2) {
+                    col3.push(col2.pop());
+                }
+
+                return { col1, col2, col3 };
+            }
+
+            // Modo balanceado a 2 Columnas (Estándar de La Gaceta)
+            const totalCaracteres = parrafos.reduce((acc, p) => acc + p.length, 0);
+            if (totalCaracteres < 160 && parrafos.length <= 1) {
+                return { col1: parrafos, col2: [], col3: [] };
+            }
+
             let unidades = [...parrafos];
             if (unidades.length === 1 && unidades[0].length > 120) {
                 const p = unidades[0];
@@ -2393,7 +2900,6 @@
                 }
             }
 
-            // Distribuir unidades buscando equilibrio alrededor del 50%
             const mitadMeta = totalCaracteres / 2;
             let mejorIndice = 1;
             let menorDiff = Infinity;
@@ -2416,7 +2922,6 @@
             let col1 = unidades.slice(0, mejorIndice);
             let col2 = unidades.slice(mejorIndice);
 
-            // Evitar que una sola columna quede desproporcionada
             const len1 = col1.reduce((a, b) => a + b.length, 0);
             const len2 = col2.reduce((a, b) => a + b.length, 0);
 
@@ -2442,7 +2947,7 @@
                 }
             }
 
-            return { col1, col2 };
+            return { col1, col2, col3: [] };
         }
 
         // MOTOR DE ANÁLISIS DE TEXTO Y DIAGRAMACIÓN
@@ -2480,12 +2985,24 @@
             const totalLineasConInterlineado = Math.ceil(totalLineasEstimadas * factorInterlineado);
 
             // 3. Cálculo de Ocupación con factor de seguridad e interlineado
-            // Al alargar el espacio entre líneas, el texto ocupa proporcionalmente más espacio vertical en la página
             const factorSeguridad = 1 + (calibracion.margenSeguridad / 100);
             const palabrasEfectivas = cantPalabras * factorSeguridad * factorInterlineado;
 
             // Porcentaje respecto a 1 página completa
             const porcentajeOcupacion = (palabrasEfectivas / calibracion.palabrasPorPagina) * 100;
+            const clampedPercent = Math.min(porcentajeOcupacion, 100);
+
+            // 4. Medidas Físicas Reales de Papel de Imprenta (La Gaceta)
+            const maxAlturaCajaCm = calibracion.tipoPapel === 'tabloide' ? 38.0 : 24.5;
+            let alturaPapelCalculada = ((clampedPercent / 100) * maxAlturaCajaCm).toFixed(1);
+            let alturaPapelStr = `${alturaPapelCalculada} cm`;
+
+            let anchoColStr = '11.5 cm';
+            if (calibracion.tipoPapel === 'tabloide') {
+                anchoColStr = calibracion.columnas === 3 ? '7.5 cm' : (calibracion.columnas === 1 ? '23.5 cm' : '11.5 cm');
+            } else {
+                anchoColStr = calibracion.columnas === 3 ? '5.6 cm' : (calibracion.columnas === 1 ? '18.0 cm' : '8.8 cm');
+            }
 
             // Actualizar Métricas en pantalla
             document.getElementById('valPalabras').textContent = cantPalabras.toLocaleString();
@@ -2494,39 +3011,97 @@
             document.getElementById('valParrafos').textContent = cantParrafos.toLocaleString();
             document.getElementById('valPorcentajeOcupado').textContent = `${porcentajeOcupacion.toFixed(1)}%`;
 
+            const valAlturaPapel = document.getElementById('valAlturaPapel');
+            if (valAlturaPapel) valAlturaPapel.textContent = alturaPapelStr;
+
+            const valAnchoColumna = document.getElementById('valAnchoColumna');
+            if (valAnchoColumna) valAnchoColumna.textContent = anchoColStr;
+
             // Actualizar barra de progreso visual
             const progressBar = document.getElementById('progressBarFill');
-            const clampedPercent = Math.min(porcentajeOcupacion, 100);
             progressBar.style.width = `${clampedPercent}%`;
 
-            // 4. Clasificación en el Catálogo de Espacios Oficiales
+            // 5. Clasificación según Tipo de Publicación (Acuerdo 249-2010 / Marcas / Juntas de Agua)
             let espacioRecomendado = null;
             let esMultiPagina = false;
             let numPaginasCompletas = 1;
 
-            if (porcentajeOcupacion <= 20) {
-                espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/5');
-            } else if (porcentajeOcupacion <= 25) {
-                espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/4');
-            } else if (porcentajeOcupacion <= 33.33) {
-                espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/3');
-            } else if (porcentajeOcupacion <= 50) {
-                espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/2');
-            } else if (porcentajeOcupacion <= 66.67) {
-                espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '2/3');
-            } else if (porcentajeOcupacion <= 100) {
-                espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1');
-            } else {
-                // Sobrepasa 1 página completa -> Multi-página
+            if (porcentajeOcupacion > 100) {
                 esMultiPagina = true;
                 numPaginasCompletas = Math.ceil(porcentajeOcupacion / 100);
+            }
+
+            const tipoPub = calibracion.tipoPublicacion || 'texto';
+
+            if (tipoPub === 'junta_agua') {
+                // Beneficio social de exención por ley
                 espacioRecomendado = {
-                    id: 'multi',
-                    desc: `${numPaginasCompletas} PÁGINAS TABLOIDE (PUBLICACIONES - TEXTO)`,
-                    precio: 3200.00 * numPaginasCompletas,
-                    fraccion: numPaginasCompletas,
-                    nombreCorto: `${numPaginasCompletas} Páginas Tabloide`
+                    id: 'junta_agua',
+                    desc: 'PUBLICACIÓN EXENTA - JUNTA DE AGUA (DECRETO LEGISLATIVO)',
+                    precio: 0.00,
+                    fraccion: clampedPercent / 100,
+                    nombreCorto: 'Junta de Agua (Exento)',
+                    alturaEstimadaCm: alturaPapelStr
                 };
+            } else if (tipoPub === 'marcas') {
+                // Tarifas de Propiedad Intelectual: 3 Publicaciones de Ley en Sección B (cotizaciones.html)
+                if (porcentajeOcupacion <= 20) {
+                    espacioRecomendado = TARIFAS_MARCAS_PATENTES['1/5'];
+                } else if (porcentajeOcupacion <= 33.33) {
+                    espacioRecomendado = TARIFAS_MARCAS_PATENTES['1/4'];
+                } else {
+                    espacioRecomendado = {
+                        id: 'marcas_media',
+                        desc: 'MARCA / PATENTE (1/2 PÁGINA - 3 PUBLICACIONES)',
+                        precio: 5400.00,
+                        fraccion: 0.50,
+                        nombreCorto: '1/2 Pág Marcas (3 Pubs)',
+                        alturaEstimadaCm: '19.0 cm'
+                    };
+                }
+            } else {
+                // Tarifa Estándar de Publicaciones de Texto (Acuerdo Ejecutivo 249-2010)
+                if (porcentajeOcupacion <= 20) {
+                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/5');
+                } else if (porcentajeOcupacion <= 25) {
+                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/4');
+                } else if (porcentajeOcupacion <= 33.33) {
+                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/3');
+                } else if (porcentajeOcupacion <= 50) {
+                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/2');
+                } else if (porcentajeOcupacion <= 66.67) {
+                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '2/3');
+                } else if (porcentajeOcupacion <= 100) {
+                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1');
+                } else {
+                    espacioRecomendado = {
+                        id: 'multi',
+                        desc: `${numPaginasCompletas} PÁGINAS TABLOIDE (PUBLICACIONES - TEXTO)`,
+                        precio: 3200.00 * numPaginasCompletas,
+                        fraccion: numPaginasCompletas,
+                        nombreCorto: `${numPaginasCompletas} Páginas Tabloide`,
+                        alturaEstimadaCm: `${(numPaginasCompletas * 38.0).toFixed(0)} cm (${numPaginasCompletas} págs)`
+                    };
+                }
+            }
+
+            // Control de paginación del simulador
+            totalPaginasPrevia = numPaginasCompletas;
+            if (paginaActualPrevia > totalPaginasPrevia) paginaActualPrevia = 1;
+
+            const paginationBar = document.getElementById('paginationBar');
+            const pageIndicator = document.getElementById('pageIndicator');
+            const btnPrevPage = document.getElementById('btnPrevPage');
+            const btnNextPage = document.getElementById('btnNextPage');
+            if (paginationBar) {
+                if (totalPaginasPrevia > 1) {
+                    paginationBar.style.display = 'flex';
+                    if (pageIndicator) pageIndicator.textContent = `Página ${paginaActualPrevia} de ${totalPaginasPrevia}`;
+                    if (btnPrevPage) btnPrevPage.disabled = (paginaActualPrevia <= 1);
+                    if (btnNextPage) btnNextPage.disabled = (paginaActualPrevia >= totalPaginasPrevia);
+                } else {
+                    paginationBar.style.display = 'none';
+                }
             }
 
             // Alerta de margen de seguridad
@@ -2537,8 +3112,12 @@
                 feedbackElem.innerHTML = `⚠️ <strong style="color: #ea580c;">Extensión Multi-Página Tabloide:</strong> El texto sobrepasa un pliego tabloide completo (${porcentajeOcupacion.toFixed(1)}% de ocupación). Se calculan ${numPaginasCompletas} páginas tabloide completas.`;
                 badgeEstado.textContent = `${numPaginasCompletas} Páginas Tabloide`;
                 badgeEstado.style.background = '#ea580c';
+            } else if (tipoPub === 'junta_agua') {
+                feedbackElem.innerHTML = `🛡️ <strong style="color: #0284c7;">Exención de Ley Aplicada:</strong> Las Juntas de Agua gozan de tasa 0 por decreto de ley de protección social.`;
+                badgeEstado.textContent = "Exento de Pago";
+                badgeEstado.style.background = '#0284c7';
             } else {
-                const fraccionTarget = espacioRecomendado.fraccion * 100;
+                const fraccionTarget = (espacioRecomendado.fraccion || 0.2) * 100;
                 const ratioEnFormato = (porcentajeOcupacion / fraccionTarget) * 100;
 
                 if (ratioEnFormato > 88) {
@@ -2560,6 +3139,8 @@
             analisisActual.porcentajePagina = porcentajeOcupacion;
             analisisActual.espacioSeleccionado = espacioRecomendado;
             analisisActual.cantidadPaginas = numPaginasCompletas;
+            analisisActual.alturaPapelCm = alturaPapelStr;
+            analisisActual.anchoColumna = anchoColStr;
             analisisActual.resumenTexto = obtenerExtractoTexto(rawText);
 
             // Actualizar UI Comercial y Financiera
@@ -2596,7 +3177,7 @@
             const valorDescuento = (precioBase * descPorc) / 100;
             analisisActual.valorDescuento = valorDescuento;
 
-            if (descPorc > 0) {
+            if (descPorc > 0 && precioBase > 0) {
                 rowDesc.style.display = 'flex';
                 document.getElementById('tarifaValorDescuento').textContent = `- ${formatMoneda(valorDescuento)} (${descPorc}%)`;
             } else {
@@ -2626,20 +3207,55 @@
             const fillBadge = document.getElementById('gacetaFillBadge');
             const col1 = document.getElementById('gacetaCol1');
             const col2 = document.getElementById('gacetaCol2');
+            const col3 = document.getElementById('gacetaCol3');
+            const columnsContainer = document.getElementById('gacetaColumns');
             const simLabel = document.getElementById('simFractionLabel');
+            const masthead = document.getElementById('gacetaMasthead');
+            const interiorHeader = document.getElementById('gacetaInteriorHeader');
+            const interiorFooter = document.getElementById('gacetaInteriorFooter');
+            const interiorSecNombre = document.getElementById('interiorSecNombre');
+            const interiorFolioNum = document.getElementById('interiorFolioNum');
 
+            // Formato y título de simulación
             if (simLabel) {
+                const colStr = calibracion.columnas === 1 ? '1 Columna' : (calibracion.columnas === 3 ? '3 Cols (Marcas/Patentes)' : '2 Columnas');
                 if (calibracion.tipoPapel === 'tabloide') {
-                    simLabel.innerHTML = '📰 Formato Oficial: Tabloide (11" × 17" • 279 × 432 mm)';
+                    simLabel.innerHTML = `📰 Tabloide Oficial (11" × 17" • 279 × 432 mm) — ${colStr}`;
                     simLabel.style.background = '#e0f2fe';
                     simLabel.style.color = '#0369a1';
                     simLabel.style.borderColor = '#bae6fd';
                 } else {
-                    simLabel.innerHTML = '📄 Formato Reducido: Carta (8.5" × 11" • 216 × 279 mm)';
+                    simLabel.innerHTML = `📄 Carta Reducido (8.5" × 11" • 216 × 279 mm) — ${colStr}`;
                     simLabel.style.background = '#f1f5f9';
                     simLabel.style.color = '#475569';
                     simLabel.style.borderColor = '#cbd5e1';
                 }
+            }
+
+            // Alternar Cabecera: Página 1 (Membrete oficial grande) vs Página 2+ (Folio interior de La Gaceta)
+            const secLetra = calibracion.tipoSeccion === 'seccion_b' ? 'B' : 'A';
+            const secNombre = calibracion.tipoSeccion === 'seccion_b' ? 'Sección B' : 'Sección A';
+
+            if (paginaActualPrevia > 1) {
+                if (masthead) masthead.style.display = 'none';
+                if (interiorHeader) interiorHeader.style.display = 'block';
+                if (interiorFooter) interiorFooter.style.display = 'flex';
+                if (interiorSecNombre) interiorSecNombre.textContent = secNombre;
+                if (interiorFolioNum) interiorFolioNum.textContent = `Pág. ${secLetra}. ${paginaActualPrevia}`;
+            } else {
+                if (masthead) masthead.style.display = 'block';
+                if (interiorHeader) interiorHeader.style.display = 'none';
+                if (interiorFooter) interiorFooter.style.display = 'none';
+            }
+
+            // Clases de columnas
+            if (columnsContainer) {
+                columnsContainer.classList.remove('cols-1', 'cols-2', 'cols-3');
+                columnsContainer.classList.add(`cols-${calibracion.columnas || 2}`);
+            }
+
+            if (col3) {
+                col3.style.display = calibracion.columnas === 3 ? 'block' : 'none';
             }
 
             // Ajustar altura de la capa verde de ocupación
@@ -2656,18 +3272,29 @@
 
             const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
-            // Flujo equilibrado del texto en las 2 columnas simuladas
-            const balance = balancearTextoEnColumnas(texto);
-            if (balance.col1.length === 0 && balance.col2.length === 0) {
-                col1.innerHTML = "<p>[Texto de la publicación en columna 1 del pliego tabloide...]</p>";
-                col2.innerHTML = "<p>[Texto de la publicación en columna 2...]</p>";
+            // Extraer texto para la página activa
+            const textoPagina = obtenerTextoParaPagina(texto, paginaActualPrevia, totalPaginasPrevia);
+
+            // Flujo equilibrado del texto en las columnas
+            const balance = balancearTextoEnColumnas(textoPagina, calibracion.columnas, calibracion.modoDistribucion);
+            if (balance.col1.length === 0 && balance.col2.length === 0 && balance.col3.length === 0) {
+                if (col1) col1.innerHTML = "<p>[Texto de la publicación en columna 1 del pliego tabloide...]</p>";
+                if (col2) col2.innerHTML = calibracion.columnas >= 2 ? "<p>[Columna 2...]</p>" : "";
+                if (col3) col3.innerHTML = calibracion.columnas === 3 ? "<p>[Columna 3...]</p>" : "";
                 return;
             }
 
-            col1.innerHTML = balance.col1.map(p => `<p ${estiloP}>${p}</p>`).join('');
-            col2.innerHTML = balance.col2.length > 0 
-                ? balance.col2.map(p => `<p ${estiloP}>${p}</p>`).join('') 
-                : '<p style="color: #94a3b8; font-style: italic;">[Continúa en columna 1...]</p>';
+            if (col1) col1.innerHTML = balance.col1.map(p => formatearParrafoConJerarquia(p, estiloP)).join('');
+            if (col2) {
+                col2.innerHTML = balance.col2.length > 0
+                    ? balance.col2.map(p => formatearParrafoConJerarquia(p, estiloP)).join('')
+                    : (calibracion.columnas >= 2 ? '<p style="color: #94a3b8; font-style: italic;">[Continúa en columna 1...]</p>' : '');
+            }
+            if (col3 && calibracion.columnas === 3) {
+                col3.innerHTML = balance.col3.length > 0
+                    ? balance.col3.map(p => formatearParrafoConJerarquia(p, estiloP)).join('')
+                    : '<p style="color: #94a3b8; font-style: italic;">[Columna 3 disponible...]</p>';
+            }
         }
 
         function resetearEstadoVacio() {
@@ -2676,11 +3303,20 @@
             document.getElementById('valLineas').textContent = '0';
             document.getElementById('valParrafos').textContent = '0';
             document.getElementById('valPorcentajeOcupado').textContent = '0.0%';
+            if (document.getElementById('valAlturaPapel')) document.getElementById('valAlturaPapel').textContent = '0.0 cm';
+            if (document.getElementById('valAnchoColumna')) document.getElementById('valAnchoColumna').textContent = '11.5 cm';
             document.getElementById('progressBarFill').style.width = '0%';
             document.getElementById('gacetaFillOverlay').style.height = '0%';
             document.getElementById('gacetaFillBadge').textContent = '0% ocupado';
             document.getElementById('gacetaCol1').innerHTML = '<p>[Texto de la publicación en columna 1 del pliego tabloide...]</p>';
             document.getElementById('gacetaCol2').innerHTML = '<p>[Texto de la publicación en columna 2...]</p>';
+            const col3 = document.getElementById('gacetaCol3');
+            if (col3) col3.innerHTML = '<p>[Columna 3...]</p>';
+
+            const paginationBar = document.getElementById('paginationBar');
+            if (paginationBar) paginationBar.style.display = 'none';
+            paginaActualPrevia = 1;
+            totalPaginasPrevia = 1;
 
             document.getElementById('tarifaTitulo').textContent = 'Sin texto ingresado';
             document.getElementById('tarifaPrecioBase').textContent = 'L. 0.00';
@@ -2705,16 +3341,44 @@
                 return;
             }
 
+            // Mapeo al catálogo de productos predefinidos de cotizaciones.html
+            let prodCatalogo = analisisActual.espacioSeleccionado.desc;
+            if (calibracion.tipoPublicacion === 'junta_agua') {
+                prodCatalogo = "JUNTAS DE AGUA";
+            } else if (calibracion.tipoPublicacion === 'marcas') {
+                if (analisisActual.espacioSeleccionado.id === '1/5') {
+                    prodCatalogo = "1/5 DE PÁGINA ( MARCAS Y PATENTES -3 PUBLICACIONES)";
+                } else if (analisisActual.espacioSeleccionado.id === '1/4') {
+                    prodCatalogo = "1/4 DE PÁGINA (MARCAS Y PATENTES- 3 PUBLICACIONES )";
+                }
+            } else {
+                const mapPredef = {
+                    '1/5': "1/5 PÁGINA (PUBLICACIONES- TEXTO)",
+                    '1/4': "1/4 PÁGINA (PUBLICACIONES- TEXTO)",
+                    '1/3': "1/3 PÁGINA (PUBLICACIONES- TEXTO)",
+                    '1/2': "1/2 PÁGINA (PUBLICACIONES- TEXTO)",
+                    '2/3': "2/3 PÁGINA (PUBLICACIONES- TEXTO)",
+                    '1': "1 PÁGINA (PUBLICACIONES - TEXTO)"
+                };
+                if (mapPredef[analisisActual.espacioSeleccionado.id]) {
+                    prodCatalogo = mapPredef[analisisActual.espacioSeleccionado.id];
+                }
+            }
+
             // Preparar el ítem estandarizado para cotizaciones.html
             const papelStr = calibracion.tipoPapel === 'tabloide' ? 'Tabloide 11"×17"' : 'Carta 8.5"×11"';
+            const secStr = calibracion.tipoSeccion === 'seccion_b' ? 'Sección B (Avisos)' : 'Sección A (Leyes)';
+            const colsStr = `${calibracion.columnas} ${calibracion.columnas === 1 ? 'Columna' : 'Columnas'}`;
             const sangriaDetalle = calibracion.sangria > 0 ? `, sangría: ${calibracion.sangria} esp.` : ', sin sangría';
             const interlineadoDetalle = (calibracion.interlineado || 1.0) > 1.0 ? `, interlineado: ${calibracion.interlineado.toFixed(2)}x` : '';
+            const alturaStr = analisisActual.alturaPapelCm ? `, altura papel: ${analisisActual.alturaPapelCm}` : '';
+
             const itemParaTransferir = {
-                producto: analisisActual.espacioSeleccionado.desc,
-                descripcion: `PUBLICACIÓN EN LA GACETA (${papelStr}): ${analisisActual.resumenTexto} (${analisisActual.palabras} palabras, ${analisisActual.lineasEstimadas} líneas est.${sangriaDetalle}${interlineadoDetalle})`,
+                producto: prodCatalogo,
+                descripcion: `PUBLICACIÓN EN LA GACETA (${secStr} • ${papelStr} • ${colsStr}${alturaStr}): ${analisisActual.resumenTexto} (${analisisActual.palabras} palabras, ${analisisActual.lineasEstimadas} líneas est.${sangriaDetalle}${interlineadoDetalle})`,
                 cantidad: analisisActual.cantidadPaginas || 1,
                 precio: analisisActual.precioUnitario,
-                impuesto: analisisActual.impuestoPorcentaje === 0 ? 'Exento' : 'ISV 15%',
+                impuesto: (calibracion.tipoPublicacion === 'junta_agua' || analisisActual.impuestoPorcentaje === 0) ? 'Exento' : 'ISV 15%',
                 tipoDescuento: document.getElementById('tipoDescuento').value,
                 porcentajeDescuento: analisisActual.descuentoPorcentaje
             };
@@ -2767,11 +3431,17 @@
             doc.text(`Papel Oficial de Imprenta: Tabloide (11" × 17" • 279 × 432 mm)`, 120, 37);
 
             // Tabla de Métricas de Diagramación
+            const secStr = calibracion.tipoSeccion === 'seccion_b' ? 'Sección B (Avisos Legales)' : 'Sección A (Decretos y Leyes)';
+            const colsStr = `${calibracion.columnas} ${calibracion.columnas === 1 ? 'Columna' : 'Columnas'}`;
+            const anchoColVal = calibracion.columnas === 3 ? '7.5 cm (Marcas/Patentes)' : (calibracion.columnas === 1 ? '23.5 cm (Columna Completa)' : '11.5 cm (Estándar)');
+
             doc.autoTable({
                 startY: 42,
                 head: [['Métrica Tipográfica', 'Valor Detectado', 'Interpretación Técnica']],
                 body: [
                     ['Formato de Papel', 'Tabloide Oficial (11" × 17" • 279 × 432 mm)', 'Estándar Oficial Diario La Gaceta (ENAG)'],
+                    ['Sección y Diagramación', `${secStr} • ${colsStr}`, `Ancho de columna útil: ${anchoColVal}`],
+                    ['Altura de Impresión Estimada', `${analisisActual.alturaPapelCm || '0.0 cm'}`, 'Caja tipográfica útil máxima: 38.0 cm por plana'],
                     ['Cantidad de Palabras', `${analisisActual.palabras.toLocaleString()} palabras`, 'Conteo estricto de vocablos'],
                     ['Caracteres Totales', `${analisisActual.caracteres.toLocaleString()} caracteres`, 'Incluye puntuación y espacios'],
                     ['Líneas de Columna Estimadas', `${analisisActual.lineasEstimadas} líneas`, `Calculado a base de ${calibracion.charsPorLinea} caracteres/línea tabloide`],
@@ -2782,11 +3452,11 @@
                 ],
                 theme: 'striped',
                 headStyles: { fillColor: primaryColor, textColor: 255, fontStyle: 'bold' },
-                styles: { fontSize: 8.5, cellPadding: 2.5 }
+                styles: { fontSize: 8.2, cellPadding: 2.2 }
             });
 
             // Resumen de Clasificación y Tarifa
-            const finalY = doc.lastAutoTable.finalY + 8;
+            const finalY = doc.lastAutoTable.finalY + 6;
 
             doc.setFillColor(245, 248, 252);
             doc.setDrawColor(2, 132, 199);
@@ -2816,7 +3486,12 @@
             doc.text(`TOTAL A PAGAR: ${formatMoneda(analisisActual.totalGeneral)}`, 120, finalY + 32);
 
             // Muestra del texto original
-            const textoY = finalY + 50;
+            let textoY = finalY + 48;
+            if (textoY > 210) {
+                doc.addPage();
+                textoY = 25;
+            }
+
             doc.setFontSize(9);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(0, 33, 71);
@@ -2828,7 +3503,11 @@
 
             const textoRaw = document.getElementById('textoPublicacion').value;
             const splitText = doc.splitTextToSize(textoRaw.substring(0, 1500) + (textoRaw.length > 1500 ? '... [Texto recortado para la ficha técnica]' : ''), 186);
-            doc.text(splitText, 15, textoY + 5);
+
+            // Si el texto se desborda antes del pie de página, recortar para no chocar
+            const maxLineas = Math.max(5, Math.floor((258 - (textoY + 5)) / 4));
+            const lineasParaMostrar = splitText.slice(0, maxLineas);
+            doc.text(lineasParaMostrar, 15, textoY + 5);
 
             // Pie de página institucional
             doc.setFontSize(7.5);
@@ -3025,7 +3704,67 @@ IRIS XIOMARA CASTRO SARMIENTO
 Presidenta Constitucional de la República
 
 HÉCTOR MANUEL ZELAYA CASTRO
-Secretario Privado de la Presidencia`
+Secretario Privado de la Presidencia`,
+
+            marca: `SOLICITUD DE REGISTRO DE MARCA DE FÁBRICA
+EXPEDIENTE N° 2026-00389
+
+DIRECCIÓN GENERAL DE PROPIEDAD INTELECTUAL (DINPI)
+SECRETARÍA DE DESARROLLO ECONÓMICO
+
+HACE SABER: Que en fecha 14 de Enero de 2026, compareció el Abogado JUAN CARLOS PINEDA en representación de la entidad mercantil "DISTRIBUIDORA ALIMENTICIA DE HONDURAS, S.A. DE C.V.", solicitando el Registro de la Marca de Fábrica:
+
+"AGUA PURA DE LA CORDILLERA"
+
+DISTINTIVO: Etiqueta mixta que consiste en la denominación AGUA PURA DE LA CORDILLERA acompañada del dibujo estilizado de dos montañas nevadas en color azul cian y plateado.
+
+CLASE INTERNACIONAL: 32 (Agua mineral, agua purificada, bebidas no alcohólicas y aguas aromatizadas).
+
+RESERVAS: No se reivindica exclusividad sobre las palabras "AGUA PURA" aisladamente consideradas sino en su conjunto marcario.
+
+PUBLICACIÓN: Publíquese el presente aviso en el Diario Oficial La Gaceta por tres veces consecutivas, con intervalos de diez días hábiles conforme lo establece el Artículo 84 de la Ley de Propiedad Industrial de Honduras.
+
+Tegucigalpa, M.D.C., 20 de Febrero de 2026.
+
+ABOG. DANIELA MERCADO SALGADO
+Registradora de la Propiedad Intelectual`,
+
+            decreto_extenso: `DECRETO LEGISLATIVO N° 45-2026
+
+EL CONGRESO NACIONAL,
+
+CONSIDERANDO: Que la Constitución de la República consagra que la soberanía nacional reside en el pueblo, del cual emanan todos los poderes del Estado y que el territorio, las aguas territoriales y el espacio aéreo constituyen el patrimonio inalienable de la Nación.
+
+CONSIDERANDO: Que es deber prioritario del Estado hondureño promover las condiciones socioeconómicas para el desarrollo integral de las comunidades rurales y garantizar la protección y conservación de las cuencas hidrográficas nacionales.
+
+CONSIDERANDO: Que la Empresa Nacional de Artes Gráficas (ENAG) y su medio insigne, el Diario Oficial La Gaceta, constituyen el instrumento oficial supremo para la publicidad y vigencia de las leyes, garantizando el principio de seguridad jurídica que rige el Estado de Derecho en Honduras.
+
+POR TANTO;
+
+DECRETA:
+
+LA SIGUIENTE:
+
+LEY DE FOMENTO DE LA PARTICIPACIÓN CIUDADANA Y FORTALECIMIENTO INSTITUCIONAL DE LA ENAG
+
+ARTÍCULO 1.- Declarar de interés nacional prioritario la digitalización, preservación histórica y modernización tecnológica integral de los talleres y plataformas digitales de la Empresa Nacional de Artes Gráficas (ENAG).
+
+ARTÍCULO 2.- Todas las entidades centralizadas, desconcentradas y descentralizadas del Poder Ejecutivo, así como los Gobiernos Locales a través de las 298 Corporaciones Municipales del país, están obligadas a remitir sus Acuerdos, Decretos y Ordenanzas Municipales en formato digital estructurado a la ENAG para su correspondiente edición, medición tipográfica y publicación oficial en el Diario Oficial La Gaceta.
+
+ARTÍCULO 3.- Las publicaciones que emanen de Organizaciones de la Sociedad Civil, Juntas Administradoras de Agua Comunitarias y Patronatos de Desarrollo debidamente acreditados ante la Secretaría de Gobernación, Justicia y Descentralización gozarán de los beneficios de exención y tarifas preferenciales de protección social reguladas en el Acuerdo Ejecutivo N° 249-2010.
+
+ARTÍCULO 4.- El presente Decreto entrará en vigencia a partir del día de su publicación en el Diario Oficial "La Gaceta".
+
+Dado en la ciudad de Tegucigalpa, Municipio del Distrito Central, en el Salón de Sesiones del Congreso Nacional, a los veinticinco días del mes de Octubre del año dos mil veintiséis.
+
+LUIS ROLANDO REDONDO GUÍFORO
+Presidente del Congreso Nacional
+
+CARLOS ARMANDO ZELAYA ROSALES
+Secretario
+
+LUZ ANGÉLICA SMITH MEJÍA
+Secretaria`
         };
 
         function cargarMuestra(tipo) {
