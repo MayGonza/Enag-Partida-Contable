@@ -3352,6 +3352,23 @@
             doc.text("Visto Bueno", 175, firmasY + 9, { align: 'center' });
 
             // Pie de página
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 100, 100);
+                doc.text("Documento generado por: " + userName, 20, 264);
+            }
+
+            doc.setFontSize(7);
+            doc.setTextColor(120, 120, 120);
             doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS — Tegucigalpa, M.D.C., Honduras", 108, 270, { align: 'center' });
 
             doc.save(`Ficha_Bien_${b.codigo}.pdf`);
@@ -3914,6 +3931,21 @@
             doc.text("Visto Bueno Institucional", 225, firmasY + 8, { align: 'center' });
 
             // Pie de página institucional
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(7.5);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 100, 100);
+                doc.text("Documento generado por: " + userName, 20, 200);
+            }
+
             doc.setFontSize(6.5);
             doc.setTextColor(140, 140, 140);
             doc.text(`Empresa Nacional de Artes Gráficas (ENAG) • Tegucigalpa, M.D.C., Honduras • Generado el ${fechaStr}`, 139.5, 205, { align: 'center' });

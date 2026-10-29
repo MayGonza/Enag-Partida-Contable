@@ -918,6 +918,15 @@
             doc.text("- Recursos Humanos se reserva el derecho de requerir documentación adicional.", 12, 272);
 
             // Open PDF
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7.5);
+            doc.setTextColor(100);
+            doc.text("Documento generado por: " + userName, 10, 277.5);
             window.open(doc.output('bloburl'), '_blank');
         });
     </script>

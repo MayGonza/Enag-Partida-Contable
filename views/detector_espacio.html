@@ -3516,6 +3516,20 @@
             doc.text("* Esta ficha constituye una estimación técnica preliminar sujeta a diagramación final en pre-prensa.", 15, 265);
             doc.text("* Empresa Nacional de Artes Gráficas (ENAG) — PBX: 2230-1120 / 2230-2525 — Tegucigalpa, M.D.C., Honduras.", 15, 270);
 
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setFont('helvetica', 'normal');
+                doc.setTextColor(100, 100, 100);
+                doc.text("Documento generado por: " + userName, 15, 260);
+            }
+
             doc.save("Ficha_Tecnica_Espacio_ENAG.pdf");
             showToast("Ficha técnica en PDF descargada con éxito", "success");
         }

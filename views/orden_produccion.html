@@ -1286,6 +1286,19 @@
             doc.text("Firma Subgerente de Producción", 142.5, currentY + 4, { align: 'center' });
 
             // Save PDF
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, marginX, doc.internal.pageSize.getHeight() - 12);
+            }
             doc.save(`Orden_Produccion_${noOrden}.pdf`);
             if (window.registrarBitacora) {
                 window.registrarBitacora('Producción', 'Generar PDF', 'Se generó un documento en el módulo Producción');

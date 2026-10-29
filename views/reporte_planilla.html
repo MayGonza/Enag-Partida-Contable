@@ -2152,14 +2152,28 @@
             doc.setTextColor(100, 116, 139);
             doc.text("Departamento de Recursos Humanos — ENAG", 105, sigY + 12.5, { align: 'center' });
 
-            // Pie de página oficial de control
-            doc.setFontSize(7);
-            doc.setTextColor(148, 163, 184);
-            doc.text(`Documento Oficial Emitido — ENAG | Fecha: ${hoy}`, 15, 255);
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
 
             // Descargar el archivo
             const safePeriodo = periodo.replace(/[^a-zA-Z0-9]/g, "_");
             doc.save(`Reporte_Resumen_Planilla_${safePeriodo}_ENAG.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', `Se generó Reporte Resumen de Planilla (${regimen}) - Período: ${periodo}`);
+            }
         }
 
         // ========================================================
@@ -2336,6 +2350,12 @@
                 });
         });
     </script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
 </body>
 
 </html>

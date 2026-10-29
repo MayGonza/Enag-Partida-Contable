@@ -1462,6 +1462,13 @@
                 doc.setFontSize(11);
                 doc.setTextColor(100, 100, 100);
                 doc.text("No hay cotizaciones para mostrar en el historial.", pageWidth / 2, 60, { align: "center" });
+                let userNameHist = localStorage.getItem('enag_username');
+                if (!userNameHist && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                    userNameHist = firebase.auth().currentUser.email;
+                }
+                if (!userNameHist) userNameHist = "Usuario Desconocido";
+                doc.setFontSize(8);
+                doc.text("Documento generado por: " + userNameHist, 15, pageHeight - 15);
                 doc.save("Reporte_Historial_Cotizaciones.pdf");
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Comercialización', 'Generar Reporte PDF', 'Se generó el PDF de Historial de Cotizaciones.');
@@ -1514,6 +1521,19 @@
                 }
             });
 
+            let userNameHist = localStorage.getItem('enag_username');
+            if (!userNameHist && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userNameHist = firebase.auth().currentUser.email;
+            }
+            if (!userNameHist) userNameHist = "Usuario Desconocido";
+            const totalPagesHist = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPagesHist; i++) {
+                doc.setPage(i);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Documento generado por: " + userNameHist, 15, pageHeight - 15);
+            }
             doc.save("Reporte_Historial_Cotizaciones.pdf");
             if (window.registrarBitacora) {
                 window.registrarBitacora('Comercialización', 'Generar Reporte PDF', 'Se generó el PDF de Historial de Cotizaciones.');
@@ -1773,6 +1793,19 @@
 
             // Descargar el documento PDF
             const nombreClienteArchivo = (data.cliente.nombre || "Cliente").trim().replace(/[^a-zA-Z0-9-_]/g, "_");
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8);
+                doc.setTextColor(100, 100, 100);
+                doc.text("Documento generado por: " + userName, 15, pageHeight - 10);
+            }
             doc.save(`Cotizacion_${nombreClienteArchivo}_ENAG.pdf`);
             if (window.registrarBitacora) {
                 window.registrarBitacora('Comercialización', 'Generar Cotización PDF', `Se generó una cotización PDF para el cliente: ${data.cliente.nombre}`);
