@@ -375,6 +375,7 @@
 <body>
     <div class="nav-container">
         <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="reporte_planilla.html" class="btn-nav" style="background-color: #0284c7; color: white;">📊 Reporte Resumen</a>
     </div>
 
     <div class="container">
@@ -457,6 +458,13 @@
                             d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z" />
                     </svg>
                     Generar PDFs Seleccionados (<span id="selectedCount">0</span>)
+                </button>
+                <button type="button" class="btn-generate" id="btnResumenPlanilla" onclick="abrirResumenPlanilla()"
+                    disabled style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-5 0h2V7H7v7zm-5 0h2v-3H2v3z"/>
+                    </svg>
+                    Reporte Resumen
                 </button>
                 <button type="button" class="btn-clear" id="btnClearList" onclick="limpiarLista()" disabled>
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
@@ -1261,6 +1269,7 @@
             document.getElementById('emptyState').style.display = 'block';
             document.getElementById('btnGenerateBulk').disabled = true;
             document.getElementById('btnClearList').disabled = true;
+            if (document.getElementById('btnResumenPlanilla')) document.getElementById('btnResumenPlanilla').disabled = true;
             document.getElementById('excelFile').value = '';
         }
 
@@ -1298,6 +1307,7 @@
 
             document.getElementById('btnGenerateBulk').disabled = false;
             document.getElementById('btnClearList').disabled = false;
+            if (document.getElementById('btnResumenPlanilla')) document.getElementById('btnResumenPlanilla').disabled = false;
 
             actualizarContadorSeleccionados();
         }
@@ -1351,6 +1361,50 @@
                     tr.style.display = match ? '' : 'none';
                 }
             });
+        }
+
+        function abrirResumenPlanilla() {
+            if (!empleados || empleados.length === 0) {
+                alert("Primero carga una planilla de salarios para generar el reporte resumen.");
+                return;
+            }
+
+            const mapDeduc = {};
+            let totalAsignado = 0;
+            let totalDevengado = 0;
+            let totalDeducciones = 0;
+            let totalNeto = 0;
+
+            empleados.forEach(emp => {
+                totalAsignado += emp.sueldoAsignado || emp.sueldoDevengado;
+                totalDevengado += emp.sueldoDevengado;
+                totalDeducciones += emp.totalDeducciones;
+                totalNeto += emp.netoPagar;
+
+                emp.deducciones.forEach(d => {
+                    if (!mapDeduc[d.nombre]) {
+                        mapDeduc[d.nombre] = { nombre: d.nombre, count: 0, total: 0 };
+                    }
+                    mapDeduc[d.nombre].count++;
+                    mapDeduc[d.nombre].total += d.monto;
+                });
+            });
+
+            const listaDeduc = Object.values(mapDeduc).sort((a, b) => b.total - a.total);
+            const dataReporte = {
+                periodo: document.getElementById('mesVoucher').value || "Febrero 2026",
+                regimen: "ACUERDO",
+                totalEmpleados: empleados.length,
+                totalAsignado,
+                totalDevengado,
+                totalDeducciones,
+                totalNeto,
+                deducciones: listaDeduc,
+                empleados: empleados
+            };
+
+            sessionStorage.setItem('enag_planilla_resumen_data', JSON.stringify(dataReporte));
+            window.location.href = "reporte_planilla.html";
         }
 
         function descargarPlantilla() {

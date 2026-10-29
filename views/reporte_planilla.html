@@ -1,0 +1,2341 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Reporte Resumen de Planilla y Deducciones — ENAG</title>
+    <meta name="description"
+        content="Reporte ejecutivo de nómina institucional con totales pagados, total global de deducciones y desglose consolidado por cada concepto de deducción.">
+
+    <!-- Bibliotecas externas locales -->
+    <script src="../js/xlsx.full.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
+
+    <style>
+        :root {
+            --primary-navy: #002147;
+            --primary-dark: #001630;
+            --primary-light: #0a3d74;
+            --accent-gold: #d97706;
+            --accent-emerald: #10b981;
+            --accent-crimson: #dc2626;
+            --accent-blue: #0284c7;
+            --bg-page: #002147;
+            --bg-card: #ffffff;
+            --text-main: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #e2e8f0;
+            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -2px rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 10px 25px -5px rgba(0, 33, 71, 0.12), 0 8px 10px -6px rgba(0, 33, 71, 0.08);
+            --shadow-lg: 0 20px 40px -10px rgba(0, 33, 71, 0.25);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 30px 20px;
+            background-color: var(--bg-page);
+            min-height: 100vh;
+            color: var(--text-main);
+            position: relative;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 38%;
+            filter: blur(10px) opacity(0.12);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .nav-container {
+            max-width: 1250px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+            transition: all 0.25s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-nav-menu {
+            background-color: #475569;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #334155;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-nav-sub {
+            background-color: rgba(255, 255, 255, 0.15);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(8px);
+        }
+
+        .btn-nav-sub:hover {
+            background-color: rgba(255, 255, 255, 0.25);
+            transform: translateY(-2px);
+            color: #ffffff;
+        }
+
+        .badge-system {
+            margin-left: auto;
+            background: rgba(255, 255, 255, 0.18);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+            padding: 7px 16px;
+            border-radius: 20px;
+            font-size: 0.82em;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .container {
+            max-width: 1250px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.985);
+            padding: 35px;
+            border-radius: 24px;
+            box-shadow: var(--shadow-lg);
+            border-top: 8px solid var(--primary-navy);
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Encabezado */
+        .form-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 22px;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 20px;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-icon {
+            width: 58px;
+            height: 58px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #002147 0%, #0a3d74 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.9em;
+            color: white;
+            box-shadow: 0 8px 18px rgba(0, 33, 71, 0.25);
+        }
+
+        .header-texts h1 {
+            color: var(--primary-navy);
+            margin: 0;
+            font-size: 1.65em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-weight: 800;
+        }
+
+        .header-texts p {
+            margin: 4px 0 0 0;
+            color: var(--text-muted);
+            font-size: 0.95em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        /* Botones de acción */
+        .btn-action {
+            padding: 10px 18px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 0.92em;
+            cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.25s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-action:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .btn-pdf {
+            background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+            color: white;
+        }
+
+        .btn-pdf:hover:not(:disabled) {
+            background: linear-gradient(135deg, #b91c1c 0%, #991b1b 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(220, 38, 38, 0.35);
+        }
+
+        .btn-excel {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+        }
+
+        .btn-excel:hover:not(:disabled) {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(16, 185, 129, 0.35);
+        }
+
+        .btn-print {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+
+        .btn-print:hover:not(:disabled) {
+            background: #e2e8f0;
+            color: #0f172a;
+            transform: translateY(-2px);
+        }
+
+        /* Drop Zone & Upload Bar */
+        .upload-section {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+            align-items: stretch;
+        }
+
+        @media (max-width: 900px) {
+            .upload-section {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .drop-zone {
+            border: 2px dashed #94a3b8;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .drop-zone:hover,
+        .drop-zone.dragover {
+            border-color: var(--primary-navy);
+            background: #f0f4f8;
+            transform: scale(1.01);
+        }
+
+        .drop-zone svg {
+            width: 44px;
+            height: 44px;
+            fill: var(--primary-navy);
+            margin-bottom: 10px;
+        }
+
+        .drop-zone p {
+            margin: 0;
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--primary-navy);
+        }
+
+        .drop-zone span {
+            font-size: 0.82em;
+            color: var(--text-muted);
+            margin-top: 4px;
+        }
+
+        .upload-info-card {
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .upload-info-header {
+            font-size: 0.9em;
+            font-weight: 700;
+            color: var(--primary-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .file-loaded-tag {
+            background: #e0f2fe;
+            border: 1px solid #bae6fd;
+            color: #0369a1;
+            padding: 6px 12px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 600;
+            word-break: break-all;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Selector de Hoja */
+        .sheet-selector-box {
+            background: #fffbeb;
+            border: 1px solid #fef3c7;
+            padding: 16px 20px;
+            border-radius: 14px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .sheet-selector-box label {
+            font-weight: 700;
+            color: #b45309;
+            font-size: 0.95em;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .sheet-selector-box select {
+            flex: 1;
+            min-width: 260px;
+            padding: 9px 14px;
+            border-radius: 8px;
+            border: 1.5px solid #cbd5e1;
+            font-weight: 700;
+            color: #1e293b;
+            background: white;
+            outline: none;
+            cursor: pointer;
+        }
+
+        /* Configuración de Parámetros */
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            background: #f8fafc;
+            border: 1px solid var(--border-color);
+            padding: 18px 22px;
+            border-radius: 16px;
+            margin-bottom: 25px;
+        }
+
+        .config-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .config-group label {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: var(--primary-navy);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-group input,
+        .config-group select {
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            font-size: 0.92em;
+            background: white;
+            color: #1e293b;
+            font-weight: 600;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .config-group input:focus,
+        .config-group select:focus {
+            border-color: var(--primary-navy);
+        }
+
+        /* ========================================================
+           TARJETAS DE MÉTRICAS EJECUTIVAS (KPIs)
+           ======================================================== */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 18px;
+            margin-bottom: 30px;
+        }
+
+        .kpi-card {
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 22px 20px;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-md);
+        }
+
+        .kpi-card::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 6px;
+            height: 100%;
+        }
+
+        /* Colores específicos de las tarjetas */
+        .kpi-card.kpi-neto {
+            border-color: #bbf7d0;
+            background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
+        }
+        .kpi-card.kpi-neto::before {
+            background: #10b981;
+        }
+
+        .kpi-card.kpi-devengado {
+            border-color: #bae6fd;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+        }
+        .kpi-card.kpi-devengado::before {
+            background: #0284c7;
+        }
+
+        .kpi-card.kpi-deducciones {
+            border-color: #fed7aa;
+            background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%);
+        }
+        .kpi-card.kpi-deducciones::before {
+            background: #ea580c;
+        }
+
+        .kpi-card.kpi-empleados {
+            border-color: #cbd5e1;
+            background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+        }
+        .kpi-card.kpi-empleados::before {
+            background: var(--primary-navy);
+        }
+
+        .kpi-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .kpi-label {
+            font-size: 0.8em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #64748b;
+        }
+
+        .kpi-badge {
+            font-size: 0.72em;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 6px;
+            text-transform: uppercase;
+        }
+
+        .badge-green {
+            background: #dcfce7;
+            color: #15803d;
+        }
+        .badge-blue {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+        .badge-orange {
+            background: #ffedd5;
+            color: #c2410c;
+        }
+        .badge-navy {
+            background: #e2e8f0;
+            color: #002147;
+        }
+
+        .kpi-value {
+            font-size: 1.75em;
+            font-weight: 800;
+            color: #0f172a;
+            margin: 0;
+            line-height: 1.2;
+            word-break: break-all;
+        }
+
+        .kpi-subtext {
+            font-size: 0.82em;
+            color: #64748b;
+            margin-top: 6px;
+            font-weight: 500;
+        }
+
+        /* ========================================================
+           DISTRIBUCIÓN VISUAL DE DEDUCCIONES (Barras)
+           ======================================================== */
+        .distribution-panel {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px;
+            margin-bottom: 30px;
+            box-shadow: var(--shadow-sm);
+        }
+
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .panel-header h2 {
+            color: var(--primary-navy);
+            margin: 0;
+            font-size: 1.25em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bars-container {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .bar-item {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .bar-labels {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.9em;
+            font-weight: 600;
+        }
+
+        .bar-title {
+            color: #334155;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .bar-amounts {
+            color: #0f172a;
+            font-weight: 700;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 10px;
+            background: #f1f5f9;
+            border-radius: 6px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .bar-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #002147 0%, #0284c7 100%);
+            border-radius: 6px;
+            transition: width 0.8s ease-out;
+        }
+
+        /* ========================================================
+           TABLA OFICIAL DE DEDUCCIONES POR CONCEPTO
+           ======================================================== */
+        .table-section {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 18px;
+            padding: 24px;
+            box-shadow: var(--shadow-sm);
+            margin-bottom: 30px;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .search-box {
+            position: relative;
+            max-width: 360px;
+            width: 100%;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 10px 14px 10px 38px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.92em;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        .search-box input:focus {
+            border-color: var(--primary-navy);
+        }
+
+        .search-box svg {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 18px;
+            height: 18px;
+            fill: #94a3b8;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.92em;
+        }
+
+        th {
+            background: #002147;
+            color: white;
+            padding: 13px 16px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+            font-size: 0.82em;
+            white-space: nowrap;
+        }
+
+        td {
+            padding: 12px 16px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
+        tbody tr:nth-child(even) {
+            background-color: #fafbfc;
+        }
+
+        tfoot tr {
+            background-color: #0f172a;
+            color: white;
+            font-weight: 800;
+            border-top: 3px solid #002147;
+        }
+
+        tfoot td {
+            padding: 14px 16px;
+            color: white;
+            border-bottom: none;
+        }
+
+        .col-right {
+            text-align: right;
+            font-variant-numeric: tabular-nums;
+        }
+
+        .col-center {
+            text-align: center;
+        }
+
+        .badge-cat {
+            display: inline-block;
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.75em;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .cat-prevision { background: #e0f2fe; color: #0369a1; }
+        .cat-seguridad { background: #dcfce7; color: #15803d; }
+        .cat-bancaria { background: #fef3c7; color: #b45309; }
+        .cat-judicial { background: #fee2e2; color: #b91c1c; }
+        .cat-gremial { background: #f3e8ff; color: #7e22ce; }
+        .cat-general { background: #f1f5f9; color: #475569; }
+
+        /* Pestañas para Detalle por Empleado */
+        .tabs-container {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 18px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 8px 18px;
+            font-weight: 700;
+            font-size: 0.95em;
+            color: #64748b;
+            cursor: pointer;
+            border-radius: 8px;
+            transition: all 0.2s;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .tab-btn.active {
+            background: #002147;
+            color: white;
+        }
+
+        .tab-btn:hover:not(.active) {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Modal de desglose de empleado */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 33, 71, 0.65);
+            backdrop-filter: blur(6px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+            z-index: 1000;
+            padding: 20px;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .modal-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3);
+            max-width: 600px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            padding: 28px;
+            border-top: 6px solid #002147;
+            transform: scale(0.95);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-box {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            border-bottom: 1.5px solid #e2e8f0;
+            padding-bottom: 14px;
+            margin-bottom: 18px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            color: #002147;
+            font-size: 1.25em;
+        }
+
+        .btn-close-modal {
+            background: #f1f5f9;
+            border: none;
+            color: #64748b;
+            font-size: 1.2em;
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .btn-close-modal:hover {
+            background: #e2e8f0;
+            color: #0f172a;
+        }
+
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            fill: #cbd5e1;
+            margin-bottom: 15px;
+        }
+
+        .empty-state h3 {
+            margin: 0;
+            font-size: 1.2em;
+            color: #475569;
+        }
+
+        .empty-state p {
+            margin: 8px 0 0 0;
+            font-size: 0.9em;
+        }
+
+        /* Firmas Institucionales */
+        .signatures-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 40px;
+            margin-top: 40px;
+            padding-top: 30px;
+            border-top: 2px dashed #cbd5e1;
+        }
+
+        .sig-block {
+            text-align: center;
+        }
+
+        .sig-line {
+            width: 80%;
+            height: 1.5px;
+            background: #475569;
+            margin: 0 auto 10px auto;
+        }
+
+        .sig-name {
+            font-weight: 700;
+            color: #0f172a;
+            font-size: 0.95em;
+        }
+
+        .sig-role {
+            font-size: 0.85em;
+            color: #64748b;
+        }
+
+        /* Estilos de Impresión */
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+                color: black !important;
+            }
+
+            body::before {
+                display: none !important;
+            }
+
+            .nav-container,
+            .upload-section,
+            .sheet-selector-box,
+            .config-grid,
+            .table-toolbar,
+            .header-actions,
+            .tabs-container {
+                display: none !important;
+            }
+
+            .container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                max-width: 100% !important;
+            }
+
+            .kpi-card {
+                border: 1px solid #ccc !important;
+                box-shadow: none !important;
+            }
+
+            table {
+                font-size: 10pt !important;
+            }
+
+            th {
+                background: #002147 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            tfoot tr {
+                background: #0f172a !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAVEGACIÓN -->
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav btn-nav-menu">
+            <span>←</span> Menú Principal
+        </a>
+        <a href="vouchers.html" class="btn-nav btn-nav-sub">
+            <span>💵</span> Vouchers Acuerdo
+        </a>
+        <a href="vouchers_contrato.html" class="btn-nav btn-nav-sub">
+            <span>💵</span> Vouchers Contrato
+        </a>
+        <div class="badge-system">
+            <span>🏛️</span> ENAG — Recursos Humanos v4.2
+        </div>
+    </div>
+
+    <!-- CONTENEDOR PRINCIPAL -->
+    <div class="container">
+
+        <!-- ENCABEZADO -->
+        <div class="form-header">
+            <div class="header-title-group">
+                <div class="header-icon">📊</div>
+                <div class="header-texts">
+                    <h1>Reporte Resumen de Planilla y Deducciones</h1>
+                    <p>Consolidado ejecutivo de valor total pagado, deducciones globales y desglose individual por concepto</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button type="button" class="btn-action btn-pdf" id="btnExportPDF" onclick="generarPDFReporte()" disabled>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                        <path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.127.208-.348.56-.63 1.007-.824.77-.333 1.833-.497 3.033-.497.666 0 1.258.046 1.764.13.43-.59.794-1.282 1.077-2.04.283-.758.45-1.554.498-2.355.03-.49.03-.947.001-1.353-.053-.74-.298-1.233-.762-1.42-.328-.133-.71-.122-1.075.053-.418.2-.767.575-1.026 1.076-.41.792-.61 1.776-.628 2.87-.015.89.066 1.775.244 2.627-.663.486-1.433.916-2.268 1.264-.424.177-.852.327-1.282.448l-.208.448z"/>
+                    </svg>
+                    Descargar Reporte PDF
+                </button>
+                <button type="button" class="btn-action btn-excel" id="btnExportExcel" onclick="exportarExcelResumen()" disabled>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.748l2.116 2.572a.5.5 0 0 0 .768-.64L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.252 5.884 6.68z"/>
+                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                    </svg>
+                    Exportar Excel (.xlsx)
+                </button>
+                <button type="button" class="btn-action btn-print" id="btnPrintReport" onclick="window.print()" disabled>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
+                        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                    </svg>
+                    Imprimir
+                </button>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE CARGA -->
+        <div class="upload-section">
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
+                <svg viewBox="0 0 24 24">
+                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                </svg>
+                <p>Arrastra aquí cualquier archivo de Planilla Excel (.xls / .xlsx)</p>
+                <span>Compatible con nóminas de Acuerdo, Contrato o planillas institucionales ENAG</span>
+                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleFileSelect(event)">
+            </div>
+
+            <div class="upload-info-card">
+                <div>
+                    <div class="upload-info-header">
+                        <span>📁</span> Archivo en Procesamiento
+                    </div>
+                    <div id="fileLoadedBadge" class="file-loaded-tag">
+                        <span>⏳</span> Cargando planilla predeterminada...
+                    </div>
+                </div>
+                <div style="margin-top: 15px;">
+                    <button type="button" class="btn-action btn-print" style="width: 100%; justify-content: center;" onclick="descargarPlantillaDemo()">
+                        📥 Descargar Plantilla Modelo
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- SELECTOR DE HOJA (Si tiene más de 1 hoja) -->
+        <div id="sheetSelectorContainer" class="sheet-selector-box" style="display: none;">
+            <label for="sheetSelect">
+                <span>📑</span> Múltiples hojas detectadas. Selecciona la hoja de planilla:
+            </label>
+            <select id="sheetSelect" onchange="cambiarHoja()"></select>
+        </div>
+
+        <!-- PANEL DE CONFIGURACIÓN DEL REPORTE -->
+        <div class="config-grid">
+            <div class="config-group">
+                <label>Período / Mes Correspondiente</label>
+                <input type="text" id="cfgPeriodo" placeholder="ej. Febrero 2026" value="Febrero 2026">
+            </div>
+            <div class="config-group">
+                <label>Régimen / Modalidad</label>
+                <select id="cfgRegimen" onchange="actualizarRegimen()">
+                    <option value="GENERAL">General / Consolidado</option>
+                    <option value="ACUERDO">Personal por Acuerdo</option>
+                    <option value="CONTRATO">Personal por Contrato</option>
+                </select>
+            </div>
+            <div class="config-group">
+                <label>Nombre Jefatura de RRHH</label>
+                <input type="text" id="cfgFirmanteRRHH" value="María José Valverde Bardales" placeholder="Nombre de quien autoriza">
+            </div>
+            <div class="config-group">
+                <label>Cargo de Jefatura de RRHH</label>
+                <input type="text" id="cfgCargoFirmanteRRHH" value="Jefe Interina de Recursos Humanos" placeholder="Cargo institucional">
+            </div>
+        </div>
+
+        <!-- CONTENIDO ACTIVO (KPIs + DISTRIBUCIÓN + TABLAS) -->
+        <div id="reportContent" style="display: none;">
+
+            <!-- KPIS EJECUTIVOS -->
+            <div class="kpi-container">
+                <!-- TOTAL NETO PAGADO -->
+                <div class="kpi-card kpi-neto">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Valor Total Pagado</span>
+                        <span class="kpi-badge badge-green">Líquido Desembolsado</span>
+                    </div>
+                    <div class="kpi-value" id="kpiNetoPagado">L. 0.00</div>
+                    <div class="kpi-subtext" id="kpiNetoPorcentaje">Total transferido a colaboradores</div>
+                </div>
+
+                <!-- TOTAL DEVENGADO (BRUTO) -->
+                <div class="kpi-card kpi-devengado">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Total Planilla Devengada</span>
+                        <span class="kpi-badge badge-blue">Sueldo Bruto</span>
+                    </div>
+                    <div class="kpi-value" id="kpiTotalDevengado">L. 0.00</div>
+                    <div class="kpi-subtext">Base salarial devengada total</div>
+                </div>
+
+                <!-- TOTAL DEDUCCIONES -->
+                <div class="kpi-card kpi-deducciones">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Total Deducciones</span>
+                        <span class="kpi-badge badge-orange" id="kpiDeduccionesBadge">Retenciones</span>
+                    </div>
+                    <div class="kpi-value" id="kpiTotalDeducciones">L. 0.00</div>
+                    <div class="kpi-subtext" id="kpiDeduccionesPorcentaje">0.00% de la planilla bruta</div>
+                </div>
+
+                <!-- EMPLEADOS Y CONCEPTOS -->
+                <div class="kpi-card kpi-empleados">
+                    <div class="kpi-top">
+                        <span class="kpi-label">Colaboradores</span>
+                        <span class="kpi-badge badge-navy" id="kpiConceptosBadge">0 Conceptos</span>
+                    </div>
+                    <div class="kpi-value" id="kpiTotalEmpleados">0</div>
+                    <div class="kpi-subtext" id="kpiPromedioNeto">Promedio Neto: L. 0.00</div>
+                </div>
+            </div>
+
+            <!-- DISTRIBUCIÓN VISUAL DE DEDUCCIONES -->
+            <div class="distribution-panel">
+                <div class="panel-header">
+                    <h2>
+                        <span>📈</span> Distribución de las Principales Deducciones
+                    </h2>
+                    <span style="font-size: 0.85em; color: var(--text-muted); font-weight: 600;">
+                        Participación proporcional sobre el monto total de deducciones
+                    </span>
+                </div>
+                <div id="distributionBars" class="bars-container">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+            <!-- PESTAÑAS DE VISTA -->
+            <div class="tabs-container">
+                <button type="button" class="tab-btn active" id="tabDeduccionesBtn" onclick="cambiarTab('deducciones')">
+                    <span>📑</span> Desglose Consolidado por Cada Deducción (<span id="countDeducTab">0</span>)
+                </button>
+                <button type="button" class="tab-btn" id="tabEmpleadosBtn" onclick="cambiarTab('empleados')">
+                    <span>👥</span> Detalle Nómina por Colaborador (<span id="countEmpTab">0</span>)
+                </button>
+            </div>
+
+            <!-- VISTA 1: TABLA CONSOLIDADA POR DEDUCCIÓN -->
+            <div id="viewDeducciones" class="table-section">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <svg viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                        <input type="text" id="searchDeducInput" placeholder="Buscar deducción (IHSS, INJUPEMP, Bancos...)" oninput="filtrarTablaDeducciones()">
+                    </div>
+                    <div style="font-size: 0.9em; font-weight: 700; color: #475569;">
+                        Total Conceptos Identificados: <span id="numConceptosLabel" style="color: #002147;">0</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tablaDeducciones">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;" class="col-center">#</th>
+                                <th>Concepto de Deducción</th>
+                                <th>Clasificación</th>
+                                <th class="col-center">Empleados Afectados</th>
+                                <th class="col-right">Total Deducido (L.)</th>
+                                <th class="col-right">% s/ Deducciones</th>
+                                <th class="col-right">% s/ Planilla</th>
+                                <th class="col-right">Promedio / Emp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyDeducciones">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="text-align: right; text-transform: uppercase;">GRAN TOTAL DEDUCCIONES:</td>
+                                <td id="tfootTotalCasos" class="col-center">0</td>
+                                <td id="tfootTotalMonto" class="col-right">L. 0.00</td>
+                                <td class="col-right">100.00%</td>
+                                <td id="tfootTotalPlanillaPct" class="col-right">0.00%</td>
+                                <td id="tfootPromedioGlobal" class="col-right">L. 0.00</td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- VISTA 2: DETALLE POR EMPLEADO -->
+            <div id="viewEmpleados" class="table-section" style="display: none;">
+                <div class="table-toolbar">
+                    <div class="search-box">
+                        <svg viewBox="0 0 16 16">
+                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                        </svg>
+                        <input type="text" id="searchEmpInput" placeholder="Buscar empleado o cargo..." oninput="filtrarTablaEmpleados()">
+                    </div>
+                    <div style="font-size: 0.9em; font-weight: 700; color: #475569;">
+                        Total Empleados Registrados: <span id="numEmpLabel" style="color: #002147;">0</span>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table id="tablaEmpleados">
+                        <thead>
+                            <tr>
+                                <th style="width: 50px;" class="col-center">#</th>
+                                <th>Nombre del Empleado</th>
+                                <th>Cargo</th>
+                                <th class="col-right">Sueldo Asignado</th>
+                                <th class="col-right">Sueldo Devengado</th>
+                                <th class="col-right">Total Deducciones</th>
+                                <th class="col-right">Neto a Pagar</th>
+                                <th class="col-center">Detalle</th>
+                            </tr>
+                        </thead>
+                        <tbody id="tbodyEmpleados">
+                            <!-- Filas dinámicas -->
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <td colspan="3" style="text-align: right; text-transform: uppercase;">TOTALES DE NÓMINA:</td>
+                                <td id="tfootEmpAsignado" class="col-right">L. 0.00</td>
+                                <td id="tfootEmpDevengado" class="col-right">L. 0.00</td>
+                                <td id="tfootEmpDeducciones" class="col-right">L. 0.00</td>
+                                <td id="tfootEmpNeto" class="col-right">L. 0.00</td>
+                                <td></td>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+            </div>
+
+            <!-- FIRMAS INSTITUCIONALES -->
+            <div class="signatures-section" style="display: flex; justify-content: center; margin-top: 35px; border-top: 2px dashed #cbd5e1; padding-top: 25px;">
+                <div class="sig-block" style="max-width: 360px; width: 100%;">
+                    <div class="sig-line"></div>
+                    <div class="sig-name" id="sigLabelRRHH">María José Valverde Bardales</div>
+                    <div class="sig-role" id="sigLabelCargoRRHH">Jefe Interina de Recursos Humanos</div>
+                    <div style="font-size: 0.8em; color: #64748b; margin-top: 4px;">Departamento de Recursos Humanos — ENAG</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- ESTADO VACÍO -->
+        <div id="emptyState" class="empty-state">
+            <svg viewBox="0 0 24 24">
+                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+            </svg>
+            <h3>Aún no se ha cargado ninguna planilla</h3>
+            <p>Arrastra tu archivo de Excel arriba o haz clic para seleccionarlo de tu equipo.</p>
+        </div>
+
+    </div>
+
+    <!-- MODAL DETALLE DE DEDUCCIONES DE UN EMPLEADO -->
+    <div id="modalEmpDeducciones" class="modal-overlay" onclick="cerrarModalEmp(event)">
+        <div class="modal-box" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalEmpNombre">Nombre del Colaborador</h3>
+                    <span id="modalEmpCargo" style="font-size: 0.85em; color: var(--text-muted); font-weight: 600;">Cargo</span>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalEmpDirect()">✕</button>
+            </div>
+            <div style="margin-bottom: 16px; background: #f8fafc; padding: 14px 18px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                <div>
+                    <span style="font-size: 0.78em; color: #64748b; font-weight: 700; text-transform: uppercase;">Sueldo Devengado</span>
+                    <div id="modalEmpDevengado" style="font-size: 1.15em; font-weight: 800; color: #002147;">L. 0.00</div>
+                </div>
+                <div>
+                    <span style="font-size: 0.78em; color: #64748b; font-weight: 700; text-transform: uppercase;">Neto a Pagar</span>
+                    <div id="modalEmpNeto" style="font-size: 1.15em; font-weight: 800; color: #10b981;">L. 0.00</div>
+                </div>
+            </div>
+            <h4 style="margin: 0 0 10px 0; color: #002147; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px;">Desglose de Deducciones Aplicadas:</h4>
+            <div class="table-responsive">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Concepto</th>
+                            <th class="col-right">Monto (L.)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="modalEmpDeduccionesBody">
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td>TOTAL DEDUCCIONES:</td>
+                            <td id="modalEmpTotalDeduc" class="col-right">L. 0.00</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- SCRIPT DE LÓGICA Y CÁLCULOS -->
+    <script>
+        // Variables globales
+        let currentWorkbook = null;
+        let reporteData = {
+            periodo: "Febrero 2026",
+            regimen: "GENERAL",
+            totalEmpleados: 0,
+            totalAsignado: 0,
+            totalDevengado: 0,
+            totalDeducciones: 0,
+            totalNeto: 0,
+            deducciones: [],
+            empleados: []
+        };
+
+        const dropZone = document.getElementById('drop-zone');
+
+        // Drag and Drop
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                procesarArchivo(files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                procesarArchivo(files[0]);
+            }
+        }
+
+        // Utilidades de formato
+        function formatMoneda(valor) {
+            return "L. " + Number(valor || 0).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function formatNumero(valor) {
+            return Number(valor || 0).toLocaleString('en-US');
+        }
+
+        function formatPorcentaje(valor) {
+            return Number(valor || 0).toFixed(2) + "%";
+        }
+
+        function normalize(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "");
+        }
+
+        function parseCleanFloat(val) {
+            if (val === undefined || val === null || val === "") return 0;
+            if (typeof val === 'number') return val;
+            const cleaned = val.toString().replace(/L\s*/gi, "").replace(/[^0-9.-]/g, "");
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function clasificarDeduccion(nombre) {
+            const n = normalize(nombre);
+            if (n.includes("ihss") || n.includes("segurosocial") || n.includes("seguro")) return { cat: "Seguridad Social", cls: "cat-seguridad" };
+            if (n.includes("injupemp") || n.includes("retiro") || n.includes("jubilacion")) return { cat: "Previsión / Retiro", cls: "cat-prevision" };
+            if (n.includes("renta") || n.includes("vecinal") || n.includes("tasa") || n.includes("impuesto")) return { cat: "Tributario / Fiscal", cls: "cat-judicial" };
+            if (n.includes("cooperativa") || n.includes("coop") || n.includes("banco") || n.includes("prestamo") || n.includes("cuscatlan") || n.includes("elga") || n.includes("sagrada") || n.includes("caja")) return { cat: "Bancaria / Financiera", cls: "cat-bancaria" };
+            if (n.includes("embargo") || n.includes("judicial")) return { cat: "Judicial", cls: "cat-judicial" };
+            if (n.includes("sindicato") || n.includes("andeph") || n.includes("colegio") || n.includes("perito") || n.includes("periodista")) return { cat: "Gremial / Sindicato", cls: "cat-gremial" };
+            return { cat: "Institucional / Otra", cls: "cat-general" };
+        }
+
+        function esColumnaDeduccion(header) {
+            if (!header) return false;
+            const norm = normalize(header);
+            if (!norm) return false;
+
+            // 1. Columnas de totales o netos (NUNCA son deducciones individuales)
+            if (
+                ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) ||
+                norm === "total" || norm.includes("sueldoneto") || norm.includes("netoapagar") || norm === "neto" || norm === "liquido" || norm.includes("totalliquido") || norm.includes("totalapagar")
+            ) return false;
+
+            // 2. Columnas de sueldos / devengados
+            if (
+                norm.includes("sueldoasignado") || norm.includes("sueldodevengado") || norm.includes("sueldobase") || norm.includes("salariobase") ||
+                norm.includes("sueldomensual") || norm.includes("sueldobruto") || norm.includes("totaldevengado") || norm.includes("salariodevengado") ||
+                norm === "asignado" || norm === "devengado" || norm === "sueldo" || norm === "salario"
+            ) return false;
+
+            // 3. Columnas de días / tiempo
+            if (
+                norm === "dias" || norm === "dt" || norm.includes("diastrabajad") || norm.includes("diaslaborad") || norm.includes("diaspagad") ||
+                norm.includes("diasdevengad") || norm.includes("diastrab") || norm.includes("diaslab") || norm.includes("diasdetrabajo") ||
+                norm.includes("tiempotrabajado") || norm.includes("diasalmes") || norm.includes("diashabiles")
+            ) return false;
+
+            // 4. Datos del empleado
+            if (
+                norm.includes("nombre") || norm.includes("empleado") || norm.includes("colaborador") || norm === "cargo" || norm === "cargoo puesto" ||
+                norm === "puesto" || norm === "puestocargo" || norm === "numero" || norm === "num" || norm === "no" || norm.includes("numerodepuesto") ||
+                norm.includes("numpuesto") || norm.includes("nopuesto") || norm === "ingreso" || norm === "fechaingreso" || norm === "fechadeingreso" ||
+                norm === "reingreso" || norm === "fechadereingreso" || norm.includes("identidad") || norm === "dni" || norm === "rtn" || norm === "periodo" ||
+                norm.includes("periododecontratacion") || norm.includes("periodocontratacion") || norm.includes("periodecontracion") || norm.includes("contracion") ||
+                norm.includes("claveplaza") || norm.includes("clavepor") || norm === "tipo" || norm === "contrato" || norm === "acuerdo" ||
+                norm.includes("observacion") || norm.includes("firma")
+            ) return false;
+
+            return true;
+        }
+
+        // Procesar archivo Excel
+        function procesarArchivo(file) {
+            document.getElementById('fileLoadedBadge').innerHTML = `<span>⏳</span> Leyendo ${file.name}...`;
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+
+                    // Configurar selector de hojas
+                    const sheetSelect = document.getElementById('sheetSelect');
+                    sheetSelect.innerHTML = '';
+                    currentWorkbook.SheetNames.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.innerText = name;
+                        sheetSelect.appendChild(opt);
+                    });
+
+                    if (currentWorkbook.SheetNames.length > 1) {
+                        document.getElementById('sheetSelectorContainer').style.display = 'flex';
+                    } else {
+                        document.getElementById('sheetSelectorContainer').style.display = 'none';
+                    }
+
+                    // Determinar hoja predeterminada con prioridad a planillas
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    document.getElementById('fileLoadedBadge').innerHTML = `<span>📄</span> ${file.name} (${defaultSheet})`;
+                    cargarHoja(defaultSheet);
+                } catch (err) {
+                    alert("Error al procesar el archivo Excel: " + err.message);
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('excelFile').value = '';
+        }
+
+        function obtenerHojaPredeterminada(workbook) {
+            const keywords = ["planilla pago", "planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            for (const kw of keywords) {
+                const found = workbook.SheetNames.find(n => n.toLowerCase().includes(kw));
+                if (found) return found;
+            }
+            return workbook.SheetNames[0];
+        }
+
+        function cambiarHoja() {
+            if (!currentWorkbook) return;
+            const sheetName = document.getElementById('sheetSelect').value;
+            cargarHoja(sheetName);
+        }
+
+        function cargarHoja(sheetName) {
+            try {
+                const sheet = currentWorkbook.Sheets[sheetName];
+                const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+                if (rowsData.length < 3) {
+                    alert("La hoja '" + sheetName + "' no contiene suficientes filas.");
+                    return;
+                }
+
+                // Detectar período en las primeras filas del archivo si está escrito
+                for (let r = 0; r < Math.min(rowsData.length, 6); r++) {
+                    const rowText = (rowsData[r] || []).join(" ").toUpperCase();
+                    if (rowText.includes("CORRESPONDIENTE") || rowText.includes("MES DE") || rowText.includes("PLANILLA")) {
+                        const meses = ["ENERO", "FEBRERO", "MARZO", "ABRIL", "MAYO", "JUNIO", "JULIO", "AGOSTO", "SEPTIEMBRE", "OCTUBRE", "NOVIEMBRE", "DICIEMBRE"];
+                        for (const mes of meses) {
+                            if (rowText.includes(mes)) {
+                                const anioMatch = rowText.match(/202\d/);
+                                const anioStr = anioMatch ? anioMatch[0] : new Date().getFullYear();
+                                document.getElementById('cfgPeriodo').value = `${mes.charAt(0) + mes.slice(1).toLowerCase()} ${anioStr}`;
+                                break;
+                            }
+                        }
+                    }
+                }
+
+                // Localizar fila de encabezados
+                let headerRowIndex = -1;
+                for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
+                    const row = rowsData[i] || [];
+                    const norm = row.map(c => normalize(c));
+                    if (norm.some(c => c.includes('nombre') || c.includes('empleado') || c.includes('colaborador')) && row.filter(c => c !== '').length >= 3) {
+                        headerRowIndex = i;
+                        break;
+                    }
+                }
+
+                if (headerRowIndex === -1) {
+                    alert("No se encontró una fila de encabezados con columna de Nombre en la hoja '" + sheetName + "'.");
+                    return;
+                }
+
+                // Detectar si hay doble fila de cabecera
+                let startRow = headerRowIndex + 1;
+                const h1 = rowsData[headerRowIndex] || [];
+                const h2 = rowsData[headerRowIndex + 1] || [];
+                let headers = h1;
+                const h2Norm = h2.map(c => normalize(c));
+                if (h2Norm.some(h => h === 'cargo' || h.includes('ihss') || h.includes('seguro') || h.includes('retiro') || h.includes('sindicato') || h.includes('impuesto') || h.includes('cooperativa'))) {
+                    startRow = headerRowIndex + 2;
+                    headers = [];
+                    const maxCols = Math.max(h1.length, h2.length);
+                    for (let c = 0; c < maxCols; c++) {
+                        const val1 = h1[c] ? h1[c].toString().trim() : '';
+                        const val2 = h2[c] ? h2[c].toString().trim() : '';
+                        if (val1 && val2) headers.push(val1 + " - " + val2);
+                        else if (val1) headers.push(val1);
+                        else if (val2) headers.push(val2);
+                        else headers.push('');
+                    }
+                }
+
+                let nombreIdx = -1, cargoIdx = -1, devengadoIdx = -1, asignadoIdx = -1, totalDeducIdx = -1, netoIdx = -1;
+                headers.forEach((h, idx) => {
+                    const n = normalize(h);
+                    if (n.includes('nombre') && nombreIdx === -1) nombreIdx = idx;
+                    if ((n.includes('cargo') || (n.includes('puesto') && !n.includes('impuesto'))) && !n.includes('numero') && cargoIdx === -1) cargoIdx = idx;
+                    if ((n.includes('asignado') || n.includes('sueldobase') || n.includes('salariobase')) && asignadoIdx === -1) asignadoIdx = idx;
+                    if ((n.includes('devengado') || n.includes('totaldevengado')) && devengadoIdx === -1) devengadoIdx = idx;
+                    if ((n.includes('total') || n.startsWith('tot')) && (n.includes('deduc') || n.includes('descuent'))) totalDeducIdx = idx;
+                    if ((n.includes('neto') || n.includes('liquido') || n.includes('totalapagar')) && netoIdx === -1) netoIdx = idx;
+                });
+
+                if (nombreIdx === -1) nombreIdx = 2;
+                if (asignadoIdx === -1) asignadoIdx = 3;
+                if (devengadoIdx === -1) devengadoIdx = asignadoIdx;
+                if (totalDeducIdx === -1) totalDeducIdx = headers.length;
+
+                // Detectar si la hoja utiliza formato de doble fila por empleado
+                let esDobleFila = false;
+                for (let k = startRow; k < Math.min(rowsData.length, startRow + 10); k++) {
+                    const r1 = rowsData[k] || [];
+                    const r2 = rowsData[k + 1] || [];
+                    let foundNum = -1;
+                    for (let c = 0; c < 3; c++) {
+                        if (r1[c] && /^\d+$/.test(r1[c].toString().trim())) { foundNum = c; break; }
+                    }
+                    if (foundNum !== -1 && (!r2[foundNum] || r2[foundNum].toString().trim() === '') && r2.some((c, idx) => idx !== foundNum && c !== '')) {
+                        esDobleFila = true;
+                        break;
+                    }
+                }
+
+                const empleados = [];
+                let step = esDobleFila ? 2 : 1;
+
+                for (let i = startRow; i < rowsData.length; i += step) {
+                    const row = rowsData[i];
+                    if (!row) continue;
+                    let empName = row[nombreIdx] ? row[nombreIdx].toString().trim() : '';
+                    if (!empName || normalize(empName).startsWith('total') || normalize(empName).startsWith('gran') || normalize(empName).includes('vanal')) continue;
+
+                    let asig = parseCleanFloat(row[asignadoIdx]);
+                    let dev = parseCleanFloat(row[devengadoIdx]);
+                    if (dev === 0 && asig > 0) dev = asig;
+                    if (dev === 0 && !row.some(c => typeof c === 'number' && c > 100)) continue;
+
+                    const rowNext = esDobleFila ? (rowsData[i + 1] || []) : null;
+                    let cargo = '';
+                    if (cargoIdx !== -1) {
+                        cargo = row[cargoIdx] || (rowNext && rowNext[cargoIdx]) || '';
+                    }
+
+                    const deducs = [];
+                    headers.forEach((h, colIdx) => {
+                        if (colIdx > devengadoIdx && colIdx < totalDeducIdx && esColumnaDeduccion(h)) {
+                            let val = parseCleanFloat(row[colIdx]);
+                            if (val > 0) {
+                                let cleanH = h.replace(/\s+/g, ' ').trim()
+                                    .replace(/^(DEDUCCIONES|Deducciones|Deducción|Deduccion)\s*-\s*/i, '')
+                                    .replace(/\bI\s+H\s+S\s+S\b/gi, 'I.H.S.S.');
+                                deducs.push({ nombre: cleanH, monto: val });
+                            }
+                        }
+                    });
+
+                    const totalDeduc = deducs.reduce((sum, d) => sum + d.monto, 0);
+                    let neto = dev - totalDeduc;
+
+                    empleados.push({
+                        id: i,
+                        nombre: empName,
+                        cargo: cargo || "EMPLEADO",
+                        sueldoAsignado: asig || dev,
+                        sueldoDevengado: dev,
+                        deducciones: deducs,
+                        totalDeducciones: totalDeduc,
+                        netoPagar: neto
+                    });
+                }
+
+                if (empleados.length === 0) {
+                    alert("No se pudieron extraer empleados válidos de la hoja '" + sheetName + "'.");
+                    return;
+                }
+
+                // Consolidar deducciones por concepto
+                const mapDeduc = {};
+                let totalAsignado = 0;
+                let totalDevengado = 0;
+                let totalDeducciones = 0;
+                let totalNeto = 0;
+
+                empleados.forEach(emp => {
+                    totalAsignado += emp.sueldoAsignado;
+                    totalDevengado += emp.sueldoDevengado;
+                    totalDeducciones += emp.totalDeducciones;
+                    totalNeto += emp.netoPagar;
+
+                    emp.deducciones.forEach(d => {
+                        if (!mapDeduc[d.nombre]) {
+                            const infoCat = clasificarDeduccion(d.nombre);
+                            mapDeduc[d.nombre] = {
+                                nombre: d.nombre,
+                                categoria: infoCat.cat,
+                                categoriaCls: infoCat.cls,
+                                count: 0,
+                                total: 0
+                            };
+                        }
+                        mapDeduc[d.nombre].count++;
+                        mapDeduc[d.nombre].total += d.monto;
+                    });
+                });
+
+                const listaDeducciones = Object.values(mapDeduc).sort((a, b) => b.total - a.total);
+
+                // Asignar al estado global
+                reporteData = {
+                    periodo: document.getElementById('cfgPeriodo').value || "Febrero 2026",
+                    regimen: document.getElementById('cfgRegimen').value || "GENERAL",
+                    totalEmpleados: empleados.length,
+                    totalAsignado: totalAsignado,
+                    totalDevengado: totalDevengado,
+                    totalDeducciones: totalDeducciones,
+                    totalNeto: totalNeto,
+                    deducciones: listaDeducciones,
+                    empleados: empleados
+                };
+
+                renderizarReporte();
+
+            } catch (err) {
+                alert("Error al cargar la hoja: " + err.message);
+                console.error(err);
+            }
+        }
+
+        // Renderizado del reporte completo
+        function renderizarReporte() {
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('reportContent').style.display = 'block';
+
+            // Habilitar botones de exportación
+            document.getElementById('btnExportPDF').disabled = false;
+            document.getElementById('btnExportExcel').disabled = false;
+            document.getElementById('btnPrintReport').disabled = false;
+
+            // 1. Actualizar KPIs
+            document.getElementById('kpiNetoPagado').innerText = formatMoneda(reporteData.totalNeto);
+            document.getElementById('kpiTotalDevengado').innerText = formatMoneda(reporteData.totalDevengado);
+            document.getElementById('kpiTotalDeducciones').innerText = formatMoneda(reporteData.totalDeducciones);
+            document.getElementById('kpiTotalEmpleados').innerText = formatNumero(reporteData.totalEmpleados);
+
+            const pctDeducPlanilla = reporteData.totalDevengado > 0 ? (reporteData.totalDeducciones / reporteData.totalDevengado) * 100 : 0;
+            const pctNetoPlanilla = reporteData.totalDevengado > 0 ? (reporteData.totalNeto / reporteData.totalDevengado) * 100 : 0;
+            document.getElementById('kpiDeduccionesPorcentaje').innerText = formatPorcentaje(pctDeducPlanilla) + " de la planilla devengada";
+            document.getElementById('kpiNetoPorcentaje').innerText = formatPorcentaje(pctNetoPlanilla) + " de desembolso neto";
+
+            document.getElementById('kpiConceptosBadge').innerText = reporteData.deducciones.length + " Conceptos";
+            const promNeto = reporteData.totalEmpleados > 0 ? reporteData.totalNeto / reporteData.totalEmpleados : 0;
+            document.getElementById('kpiPromedioNeto').innerText = "Promedio Neto: " + formatMoneda(promNeto);
+
+            // 2. Renderizar Barras de Distribución (Top 6)
+            const barsContainer = document.getElementById('distributionBars');
+            barsContainer.innerHTML = '';
+            const topDeducciones = reporteData.deducciones.slice(0, 6);
+
+            topDeducciones.forEach(d => {
+                const pct = reporteData.totalDeducciones > 0 ? (d.total / reporteData.totalDeducciones) * 100 : 0;
+                const barItem = document.createElement('div');
+                barItem.className = 'bar-item';
+                barItem.innerHTML = `
+                    <div class="bar-labels">
+                        <span class="bar-title">
+                            <span>📌</span> <strong>${d.nombre}</strong> (${d.count} empleados)
+                        </span>
+                        <span class="bar-amounts">
+                            ${formatMoneda(d.total)} <span style="color: #64748b; font-weight: normal;">(${formatPorcentaje(pct)})</span>
+                        </span>
+                    </div>
+                    <div class="bar-track">
+                        <div class="bar-fill" style="width: ${Math.min(pct, 100).toFixed(1)}%;"></div>
+                    </div>
+                `;
+                barsContainer.appendChild(barItem);
+            });
+
+            // 3. Renderizar Tabla Consolidada de Deducciones
+            renderizarTablaDeducciones(reporteData.deducciones);
+
+            // 4. Renderizar Tabla de Empleados
+            renderizarTablaEmpleados(reporteData.empleados);
+
+            // Contadores de pestañas
+            document.getElementById('countDeducTab').innerText = reporteData.deducciones.length;
+            document.getElementById('countEmpTab').innerText = reporteData.empleados.length;
+            document.getElementById('numConceptosLabel').innerText = reporteData.deducciones.length;
+            document.getElementById('numEmpLabel').innerText = reporteData.empleados.length;
+
+            // Firmas
+            actualizarFirmas();
+        }
+
+        function renderizarTablaDeducciones(lista) {
+            const tbody = document.getElementById('tbodyDeducciones');
+            tbody.innerHTML = '';
+
+            let totalCasos = 0;
+            let sumTotalMonto = 0;
+
+            lista.forEach((d, idx) => {
+                totalCasos += d.count;
+                sumTotalMonto += d.total;
+
+                const pctDeducciones = reporteData.totalDeducciones > 0 ? (d.total / reporteData.totalDeducciones) * 100 : 0;
+                const pctPlanilla = reporteData.totalDevengado > 0 ? (d.total / reporteData.totalDevengado) * 100 : 0;
+                const promEmp = d.count > 0 ? d.total / d.count : 0;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="col-center" style="font-weight: 700; color: #64748b;">${idx + 1}</td>
+                    <td style="font-weight: 700; color: #002147;">${d.nombre}</td>
+                    <td><span class="badge-cat ${d.categoriaCls}">${d.categoria}</span></td>
+                    <td class="col-center"><strong>${d.count}</strong> <span style="font-size: 0.8em; color: #64748b;">(${formatPorcentaje((d.count / reporteData.totalEmpleados) * 100)})</span></td>
+                    <td class="col-right" style="font-weight: 800; color: #0f172a;">${formatMoneda(d.total)}</td>
+                    <td class="col-right" style="font-weight: 700; color: #0369a1;">${formatPorcentaje(pctDeducciones)}</td>
+                    <td class="col-right" style="color: #64748b;">${formatPorcentaje(pctPlanilla)}</td>
+                    <td class="col-right">${formatMoneda(promEmp)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            // Totales en el pie
+            document.getElementById('tfootTotalCasos').innerText = formatNumero(totalCasos) + " retenciones";
+            document.getElementById('tfootTotalMonto').innerText = formatMoneda(sumTotalMonto);
+            const globalPctPlanilla = reporteData.totalDevengado > 0 ? (sumTotalMonto / reporteData.totalDevengado) * 100 : 0;
+            document.getElementById('tfootTotalPlanillaPct').innerText = formatPorcentaje(globalPctPlanilla);
+            const promGlobal = totalCasos > 0 ? sumTotalMonto / totalCasos : 0;
+            document.getElementById('tfootPromedioGlobal').innerText = formatMoneda(promGlobal);
+        }
+
+        function renderizarTablaEmpleados(lista) {
+            const tbody = document.getElementById('tbodyEmpleados');
+            tbody.innerHTML = '';
+
+            let sumAsig = 0, sumDev = 0, sumDed = 0, sumNeto = 0;
+
+            lista.forEach((emp, idx) => {
+                sumAsig += emp.sueldoAsignado;
+                sumDev += emp.sueldoDevengado;
+                sumDed += emp.totalDeducciones;
+                sumNeto += emp.netoPagar;
+
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td class="col-center" style="font-weight: 700; color: #64748b;">${idx + 1}</td>
+                    <td style="font-weight: 700; color: #002147;">${emp.nombre}</td>
+                    <td style="font-size: 0.88em; color: #475569;">${emp.cargo}</td>
+                    <td class="col-right">${formatMoneda(emp.sueldoAsignado)}</td>
+                    <td class="col-right" style="font-weight: 700;">${formatMoneda(emp.sueldoDevengado)}</td>
+                    <td class="col-right" style="color: #dc2626; font-weight: 700;">${formatMoneda(emp.totalDeducciones)}</td>
+                    <td class="col-right" style="color: #10b981; font-weight: 800;">${formatMoneda(emp.netoPagar)}</td>
+                    <td class="col-center">
+                        <button type="button" class="btn-action btn-print" style="padding: 4px 10px; font-size: 0.8em;" onclick="abrirModalEmp(${emp.id})">
+                            👁️ Ver (${emp.deducciones.length})
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('tfootEmpAsignado').innerText = formatMoneda(sumAsig);
+            document.getElementById('tfootEmpDevengado').innerText = formatMoneda(sumDev);
+            document.getElementById('tfootEmpDeducciones').innerText = formatMoneda(sumDed);
+            document.getElementById('tfootEmpNeto').innerText = formatMoneda(sumNeto);
+        }
+
+        // Búsqueda y filtrado
+        function filtrarTablaDeducciones() {
+            const q = normalize(document.getElementById('searchDeducInput').value);
+            const filtradas = reporteData.deducciones.filter(d => normalize(d.nombre).includes(q) || normalize(d.categoria).includes(q));
+            renderizarTablaDeducciones(filtradas);
+            document.getElementById('numConceptosLabel').innerText = filtradas.length;
+        }
+
+        function filtrarTablaEmpleados() {
+            const q = normalize(document.getElementById('searchEmpInput').value);
+            const filtrados = reporteData.empleados.filter(e => normalize(e.nombre).includes(q) || normalize(e.cargo).includes(q));
+            renderizarTablaEmpleados(filtrados);
+            document.getElementById('numEmpLabel').innerText = filtrados.length;
+        }
+
+        // Pestañas
+        function cambiarTab(tab) {
+            if (tab === 'deducciones') {
+                document.getElementById('tabDeduccionesBtn').classList.add('active');
+                document.getElementById('tabEmpleadosBtn').classList.remove('active');
+                document.getElementById('viewDeducciones').style.display = 'block';
+                document.getElementById('viewEmpleados').style.display = 'none';
+            } else {
+                document.getElementById('tabEmpleadosBtn').classList.add('active');
+                document.getElementById('tabDeduccionesBtn').classList.remove('active');
+                document.getElementById('viewEmpleados').style.display = 'block';
+                document.getElementById('viewDeducciones').style.display = 'none';
+            }
+        }
+
+        // Modal de empleado
+        function abrirModalEmp(empId) {
+            const emp = reporteData.empleados.find(e => e.id === empId);
+            if (!emp) return;
+
+            document.getElementById('modalEmpNombre').innerText = emp.nombre;
+            document.getElementById('modalEmpCargo').innerText = emp.cargo;
+            document.getElementById('modalEmpDevengado').innerText = formatMoneda(emp.sueldoDevengado);
+            document.getElementById('modalEmpNeto').innerText = formatMoneda(emp.netoPagar);
+            document.getElementById('modalEmpTotalDeduc').innerText = formatMoneda(emp.totalDeducciones);
+
+            const tbody = document.getElementById('modalEmpDeduccionesBody');
+            tbody.innerHTML = '';
+            emp.deducciones.forEach(d => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td style="font-weight: 600; color: #002147;">${d.nombre}</td>
+                    <td class="col-right" style="font-weight: 700; color: #dc2626;">${formatMoneda(d.monto)}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            document.getElementById('modalEmpDeducciones').classList.add('active');
+        }
+
+        function cerrarModalEmp(e) {
+            if (e.target.id === 'modalEmpDeducciones') {
+                cerrarModalEmpDirect();
+            }
+        }
+
+        function cerrarModalEmpDirect() {
+            document.getElementById('modalEmpDeducciones').classList.remove('active');
+        }
+
+        // Actualización de firmas
+        function actualizarFirmas() {
+            const rrhh = document.getElementById('cfgFirmanteRRHH').value || "María José Valverde Bardales";
+            const cargo = document.getElementById('cfgCargoFirmanteRRHH').value || "Jefe Interina de Recursos Humanos";
+            document.getElementById('sigLabelRRHH').innerText = rrhh;
+            document.getElementById('sigLabelCargoRRHH').innerText = cargo;
+        }
+
+        document.getElementById('cfgFirmanteRRHH').addEventListener('input', actualizarFirmas);
+        document.getElementById('cfgCargoFirmanteRRHH').addEventListener('input', actualizarFirmas);
+
+        function actualizarRegimen() {
+            reporteData.regimen = document.getElementById('cfgRegimen').value;
+        }
+
+        // Función auxiliar para cargar imagen base64
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        // ========================================================
+        // GENERACIÓN DE REPORTE OFICIAL EN PDF (jsPDF + AutoTable)
+        // ========================================================
+        async function generarPDFReporte() {
+            if (!reporteData || reporteData.deducciones.length === 0) {
+                alert("No hay datos de planilla cargados para generar el reporte.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'a4');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // Fondo institucional o membrete
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+            if (logoBgUrl) {
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            }
+
+            // Título y membrete institucional (colocado con seguridad debajo del logo preimpreso del membrete)
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(11);
+            doc.setTextColor(0, 33, 71); // Azul ENAG
+            doc.text("DEPARTAMENTO DE RECURSOS HUMANOS", 105, 43, { align: "center" });
+
+            doc.setFontSize(13);
+            doc.setTextColor(15, 23, 42);
+            doc.text("REPORTE RESUMEN DE PLANILLA Y DEDUCCIONES", 105, 49, { align: "center" });
+
+            // Línea divisoria decorativa bajo el título
+            doc.setDrawColor(0, 33, 71);
+            doc.setLineWidth(0.4);
+            doc.line(45, 51.5, 165, 51.5);
+
+            doc.setFontSize(8);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(71, 85, 105);
+            const periodo = document.getElementById('cfgPeriodo').value || "Febrero 2026";
+            const regimenSelect = document.getElementById('cfgRegimen');
+            const regimen = regimenSelect && regimenSelect.selectedIndex >= 0 ? regimenSelect.options[regimenSelect.selectedIndex].text : "Personal por Acuerdo";
+            const hoy = new Date().toLocaleDateString('es-HN', { day: '2-digit', month: 'long', year: 'numeric' });
+            doc.text(`Período: ${periodo}   |   Régimen: ${regimen}   |   Fecha de Emisión: ${hoy}`, 105, 56, { align: "center" });
+
+            // ----------------------------------------------------
+            // SECCIÓN I: CUADRO DE RESUMEN FINANCIERO EJECUTIVO
+            // ----------------------------------------------------
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(0, 33, 71);
+            doc.text("I. RESUMEN FINANCIERO DE PLANILLA", 15, 62);
+
+            const sumHeaders = [["Total Colaboradores", "Planilla Devengada (Bruto)", "Total Deducciones Aplicadas", "VALOR TOTAL PAGADO (NETO)"]];
+            const sumBody = [[
+                `${reporteData.totalEmpleados} empleados`,
+                formatMoneda(reporteData.totalDevengado),
+                formatMoneda(reporteData.totalDeducciones),
+                formatMoneda(reporteData.totalNeto)
+            ]];
+
+            doc.autoTable({
+                startY: 64,
+                margin: { left: 15, right: 15 },
+                head: sumHeaders,
+                body: sumBody,
+                theme: 'grid',
+                headStyles: {
+                    fillColor: [0, 33, 71],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'center',
+                    fontSize: 7.5,
+                    cellPadding: 1.8
+                },
+                styles: {
+                    fontSize: 9,
+                    cellPadding: 2.2,
+                    textColor: [15, 23, 42],
+                    lineColor: [203, 213, 225],
+                    lineWidth: 0.2,
+                    fillColor: [255, 255, 255]
+                },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 35, fontStyle: 'bold' },
+                    1: { halign: 'right', cellWidth: 48, fontStyle: 'bold' },
+                    2: { halign: 'right', cellWidth: 48, fontStyle: 'bold', textColor: [180, 20, 20] },
+                    3: { halign: 'right', cellWidth: 49, fontStyle: 'bold', textColor: [0, 110, 60] }
+                }
+            });
+
+            // ----------------------------------------------------
+            // SECCIÓN II: TABLA OFICIAL DE DEDUCCIONES POR CONCEPTO
+            // ----------------------------------------------------
+            const startTableY = doc.lastAutoTable.finalY + 5;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(0, 33, 71);
+            doc.text("II. DESGLOSE CONSOLIDADO POR CADA DEDUCCIÓN", 15, startTableY);
+
+            const tableRows = [];
+            let totalCasos = 0;
+            reporteData.deducciones.forEach((d, idx) => {
+                totalCasos += d.count;
+                const pctDeduc = reporteData.totalDeducciones > 0 ? (d.total / reporteData.totalDeducciones) * 100 : 0;
+                const prom = d.count > 0 ? d.total / d.count : 0;
+
+                tableRows.push([
+                    (idx + 1).toString(),
+                    d.nombre,
+                    d.count.toString(),
+                    formatMoneda(d.total),
+                    formatPorcentaje(pctDeduc),
+                    formatMoneda(prom)
+                ]);
+            });
+
+            const promGlobal = totalCasos > 0 ? reporteData.totalDeducciones / totalCasos : 0;
+            const footRow = [
+                "",
+                "TOTAL GENERAL DE DEDUCCIONES",
+                totalCasos.toString(),
+                formatMoneda(reporteData.totalDeducciones),
+                "100.00%",
+                formatMoneda(promGlobal)
+            ];
+
+            const numRows = tableRows.length;
+            let dynamicFontSize = 7.5;
+            let dynamicCellPadding = 1.2;
+            if (numRows > 22) {
+                dynamicFontSize = 6.5;
+                dynamicCellPadding = 0.8;
+            } else if (numRows > 16) {
+                dynamicFontSize = 7.0;
+                dynamicCellPadding = 1.0;
+            }
+
+            doc.autoTable({
+                startY: startTableY + 2,
+                margin: { left: 15, right: 15 },
+                head: [["#", "Concepto de Deducción", "Empleados", "Total Deducido", "% s/ Total", "Promedio / Emp"]],
+                body: tableRows,
+                foot: [footRow],
+                theme: 'grid',
+                styles: {
+                    fontSize: dynamicFontSize,
+                    cellPadding: dynamicCellPadding,
+                    textColor: [30, 41, 59],
+                    lineColor: [226, 232, 240],
+                    lineWidth: 0.15,
+                    fillColor: [255, 255, 255]
+                },
+                headStyles: {
+                    fillColor: [0, 33, 71],
+                    textColor: [255, 255, 255],
+                    fontStyle: 'bold',
+                    halign: 'left',
+                    cellPadding: 1.8
+                },
+                footStyles: {
+                    fillColor: [241, 245, 249],
+                    textColor: [0, 33, 71],
+                    fontStyle: 'bold',
+                    fontSize: dynamicFontSize + 0.5,
+                    cellPadding: dynamicCellPadding + 0.3
+                },
+                columnStyles: {
+                    0: { halign: 'center', cellWidth: 8 },
+                    1: { cellWidth: 70, fontStyle: 'bold' },
+                    2: { halign: 'center', cellWidth: 22 },
+                    3: { halign: 'right', cellWidth: 32, fontStyle: 'bold' },
+                    4: { halign: 'right', cellWidth: 22 },
+                    5: { halign: 'right', cellWidth: 26 }
+                },
+                didParseCell: function (data) {
+                    if (data.section === 'foot') {
+                        if (data.column.index === 0 || data.column.index === 2) {
+                            data.cell.styles.halign = 'center';
+                        } else if (data.column.index >= 3) {
+                            data.cell.styles.halign = 'right';
+                        }
+                    } else if (data.section === 'head') {
+                        if (data.column.index === 0 || data.column.index === 2) {
+                            data.cell.styles.halign = 'center';
+                        } else if (data.column.index >= 3) {
+                            data.cell.styles.halign = 'right';
+                        }
+                    }
+                }
+            });
+
+            // ----------------------------------------------------
+            // BLOQUE DE FIRMA ÚNICA: RECURSOS HUMANOS (Garantizado en 1 página)
+            // ----------------------------------------------------
+            const finalY = doc.lastAutoTable.finalY;
+            const firmanteRRHH = document.getElementById('cfgFirmanteRRHH').value || "María José Valverde Bardales";
+            const cargoRRHH = document.getElementById('cfgCargoFirmanteRRHH').value || "Jefe Interina de Recursos Humanos";
+
+            let sigY = Math.max(finalY + 14, 218);
+            if (sigY > 238) sigY = 238;
+
+            const sigWidth = 80;
+            const sigX = (pageWidth - sigWidth) / 2;
+
+            doc.setDrawColor(0, 33, 71);
+            doc.setLineWidth(0.4);
+            doc.line(sigX, sigY, sigX + sigWidth, sigY);
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9.5);
+            doc.setTextColor(0, 33, 71);
+            doc.text(firmanteRRHH, 105, sigY + 4.5, { align: 'center' });
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(8);
+            doc.setTextColor(51, 65, 85);
+            doc.text(cargoRRHH, 105, sigY + 8.5, { align: 'center' });
+
+            doc.setFontSize(7.5);
+            doc.setTextColor(100, 116, 139);
+            doc.text("Departamento de Recursos Humanos — ENAG", 105, sigY + 12.5, { align: 'center' });
+
+            // Pie de página oficial de control
+            doc.setFontSize(7);
+            doc.setTextColor(148, 163, 184);
+            doc.text(`Documento Oficial Emitido — ENAG | Fecha: ${hoy}`, 15, 255);
+
+            // Descargar el archivo
+            const safePeriodo = periodo.replace(/[^a-zA-Z0-9]/g, "_");
+            doc.save(`Reporte_Resumen_Planilla_${safePeriodo}_ENAG.pdf`);
+        }
+
+        // ========================================================
+        // EXPORTACIÓN A EXCEL (.XLSX)
+        // ========================================================
+        function exportarExcelResumen() {
+            if (!reporteData || reporteData.deducciones.length === 0) {
+                alert("No hay datos cargados para exportar a Excel.");
+                return;
+            }
+
+            const wb = XLSX.utils.book_new();
+
+            // Hoja 1: Resumen de Deducciones y Totales
+            const periodo = document.getElementById('cfgPeriodo').value || "Febrero 2026";
+            const wsData = [
+                ["EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)"],
+                ["DEPARTAMENTO DE RECURSOS HUMANOS"],
+                ["REPORTE RESUMEN EJECUTIVO DE PLANILLA Y DEDUCCIONES"],
+                [`Período: ${periodo}`, `Total Empleados: ${reporteData.totalEmpleados}`, `Fecha: ${new Date().toLocaleDateString('es-HN')}`],
+                [],
+                ["INDICADORES FINANCIEROS DE PLANILLA"],
+                ["Total Planilla Devengada (Sueldo Bruto)", reporteData.totalDevengado],
+                ["Total Deducciones Globales", reporteData.totalDeducciones],
+                ["VALOR TOTAL PAGADO EN PLANILLA (NETO)", reporteData.totalNeto],
+                ["Porcentaje de Retención sobre Planilla", (reporteData.totalDeducciones / reporteData.totalDevengado) * 100 + "%"],
+                [],
+                ["DESGLOSE CONSOLIDADO POR CADA DEDUCCIÓN"],
+                ["No.", "Concepto de Deducción", "Clasificación", "Empleados Afectados", "Total Deducido (L.)", "% s/ Deducciones", "% s/ Planilla", "Promedio / Empleado"]
+            ];
+
+            let totalCasos = 0;
+            reporteData.deducciones.forEach((d, idx) => {
+                totalCasos += d.count;
+                const pctDeduc = (d.total / reporteData.totalDeducciones) * 100;
+                const pctPlan = (d.total / reporteData.totalDevengado) * 100;
+                const prom = d.total / d.count;
+                wsData.push([
+                    idx + 1,
+                    d.nombre,
+                    d.categoria,
+                    d.count,
+                    d.total,
+                    pctDeduc / 100,
+                    pctPlan / 100,
+                    prom
+                ]);
+            });
+
+            // Fila de gran total
+            wsData.push([
+                "",
+                "TOTAL GENERAL DE DEDUCCIONES",
+                "",
+                totalCasos,
+                reporteData.totalDeducciones,
+                1.0,
+                reporteData.totalDeducciones / reporteData.totalDevengado,
+                reporteData.totalDeducciones / totalCasos
+            ]);
+
+            const wsResumen = XLSX.utils.aoa_to_sheet(wsData);
+            XLSX.utils.book_append_sheet(wb, wsResumen, "Resumen Deducciones");
+
+            // Hoja 2: Detalle por Empleado
+            const wsEmpData = [
+                ["No.", "Nombre del Empleado", "Cargo / Puesto", "Sueldo Asignado", "Sueldo Devengado", "Total Deducciones", "Neto a Pagar"]
+            ];
+            reporteData.empleados.forEach((emp, idx) => {
+                wsEmpData.push([
+                    idx + 1,
+                    emp.nombre,
+                    emp.cargo,
+                    emp.sueldoAsignado,
+                    emp.sueldoDevengado,
+                    emp.totalDeducciones,
+                    emp.netoPagar
+                ]);
+            });
+
+            const wsEmpleados = XLSX.utils.aoa_to_sheet(wsEmpData);
+            XLSX.utils.book_append_sheet(wb, wsEmpleados, "Detalle Colaboradores");
+
+            const safePeriodo = periodo.replace(/[^a-zA-Z0-9]/g, "_");
+            XLSX.writeFile(wb, `Reporte_Resumen_Planilla_${safePeriodo}.xlsx`);
+        }
+
+        function descargarPlantillaDemo() {
+            const headers = [
+                "No.", "Numero de Puesto", "Nombre", "Cargo", "Sueldo Asignado", "Sueldo Devengado",
+                "I.H.S.S.", "Plan de Retiro INJUPEMP 9.5%", "INJUPEMP Prestamo Personal.",
+                "Impuesto Sobre la Renta", "Banco Cuscatlan", "Cooperativa Sagrada Familia",
+                "Total de Deducciones", "Sueldo Neto"
+            ];
+            const data = [
+                headers,
+                [1, "001", "JUAN PÉREZ", "GERENTE GENERAL", 45000.00, 45000.00, 297.58, 4275.00, 3500.00, 2800.00, 4500.00, 2000.00, 17372.58, 27627.42],
+                [2, "002", "MARÍA LÓPEZ", "CONTADORA GENERAL", 30000.00, 30000.00, 297.58, 2850.00, 0.00, 1200.00, 0.00, 1500.00, 5847.58, 24152.42]
+            ];
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Planilla Pago");
+            XLSX.writeFile(wb, "Plantilla_Ejemplo_Planilla_ENAG.xlsx");
+        }
+
+        // ========================================================
+        // INICIALIZACIÓN AUTOMÁTICA
+        // ========================================================
+        window.addEventListener('DOMContentLoaded', () => {
+            // 1. Revisar si hay datos transferidos vía sessionStorage
+            const sessionData = sessionStorage.getItem('enag_planilla_resumen_data');
+            if (sessionData) {
+                try {
+                    const parsed = JSON.parse(sessionData);
+                    if (parsed && parsed.empleados && parsed.empleados.length > 0) {
+                        document.getElementById('fileLoadedBadge').innerHTML = `<span>⚡</span> Datos cargados desde Vouchers (${parsed.empleados.length} colaboradores)`;
+                        if (parsed.periodo) document.getElementById('cfgPeriodo').value = parsed.periodo;
+                        if (parsed.regimen) document.getElementById('cfgRegimen').value = parsed.regimen;
+
+                        // Asegurar que cada deducción cuente con su categoría clasificada
+                        if (parsed.deducciones && Array.isArray(parsed.deducciones)) {
+                            parsed.deducciones.forEach(d => {
+                                if (!d.categoria || !d.categoriaCls) {
+                                    const infoCat = clasificarDeduccion(d.nombre);
+                                    d.categoria = infoCat.cat;
+                                    d.categoriaCls = infoCat.cls;
+                                }
+                            });
+                        }
+
+                        reporteData = parsed;
+                        renderizarReporte();
+                        return;
+                    }
+                } catch (e) {
+                    console.log("No hay datos válidos en sessionStorage:", e.message);
+                }
+            }
+
+            // 2. Si no hay datos en sessionStorage, auto-cargar plantilla predeterminada del servidor
+            fetch('../templates/planilla2.xls')
+                .then(res => {
+                    if (res.ok) return res.arrayBuffer();
+                    return fetch('../templates/planilla.xls').then(res2 => {
+                        if (res2.ok) return res2.arrayBuffer();
+                        throw new Error("No default template found");
+                    });
+                })
+                .then(arrayBuffer => {
+                    const data = new Uint8Array(arrayBuffer);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+
+                    const sheetSelect = document.getElementById('sheetSelect');
+                    sheetSelect.innerHTML = '';
+                    currentWorkbook.SheetNames.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.innerText = name;
+                        sheetSelect.appendChild(opt);
+                    });
+
+                    if (currentWorkbook.SheetNames.length > 1) {
+                        document.getElementById('sheetSelectorContainer').style.display = 'flex';
+                    }
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    document.getElementById('fileLoadedBadge').innerHTML = `<span>📄</span> Planilla Predeterminada (${defaultSheet})`;
+                    cargarHoja(defaultSheet);
+                })
+                .catch(err => {
+                    console.log("Auto-carga omitida:", err.message);
+                    document.getElementById('fileLoadedBadge').innerHTML = `<span>ℹ️</span> Esperando archivo de planilla...`;
+                });
+        });
+    </script>
+</body>
+
+</html>
