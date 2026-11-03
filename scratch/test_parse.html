@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Test Parse planilla2.xls</title>
+    <script src="../js/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="output" style="font-family: monospace; white-space: pre;">Cargando...</div>
+    <script>
+        // Copy helper functions from constancias/vouchers
+        function normalize(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "")
+                .replace(/[^a-z0-9]/g, "");
+        }
+
+        function parseCleanFloat(val) {
+            if (val === undefined || val === null || val === "") return 0;
+            if (typeof val === 'number') return val;
+            const cleaned = val.toString().replace(/L\s*/gi,"").replace(/[^0-9.-]/g,"");
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function parsearFechaIngreso(val) {
+            if (val === undefined || val === null || val === "") return "";
+            if (typeof val === 'string' && /[a-zA-Z]/.test(val)) return val.trim();
+            if (val instanceof Date) {
+                const meses = ["enero","febrero","marzo","abril","mayo","junio",
+                               "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+                return `${val.getDate()} de ${meses[val.getMonth()]} del ${val.getFullYear()}`;
+            }
+            const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
+            if (!isNaN(num) && num > 100 && num < 70000) {
+                const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+                if (!isNaN(date.getTime())) {
+                    const meses = ["enero","febrero","marzo","abril","mayo","junio",
+                                   "julio","agosto","septiembre","octubre","noviembre","diciembre"];
+                    return `${date.getUTCDate()} de ${meses[date.getUTCMonth()]} del ${date.getUTCFullYear()}`;
+                }
+            }
+            return val.toString().trim();
+        }
+
+        fetch('../planilla2.xls')
+            .then(res => res.arrayBuffer())
+            .then(arrayBuffer => {
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                
+                // Let's run the exact header and sheet loading logic
+                const sheetName = "Planilla Pago";
+                const sheet = workbook.Sheets[sheetName];
+                const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                
+                let headerRowIndex = -1;
+                for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
+                    const row = rowsData[i] || [];
+                    const normalizedRow = row.map(cell => normalize(cell));
+                    const tieneNombre = normalizedRow.some(cell =>
+                        cell.includes("nombre") || cell.includes("empleado") || cell.includes("colaborador")
+                    );
+                    const tieneMultiplesColumnas = row.filter(cell => cell !== undefined && cell.toString().trim() !== "").length >= 3;
+                    if (tieneNombre && tieneMultiplesColumnas) {
+                        headerRowIndex = i;
+                        break;
+                    }
+                }
+                
+                let startRow = headerRowIndex + 1;
+                let headers = rowsData[headerRowIndex];
+                const rowSiguiente = rowsData[headerRowIndex + 1] || [];
+                const rowSiguienteNorm = rowSiguiente.map(h => normalize(h));
+                const tieneSegundaCabecera = rowSiguienteNorm.some(h =>
+                    h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato")
+                );
+
+                if (tieneSegundaCabecera) {
+                    startRow = headerRowIndex + 2;
+                    const h1 = rowsData[headerRowIndex];
+                    const h2 = rowsData[headerRowIndex + 1];
+                    headers = [];
+                    const maxCols = Math.max(h1.length, h2.length);
+                    for (let c = 0; c < maxCols; c++) {
+                        const val1 = h1[c] ? h1[c].toString().trim() : "";
+                        const val2 = h2[c] ? h2[c].toString().trim() : "";
+                        if (val1 && val2) headers.push(val1 + " - " + val2);
+                        else if (val1) headers.push(val1);
+                        else if (val2) headers.push(val2);
+                        else headers.push("");
+                    }
+                }
+
+                let nombreIdx = -1, puestoIdx = -1, ingresoIdx = -1, tipoIdx = -1, asignadoIdx = -1, devengadoIdx = -1;
+                let numeroPuestoIdx = -1, totalDeduccionesIdx = -1;
+
+                headers.forEach((header, index) => {
+                    const norm = normalize(header);
+                    if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
+                    if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) {
+                        puestoIdx = index;
+                    }
+                    if (norm.includes("ingreso")) ingresoIdx = index;
+                    if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
+                    if (norm.includes("asignado")) asignadoIdx = index;
+                    if (norm.includes("devengado")) devengadoIdx = index;
+                    if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
+                    if (norm.includes("totaldededucciones") || (norm.includes("total") && norm.includes("deduc"))) totalDeduccionesIdx = index;
+                });
+
+                if (nombreIdx === -1) nombreIdx = 2;
+                if (puestoIdx === -1) puestoIdx = 2;
+                if (numeroPuestoIdx === -1) numeroPuestoIdx = 1;
+                if (asignadoIdx === -1) asignadoIdx = 3;
+                if (devengadoIdx === -1) devengadoIdx = 4;
+                if (totalDeduccionesIdx === -1) totalDeduccionesIdx = headers.length - 2;
+
+                let esDobleFila = false;
+                for (let k = startRow; k < Math.min(rowsData.length, startRow + 12); k++) {
+                    const rowVal = rowsData[k] || [];
+                    const nextRowVal = rowsData[k + 1] || [];
+                    let foundNumberCol = -1;
+                    for (let c = 0; c < 3; c++) {
+                        const str = rowVal[c] ? rowVal[c].toString().trim() : "";
+                        if (str && /^\d+$/.test(str)) {
+                            foundNumberCol = c;
+                            break;
+                        }
+                    }
+                    if (foundNumberCol !== -1) {
+                        const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
+                        const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
+                        if (nextColVal === "" && hasNextData) {
+                            esDobleFila = true;
+                            break;
+                        }
+                    }
+                }
+
+                let out = `esDobleFila: ${esDobleFila}\n`;
+                out += `nombreIdx: ${nombreIdx}, puestoIdx: ${puestoIdx}, ingresoIdx: ${ingresoIdx}\n\n`;
+
+                const emps = [];
+                let i = startRow;
+                while (i < rowsData.length) {
+                    const rowA = rowsData[i];
+                    if (!rowA) { i++; continue; }
+                    let isEmployeeRow = false;
+                    for (let c = 0; c < 3; c++) {
+                        const str = rowA[c] ? rowA[c].toString().trim() : "";
+                        if (str && /^\d+$/.test(str)) {
+                            isEmployeeRow = true;
+                            break;
+                        }
+                    }
+                    if (isEmployeeRow) {
+                        const rowB = rowsData[i + 1];
+                        const empName = rowA[nombreIdx] ? rowA[nombreIdx].toString().trim().toUpperCase() : "";
+                        const empPuesto = puestoIdx !== -1 && rowB && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "N/D";
+                        const empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "N/D";
+                        
+                        emps.push({
+                            nombre: empName,
+                            puesto: empPuesto,
+                            ingreso: empIngreso,
+                            rawIngresoValue: rowA[ingresoIdx]
+                        });
+                        i += 2;
+                    } else {
+                        i++;
+                    }
+                }
+
+                out += "EMPLEADOS LEIDOS:\n" + JSON.stringify(emps, null, 2);
+                document.getElementById('output').innerText = out;
+            })
+            .catch(err => {
+                document.getElementById('output').innerText = "Error: " + err.message;
+            });
+    </script>
+</body>
+</html>

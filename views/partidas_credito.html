@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
-    <title>Nueva Partida Contable</title>
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Nueva Partida Contable (Facturas al Crédito)</title>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -34,7 +35,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
+            background: url('../assets/logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
@@ -272,17 +273,17 @@
             font-size: 15px !important;
         }
     </style>
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
 </head>
 
 <body>
     <div class="nav-container">
-        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
     </div>
     <div class="container">
         <div class="form-header">
-            <h2>Gestión de Partidas Contables</h2>
+            <h2>Gestión de Partidas (Facturas al Crédito)</h2>
             <div style="margin-top: 15px; display: flex; justify-content: center; gap: 10px;">
                 <label for="importarPDF" class="btn-clean"
                     style="cursor: pointer; background-color: #002147; color: white; display: inline-flex; align-items: center; gap: 8px; font-size: 14px; padding: 8px 15px;">
@@ -299,16 +300,50 @@
             </div>
         </div>
         <form id="partidaForm">
+            <!-- Fecha y Número de Partida -->
             <div style="display: flex; gap: 20px;">
                 <div class="form-group" style="flex: 1;">
-                    <label class="destacado-label">Fecha: <span class="required">*</span></label>
-                    <input type="date" id="fecha" class="destacado-input" required>
+                    <label class="destacado-label">Fecha (DD/MM/YYYY): <span class="required">*</span></label>
+                    <input type="text" id="fecha" class="destacado-input" placeholder="DD/MM/YYYY" maxlength="10"
+                        required>
                 </div>
                 <div class="form-group" style="flex: 1;">
                     <label>Número de Partida: <span class="required">*</span></label>
                     <input type="number" id="numeroPartida" required>
                 </div>
             </div>
+
+            <!-- RTN y Orden de Compra -->
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">RTN: <span class="required">*</span></label>
+                    <input type="text" id="rtn" placeholder="0000-0000-000000" class="destacado-input" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Orden de Compra: <span class="required">*</span></label>
+                    <input type="text" id="ordenCompra" placeholder="OC-XXXXXX" class="destacado-input" required>
+                </div>
+            </div>
+
+            <!-- Proceso y Factura -->
+            <div style="display: flex; gap: 20px;">
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Proceso: <span class="required">*</span></label>
+                    <input type="text" id="proceso" placeholder="LPN-XXX-XXXX" class="destacado-input" required>
+                </div>
+                <div class="form-group" style="flex: 1;">
+                    <label class="destacado-label">Factura: <span class="required">*</span></label>
+                    <input type="text" id="factura" placeholder="000-000-00-00000000" class="destacado-input" required>
+                </div>
+            </div>
+
+            <!-- CAI -->
+            <div class="form-group">
+                <label class="destacado-label">CAI: <span class="required">*</span></label>
+                <input type="text" id="cai" placeholder="XXXXXX-XXXXXX-XXXXXX-XXXXXX-XXXXXX-XX" class="destacado-input"
+                    required style="text-transform: uppercase;">
+            </div>
+
             <div class="form-group">
                 <label class="destacado-label">Beneficiario: <span class="required">*</span></label>
                 <input type="text" id="beneficiario" placeholder="NOMBRE DEL BENEFICIARIO" class="destacado-input"
@@ -633,6 +668,7 @@
 
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF();
+            doc.setTextColor(0, 0, 0);
 
             const getBase64FromUrl = (url) => new Promise((resolve) => {
                 const img = new Image();
@@ -647,7 +683,7 @@
                 img.src = url.includes(' ') ? encodeURI(url) : url;
             });
 
-            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
 
             if (logoBgUrl) {
                 const pageWidth = doc.internal.pageSize.getWidth();
@@ -657,7 +693,7 @@
 
             doc.setFont('helvetica', 'bold');
             doc.setFontSize(16);
-            const title = "PARTIDA CONTABLE";
+            const title = "PARTIDA FACTURA AL CRÉDITO";
             doc.text(title, 105, 52, { align: "center" });
             const titleWidth = doc.getTextWidth(title);
             doc.setLineWidth(0.5);
@@ -681,28 +717,74 @@
             doc.line(startX + labelWidth, 63.5, startX + labelWidth + numWidth, 63.5);
 
             doc.setFont('helvetica', 'bold');
-            doc.setFontSize(11);
-            const fecha = document.getElementById('fecha').value;
+            doc.setFontSize(10);
+            const fechaRaw = document.getElementById('fecha').value;
+            const fecha = formatFechaHonduras(fechaRaw);
             const beneficiario = document.getElementById('beneficiario').value.toUpperCase();
+            const rtn = document.getElementById('rtn').value;
+            const ordenCompra = document.getElementById('ordenCompra').value.toUpperCase();
+            const proceso = document.getElementById('proceso').value.toUpperCase();
+            const factura = document.getElementById('factura').value;
+            const cai = document.getElementById('cai').value.toUpperCase();
             const descripcion = document.getElementById('descripcion').value;
 
+            // Fila 1 (Y = 72)
             doc.text("FECHA:", 14, 72);
+            doc.setFont('helvetica', 'normal');
             doc.text(fecha, 14 + doc.getTextWidth("FECHA:") + 3, 72);
 
+            doc.setFont('helvetica', 'bold');
+            doc.text("N° PARTIDA:", 110, 72);
+            doc.setFont('helvetica', 'normal');
+            doc.text(num, 110 + doc.getTextWidth("N° PARTIDA:") + 3, 72);
+
+            // Fila 2 (Y = 78)
+            doc.setFont('helvetica', 'bold');
             doc.text("BENEFICIARIO:", 14, 78);
+            doc.setFont('helvetica', 'normal');
             doc.text(beneficiario, 14 + doc.getTextWidth("BENEFICIARIO:") + 3, 78);
 
-            doc.text("DESCRIPCIÓN:", 14, 84);
+            doc.setFont('helvetica', 'bold');
+            doc.text("RTN:", 110, 78);
+            doc.setFont('helvetica', 'normal');
+            doc.text(rtn, 110 + doc.getTextWidth("RTN:") + 3, 78);
+
+            // Fila 3 (Y = 84)
+            doc.setFont('helvetica', 'bold');
+            doc.text("ORDEN DE COMPRA:", 14, 84);
+            doc.setFont('helvetica', 'normal');
+            doc.text(ordenCompra, 14 + doc.getTextWidth("ORDEN DE COMPRA:") + 3, 84);
+
+            doc.setFont('helvetica', 'bold');
+            doc.text("PROCESO:", 110, 84);
+            doc.setFont('helvetica', 'normal');
+            doc.text(proceso, 110 + doc.getTextWidth("PROCESO:") + 3, 84);
+
+            // Fila 4 (Y = 90)
+            doc.setFont('helvetica', 'bold');
+            doc.text("FACTURA N°:", 14, 90);
+            doc.setFont('helvetica', 'normal');
+            doc.text(factura, 14 + doc.getTextWidth("FACTURA N°:") + 3, 90);
+
+            // Fila 5 (Y = 96)
+            doc.setFont('helvetica', 'bold');
+            doc.text("CAI:", 14, 96);
+            doc.setFont('helvetica', 'normal');
+            doc.text(cai, 14 + doc.getTextWidth("CAI:") + 3, 96);
+
+            // Fila 6 (Y = 102)
+            doc.setFont('helvetica', 'bold');
+            doc.text("DESCRIPCIÓN:", 14, 102);
 
             const offsetDescripcion = doc.getTextWidth("DESCRIPCIÓN:") + 3;
             const anchoMaximoDescripcion = 180 - offsetDescripcion;
 
             doc.setFont('helvetica', 'normal');
             const lineasDescripcion = doc.splitTextToSize(descripcion, anchoMaximoDescripcion);
-            doc.text(lineasDescripcion, 14 + offsetDescripcion, 84, { maxWidth: anchoMaximoDescripcion, align: "justify" });
+            doc.text(lineasDescripcion, 14 + offsetDescripcion, 102, { maxWidth: anchoMaximoDescripcion, align: "justify" });
 
             const altoLinea = 5.0;
-            const finalConceptoY = 84 + ((lineasDescripcion.length - 1) * altoLinea);
+            const finalConceptoY = 102 + ((lineasDescripcion.length - 1) * altoLinea);
 
             const currentTaxType = document.querySelector('input[name="taxType"]:checked').value;
             const filasData = [];
@@ -765,7 +847,7 @@
                 theme: 'grid',
                 headStyles: { fillColor: [44, 62, 80], halign: 'center' },
                 footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
-                styles: { fontSize: 9, cellPadding: 3 },
+                styles: { fontSize: 9, cellPadding: 3, textColor: [0, 0, 0] },
                 columnStyles: {
                     0: { cellWidth: 35, halign: 'center' }, // Objeto
                     1: { cellWidth: 'auto' }, // Cuenta
@@ -824,6 +906,22 @@
                 formData.rows.push({ objeto, cuenta, debe, haber, isFixed, isTax, comentario });
             });
 
+
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
+
             const pdfBlob = doc.output('blob');
             const dataString = "\n%PARTIDA_DATA:" + btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
             const finalBlob = new Blob([pdfBlob, dataString], { type: 'application/pdf' });
@@ -831,6 +929,10 @@
             const link = document.createElement('a');
             link.href = URL.createObjectURL(finalBlob);
             link.download = `Partida_${num}.pdf`;
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Contabilidad', 'Generar PDF', 'Se generó un documento en el módulo Contabilidad');
+            }
+
             link.click();
             URL.revokeObjectURL(link.href);
         };
@@ -1132,8 +1234,8 @@
             calcularTotales();
         }
 
-        function limpiarFormulario() {
-            if (confirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) {
+        async function limpiarFormulario() {
+            if ((window.enagConfirm && await window.enagConfirm('¿Está seguro de que desea limpiar todos los campos de la partida?')) || (!window.enagConfirm && confirm('¿Está seguro de que desea limpiar todos los campos de la partida?'))) {
                 document.getElementById('partidaForm').reset();
                 tabla.innerHTML = '';
                 // Restaurar filas iniciales
@@ -1144,11 +1246,86 @@
             }
         }
 
+        // Input masks and constraints for credit invoice fields
+        document.getElementById('rtn').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // numbers only
+            if (value.length > 14) value = value.slice(0, 14);
+            let formatted = '';
+            if (value.length > 0) formatted += value.slice(0, 4);
+            if (value.length > 4) formatted += '-' + value.slice(4, 8);
+            if (value.length > 8) formatted += '-' + value.slice(8, 14);
+            e.target.value = formatted;
+        });
+
+        document.getElementById('factura').addEventListener('input', function (e) {
+            let value = e.target.value.replace(/\D/g, ''); // numbers only
+            if (value.length > 16) value = value.slice(0, 16);
+            let formatted = '';
+            if (value.length > 0) formatted += value.slice(0, 3);
+            if (value.length > 3) formatted += '-' + value.slice(3, 6);
+            if (value.length > 6) formatted += '-' + value.slice(6, 8);
+            if (value.length > 8) formatted += '-' + value.slice(8, 16);
+            e.target.value = formatted;
+        });
+
+        document.getElementById('cai').addEventListener('input', function (e) {
+            let value = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ''); // alphanumeric uppercase
+            if (value.length > 32) value = value.slice(0, 32);
+            let formatted = '';
+            if (value.length > 0) formatted += value.slice(0, 6);
+            if (value.length > 6) formatted += '-' + value.slice(6, 12);
+            if (value.length > 12) formatted += '-' + value.slice(12, 18);
+            if (value.length > 18) formatted += '-' + value.slice(18, 24);
+            if (value.length > 24) formatted += '-' + value.slice(24, 30);
+            if (value.length > 30) formatted += '-' + value.slice(30, 32);
+            e.target.value = formatted;
+        });
+
+        document.getElementById('ordenCompra').addEventListener('input', function (e) {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9\-]/g, '');
+        });
+
+        document.getElementById('proceso').addEventListener('input', function (e) {
+            e.target.value = e.target.value.toUpperCase().replace(/[^A-Z0-9\-]/g, '');
+        });
+
+        // Auto-formateo de Fecha en formato Honduras (DD/MM/YYYY)
+        const fechaElem = document.getElementById('fecha');
+        if (fechaElem) {
+            if (!fechaElem.value) {
+                const hoy = new Date();
+                const d = String(hoy.getDate()).padStart(2, '0');
+                const m = String(hoy.getMonth() + 1).padStart(2, '0');
+                const y = hoy.getFullYear();
+                fechaElem.value = `${d}/${m}/${y}`;
+            }
+            fechaElem.addEventListener('input', function (e) {
+                let v = e.target.value.replace(/\D/g, '');
+                if (v.length > 8) v = v.substring(0, 8);
+                if (v.length >= 5) {
+                    e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+                } else if (v.length >= 3) {
+                    e.target.value = `${v.substring(0, 2)}/${v.substring(2)}`;
+                } else {
+                    e.target.value = v;
+                }
+            });
+        }
+
         agregarFila(); agregarFila();
         agregarFila('27115', 'Exento', 0, 0, false, true);
         agregarFila('111020100000700', 'Banco Central de Honduras', 0, 0, true, false);
         calcularTotales();
     </script>
+    <script src="../js/soporte.js"></script>
+    <script src="../js/honduras-datepicker.js"></script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
 </body>
 
 </html>

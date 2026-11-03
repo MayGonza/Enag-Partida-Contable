@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Parámetros del Sistema - TI</title>
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --bg-body: #002147;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid var(--primary);
+        }
+
+        .nav-container {
+            max-width: 800px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            background: #6c757d;
+            color: white;
+            transition: all 0.3s;
+        }
+
+        .btn-nav:hover {
+            background-color: #5a6268;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .param-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .param-card h2 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 1rem;
+        }
+
+        .form-group input {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #cbd5e1;
+            width: 100%;
+            font-size: 1rem;
+            outline: none;
+            box-sizing: border-box;
+        }
+        
+        .form-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.1);
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            font-size: 1rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-save:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .helper-text {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin-top: 10px;
+        }
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .checkbox-group input {
+            width: 20px;
+            height: 20px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .checkbox-group label {
+            font-weight: bold;
+            font-size: 1rem;
+            cursor: pointer;
+            margin: 0;
+        }
+        
+        .grid-forms {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav">← Volver al Menú Principal</a>
+        <a href="login.html" class="btn-nav" id="btnCerrarSesion" onclick="cerrarSesion(event)">← Cerrar Sesión</a>
+    </div>
+
+    <div class="container">
+        <h1>⚙️ Parámetros del Sistema</h1>
+        <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Administración de configuraciones globales - Solo TI</p>
+
+        <div class="param-card">
+            <h2>Gestión de Sesiones y Accesos</h2>
+            <div class="grid-forms">
+                <div class="form-group">
+                    <label for="paramInactividad">Tiempo de Inactividad (Minutos)</label>
+                    <input type="number" id="paramInactividad" min="1" value="5" placeholder="Ej: 5">
+                    <div class="helper-text">Desconexión automática por inactividad.</div>
+                </div>
+                <div class="form-group" style="display: flex; flex-direction: column; justify-content: center;">
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="paramSesionMultiple">
+                        <label for="paramSesionMultiple">Permitir Sesiones Simultáneas</label>
+                    </div>
+                    <div class="helper-text" style="margin-top: -5px;">Si se activa, el mismo usuario podrá tener abierta la sesión en múltiples dispositivos al mismo tiempo (ej. PC y Celular).</div>
+                </div>
+            </div>
+
+            <hr style="border: 0; border-top: 1px solid #cbd5e1; margin: 30px 0;">
+
+            <h2>Cotizaciones y Facturación</h2>
+            <div class="grid-forms">
+                <div class="form-group">
+                    <label for="paramVigenciaCotizacion">Vigencia de Cotizaciones (Días)</label>
+                    <input type="number" id="paramVigenciaCotizacion" min="1" value="15" placeholder="Ej: 15">
+                    <div class="helper-text">Días hasta que una cotización cambie a estado rojo (vencida).</div>
+                </div>
+                <div class="form-group">
+                    <label for="paramAlertaNaranja">Alerta de Vigencia (Días)</label>
+                    <input type="number" id="paramAlertaNaranja" min="1" value="7" placeholder="Ej: 7">
+                    <div class="helper-text">Días desde su creación para que el semáforo cambie a color naranja.</div>
+                </div>
+                <div class="form-group">
+                    <label for="paramIsv">Impuesto Sobre Ventas (ISV %)</label>
+                    <input type="number" id="paramIsv" min="0" max="100" value="15" placeholder="Ej: 15">
+                    <div class="helper-text">Porcentaje de impuesto a aplicar por defecto en el sistema.</div>
+                </div>
+            </div>
+            
+            <button type="button" class="btn-save" onclick="guardarParametros()">Guardar Cambios</button>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+        async function cerrarSesion(e) {
+            e.preventDefault();
+            if (window.registrarBitacora) {
+                await window.registrarBitacora('Autenticación', 'Cerrar Sesión', 'El usuario ha cerrado su sesión en el sistema.');
+            }
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (user) {
+                try {
+                    const doc = await dbFirestore.collection('usuarios').doc(user.uid).get();
+                    if (doc.exists) {
+                        const userData = doc.data();
+                        if (userData.departamento !== 'ti' && userData.departamento !== 'direccion') {
+                            if (typeof Swal !== 'undefined') {
+                                Swal.fire({title: 'Acceso denegado', text: 'Solo el departamento de TI puede ver esta configuración.', icon: 'error'}).then(() => {
+                                    window.location.href = '../index.html';
+                                });
+                            } else {
+                                alert("Acceso denegado: Solo el departamento de TI puede ver esta configuración.");
+                                window.location.href = '../index.html';
+                            }
+                            return;
+                        }
+                        cargarParametros();
+                    }
+                } catch (e) {
+                    console.error("Error validando usuario", e);
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        function cargarParametros() {
+            dbFirestore.collection('parametros').doc('sistema').onSnapshot((doc) => {
+                if (doc.exists) {
+                    const data = doc.data();
+                    if (data.tiempoInactividad) {
+                        document.getElementById('paramInactividad').value = data.tiempoInactividad;
+                    }
+                    if (data.permitirSesionMultiple !== undefined) {
+                        document.getElementById('paramSesionMultiple').checked = data.permitirSesionMultiple;
+                    }
+                    if (data.vigenciaCotizacion) {
+                        document.getElementById('paramVigenciaCotizacion').value = data.vigenciaCotizacion;
+                    }
+                    if (data.alertaNaranjaCotizacion) {
+                        document.getElementById('paramAlertaNaranja').value = data.alertaNaranjaCotizacion;
+                    }
+                    if (data.isv) {
+                        document.getElementById('paramIsv').value = data.isv;
+                    }
+                }
+            });
+        }
+
+        async function guardarParametros() {
+            const minInact = parseInt(document.getElementById('paramInactividad').value, 10);
+            const vigencia = parseInt(document.getElementById('paramVigenciaCotizacion').value, 10);
+            const alertaNar = parseInt(document.getElementById('paramAlertaNaranja').value, 10);
+            const isv = parseFloat(document.getElementById('paramIsv').value);
+            const multSesion = document.getElementById('paramSesionMultiple').checked;
+
+            if (!minInact || minInact < 1 || !vigencia || !alertaNar || isv === NaN) {
+                alert("Por favor ingrese valores válidos en todos los campos numéricos.");
+                return;
+            }
+            try {
+                await dbFirestore.collection('parametros').doc('sistema').set({
+                    tiempoInactividad: minInact,
+                    permitirSesionMultiple: multSesion,
+                    vigenciaCotizacion: vigencia,
+                    alertaNaranjaCotizacion: alertaNar,
+                    isv: isv,
+                    actualizadoPor: firebase.auth().currentUser.email,
+                    actualizadoEn: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Configuración', 'Actualizar Parámetros', `Se actualizaron los parámetros globales del sistema.`);
+                }
+                alert("Parámetros actualizados exitosamente.");
+            } catch (e) {
+                console.error("Error guardando parámetros:", e);
+                alert("Hubo un error al guardar los parámetros.");
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Manual Técnico — Sistema ENAG</title>
+    <meta name="description" content="Manual técnico y de arquitectura para desarrolladores y administradores del Sistema de Gestión de la ENAG.">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --primary-accent: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --code-bg: #0f172a;
+            --code-text: #38bdf8;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--primary);
+            min-height: 100vh;
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Top Navigation Header */
+        .top-navbar {
+            background-color: #ffffff;
+            border-bottom: 3px solid var(--primary);
+            padding: 15px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .navbar-brand {
+            font-size: 1.25em;
+            font-weight: bold;
+            color: var(--primary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .navbar-actions {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.88em;
+            transition: all 0.25s;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-nav-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-nav-primary:hover {
+            background-color: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-nav-secondary {
+            background-color: #64748b;
+            color: white;
+        }
+
+        .btn-nav-secondary:hover {
+            background-color: #475569;
+            transform: translateY(-1px);
+        }
+
+        /* Main Workspace Layout */
+        .manual-layout {
+            display: grid;
+            grid-template-columns: 290px 1fr;
+            max-width: 1450px;
+            width: 100%;
+            margin: 25px auto;
+            padding: 0 20px;
+            gap: 25px;
+            flex-grow: 1;
+            box-sizing: border-box;
+        }
+
+        @media (max-width: 992px) {
+            .manual-layout {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Sidebar Navigation */
+        .sidebar {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 22px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border-top: 5px solid var(--primary);
+            position: sticky;
+            top: 95px;
+            max-height: calc(100vh - 130px);
+            overflow-y: auto;
+        }
+
+        .sidebar h3 {
+            margin-top: 0;
+            color: var(--primary);
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            border-bottom: 2px solid #f1f5f9;
+            padding-bottom: 8px;
+            margin-bottom: 12px;
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .sidebar-link {
+            display: block;
+            padding: 8px 12px;
+            color: #475569;
+            text-decoration: none;
+            border-radius: 6px;
+            font-size: 0.88em;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+
+        .sidebar-link:hover {
+            background-color: #f1f5f9;
+            color: var(--primary);
+            padding-left: 15px;
+        }
+
+        .sidebar-link.active {
+            background-color: var(--primary);
+            color: white;
+            font-weight: bold;
+        }
+
+        /* Content Panel */
+        .content-panel {
+            background: var(--card-bg);
+            border-radius: 14px;
+            padding: 35px 40px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+            border-top: 5px solid var(--primary);
+        }
+
+        .manual-section {
+            margin-bottom: 45px;
+            scroll-margin-top: 90px;
+        }
+
+        .manual-section h1 {
+            color: var(--primary);
+            font-size: 1.7em;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+            margin-top: 0;
+            margin-bottom: 18px;
+        }
+
+        .manual-section h2 {
+            color: var(--primary-light);
+            font-size: 1.25em;
+            margin-top: 25px;
+            margin-bottom: 12px;
+        }
+
+        .manual-section p {
+            line-height: 1.65;
+            color: #334155;
+            margin-bottom: 14px;
+            font-size: 0.95em;
+        }
+
+        .manual-section ul,
+        .manual-section ol {
+            line-height: 1.65;
+            color: #334155;
+            margin-bottom: 15px;
+            padding-left: 22px;
+            font-size: 0.95em;
+        }
+
+        .manual-section li {
+            margin-bottom: 6px;
+        }
+
+        /* Tables */
+        .tech-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0 25px 0;
+            font-size: 0.9em;
+        }
+
+        .tech-table th {
+            background-color: #002147;
+            color: white;
+            padding: 10px 14px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        .tech-table td {
+            padding: 9px 14px;
+            border-bottom: 1px solid #e2e8f0;
+            color: #334155;
+        }
+
+        .tech-table tr:nth-child(even) td {
+            background-color: #f8fafc;
+        }
+
+        /* Code Blocks */
+        pre {
+            background-color: var(--code-bg);
+            color: #f8fafc;
+            padding: 16px 20px;
+            border-radius: 8px;
+            overflow-x: auto;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.88em;
+            line-height: 1.5;
+            margin: 15px 0 20px 0;
+            box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.3);
+        }
+
+        code {
+            background-color: #f1f5f9;
+            color: #0369a1;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Consolas', 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+
+        pre code {
+            background-color: transparent;
+            color: inherit;
+            padding: 0;
+        }
+
+        /* Callout Boxes */
+        .callout {
+            padding: 14px 18px;
+            border-radius: 8px;
+            margin: 18px 0;
+            font-size: 0.92em;
+            line-height: 1.55;
+        }
+
+        .callout-info {
+            background-color: #eff6ff;
+            border-left: 4px solid #3b82f6;
+            color: #1e40af;
+        }
+
+        .callout-warning {
+            background-color: #fffbeb;
+            border-left: 4px solid #f59e0b;
+            color: #92400e;
+        }
+
+        .callout-success {
+            background-color: #ecfdf5;
+            border-left: 4px solid #10b981;
+            color: #065f46;
+        }
+
+        .manual-footer {
+            text-align: center;
+            padding: 18px;
+            color: #94a3b8;
+            font-size: 0.85em;
+            font-weight: bold;
+            margin-top: auto;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- TOP NAVBAR -->
+    <div class="top-navbar">
+        <div class="navbar-brand">
+            <span>⚙️ Manual Técnico de Arquitectura</span>
+        </div>
+        <div class="navbar-actions">
+            <a href="manual.html" class="btn-nav btn-nav-primary">📖 Ver Manual de Usuario</a>
+            <a href="../index.html" class="btn-nav btn-nav-secondary">← Volver al Portal</a>
+        </div>
+    </div>
+
+    <!-- MAIN WORKSPACE LAYOUT -->
+    <div class="manual-layout">
+
+        <!-- SIDEBAR -->
+        <div class="sidebar">
+            <h3>Arquitectura TI</h3>
+            <ul class="sidebar-menu">
+                <li><a href="#arquitectura" class="sidebar-link active">1. Arquitectura General</a></li>
+                <li><a href="#stack" class="sidebar-link">2. Stack Tecnológico</a></li>
+                <li><a href="#directorios" class="sidebar-link">3. Estructura de Archivos</a></li>
+                <li><a href="#firestore" class="sidebar-link">4. Esquema de Base de Datos</a></li>
+                <li><a href="#seguridad" class="sidebar-link">5. Seguridad y Reglas</a></li>
+                <li><a href="#concurrencia" class="sidebar-link">6. Control de Sesión Única</a></li>
+                <li><a href="#algoritmos" class="sidebar-link">7. Algoritmos y Fórmulas</a></li>
+                <li><a href="#instalacion" class="sidebar-link">8. Instalación y Entorno</a></li>
+                <li><a href="#despliegue" class="sidebar-link">9. Despliegue en Firebase</a></li>
+                <li><a href="#troubleshooting" class="sidebar-link">10. Resolución de Errores</a></li>
+            </ul>
+        </div>
+
+        <!-- CONTENT PANEL -->
+        <div class="content-panel">
+
+            <!-- 1. ARQUITECTURA -->
+            <div id="arquitectura" class="manual-section">
+                <h1>1. Arquitectura General del Sistema</h1>
+                <p>El <strong>Sistema Integral de Gestión Administrativa de la ENAG</strong> está fundamentado en un modelo <strong>Jamstack / Serverless</strong> desacoplado, diseñado para garantizar alta velocidad, cero costo fijo de infraestructura de servidores y máxima seguridad institucional.</p>
+                
+                <div class="callout callout-info">
+                    <strong>Patrón Arquitectónico:</strong> Frontend modular desacoplado en cliente (HTML5/Vanilla CSS/ES6+) comunicándose directamente mediante protocolos seguros HTTPS y WebSocket con <strong>Google Firebase</strong> (Firebase Authentication y Cloud Firestore NoSQL).
+                </div>
+
+                <pre>
+┌────────────────────────────────────────────────────────┐
+│                   CLIENTE / NAVEGADOR                  │
+│                                                        │
+│   • HTML5 Semántico + CSS Variables (:root)            │
+│   • Lógica en JavaScript ES6+ (Async/Await nativo)     │
+│   • Generación Client-Side de PDF (jsPDF + AutoTable)  │
+│   • Parseo de Libros Excel en Navegador (SheetJS)      │
+└───────────────────────────┬────────────────────────────┘
+                            │ HTTPS / WebSockets WSS
+                            ▼
+┌────────────────────────────────────────────────────────┐
+│               GOOGLE FIREBASE SERVICES                 │
+│                                                        │
+│   • Firebase Hosting: Red CDN global con SSL y caché   │
+│   • Firebase Authentication: Usuarios y email verif.   │
+│   • Cloud Firestore: Almacén NoSQL y sync tiempo real  │
+└────────────────────────────────────────────────────────┘</pre>
+            </div>
+
+            <!-- 2. STACK -->
+            <div id="stack" class="manual-section">
+                <h1>2. Stack Tecnológico y Dependencias</h1>
+                <table class="tech-table">
+                    <thead>
+                        <tr>
+                            <th>Capa</th>
+                            <th>Tecnología / Librería</th>
+                            <th>Uso en el Sistema</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Frontend UI</td>
+                            <td>HTML5 & Vanilla CSS3</td>
+                            <td>Estructura modular y diseño responsivo institucional sin frameworks pesados.</td>
+                        </tr>
+                        <tr>
+                            <td>Frontend Lógica</td>
+                            <td>JavaScript ES6+</td>
+                            <td>Control reactivo del DOM, validaciones, cálculos y promesas asíncronas.</td>
+                        </tr>
+                        <tr>
+                            <td>BaaS / Nube</td>
+                            <td>Firebase Auth & Firestore v10</td>
+                            <td>Autenticación, tokens JWT, verificación de email y persistencia distribuida.</td>
+                        </tr>
+                        <tr>
+                            <td>Reportes PDF</td>
+                            <td>jsPDF v2.5.1 + AutoTable v3.5.25</td>
+                            <td>Generación vectorial de cotizaciones, vouchers, cartas de constancia y reportes.</td>
+                        </tr>
+                        <tr>
+                            <td>Planillas Excel</td>
+                            <td>SheetJS (xlsx.full.min.js)</td>
+                            <td>Lectura y extracción de datos de empleados de archivos .xls/.xlsx para RRHH.</td>
+                        </tr>
+                        <tr>
+                            <td>Validación QR</td>
+                            <td>qrcode.js</td>
+                            <td>Generación de sellos QR para verificación de constancias laborales.</td>
+                        </tr>
+                        <tr>
+                            <td>Escritorio (Opcional)</td>
+                            <td>Electron ^30.0.0</td>
+                            <td>Empaquetado de la aplicación en formato desktop ejecutable para Windows.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- 3. DIRECTORIOS -->
+            <div id="directorios" class="manual-section">
+                <h1>3. Estructura de Archivos del Proyecto</h1>
+                <pre>
+Enag-Partida-Contable/
+├── assets/                 # Membretes, logos y capturas oficiales
+├── css/                    # Estilos auxiliares
+├── js/
+│   ├── firebase-config.js  # Credenciales de Firebase y utilidades globales
+│   ├── jspdf.umd.min.js    # Motor gráfico jsPDF
+│   ├── jspdf-autotable.min.js # Motor de tablas jsPDF
+│   ├── xlsx.full.min.js    # Parser de hojas Excel SheetJS
+│   ├── qrcode.js           # Generador de códigos QR
+│   ├── flatpickr.min.js    # Selector de fechas
+│   └── soporte.js          # Emisión de tickets y bitácora de TI
+├── views/                  # Vistas modulares de cada área institucional
+│   ├── bitacora.html       # Auditoría histórica del sistema
+│   ├── comprobante_retencion.html # Retenciones de impuestos SAR
+│   ├── constancias*.html   # Emisión de 4 variantes de constancias
+│   ├── cotizaciones.html   # Módulo oficial de cotizaciones La Gaceta
+│   ├── incapacidades.html  # Cálculo y reintegros de subsidios IHSS
+│   ├── login.html          # Control de acceso, sesión única y recuperación
+│   ├── manual.html         # Manual de Usuario interactivo
+│   ├── manual_tecnico.html # Este Manual Técnico de Arquitectura
+│   ├── orden_produccion.html # Órdenes y fases de producción en talleres
+│   ├── parametros.html     # Parámetros dinámicos y timeouts
+│   ├── partidas*.html      # Partidas contables de diario y crédito
+│   ├── rrhh_permisos.html  # Control de permisos laborales
+│   ├── solicitud_personal.html # Requisición de plazas
+│   ├── vacaciones.html     # Control de vacaciones
+│   └── vouchers*.html      # Vouchers para Acuerdo y Contrato
+├── firebase.json           # Configuración de Firebase Hosting
+├── firestore.rules         # Directivas de seguridad de Firestore
+├── index.html              # Portal central del sistema
+└── MANUAL_TECNICO.md       # Documento técnico canónico en Markdown</pre>
+            </div>
+
+            <!-- 4. FIRESTORE -->
+            <div id="firestore" class="manual-section">
+                <h1>4. Esquema de Base de Datos (Cloud Firestore)</h1>
+                <p>Las colecciones principales almacenadas en Firestore son:</p>
+
+                <h2>4.1. Colección <code>usuarios</code></h2>
+                <p>Documentos ubicados en <code>/usuarios/{uid}</code>:</p>
+                <ul>
+                    <li><code>uid</code> (string): ID único de usuario en Firebase Auth.</li>
+                    <li><code>nombre</code> (string): Nombre completo del colaborador.</li>
+                    <li><code>usuario</code> (string): Nombre de usuario institucional.</li>
+                    <li><code>email</code> (string): Correo corporativo autenticado.</li>
+                    <li><code>departamento</code> (string): Contabilidad, RRHH, Producción, Comercialización, TI.</li>
+                    <li><code>sessionId</code> (string): UUID de la sesión activa para prevención de concurrencia.</li>
+                    <li><code>lastLogin</code> (timestamp): Registro del último acceso.</li>
+                </ul>
+
+                <h2>4.2. Colección <code>cotizaciones</code></h2>
+                <p>Documentos ubicados en <code>/cotizaciones/{numero}</code>:</p>
+                <ul>
+                    <li><code>numero</code> (number): Folio numérico único correlativo.</li>
+                    <li><code>fecha</code> (string): Fecha y hora en formato ISO.</li>
+                    <li><code>cliente</code> (map): <code>{ nombre, rtn, contacto, telefono, direccion, correo }</code>.</li>
+                    <li><code>items</code> (array): <code>[{ producto, descripcion, cantidad, precioUnitario, impuesto, precioTotal }]</code>.</li>
+                    <li><code>totalBase</code>, <code>valorDescuento</code>, <code>totalNeto</code>, <code>totalImpuesto</code>, <code>totalGeneral</code> (numbers).</li>
+                    <li><code>estado</code> (string): <code>'Pendiente'</code>, <code>'Aprobada'</code>, <code>'Rechazada'</code>.</li>
+                    <li><code>timestamp</code> (timestamp): Marca temporal del servidor.</li>
+                </ul>
+
+                <h2>4.3. Colección <code>bitacora</code></h2>
+                <p>Registro histórico inmutable de auditoría institucional:</p>
+                <ul>
+                    <li><code>modulo</code> (string): Área de origen del evento.</li>
+                    <li><code>accion</code> (string): Crear, Modificar, Eliminar, Generar PDF, etc.</li>
+                    <li><code>mensaje</code> (string): Detalle textual legible.</li>
+                    <li><code>usuario</code> (string): Operador responsable.</li>
+                    <li><code>timestamp</code> (timestamp): Fecha y hora exacta registrada en servidor.</li>
+                </ul>
+            </div>
+
+            <!-- 5. SEGURIDAD -->
+            <div id="seguridad" class="manual-section">
+                <h1>5. Seguridad y Reglas de Firestore</h1>
+                <p>Las reglas en <code>firestore.rules</code> bloquean accesos anónimos y restringen permisos por verificación de email:</p>
+                <pre>
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    
+    function isAuth() {
+      return request.auth != null && request.auth.token.email_verified == true;
+    }
+    
+    match /usuarios/{userId} {
+      allow read: if isAuth();
+      allow write: if isAuth() && (request.auth.uid == userId || request.auth.token.admin == true);
+    }
+    
+    match /cotizaciones/{document=**} {
+      allow read, create, update, delete: if isAuth();
+    }
+    
+    match /bitacora/{logId} {
+      allow read, create: if isAuth();
+      allow update, delete: if false; // Inmutabilidad garantizada
+    }
+  }
+}</pre>
+            </div>
+
+            <!-- 6. CONCURRENCIA -->
+            <div id="concurrencia" class="manual-section">
+                <h1>6. Control de Sesión Única (Concurrencia)</h1>
+                <p>Para garantizar que las credenciales no sean compartidas simultáneamente:</p>
+                <ol>
+                    <li>Al autenticarse en <code>views/login.html</code>, el cliente genera un identificador aleatorio de sesión (<code>sessionId = crypto.randomUUID()</code>).</li>
+                    <li>Se almacena en <code>localStorage</code> y se actualiza en el documento <code>/usuarios/{uid}</code> en Firestore.</li>
+                    <li>Un listener <code>onSnapshot</code> monitorea el documento en tiempo real. Si detecta que <code>doc.data().sessionId !== localStorage.getItem('enag_session_id')</code>, bloquea la interfaz de inmediato y ejecuta <code>firebase.auth().signOut()</code>.</li>
+                </ol>
+            </div>
+
+            <!-- 7. ALGORITMOS -->
+            <div id="algoritmos" class="manual-section">
+                <h1>7. Algoritmos y Fórmulas Clave</h1>
+                
+                <h2>7.1. Cotizaciones y Descuentos Oficiales</h2>
+                <p>Cada ítem calcula su total bruto y descuenta el porcentaje de ley (ej. 25% Adulto Mayor, 60% Municipalidades). Los impuestos (ISV 15%) se aplican sobre el subtotal neto únicamente a ítems gravados (no exentos).</p>
+                
+                <div class="callout callout-warning">
+                    <strong>⚠️ Regla de Desarrollo:</strong> Cualquier función que use <code>await window.enagConfirm(...)</code> o interacción asíncrona DEBE declararse explícitamente con <code>async function</code> para evitar errores de sintaxis en tiempo de análisis.
+                </div>
+
+                <h2>7.2. Balanceo de Partidas Contables</h2>
+                <p>La partida doble exige <code>Math.abs(totalDebe - totalHaber) < 0.001</code>. Si existe diferencia, la UI bloquea el guardado y la exportación de PDF, informando el valor exacto del descuadre.</p>
+
+                <h2>7.3. Subsidios IHSS (Metodología ENAG)</h2>
+                <p>Sueldo Diario de Referencia: <code>(Techo IHSS * 3) / Días_3_Meses_Anteriores</code>. El 66% es subsidio IHSS reintegrable a la ENAG; el 34% es aporte patronal complementario.</p>
+            </div>
+
+            <!-- 8. INSTALACION -->
+            <div id="instalacion" class="manual-section">
+                <h1>8. Instalación y Entorno de Desarrollo</h1>
+                <pre>
+# 1. Clonar el repositorio
+git clone https://github.com/MayGonza/Enag-Partida-Contable.git
+cd Enag-Partida-Contable
+
+# 2. Instalar dependencias
+npm install
+
+# 3. Configurar variables en .env a partir de .env.example
+
+# 4. Iniciar entorno de desarrollo local
+npm start</pre>
+            </div>
+
+            <!-- 9. DESPLIEGUE -->
+            <div id="despliegue" class="manual-section">
+                <h1>9. Procedimiento de Despliegue en Firebase</h1>
+                <p>El despliegue a producción se realiza mediante Firebase CLI:</p>
+                <pre>
+# 1. Iniciar sesión en Firebase (si no se ha hecho previamente)
+npx firebase login
+
+# 2. Desplegar reglas de Firestore
+npx firebase deploy --only firestore:rules
+
+# 3. Desplegar la aplicación web a Firebase Hosting
+npx firebase deploy --only hosting</pre>
+                <div class="callout callout-success">
+                    <strong>URL de Producción:</strong> <a href="https://sistemagestionenag.web.app" target="_blank" style="color: #065f46; font-weight: bold;">https://sistemagestionenag.web.app</a>
+                </div>
+            </div>
+
+            <!-- 10. TROUBLESHOOTING -->
+            <div id="troubleshooting" class="manual-section">
+                <h1>10. Resolución de Incidencias Comunes</h1>
+                <table class="tech-table">
+                    <thead>
+                        <tr>
+                            <th>Error / Incidencia</th>
+                            <th>Causa Técnica</th>
+                            <th>Solución</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><code>SyntaxError: await is only valid in async functions</code></td>
+                            <td>Uso de <code>await</code> en función declarada de manera síncrona.</td>
+                            <td>Agregar la palabra reservada <code>async</code> a la función.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Uncaught ReferenceError: agregarFila is not defined</code></td>
+                            <td>El script falló en tiempo de parseo por un error previo de sintaxis.</td>
+                            <td>Revisar la consola del navegador y corregir el primer error de sintaxis en el archivo.</td>
+                        </tr>
+                        <tr>
+                            <td><code>Missing or insufficient permissions</code></td>
+                            <td>El usuario no ha verificado su correo electrónico en Firebase Auth.</td>
+                            <td>Abrir el enlace de verificación enviado al correo del usuario.</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER -->
+    <div class="manual-footer">
+        DEPARTAMENTO DE TECNOLOGÍAS DE LA INFORMACIÓN — EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG 2026)
+    </div>
+
+    <script>
+        // Efecto scroll activo en la barra lateral
+        const sections = document.querySelectorAll(".manual-section");
+        const navLinks = document.querySelectorAll(".sidebar-link");
+
+        window.addEventListener("scroll", () => {
+            let current = "";
+            sections.forEach(section => {
+                const sectionTop = section.offsetTop;
+                if (pageYOffset >= sectionTop - 110) {
+                    current = section.getAttribute("id");
+                }
+            });
+
+            navLinks.forEach(link => {
+                link.classList.remove("active");
+                if (link.getAttribute("href") === `#${current}`) {
+                    link.classList.add("active");
+                }
+            });
+        });
+    </script>
+
+</body>
+
+</html>

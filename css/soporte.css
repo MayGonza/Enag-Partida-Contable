@@ -1,0 +1,219 @@
+/* Estilos para el Widget de Soporte Técnico ENAG */
+.btn-soporte-flotante {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    background: linear-gradient(135deg, #002147 0%, #0d47a1 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 50px;
+    padding: 14px 22px;
+    font-size: 15px;
+    font-weight: 600;
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    cursor: pointer;
+    box-shadow: 0 8px 25px rgba(0, 33, 71, 0.35);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    z-index: 99999;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.btn-soporte-flotante:hover {
+    transform: translateY(-4px) scale(1.03);
+    box-shadow: 0 12px 30px rgba(0, 33, 71, 0.5);
+    background: linear-gradient(135deg, #001530 0%, #1565c0 100%);
+}
+
+.btn-soporte-flotante svg {
+    width: 22px;
+    height: 22px;
+    fill: currentColor;
+}
+
+/* Modal Overlay */
+.modal-soporte-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 15, 35, 0.65);
+    backdrop-filter: blur(5px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 100000;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.modal-soporte-overlay.active {
+    opacity: 1;
+    visibility: visible;
+}
+
+/* Modal Container */
+.modal-soporte-card {
+    background: #ffffff;
+    width: 90%;
+    max-width: 520px;
+    border-radius: 16px;
+    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.3);
+    overflow: hidden;
+    transform: translateY(20px) scale(0.95);
+    transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+}
+
+.modal-soporte-overlay.active .modal-soporte-card {
+    transform: translateY(0) scale(1);
+}
+
+/* Modal Header */
+.modal-soporte-header {
+    background: #002147;
+    color: #ffffff;
+    padding: 20px 25px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 4px solid #1565c0;
+}
+
+.modal-soporte-header h3 {
+    margin: 0;
+    font-size: 1.25em;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-soporte-cerrar {
+    background: transparent;
+    border: none;
+    color: #ffffff;
+    font-size: 24px;
+    cursor: pointer;
+    line-height: 1;
+    opacity: 0.8;
+    transition: opacity 0.2s;
+}
+
+.modal-soporte-cerrar:hover {
+    opacity: 1;
+}
+
+/* Modal Body */
+.modal-soporte-body {
+    padding: 25px;
+}
+
+.form-group-soporte {
+    margin-bottom: 18px;
+}
+
+.form-group-soporte label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #1e293b;
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.form-group-soporte input,
+.form-group-soporte select,
+.form-group-soporte textarea {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    font-size: 14px;
+    box-sizing: border-box;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    font-family: inherit;
+    background-color: #f8fafc;
+}
+
+.form-group-soporte input:focus,
+.form-group-soporte select:focus,
+.form-group-soporte textarea:focus {
+    outline: none;
+    border-color: #002147;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.12);
+}
+
+.form-group-soporte textarea {
+    resize: vertical;
+    min-height: 100px;
+}
+
+/* Modal Footer / Buttons */
+.modal-soporte-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 25px;
+}
+
+.btn-soporte-cancelar {
+    background: #e2e8f0;
+    color: #475569;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.btn-soporte-cancelar:hover {
+    background: #cbd5e1;
+}
+
+.btn-soporte-enviar {
+    background: #002147;
+    color: #ffffff;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-soporte-enviar:hover {
+    background: #0d47a1;
+}
+
+.btn-soporte-enviar:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+/* Estado de Éxito / Ticket Asignado */
+.ticket-exito-box {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.ticket-badge {
+    display: inline-block;
+    background: #e0f2fe;
+    color: #0369a1;
+    font-size: 1.5em;
+    font-weight: bold;
+    padding: 8px 20px;
+    border-radius: 30px;
+    border: 2px dashed #0284c7;
+    margin: 15px 0;
+}

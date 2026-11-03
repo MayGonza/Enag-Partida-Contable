@@ -1,0 +1,935 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Solicitudes de Personal - RRHH</title>
+    <!-- Import Google Fonts: Outfit and Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --accent: #d97706;
+            --bg-body: #f8fafc;
+            --card-bg: #ffffff;
+            --text-color: #1e293b;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: var(--bg-body);
+            color: var(--text-color);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 30%;
+            filter: blur(12px) opacity(0.08);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: auto;
+            background: var(--card-bg);
+            padding: 35px;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            border-top: 6px solid var(--primary);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 600;
+            background: #64748b;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .btn-nav:hover {
+            background: #475569;
+        }
+
+        h1 {
+            color: var(--primary);
+            text-align: center;
+            margin-bottom: 30px;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th,
+        td {
+            border: 1px solid #e2e8f0;
+            padding: 14px;
+            text-align: left;
+            font-size: 0.9em;
+        }
+
+        th {
+            background: #f1f5f9;
+            color: var(--primary);
+            font-weight: 600;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f8fafc;
+        }
+
+        .badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.85em;
+            display: inline-block;
+        }
+
+        .badge-pendiente {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .badge-aprobado {
+            background: #dcfce7;
+            color: #166534;
+        }
+
+        .badge-rechazado {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-action {
+            padding: 6px 12px;
+            border-radius: 6px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: 500;
+        }
+
+        /* Dashboard Stats */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .stat-card .stat-value {
+            font-size: 2.5em;
+            font-weight: 700;
+            font-family: 'Outfit', sans-serif;
+            margin: 10px 0;
+        }
+
+        .stat-card .stat-label {
+            font-size: 0.9em;
+            color: #64748b;
+            text-transform: uppercase;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .stat-blue .stat-value {
+            color: #0284c7;
+        }
+
+        .stat-yellow .stat-value {
+            color: #ca8a04;
+        }
+
+        .stat-green .stat-value {
+            color: #16a34a;
+        }
+
+        .stat-red .stat-value {
+            color: #dc2626;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-card {
+            background: white;
+            padding: 30px;
+            border-radius: 16px;
+            width: 90%;
+            max-width: 600px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+        }
+
+        /* ===== Documentación de respaldo ===== */
+        .clip-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            margin-left: 6px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            background: #e0f2fe;
+            color: #0369a1;
+            font-size: 0.78em;
+            font-weight: 600;
+            vertical-align: middle;
+        }
+
+        .adjuntos-box {
+            margin-top: 20px;
+            padding: 18px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+            background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+        }
+
+        .adjuntos-box h3 {
+            margin: 0 0 12px 0;
+            font-size: 1.05em;
+            color: var(--primary);
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .adjuntos-vacio {
+            color: #94a3b8;
+            font-size: 0.9em;
+            font-style: italic;
+        }
+
+        .adjunto-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 10px 12px;
+            background: #fff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            transition: all 0.2s ease;
+        }
+
+        .adjunto-item:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.06);
+            transform: translateY(-1px);
+        }
+
+        .adjunto-thumb {
+            width: 46px;
+            height: 46px;
+            border-radius: 8px;
+            object-fit: cover;
+            flex-shrink: 0;
+            border: 1px solid #e2e8f0;
+            cursor: zoom-in;
+        }
+
+        .adjunto-thumb-pdf {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #fee2e2, #fecaca);
+            color: #b91c1c;
+            font-weight: 700;
+            font-size: 0.72em;
+            font-family: 'Outfit', sans-serif;
+            cursor: pointer;
+        }
+
+        .adjunto-meta {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .adjunto-nombre {
+            font-weight: 500;
+            font-size: 0.9em;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .adjunto-tamano {
+            font-size: 0.78em;
+            color: #64748b;
+        }
+
+        .btn-adjunto {
+            padding: 7px 12px;
+            border-radius: 7px;
+            border: 1px solid #cbd5e1;
+            background: #fff;
+            color: var(--primary);
+            font-weight: 600;
+            font-size: 0.82em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-adjunto:hover {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: #fff;
+        }
+
+        .skeleton {
+            height: 66px;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.2s infinite;
+        }
+
+        @keyframes shimmer {
+            from {
+                background-position: 200% 0;
+            }
+
+            to {
+                background-position: -200% 0;
+            }
+        }
+
+        .modal-card h2 {
+            color: var(--primary);
+            margin-top: 0;
+            font-family: 'Outfit', sans-serif;
+        }
+
+        .detail-row {
+            margin-bottom: 12px;
+            font-size: 0.95em;
+        }
+
+        .detail-row strong {
+            color: var(--primary-light);
+        }
+
+        .resolucion-box {
+            margin-top: 25px;
+            padding: 20px;
+            background: #f8fafc;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 25px;
+            justify-content: flex-end;
+        }
+
+        .btn-cancel {
+            background: #94a3b8;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-save {
+            background: var(--primary);
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        .btn-print {
+            background: #059669;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav">← Regresar al Menú</a>
+    </div>
+
+    <div class="container">
+        <h1>Gestión de Solicitudes de Personal</h1>
+        <p style="text-align: center; color: #64748b; margin-top: -20px; margin-bottom: 30px;">Departamento de Recursos
+            Humanos</p>
+
+        <div class="dashboard-grid">
+            <div class="stat-card stat-blue">
+                <span class="stat-label">Total Solicitudes</span>
+                <span class="stat-value" id="statTotal">0</span>
+            </div>
+            <div class="stat-card stat-yellow">
+                <span class="stat-label">Pendientes</span>
+                <span class="stat-value" id="statPendientes">0</span>
+            </div>
+            <div class="stat-card stat-green">
+                <span class="stat-label">Aprobadas</span>
+                <span class="stat-value" id="statAprobadas">0</span>
+            </div>
+            <div class="stat-card stat-red">
+                <span class="stat-label">No Aprobadas</span>
+                <span class="stat-value" id="statRechazadas">0</span>
+            </div>
+        </div>
+
+        <h3 style="margin-top: 10px; color: var(--primary); font-family: 'Outfit', sans-serif;">Desglose por Tipo de Solicitud</h3>
+        <div class="dashboard-grid" style="grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 15px; margin-bottom: 30px;">
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Permisos</span>
+                <span class="stat-value" id="statPermisos" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Vacaciones</span>
+                <span class="stat-value" id="statVacaciones" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Incapacidades</span>
+                <span class="stat-value" id="statIncapacidades" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Constancias</span>
+                <span class="stat-value" id="statConstancias" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Justificaciones</span>
+                <span class="stat-value" id="statJustificaciones" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+            <div class="stat-card" style="padding: 15px;">
+                <span class="stat-label" style="font-size: 0.75em;">Otros</span>
+                <span class="stat-value" id="statOtros" style="font-size: 1.8em; color: var(--primary);">0</span>
+            </div>
+        </div>
+
+        <table id="solicitudesTable">
+            <thead>
+                <tr>
+                    <th>Fecha Solicitud</th>
+                    <th>Empleado</th>
+                    <th>Departamento</th>
+                    <th>Tipo</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                </tr>
+            </thead>
+            <tbody id="solicitudesBody">
+                <tr>
+                    <td colspan="6" style="text-align:center;">Cargando solicitudes...</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Modal Resolución -->
+    <div class="modal-overlay" id="resolucionModal">
+        <div class="modal-card">
+            <h2>Detalles de Solicitud</h2>
+            <div id="modalDetails"></div>
+
+            <div class="adjuntos-box" id="adjuntosBox">
+                <h3>📎 Documentación de respaldo</h3>
+                <div id="adjuntosContenido"></div>
+            </div>
+
+            <div class="resolucion-box">
+                <h3 style="margin-top:0; font-size: 1.1em; color: var(--primary);">Resolución de Recursos Humanos</h3>
+
+                <label style="font-weight:600; font-size:0.9em;">Estado de Solicitud:</label>
+                <select id="resEstado" class="form-select">
+                    <option value="Pendiente">Pendiente</option>
+                    <option value="Aprobado">Aprobado</option>
+                    <option value="No Aprobado">No Aprobado</option>
+                </select>
+
+                <label style="font-weight:600; font-size:0.9em;">Observaciones (Opcional):</label>
+                <textarea id="resObservaciones" class="form-textarea" rows="3"></textarea>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn-cancel" onclick="cerrarModal()">Cancelar</button>
+                <button class="btn-print" id="btnPrintFicha">Imprimir Ficha</button>
+                <button class="btn-save" id="btnSaveResolucion">Guardar Resolución</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+
+    <script>
+        let currentSolicitudId = null;
+        let currentSolicitudData = null;
+        let currentAdjuntos = [];
+
+        // Escapa texto ingresado por el empleado (el formulario es público)
+        function esc(valor) {
+            const div = document.createElement('div');
+            div.textContent = valor == null ? '' : String(valor);
+            return div.innerHTML;
+        }
+
+        function formatearTamano(bytes) {
+            if (!bytes) return '';
+            if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(0) + ' KB';
+            return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
+        }
+
+        // Protección de Ruta
+        firebase.auth().onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+            } else {
+                cargarSolicitudes();
+            }
+        });
+
+        async function cargarSolicitudes() {
+            const tbody = document.getElementById('solicitudesBody');
+
+            dbFirestore.collection('solicitudes_personal').orderBy('fechaCreacion', 'desc').onSnapshot((snapshot) => {
+                tbody.innerHTML = '';
+
+                let countTotal = 0;
+                let countPendientes = 0;
+                let countAprobadas = 0;
+                let countRechazadas = 0;
+
+                let countPermisos = 0;
+                let countVacaciones = 0;
+                let countIncapacidades = 0;
+                let countConstancias = 0;
+                let countJustificaciones = 0;
+                let countOtros = 0;
+
+                if (snapshot.empty) {
+                    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No hay solicitudes registradas.</td></tr>';
+                    document.getElementById('statTotal').innerText = 0;
+                    document.getElementById('statPendientes').innerText = 0;
+                    document.getElementById('statAprobadas').innerText = 0;
+                    document.getElementById('statRechazadas').innerText = 0;
+                    
+                    document.getElementById('statPermisos').innerText = 0;
+                    document.getElementById('statVacaciones').innerText = 0;
+                    document.getElementById('statIncapacidades').innerText = 0;
+                    document.getElementById('statConstancias').innerText = 0;
+                    document.getElementById('statJustificaciones').innerText = 0;
+                    document.getElementById('statOtros').innerText = 0;
+                    return;
+                }
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    countTotal++;
+
+                    let badgeClass = 'badge-pendiente';
+                    if (data.estado === 'Aprobado') {
+                        badgeClass = 'badge-aprobado';
+                        countAprobadas++;
+                    } else if (data.estado === 'No Aprobado') {
+                        badgeClass = 'badge-rechazado';
+                        countRechazadas++;
+                    } else {
+                        countPendientes++;
+                    }
+
+                    if(data.tipoSolicitud === 'Permiso personal' || data.tipoSolicitud === 'Permiso de trabajo') countPermisos++;
+                    else if(data.tipoSolicitud === 'Vacaciones') countVacaciones++;
+                    else if(data.tipoSolicitud === 'Incapacidad') countIncapacidades++;
+                    else if(data.tipoSolicitud === 'Constancia laboral/Boucher') countConstancias++;
+                    else if(data.tipoSolicitud === 'Justificación de ausencia') countJustificaciones++;
+                    else countOtros++;
+
+                    const fechaFormat = data.fechaCreacion ? data.fechaCreacion.toDate().toLocaleDateString('es-HN') : 'N/A';
+
+                    const numAdjuntos = data.cantidadAdjuntos || (Array.isArray(data.adjuntos) ? data.adjuntos.length : 0);
+                    const clip = numAdjuntos > 0
+                        ? `<span class="clip-badge" title="${numAdjuntos} documento(s) de respaldo">📎 ${numAdjuntos}</span>`
+                        : '';
+
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td>${fechaFormat}</td>
+                        <td>${esc(data.nombre)}</td>
+                        <td>${esc(data.departamento)}</td>
+                        <td>${esc(data.tipoSolicitud)}${clip}</td>
+                        <td><span class="badge ${badgeClass}">${esc(data.estado)}</span></td>
+                        <td>
+                            <button class="btn-action" onclick='abrirModal("${doc.id}", ${JSON.stringify(data).replace(/'/g, "&#39;")})'>Gestionar</button>
+                        </td>
+                    `;
+                    tbody.appendChild(tr);
+                });
+
+                // Update Dashboard
+                document.getElementById('statTotal').innerText = countTotal;
+                document.getElementById('statPendientes').innerText = countPendientes;
+                document.getElementById('statAprobadas').innerText = countAprobadas;
+                document.getElementById('statRechazadas').innerText = countRechazadas;
+
+                document.getElementById('statPermisos').innerText = countPermisos;
+                document.getElementById('statVacaciones').innerText = countVacaciones;
+                document.getElementById('statIncapacidades').innerText = countIncapacidades;
+                document.getElementById('statConstancias').innerText = countConstancias;
+                document.getElementById('statJustificaciones').innerText = countJustificaciones;
+                document.getElementById('statOtros').innerText = countOtros;
+            });
+        }
+
+        function abrirModal(id, data) {
+            currentSolicitudId = id;
+            currentSolicitudData = data;
+
+            const detailsHtml = `
+                <div class="detail-row"><strong>Empleado:</strong> ${esc(data.nombre)} (${esc(data.puesto)})</div>
+                <div class="detail-row"><strong>Depto:</strong> ${esc(data.departamento)}</div>
+                <div class="detail-row"><strong>Tipo de Solicitud:</strong> ${esc(data.tipoSolicitud)}</div>
+                <div class="detail-row"><strong>Periodo:</strong> ${esc(data.fechaInicio)} ${data.fechaFin ? ' al ' + esc(data.fechaFin) : ''}</div>
+                <div class="detail-row"><strong>Horas (si aplica):</strong> ${esc(data.horaSalida || '--')} a ${esc(data.horaRetorno || '--')}</div>
+                <div class="detail-row"><strong>Descripción:</strong> ${esc(data.descripcion)}</div>
+            `;
+
+            document.getElementById('modalDetails').innerHTML = detailsHtml;
+            document.getElementById('resEstado').value = data.estado || 'Pendiente';
+            document.getElementById('resObservaciones').value = data.observacionesRRHH || '';
+
+            document.getElementById('resolucionModal').style.display = 'flex';
+            cargarAdjuntos(id, data);
+        }
+
+        // Carga bajo demanda de la documentación de respaldo (subcolección "adjuntos")
+        async function cargarAdjuntos(id, data) {
+            const cont = document.getElementById('adjuntosContenido');
+            currentAdjuntos = [];
+            const esperados = data.cantidadAdjuntos || (Array.isArray(data.adjuntos) ? data.adjuntos.length : 0);
+
+            if (!esperados) {
+                cont.innerHTML = '<div class="adjuntos-vacio">El empleado no adjuntó documentación de respaldo.</div>';
+                return;
+            }
+
+            cont.innerHTML = '<div class="skeleton"></div>'.repeat(esperados);
+
+            try {
+                const snap = await dbFirestore.collection('solicitudes_personal').doc(id).collection('adjuntos').get();
+                if (currentSolicitudId !== id) return; // se cambió de solicitud mientras cargaba
+
+                snap.forEach(d => currentAdjuntos.push({ id: d.id, ...d.data() }));
+
+                if (!currentAdjuntos.length) {
+                    cont.innerHTML = '<div class="adjuntos-vacio">No se encontraron los archivos adjuntos.</div>';
+                    return;
+                }
+
+                cont.innerHTML = currentAdjuntos.map((a, i) => {
+                    // Solo se muestra miniatura si el contenido es un JPEG base64 legítimo
+                    const esImagen = (a.tipo || '').startsWith('image/');
+                    const imagenValida = esImagen && /^data:image\/jpeg;base64,[A-Za-z0-9+/=]+$/.test(a.data || '');
+                    const thumb = imagenValida
+                        ? `<img class="adjunto-thumb" src="${a.data}" alt="Vista previa" onclick="verAdjunto(${i})">`
+                        : `<div class="adjunto-thumb adjunto-thumb-pdf" onclick="verAdjunto(${i})">${esImagen ? 'IMG' : 'PDF'}</div>`;
+                    return `
+                        <div class="adjunto-item">
+                            ${thumb}
+                            <div class="adjunto-meta">
+                                <div class="adjunto-nombre" title="${esc(a.nombre)}">${esc(a.nombre)}</div>
+                                <div class="adjunto-tamano">${esImagen ? 'Imagen' : 'Documento PDF'} · ${formatearTamano(a.tamano)}</div>
+                            </div>
+                            <button class="btn-adjunto" id="btnVerAdjunto${i}" onclick="verAdjunto(${i})">Ver</button>
+                            <button class="btn-adjunto" id="btnDescargarAdjunto${i}" onclick="descargarAdjunto(${i})">Descargar</button>
+                        </div>`;
+                }).join('');
+            } catch (e) {
+                console.error('Error al cargar adjuntos:', e);
+                cont.innerHTML = `<div class="adjuntos-vacio">⚠️ Error al cargar los documentos: ${esc(e.message)}</div>`;
+            }
+        }
+
+        // Convierte el base64 a Blob para abrirlo en otra pestaña (los navegadores bloquean data: URLs)
+        function adjuntoABlobUrl(a) {
+            const base64 = a.data.split(',')[1];
+            const binario = atob(base64);
+            const bytes = new Uint8Array(binario.length);
+            for (let i = 0; i < binario.length; i++) bytes[i] = binario.charCodeAt(i);
+            return URL.createObjectURL(new Blob([bytes], { type: a.tipo }));
+        }
+
+        function registrarAccesoAdjunto(accion, a) {
+            if (window.registrarBitacora && currentSolicitudData) {
+                window.registrarBitacora('Recursos Humanos', accion,
+                    `${accion}: "${a.nombre}" de la solicitud de ${currentSolicitudData.nombre} (${currentSolicitudData.tipoSolicitud})`);
+            }
+        }
+
+        function verAdjunto(i) {
+            const a = currentAdjuntos[i];
+            if (!a) return;
+            const url = adjuntoABlobUrl(a);
+            window.open(url, '_blank');
+            setTimeout(() => URL.revokeObjectURL(url), 60000);
+            registrarAccesoAdjunto('Visualización de documento de respaldo', a);
+        }
+
+        function descargarAdjunto(i) {
+            const a = currentAdjuntos[i];
+            if (!a) return;
+            const url = adjuntoABlobUrl(a);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = a.nombre || 'documento';
+            document.body.appendChild(link);
+            link.click();
+            link.remove();
+            setTimeout(() => URL.revokeObjectURL(url), 10000);
+            registrarAccesoAdjunto('Descarga de documento de respaldo', a);
+        }
+
+        function cerrarModal() {
+            document.getElementById('resolucionModal').style.display = 'none';
+        }
+
+        document.getElementById('btnSaveResolucion').addEventListener('click', async () => {
+            const estado = document.getElementById('resEstado').value;
+            const obs = document.getElementById('resObservaciones').value;
+
+            try {
+                const batch = dbFirestore.batch();
+                
+                batch.update(dbFirestore.collection('solicitudes_personal').doc(currentSolicitudId), {
+                    estado: estado,
+                    observacionesRRHH: obs
+                });
+                
+                batch.set(dbFirestore.collection('consulta_solicitudes').doc(currentSolicitudId), {
+                    estado: estado,
+                    observacionesRRHH: obs,
+                    fechaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                await batch.commit();
+
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Recursos Humanos', 'Resolución Solicitud', `Se cambió estado de solicitud de ${currentSolicitudData.nombre} a ${estado}`);
+                }
+                cerrarModal();
+            } catch (e) {
+                alert("Error al guardar: " + e.message);
+            }
+        });
+
+        // Impresión Ficha
+        document.getElementById('btnPrintFicha').addEventListener('click', () => {
+            const data = currentSolicitudData;
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+
+            // Header
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS", 10, 15);
+
+            doc.setFontSize(14);
+            doc.text("DEPARTAMENTO DE RECURSOS HUMANOS", 105, 22, { align: "center" });
+            doc.text("FORMATO ÚNICO DE SOLICITUD DE PERSONAL", 105, 29, { align: "center" });
+
+            doc.setFontSize(10);
+
+            // Cuadros de Fecha
+            doc.rect(10, 38, 90, 15); // Fecha Inicio box
+            doc.text("Fecha de Inicio:", 12, 43);
+            doc.setFont("helvetica", "normal");
+            if (data.fechaInicio) {
+                const parts = data.fechaInicio.split('-');
+                doc.text(parts[2] + "/" + parts[1] + "/" + parts[0], 12, 50); // DD/MM/YYYY
+            }
+
+            doc.rect(110, 38, 95, 15); // Fecha Fin box
+            doc.setFont("helvetica", "bold");
+            doc.text("Fecha de finalización (si aplica):", 112, 43);
+            doc.setFont("helvetica", "normal");
+            if (data.fechaFin) {
+                const parts = data.fechaFin.split('-');
+                doc.text(parts[2] + "/" + parts[1] + "/" + parts[0], 112, 50);
+            }
+
+            // Cuadros Horas
+            doc.rect(10, 56, 90, 10);
+            doc.setFont("helvetica", "bold");
+            doc.text("Hora de salida (si aplica):", 12, 62);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.horaSalida || '---', 60, 62);
+
+            doc.rect(110, 56, 95, 10);
+            doc.setFont("helvetica", "bold");
+            doc.text("Hora de retorno (si aplica):", 112, 62);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.horaRetorno || '---', 165, 62);
+
+            // Tipo de Solicitud (Banner)
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 72, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.text("Marque con una 'X' la Solicitud que corresponda", 105, 77.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+
+            doc.rect(10, 80, 195, 15);
+            doc.setFont("helvetica", "bold");
+            doc.text("Tipo de Solicitud:", 12, 85);
+            doc.setFont("helvetica", "normal");
+            doc.text(data.tipoSolicitud, 12, 91);
+
+            // Descripción
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 100, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("Describa de forma clara su solicitud:", 105, 105.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+            doc.rect(10, 108, 195, 25);
+            doc.setFont("helvetica", "normal");
+            const splitDesc = doc.splitTextToSize(data.descripcion, 190);
+            doc.text(splitDesc, 12, 114);
+
+            // Identificación
+            doc.setFillColor(220, 220, 220);
+            doc.rect(10, 138, 195, 8, 'F');
+            doc.setFont("helvetica", "bold");
+            doc.text("Identificación del Empleado quien solicita:", 105, 143.5, { align: "center" });
+
+            doc.rect(10, 146, 195, 25);
+            doc.text("Nombre:", 12, 152); doc.setFont("helvetica", "normal"); doc.text(data.nombre, 40, 152);
+            doc.setFont("helvetica", "bold");
+            doc.text("Depto:", 12, 159); doc.setFont("helvetica", "normal"); doc.text(data.departamento, 40, 159);
+            doc.setFont("helvetica", "bold");
+            doc.text("Puesto:", 12, 166); doc.setFont("helvetica", "normal"); doc.text(data.puesto || '---', 40, 166);
+
+            // Resolución RRHH
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 176, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.setFont("helvetica", "bold");
+            doc.text("Resolución de Recursos Humanos", 105, 181.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+
+            doc.rect(10, 184, 195, 30);
+            doc.text("Estado:", 12, 190); doc.setFont("helvetica", "normal"); doc.text(data.estado || 'Pendiente', 40, 190);
+            doc.setFont("helvetica", "bold");
+            doc.text("Observaciones:", 12, 198); doc.setFont("helvetica", "normal");
+            const obsRRHH = document.getElementById('resObservaciones').value || data.observacionesRRHH || '---';
+            const splitObs = doc.splitTextToSize(obsRRHH, 150);
+            doc.text(splitObs, 40, 198);
+
+            // Firmas
+            doc.setFont("helvetica", "bold");
+            doc.line(20, 240, 90, 240);
+            doc.text("Firma del Empleado", 55, 245, { align: "center" });
+
+            doc.line(120, 240, 190, 240);
+            doc.text("Firma Recursos Humanos", 155, 245, { align: "center" });
+
+            // Importante
+            doc.setFillColor(150, 150, 150);
+            doc.rect(10, 255, 195, 8, 'F');
+            doc.setTextColor(255, 255, 255);
+            doc.text("IMPORTANTE", 105, 260.5, { align: "center" });
+            doc.setTextColor(0, 0, 0);
+            doc.rect(10, 263, 195, 12);
+            doc.setFontSize(8);
+            doc.text("- Toda solicitud debe presentarse con al menos 2 días de anticipación.", 12, 268);
+            doc.text("- Recursos Humanos se reserva el derecho de requerir documentación adicional.", 12, 272);
+
+            // Open PDF
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(7.5);
+            doc.setTextColor(100);
+            doc.text("Documento generado por: " + userName, 10, 277.5);
+            window.open(doc.output('bloburl'), '_blank');
+        });
+    </script>
+</body>
+
+</html>

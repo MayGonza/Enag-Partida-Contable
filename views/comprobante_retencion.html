@@ -3,8 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
     <title>Comprobante de Retención de Impuestos</title>
+
     <style>
         body { 
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
@@ -21,7 +22,7 @@
             content: "";
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
+            background: url('../assets/logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
@@ -142,12 +143,12 @@
         .btn-nav-inactive { background-color: #f1f3f5; color: #333; border: 1px solid #ccc; }
         .btn-nav-inactive:hover { background-color: #e9ecef; }
     </style>
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
 </head>
 <body>
 <div class="nav-container">
-    <a href="index.html" class="btn-nav btn-nav-menu">
+    <a href="../index.html" class="btn-nav btn-nav-menu">
         ← Ir al Menú
     </a>
 </div>
@@ -197,8 +198,8 @@
                 <input type="text" id="cai" maxlength="37" required>
             </div>
             <div class="form-group">
-                <label>Fecha: <span class="required">*</span></label>
-                <input type="date" id="fecha" required>
+                <label>Fecha (DD/MM/YYYY): <span class="required">*</span></label>
+                <input type="text" id="fecha" placeholder="DD/MM/YYYY" maxlength="10" required>
             </div>
             <div class="form-group">
                 <label>Orden de Pago:</label>
@@ -402,7 +403,7 @@
 
         let logoBackgroundDataUrl;
         try {
-            logoBackgroundDataUrl = await getBase64FromUrl('Logo odoo.png');
+            logoBackgroundDataUrl = await getBase64FromUrl('../assets/Logo odoo.png');
         } catch (error) {
             console.error(error);
         }
@@ -588,13 +589,33 @@
             });
         });
 
-        const pdfBlob = doc.output('blob');
+        
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
+
+            const pdfBlob = doc.output('blob');
         const dataString = "\n%RETENCION_DATA:" + btoa(unescape(encodeURIComponent(JSON.stringify(formData))));
         const finalBlob = new Blob([pdfBlob, dataString], { type: 'application/pdf' });
 
         const link = document.createElement('a');
         link.href = URL.createObjectURL(finalBlob);
         link.download = `Retencion_${correlativoUser}.pdf`;
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Contabilidad', 'Generar PDF', 'Se generó un documento en el módulo Contabilidad');
+            }
+
         link.click();
         URL.revokeObjectURL(link.href);
     };
@@ -893,8 +914,8 @@
     }
 
     // Función para limpiar todo el formulario y reestablecer la tabla de retenciones
-    function limpiarFormulario() {
-        if (confirm('¿Está seguro de que desea limpiar todos los campos del formulario?')) {
+    async function limpiarFormulario() {
+        if ((window.enagConfirm && await window.enagConfirm('¿Está seguro de que desea limpiar todos los campos del formulario?')) || (!window.enagConfirm && confirm('¿Está seguro de que desea limpiar todos los campos del formulario?'))) {
             document.getElementById('retencionForm').reset();
             tbody.innerHTML = '';
             agregarFila();
@@ -902,9 +923,41 @@
         }
     }
 
+    // Auto-formateo de Fecha en formato Honduras (DD/MM/YYYY)
+    const fechaElem = document.getElementById('fecha');
+    if (fechaElem) {
+        if (!fechaElem.value) {
+            const hoy = new Date();
+            const d = String(hoy.getDate()).padStart(2, '0');
+            const m = String(hoy.getMonth() + 1).padStart(2, '0');
+            const y = hoy.getFullYear();
+            fechaElem.value = `${d}/${m}/${y}`;
+        }
+        fechaElem.addEventListener('input', function(e) {
+            let v = e.target.value.replace(/\D/g, '');
+            if (v.length > 8) v = v.substring(0, 8);
+            if (v.length >= 5) {
+                e.target.value = `${v.substring(0, 2)}/${v.substring(2, 4)}/${v.substring(4)}`;
+            } else if (v.length >= 3) {
+                e.target.value = `${v.substring(0, 2)}/${v.substring(2)}`;
+            } else {
+                e.target.value = v;
+            }
+        });
+    }
+
     // Agregar fila inicial
     agregarFila();
 </script>
+
+<script src="../js/soporte.js"></script>
+<script src="../js/honduras-datepicker.js"></script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
 
 </body>
 </html>

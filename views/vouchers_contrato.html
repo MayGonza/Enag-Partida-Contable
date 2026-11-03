@@ -4,8 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" href="logo.ico" type="image/x-icon">
-    <title>Generación de Vouchers de Pago</title>
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Generación de Vouchers de Pago por Contrato</title>
+
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -35,7 +36,7 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: url('logo.jpeg') no-repeat center center;
+            background: url('../assets/logo.jpeg') no-repeat center center;
             background-size: 40%;
             filter: blur(10px) opacity(0.15);
             z-index: -1;
@@ -93,6 +94,56 @@
         .btn-nav-menu:hover {
             background-color: #5a6268;
             transform: translateY(-1px);
+        }
+
+        /* Config panel */
+        .config-panel {
+            background: #f0f4f8;
+            border: 1px solid #d1dce8;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+        }
+
+        .config-panel h3 {
+            margin: 0 0 16px 0;
+            color: #002147;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .config-field label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.87em;
+            color: #002147;
+            margin-bottom: 5px;
+        }
+
+        .config-field input,
+        .config-field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.93em;
+            box-sizing: border-box;
+            background: white;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+
+        .config-field input:focus,
+        .config-field select:focus {
+            outline: none;
+            border-color: #002147;
         }
 
         /* Drag & Drop Area */
@@ -316,47 +367,71 @@
         }
     </style>
     <!-- Import libraries -->
-    <script src="js/xlsx.full.min.js"></script>
-    <script src="js/jspdf.umd.min.js"></script>
-    <script src="js/jspdf-autotable.min.js"></script>
+    <script src="../js/xlsx.full.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
 </head>
 
 <body>
     <div class="nav-container">
-        <a href="index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="reporte_planilla.html" class="btn-nav" style="background-color: #0284c7; color: white;">📊 Reporte Resumen</a>
     </div>
 
     <div class="container">
 
         <div class="form-header">
-            <h2>Generador de Vouchers de Pago</h2>
+            <h2>Generador de Vouchers de Pago por Contrato</h2>
             <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de salarios desde un archivo de Excel para
                 procesar e imprimir los comprobantes.</p>
         </div>
 
         <!-- Selector de Hoja de Excel (oculto por defecto) -->
-        <div id="sheetSelectorContainer" style="display: none; margin-bottom: 25px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fef3c7;">
-            <label style="font-weight: bold; color: #b45309; margin-bottom: 6px; display: block; font-size: 0.95em;">Este archivo contiene múltiples hojas. Selecciona la hoja con los datos:</label>
-            <select id="sheetSelect" onchange="cambiarHoja()" style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; max-width: 450px; font-size: 1em; box-sizing: border-box; background: white; font-weight: bold; color: #333;">
+        <div id="sheetSelectorContainer"
+            style="display: none; margin-bottom: 25px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fef3c7;">
+            <label
+                style="font-weight: bold; color: #b45309; margin-bottom: 6px; display: block; font-size: 0.95em;">Este
+                archivo contiene múltiples hojas. Selecciona la hoja con los datos:</label>
+            <select id="sheetSelect" onchange="cambiarHoja()"
+                style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; max-width: 450px; font-size: 1em; box-sizing: border-box; background: white; font-weight: bold; color: #333;">
             </select>
         </div>
 
         <!-- Month and Date Selectors -->
-        <div
-            style="display: flex; gap: 20px; align-items: center; margin-bottom: 25px; flex-wrap: wrap; background: #f8fafc; padding: 20px; border-radius: 12px; border: 1px solid #e2e8f0;">
-            <div style="flex: 1; min-width: 200px;">
-                <label
-                    style="font-weight: bold; color: #002147; margin-bottom: 6px; display: block; font-size: 0.95em;">Mes
-                    Correspondiente:</label>
-                <input type="text" id="mesVoucher" placeholder="ej. marzo 2026"
-                    style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; font-size: 1em; box-sizing: border-box;">
-            </div>
-            <div style="flex: 1; min-width: 200px;">
-                <label
-                    style="font-weight: bold; color: #002147; margin-bottom: 6px; display: block; font-size: 0.95em;">Fecha
-                    de Emisión (Opcional):</label>
-                <input type="text" id="fechaEmision" placeholder="ej. 30 de marzo del 2026"
-                    style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; font-size: 1em; box-sizing: border-box;">
+        <!-- Configuración del documento -->
+        <div class="config-panel">
+            <h3>⚙️ Configuración del Documento</h3>
+            <div class="config-grid">
+                <div class="config-field">
+                    <label>Mes Correspondiente</label>
+                    <input type="text" id="mesVoucher" placeholder="ej. marzo 2026" value="">
+                </div>
+
+                <div class="config-field">
+                    <label>Nombre del/la firmante</label>
+                    <input type="text" id="cfgFirmante" value="María José Valverde Bardales"
+                        placeholder="ej. María José Valverde Bardales">
+                </div>
+                <div class="config-field">
+                    <label>Cargo del/la firmante</label>
+                    <input type="text" id="cfgCargoFirmante" value="Jefe Interina de Recursos Humanos"
+                        placeholder="ej. Jefe Interina de Recursos Humanos">
+                </div>
+                <div class="config-field"
+                    style="grid-column: span 2; display: flex; flex-direction: column; gap: 8px; margin-top: 10px;">
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147; font-size: 0.95em;">
+                        <input type="checkbox" id="showFechaIngreso"
+                            style="width: 18px; height: 18px; cursor: pointer;">
+                        Mostrar Fecha de Ingreso en PDF
+                    </label>
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147; font-size: 0.95em;">
+                        <input type="checkbox" id="showPeriodoContratacion"
+                            style="width: 18px; height: 18px; cursor: pointer;">
+                        Mostrar Periodo de Contratación en PDF
+                    </label>
+                </div>
             </div>
         </div>
 
@@ -391,6 +466,13 @@
                     </svg>
                     Generar PDFs Seleccionados (<span id="selectedCount">0</span>)
                 </button>
+                <button type="button" class="btn-generate" id="btnResumenPlanilla" onclick="abrirResumenPlanilla()"
+                    disabled style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-5 0h2V7H7v7zm-5 0h2v-3H2v3z"/>
+                    </svg>
+                    Reporte Resumen
+                </button>
                 <button type="button" class="btn-clear" id="btnClearList" onclick="limpiarLista()" disabled>
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
                         <path
@@ -420,9 +502,7 @@
                                     onchange="toggleSelectAll(this)"></th>
                             <th>Nombre del Empleado</th>
                             <th>Cargo</th>
-                            <th style="text-align: center;">Tipo</th>
                             <th style="text-align: center;">N° Puesto</th>
-                            <th>Fecha Ingreso</th>
                             <th style="text-align: right;">Sueldo Devengado</th>
                             <th style="text-align: right;">Deducciones</th>
                             <th style="text-align: right;">Neto a Pagar</th>
@@ -461,19 +541,21 @@
             const dia = fechaActual.getDate();
             const mesLetras = meses[fechaActual.getMonth()];
             const anio = fechaActual.getFullYear();
-            document.getElementById('fechaEmision').value = `${dia} de ${mesLetras} del ${anio}`;
 
-            // Auto-cargar planilla.xls si existe en el servidor
-            fetch('planilla.xls')
+            // Auto-cargar planilla2.xls (o planilla.xls) si existe en el servidor
+            fetch('../templates/planilla2.xls')
                 .then(res => {
                     if (res.ok) return res.arrayBuffer();
-                    throw new Error("No default planilla.xls found on server");
+                    return fetch('../templates/planilla.xls').then(res2 => {
+                        if (res2.ok) return res2.arrayBuffer();
+                        throw new Error("No default spreadsheet found");
+                    });
                 })
                 .then(arrayBuffer => {
                     const data = new Uint8Array(arrayBuffer);
                     currentWorkbook = XLSX.read(data, { type: 'array' });
                     construirMapaEmpleados(currentWorkbook);
-                    
+
                     const sheetSelect = document.getElementById('sheetSelect');
                     sheetSelect.innerHTML = '';
                     currentWorkbook.SheetNames.forEach(name => {
@@ -482,14 +564,16 @@
                         opt.innerText = name;
                         sheetSelect.appendChild(opt);
                     });
-                    
+
                     if (currentWorkbook.SheetNames.length > 1) {
                         document.getElementById('sheetSelectorContainer').style.display = 'block';
                     } else {
                         document.getElementById('sheetSelectorContainer').style.display = 'none';
                     }
-                    
-                    cargarHoja(currentWorkbook.SheetNames[0]);
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
                 })
                 .catch(err => {
                     console.log("Auto-carga omitida o fallida:", err.message);
@@ -537,6 +621,33 @@
                 .replace(/[^a-z0-9]/g, ""); // conservar solo alfanuméricos
         }
 
+        // Convierte un valor de celda Excel a string de fecha legible en español.
+        // Excel almacena fechas como números seriales (días desde 1900-01-01).
+        function parsearFechaIngreso(val) {
+            if (val === undefined || val === null || val === "") return "";
+            // Si ya es un string con letras, devolver tal cual
+            if (typeof val === 'string' && /[a-zA-Z]/.test(val)) return val.trim();
+            // Si es un objeto Date (cellDates:true)
+            if (val instanceof Date) {
+                const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                return `${val.getDate()} de ${meses[val.getMonth()]} del ${val.getFullYear()}`;
+            }
+            // Si es un número entero positivo probable serial de Excel (entre 1 y 60000)
+            const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
+            if (!isNaN(num) && num > 100 && num < 70000) {
+                // Convertir serial Excel a Date (Excel serial empieza el 1 ene 1900)
+                const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+                if (!isNaN(date.getTime())) {
+                    const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                    return `${date.getUTCDate()} de ${meses[date.getUTCMonth()]} del ${date.getUTCFullYear()}`;
+                }
+            }
+            // Cualquier otro caso: devolver como texto
+            return val.toString().trim();
+        }
+
         function parseCleanFloat(val) {
             if (val === undefined || val === null || val === "") return 0;
             if (typeof val === 'number') return val;
@@ -547,36 +658,112 @@
             return isNaN(num) ? 0 : num;
         }
 
-        async function debugLocalExcel() {
-            try {
-                const response = await fetch('./planilla.xls');
-                if (!response.ok) {
-                    throw new Error("No se pudo cargar planilla.xls desde el servidor local (código " + response.status + "). Asegúrate de estar corriendo Live Server.");
-                }
-                const arrayBuffer = await response.arrayBuffer();
-                const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: 'array' });
-                
-                let out = "HOJAS ENCONTRADAS EN EL LIBRO:\n" + JSON.stringify(workbook.SheetNames) + "\n\n";
-                
-                workbook.SheetNames.forEach(sheetName => {
-                    const sheet = workbook.Sheets[sheetName];
-                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
-                    out += `=========================================\n`;
-                    out += `HOJA: "${sheetName}" (Total filas: ${rows.length})\n`;
-                    out += `=========================================\n`;
-                    rows.slice(0, 15).forEach((row, idx) => {
-                        const rowSlice = row.map(cell => cell !== undefined ? cell.toString().trim() : "");
-                        out += `Fila ${idx + 1}: [${rowSlice.join(" | ")}]\n`;
-                    });
-                    out += "\n\n";
-                });
-                
-                const dbg = document.getElementById('debugOutput');
-                dbg.innerText = out;
-                dbg.style.display = 'block';
-            } catch (err) {
-                alert("Error al analizar planilla.xls: " + err.message);
+        function esColumnaDeduccion(header) {
+            if (!header) return false;
+            const norm = normalize(header);
+            if (!norm) return false;
+
+            // 1. Columnas de totales o netos (NUNCA son deducciones individuales)
+            if (
+                ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) ||
+                norm === "total" ||
+                norm.includes("sueldoneto") ||
+                norm.includes("netoapagar") ||
+                norm === "neto" ||
+                norm === "liquido" ||
+                norm.includes("totalliquido") ||
+                norm.includes("totalapagar")
+            ) {
+                return false;
             }
+
+            // 2. Columnas de sueldos / devengados
+            if (
+                norm.includes("sueldoasignado") ||
+                norm.includes("sueldodevengado") ||
+                norm.includes("sueldobase") ||
+                norm.includes("salariobase") ||
+                norm.includes("sueldomensual") ||
+                norm.includes("sueldobruto") ||
+                norm.includes("totaldevengado") ||
+                norm.includes("salariodevengado") ||
+                norm === "asignado" ||
+                norm === "devengado" ||
+                norm === "sueldo" ||
+                norm === "salario"
+            ) {
+                return false;
+            }
+
+            // 3. Columnas de control de días / tiempo trabajado
+            if (
+                norm === "dias" ||
+                norm === "dt" ||
+                norm.includes("diastrabajad") ||
+                norm.includes("diaslaborad") ||
+                norm.includes("diaspagad") ||
+                norm.includes("diasdevengad") ||
+                norm.includes("diastrab") ||
+                norm.includes("diaslab") ||
+                norm.includes("diasdetrabajo") ||
+                norm.includes("tiempotrabajado") ||
+                norm.includes("diasalmes") ||
+                norm.includes("diashabiles")
+            ) {
+                return false;
+            }
+
+            // 4. Columnas informativas del empleado (nombre, cargo, puesto, fecha de ingreso, etc.)
+            if (
+                norm.includes("nombre") ||
+                norm.includes("empleado") ||
+                norm.includes("colaborador") ||
+                norm === "cargo" ||
+                norm === "cargoo puesto" ||
+                norm === "puesto" ||
+                norm === "puestocargo" ||
+                norm === "numero" ||
+                norm === "num" ||
+                norm === "no" ||
+                norm.includes("numerodepuesto") ||
+                norm.includes("numpuesto") ||
+                norm.includes("nopuesto") ||
+                norm === "ingreso" ||
+                norm === "fechaingreso" ||
+                norm === "fechadeingreso" ||
+                norm === "reingreso" ||
+                norm === "fechadereingreso" ||
+                norm.includes("identidad") ||
+                norm === "dni" ||
+                norm === "rtn" ||
+                norm === "periodo" ||
+                norm.includes("periododecontratacion") ||
+                norm.includes("periodocontratacion") ||
+                norm.includes("periodecontracion") ||  // typo frecuente en archivo ENAG
+                norm.includes("contracion") ||          // typo de "contratacion"
+                norm.includes("claveplaza") ||          // Clave de Plaza por Contrato
+                norm.includes("clavepor") ||
+                norm === "tipo" ||
+                norm === "contrato" ||
+                norm === "acuerdo" ||
+                norm.includes("observacion") ||
+                norm.includes("firma")
+            ) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function obtenerHojaPredeterminada(workbook) {
+            const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            for (const name of workbook.SheetNames) {
+                const lower = name.toLowerCase();
+                if (keywords.some(kw => lower.includes(kw))) {
+                    return name;
+                }
+            }
+            return workbook.SheetNames[0];
         }
 
         function construirMapaEmpleados(workbook) {
@@ -584,7 +771,14 @@
             window.empleadoNumeroPuestoMap = {};
             window.empleadoIngresoMap = {};
 
-            workbook.SheetNames.forEach(sheetName => {
+            const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            const payrollSheets = workbook.SheetNames.filter(name => {
+                const lower = name.toLowerCase();
+                return keywords.some(kw => lower.includes(kw));
+            });
+            const sheetsToProcess = payrollSheets.length > 0 ? payrollSheets : workbook.SheetNames;
+
+            sheetsToProcess.forEach(sheetName => {
                 try {
                     const sheet = workbook.Sheets[sheetName];
                     const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
@@ -626,7 +820,7 @@
                         if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
                         if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) puestoIdx = index;
                         if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
-                        if (norm.includes("ingreso")) ingresoIdx = index;
+                        if ((norm.includes("ingreso") || norm.includes("contrata") || norm.includes("periododecontratacion")) && !norm.includes("reingreso")) ingresoIdx = index;
                     });
 
                     if (nombreIdx === -1) return;
@@ -636,7 +830,7 @@
                     for (let k = headerRowIndex + 2; k < Math.min(rowsData.length, headerRowIndex + 14); k++) {
                         const rowVal = rowsData[k] || [];
                         const nextRowVal = rowsData[k + 1] || [];
-                        
+
                         let foundNumberCol = -1;
                         for (let c = 0; c < 3; c++) {
                             const str = rowVal[c] ? rowVal[c].toString().trim() : "";
@@ -645,7 +839,7 @@
                                 break;
                             }
                         }
-                        
+
                         if (foundNumberCol !== -1) {
                             const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
                             const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
@@ -662,7 +856,7 @@
                         while (i < rowsData.length) {
                             const rowA = rowsData[i];
                             if (!rowA) { i++; continue; }
-                            
+
                             let isEmployeeRow = false;
                             for (let c = 0; c < 3; c++) {
                                 const str = rowA[c] ? rowA[c].toString().trim() : "";
@@ -671,7 +865,7 @@
                                     break;
                                 }
                             }
-                            
+
                             if (isEmployeeRow) {
                                 const rowB = rowsData[i + 1];
                                 if (rowB) {
@@ -679,8 +873,8 @@
                                     if (empName) {
                                         const cargo = puestoIdx !== -1 && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "";
                                         const numPuesto = numeroPuestoIdx !== -1 && rowB[numeroPuestoIdx] ? rowB[numeroPuestoIdx].toString().trim() : "";
-                                        const ingreso = ingresoIdx !== -1 && rowA[ingresoIdx] ? rowA[ingresoIdx].toString().trim() : "";
-                                        
+                                        const ingreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
+
                                         if (cargo) window.empleadoCargoMap[empName] = cargo;
                                         if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
                                         if (ingreso) window.empleadoIngresoMap[empName] = ingreso;
@@ -701,11 +895,9 @@
                             if (empName) {
                                 const cargo = puestoIdx !== -1 && row[puestoIdx] ? row[puestoIdx].toString().trim().toUpperCase() : "";
                                 const numPuesto = numeroPuestoIdx !== -1 && row[numeroPuestoIdx] ? row[numeroPuestoIdx].toString().trim() : "";
-                                const ingreso = ingresoIdx !== -1 && row[ingresoIdx] ? row[ingresoIdx].toString().trim() : "";
-                                
+
                                 if (cargo) window.empleadoCargoMap[empName] = cargo;
                                 if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
-                                if (ingreso) window.empleadoIngresoMap[empName] = ingreso;
                             }
                         }
                     }
@@ -724,24 +916,26 @@
                     const data = new Uint8Array(e.target.result);
                     currentWorkbook = XLSX.read(data, { type: 'array' });
                     construirMapaEmpleados(currentWorkbook);
-                    
+
                     const sheetSelect = document.getElementById('sheetSelect');
                     sheetSelect.innerHTML = '';
-                    
+
                     currentWorkbook.SheetNames.forEach(name => {
                         const opt = document.createElement('option');
                         opt.value = name;
                         opt.innerText = name;
                         sheetSelect.appendChild(opt);
                     });
-                    
+
                     if (currentWorkbook.SheetNames.length > 1) {
                         document.getElementById('sheetSelectorContainer').style.display = 'block';
                     } else {
                         document.getElementById('sheetSelectorContainer').style.display = 'none';
                     }
-                    
-                    cargarHoja(currentWorkbook.SheetNames[0]);
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
                 } catch (err) {
                     alert("Error al abrir el archivo Excel: " + err.message);
                     console.error(err);
@@ -772,14 +966,14 @@
                 for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
                     const row = rowsData[i] || [];
                     const normalizedRow = row.map(cell => normalize(cell));
-                    
+
                     // La fila debe contener la palabra nombre/empleado y además tener múltiples columnas ocupadas
                     // para evitar confundirla con banners de sección como "EMPLEADOS POR ACUERDO"
-                    const tieneNombre = normalizedRow.some(cell => 
+                    const tieneNombre = normalizedRow.some(cell =>
                         cell.includes("nombre") || cell.includes("empleado") || cell.includes("colaborador")
                     );
                     const tieneMultiplesColumnas = row.filter(cell => cell !== undefined && cell.toString().trim() !== "").length >= 3;
-                    
+
                     if (tieneNombre && tieneMultiplesColumnas) {
                         headerRowIndex = i;
                         break;
@@ -798,8 +992,9 @@
                 // Detectar si hay una segunda fila de cabecera (celdas combinadas)
                 const rowSiguiente = rowsData[headerRowIndex + 1] || [];
                 const rowSiguienteNorm = rowSiguiente.map(h => normalize(h));
-                const tieneSegundaCabecera = rowSiguienteNorm.some(h => 
-                    h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato")
+                const tieneSegundaCabecera = rowSiguienteNorm.some(h =>
+                    h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato") ||
+                    h.includes("impuesto") || h.includes("deduc") || h.includes("ihss") || h.includes("cooperativa") || h.includes("banco")
                 );
 
                 if (tieneSegundaCabecera) {
@@ -811,7 +1006,7 @@
                     for (let c = 0; c < maxCols; c++) {
                         const val1 = h1[c] ? h1[c].toString().trim() : "";
                         const val2 = h2[c] ? h2[c].toString().trim() : "";
-                        
+
                         if (val1 && val2) {
                             headers.push(val1 + " - " + val2);
                         } else if (val1) {
@@ -824,8 +1019,8 @@
                     }
                 }
 
-                let nombreIdx = -1, puestoIdx = -1, ingresoIdx = -1, tipoIdx = -1, mesIdx = -1, asignadoIdx = -1, devengadoIdx = -1;
-                let numeroPuestoIdx = -1, totalDeduccionesIdx = -1;
+                let nombreIdx = -1, puestoIdx = -1, tipoIdx = -1, mesIdx = -1, asignadoIdx = -1, devengadoIdx = -1, ingresoIdx = -1, periodoIdx = -1;
+                let numeroPuestoIdx = -1, totalDeduccionesIdx = -1, diasTrabajadosIdx = -1;
 
                 // Mapear cabeceras
                 headers.forEach((header, index) => {
@@ -834,13 +1029,23 @@
                     if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) {
                         puestoIdx = index;
                     }
-                    if (norm.includes("ingreso")) ingresoIdx = index;
-                    if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
-                    if (norm.includes("mes") || norm.includes("periodo")) mesIdx = index;
-                    if (norm.includes("asignado")) asignadoIdx = index;
-                    if (norm.includes("devengado")) devengadoIdx = index;
-                    if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
-                    if (norm.includes("totaldededucciones") || (norm.includes("total") && norm.includes("deduc"))) totalDeduccionesIdx = index;
+                    // tipoIdx: solo si es exactamente tipo/acuerdo, NO si es "periodo de contracion" con typo
+                    if ((norm === "tipo" || norm.includes("acuerdo") || norm === "contrato") && !norm.includes("periodo") && !norm.includes("contracion")) tipoIdx = index;
+                    if ((norm.includes("mes") || norm.includes("periodo")) && !norm.includes("contrat") && !norm.includes("contraci")) mesIdx = index;
+                    if ((norm.includes("diastrabaj") || norm.includes("diaslabor") || norm.includes("diaspag") || norm.includes("diastrab") || norm.includes("diaslab") || norm.includes("tiempotrabaj") || norm.includes("diasdetrabajo") || norm === "dias" || norm === "dt") && !norm.includes("deduc") && !norm.includes("descuento")) {
+                        diasTrabajadosIdx = index;
+                    }
+                    if ((norm.includes("asignado") || norm.includes("sueldobase") || norm.includes("salariobase") || norm.includes("sueldomensual")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
+                        asignadoIdx = index;
+                    }
+                    if ((norm.includes("devengado") || norm.includes("totaldevengado") || norm.includes("sueldodevengado") || norm.includes("salariodevengado")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
+                        devengadoIdx = index;
+                    }
+                    if (norm.includes("numerodepuesto") || norm.includes("claveplaza") || norm.includes("clavepor") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
+                    if ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) totalDeduccionesIdx = index;
+                    if (norm.includes("ingreso") && !norm.includes("reingreso")) ingresoIdx = index;
+                    // Detectar período de contratación (incluyendo typo "contracion" del archivo real)
+                    if ((norm.includes("periodo") || norm.includes("contratacion") || norm.includes("contracion")) && !norm.includes("reingreso") && periodoIdx === -1) periodoIdx = index;
                 });
 
                 // Si no se mapearon adecuadamente por nombre completo, forzar defaults para el formato ENAG
@@ -848,19 +1053,19 @@
                 if (puestoIdx === -1) puestoIdx = 2;
                 if (numeroPuestoIdx === -1) numeroPuestoIdx = 1;
                 if (asignadoIdx === -1) asignadoIdx = 3;
-                if (devengadoIdx === -1) devengadoIdx = 4;
+                if (devengadoIdx === -1) devengadoIdx = asignadoIdx !== -1 ? asignadoIdx : 4;
 
                 // Encontrar total deducciones dinámicamente
                 if (totalDeduccionesIdx === -1) {
                     headers.forEach((header, index) => {
                         const norm = normalize(header);
                         if (norm.includes("neto") || norm.includes("liquido") || norm.includes("sueldoneto")) {
-                            totalDeduccionesIdx = index - 1;
+                            totalDeduccionesIdx = index;
                         }
                     });
                 }
                 if (totalDeduccionesIdx === -1) {
-                    totalDeduccionesIdx = headers.length - 2;
+                    totalDeduccionesIdx = headers.length;
                 }
 
                 // Determinar si la hoja usa el formato de doble fila por empleado
@@ -868,7 +1073,7 @@
                 for (let k = startRow; k < Math.min(rowsData.length, startRow + 12); k++) {
                     const rowVal = rowsData[k] || [];
                     const nextRowVal = rowsData[k + 1] || [];
-                    
+
                     let foundNumberCol = -1;
                     for (let c = 0; c < 3; c++) {
                         const str = rowVal[c] ? rowVal[c].toString().trim() : "";
@@ -877,7 +1082,7 @@
                             break;
                         }
                     }
-                    
+
                     if (foundNumberCol !== -1) {
                         const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
                         const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
@@ -914,11 +1119,13 @@
                                 // Las deducciones se encuentran entre la columna "Sueldo Devengado" y "Total de Deducciones"
                                 headers.forEach((header, index) => {
                                     if (index > devengadoIdx && index < totalDeduccionesIdx) {
+                                        if (!esColumnaDeduccion(header)) return;
+
                                         const val = parseCleanFloat(rowA[index]);
                                         if (val && !isNaN(val) && val > 0) {
                                             // Reemplazar múltiples espacios internos por uno solo y limpiar prefijos
                                             const cleanName = header.toString().replace(/\s+/g, ' ').trim()
-                                                .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
+                                                .replace(/^(DEDUCCIONES|Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                                 .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
                                             if (cleanName && cleanName.trim() !== "") {
                                                 deducciones.push({
@@ -945,13 +1152,21 @@
                                 }
                                 if (!empNumPuesto) empNumPuesto = "N/D";
 
-                                let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] ? rowA[ingresoIdx].toString().trim() : "";
+                                const empTipo = "Contrato";
+
+                                let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
                                 if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
                                     empIngreso = window.empleadoIngresoMap[empName];
                                 }
                                 if (!empIngreso) empIngreso = "N/D";
 
-                                const empTipo = tipoIdx !== -1 && rowA[tipoIdx] ? (rowA[tipoIdx].toString().toUpperCase().includes("CONTRATO") ? "Contrato" : "Acuerdo") : "Acuerdo";
+                                let empPeriodo = periodoIdx !== -1 && rowA[periodoIdx] !== undefined && rowA[periodoIdx] !== "" ? parsearFechaIngreso(rowA[periodoIdx]) : "";
+                                if (!empPeriodo && window.empleadoPeriodoMap && window.empleadoPeriodoMap[empName]) {
+                                    empPeriodo = window.empleadoPeriodoMap[empName];
+                                }
+                                if (!empPeriodo) empPeriodo = "N/D";
+
+                                const diasTrab = diasTrabajadosIdx !== -1 && rowA[diasTrabajadosIdx] !== undefined ? parseCleanFloat(rowA[diasTrabajadosIdx]) : null;
 
                                 // Solo agregarlo si el nombre no está vacío
                                 if (empName !== "") {
@@ -961,7 +1176,9 @@
                                         puesto: empPuesto,
                                         numeroPuesto: empNumPuesto,
                                         ingreso: empIngreso,
+                                        periodoContratacion: empPeriodo,
                                         tipo: empTipo,
+                                        diasTrabajados: diasTrab,
                                         mes: mesIdx !== -1 && rowA[mesIdx] ? rowA[mesIdx].toString().trim() : "marzo 2026",
                                         sueldoAsignado: sueldoAsignado,
                                         sueldoDevengado: sueldoDevengado,
@@ -991,10 +1208,12 @@
 
                         headers.forEach((header, index) => {
                             if (index > devengadoIdx && index < totalDeduccionesIdx) {
+                                if (!esColumnaDeduccion(header)) return;
+
                                 const val = parseCleanFloat(row[index]);
                                 if (val && !isNaN(val) && val > 0) {
                                     const cleanName = header.toString().replace(/\s+/g, ' ').trim()
-                                        .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
+                                        .replace(/^(DEDUCCIONES|Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
                                         .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
                                     if (cleanName && cleanName.trim() !== "") {
                                         deducciones.push({
@@ -1022,13 +1241,21 @@
                         }
                         if (!empNumPuesto) empNumPuesto = "N/D";
 
-                        let empIngreso = ingresoIdx !== -1 && row[ingresoIdx] ? row[ingresoIdx].toString().trim() : "";
+                        const empTipo = "Contrato";
+
+                        let empIngreso = ingresoIdx !== -1 && row[ingresoIdx] !== undefined && row[ingresoIdx] !== "" ? parsearFechaIngreso(row[ingresoIdx]) : "";
                         if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
                             empIngreso = window.empleadoIngresoMap[empName];
                         }
                         if (!empIngreso) empIngreso = "N/D";
 
-                        const empTipo = tipoIdx !== -1 && row[tipoIdx] ? (row[tipoIdx].toString().toUpperCase().includes("CONTRATO") ? "Contrato" : "Acuerdo") : "Acuerdo";
+                        let empPeriodo = periodoIdx !== -1 && row[periodoIdx] !== undefined && row[periodoIdx] !== "" ? parsearFechaIngreso(row[periodoIdx]) : "";
+                        if (!empPeriodo && window.empleadoPeriodoMap && window.empleadoPeriodoMap[empName]) {
+                            empPeriodo = window.empleadoPeriodoMap[empName];
+                        }
+                        if (!empPeriodo) empPeriodo = "N/D";
+
+                        const diasTrab = diasTrabajadosIdx !== -1 && row[diasTrabajadosIdx] !== undefined ? parseCleanFloat(row[diasTrabajadosIdx]) : null;
 
                         empleados.push({
                             id: i,
@@ -1036,7 +1263,9 @@
                             puesto: empPuesto,
                             numeroPuesto: empNumPuesto,
                             ingreso: empIngreso,
+                            periodoContratacion: empPeriodo,
                             tipo: empTipo,
+                            diasTrabajados: diasTrab,
                             mes: mesIdx !== -1 && row[mesIdx] ? row[mesIdx].toString().trim() : "marzo 2026",
                             sueldoAsignado: sueldoAsignado,
                             sueldoDevengado: sueldoDevengado,
@@ -1069,6 +1298,7 @@
             document.getElementById('emptyState').style.display = 'block';
             document.getElementById('btnGenerateBulk').disabled = true;
             document.getElementById('btnClearList').disabled = true;
+            if (document.getElementById('btnResumenPlanilla')) document.getElementById('btnResumenPlanilla').disabled = true;
             document.getElementById('excelFile').value = '';
         }
 
@@ -1089,14 +1319,7 @@
                     <td class="checkbox-cell"><input type="checkbox" class="emp-checkbox" ${emp.selected ? 'checked' : ''} onchange="toggleSelect(${emp.id}, this.checked)"></td>
                     <td><strong>${emp.nombre}</strong></td>
                     <td style="color: #475569; font-size: 0.9em;">${emp.puesto}</td>
-                    <td style="text-align: center;">
-                        <select onchange="cambiarTipo(${emp.id}, this.value)" style="padding: 4px; border-radius: 4px; border: 1px solid #cbd5e1; font-weight: bold;">
-                            <option value="Acuerdo" ${emp.tipo === 'Acuerdo' ? 'selected' : ''}>Acuerdo</option>
-                            <option value="Contrato" ${emp.tipo === 'Contrato' ? 'selected' : ''}>Contrato</option>
-                        </select>
-                    </td>
                     <td style="color: #475569; font-size: 0.9em; text-align: center;">${emp.numeroPuesto}</td>
-                    <td style="color: #64748b; font-size: 0.9em;">${emp.ingreso}</td>
                     <td style="text-align: right; font-family: monospace;">${formatMoneda(emp.sueldoDevengado)}</td>
                     <td style="text-align: right; font-family: monospace; color: #ef4444;">${formatMoneda(emp.totalDeducciones)}</td>
                     <td style="text-align: right; font-family: monospace; font-weight: bold; color: #16a34a;">${formatMoneda(emp.netoPagar)}</td>
@@ -1113,6 +1336,7 @@
 
             document.getElementById('btnGenerateBulk').disabled = false;
             document.getElementById('btnClearList').disabled = false;
+            if (document.getElementById('btnResumenPlanilla')) document.getElementById('btnResumenPlanilla').disabled = false;
 
             actualizarContadorSeleccionados();
         }
@@ -1168,15 +1392,57 @@
             });
         }
 
+        function abrirResumenPlanilla() {
+            if (!empleados || empleados.length === 0) {
+                alert("Primero carga una planilla de salarios para generar el reporte resumen.");
+                return;
+            }
+
+            const mapDeduc = {};
+            let totalAsignado = 0;
+            let totalDevengado = 0;
+            let totalDeducciones = 0;
+            let totalNeto = 0;
+
+            empleados.forEach(emp => {
+                totalAsignado += emp.sueldoAsignado || emp.sueldoDevengado;
+                totalDevengado += emp.sueldoDevengado;
+                totalDeducciones += emp.totalDeducciones;
+                totalNeto += emp.netoPagar;
+
+                emp.deducciones.forEach(d => {
+                    if (!mapDeduc[d.nombre]) {
+                        mapDeduc[d.nombre] = { nombre: d.nombre, count: 0, total: 0 };
+                    }
+                    mapDeduc[d.nombre].count++;
+                    mapDeduc[d.nombre].total += d.monto;
+                });
+            });
+
+            const listaDeduc = Object.values(mapDeduc).sort((a, b) => b.total - a.total);
+            const dataReporte = {
+                periodo: document.getElementById('mesVoucher').value || "Febrero 2026",
+                regimen: "CONTRATO",
+                totalEmpleados: empleados.length,
+                totalAsignado,
+                totalDevengado,
+                totalDeducciones,
+                totalNeto,
+                deducciones: listaDeduc,
+                empleados: empleados
+            };
+
+            sessionStorage.setItem('enag_planilla_resumen_data', JSON.stringify(dataReporte));
+            window.location.href = "reporte_planilla.html";
+        }
+
         function descargarPlantilla() {
-            // Generar plantilla de Excel con todos los campos exactos de la imagen
             const headers = [
                 "No.",
                 "Numero de Puesto",
                 "Nombre",
                 "Cargo",
-                "Fecha de Ingreso",
-                "Tipo",
+                "Ingreso",
                 "Sueldo Asignado",
                 "Sueldo Devengado",
                 "I.H.S.S.",
@@ -1210,8 +1476,7 @@
                     "1024",
                     "DANIA MARÍA COLINDRES BARAHONA",
                     "AUXILIAR DE CONTABILIDAD",
-                    "02 de enero del 2013",
-                    "Acuerdo",
+                    "01/01/2020",
                     18000.00,
                     18000.00,
                     297.58,
@@ -1242,8 +1507,7 @@
                     "1025",
                     "PEDRO ANTONIO GÓMEZ REYES",
                     "DISEÑADOR GRÁFICO",
-                    "15 de marzo del 2018",
-                    "Contrato",
+                    "15/06/2022",
                     15000.00,
                     15000.00,
                     247.98,
@@ -1290,6 +1554,15 @@
             img.src = url;
         });
 
+        function formatNombreOracion(str) {
+            if (!str) return "";
+            return str.toLowerCase().split(' ').map(word => {
+                if (!word) return "";
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                return isRoman ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
+
         async function generarPDFEmpleado(emp, doc, isBulk = false) {
             const { jsPDF } = window.jspdf;
 
@@ -1299,7 +1572,7 @@
                 doc.addPage();
             }
 
-            const logoBgUrl = await getBase64FromUrl('Logo odoo.png');
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
             if (logoBgUrl) {
                 const pageWidth = doc.internal.pageSize.getWidth();
                 const pageHeight = doc.internal.pageSize.getHeight();
@@ -1314,26 +1587,42 @@
 
             // Datos del empleado
             doc.setFontSize(10.5);
-            doc.text(`Nombre del Empleado: ${emp.nombre}`, 25, 66);
-            doc.text(`Puesto: ${emp.puesto}`, 25, 72);
+            doc.text(`Nombre del Empleado: ${formatNombreOracion(emp.nombre)}`, 25, 66);
+            const puestoStr = emp.puesto || '';
+            const excepciones = ['de', 'del', 'y', 'en', 'el', 'la', 'los', 'las', 'a', 'con', 'por', 'para'];
+            const puestoOracion = puestoStr.toLowerCase().split(' ').map((word, i) => {
+                if (i > 0 && excepciones.includes(word)) return word;
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                if (isRoman) return word.toUpperCase();
+                return word ? word.charAt(0).toUpperCase() + word.slice(1) : '';
+            }).join(' ');
+            doc.text(`Puesto: ${puestoOracion}`, 25, 72);
+
+            let currentY = 78;
             if (emp.numeroPuesto && emp.numeroPuesto !== "N/D") {
-                doc.text(`N° de Puesto: ${emp.numeroPuesto}`, 25, 78);
-                doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, 84);
-            } else {
-                doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, 78);
+                doc.text(`N° de Puesto: ${emp.numeroPuesto}`, 25, currentY);
+                currentY += 6;
             }
+            if (document.getElementById('showFechaIngreso').checked) {
+                doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, currentY);
+                currentY += 6;
+            }
+            if (document.getElementById('showPeriodoContratacion') && document.getElementById('showPeriodoContratacion').checked) {
+                doc.text(`Periodo de Contratación: ${emp.periodoContratacion}`, 25, currentY);
+                currentY += 6;
+            }
+
+            let startVoucherY = Math.max(91, currentY + 5);
 
             // Mes del Voucher
             const mesSeleccionado = document.getElementById('mesVoucher').value || "marzo 2026";
             doc.setFontSize(11);
-            doc.text(`Voucher de Pago Correspondiente al Mes de ${mesSeleccionado}`, 105, 91, { align: "center" });
+            doc.text(`Voucher de Pago Correspondiente al Mes de ${mesSeleccionado}`, 105, startVoucherY, { align: "center" });
 
             // Checkboxes Acuerdo/Contrato
             doc.setFontSize(10);
-            const checkAcuerdo = emp.tipo === 'Acuerdo' ? '(X)' : '( )';
-            const checkContrato = emp.tipo === 'Contrato' ? '(X)' : '( )';
-            doc.text(`Acuerdo ${checkAcuerdo}`, 55, 97);
-            doc.text(`Contrato ${checkContrato}`, 125, 97);
+            doc.text(`Acuerdo ( )`, 55, startVoucherY + 6);
+            doc.text(`Contrato (X)`, 125, startVoucherY + 6);
 
             // Tabla de Pagos y Deducciones (Dibujada manualmente para coincidir exactamente con el diseño provisto)
             const tableLeft = 25;
@@ -1342,7 +1631,7 @@
             const labelX = 28;
             const valueX = 182; // Alineado a la derecha
             const rowHeight = 6.5;
-            let y = 103;
+            let y = startVoucherY + 12;
 
             const tableRows = [];
             tableRows.push({ type: 'normal', label: 'Sueldo Asignado', val: emp.sueldoAsignado });
@@ -1350,7 +1639,11 @@
             tableRows.push({ type: 'header', label: 'Deducciones', val: null });
 
             emp.deducciones.forEach(d => {
-                tableRows.push({ type: 'normal', label: d.nombre, val: d.monto });
+                let labelText = d.nombre;
+                if (labelText.toLowerCase().includes("partido")) {
+                    labelText = "Otras Deducciones";
+                }
+                tableRows.push({ type: 'normal', label: labelText, val: d.monto });
             });
 
             tableRows.push({ type: 'total_deduc', label: 'Total Deducciones', val: emp.totalDeducciones });
@@ -1374,27 +1667,46 @@
                     doc.setFont('helvetica', 'bold');
                     doc.text("Total a Pagar", middleX - 3, y + 4.5, { align: 'right' });
                     doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
+                } else if (row.label === 'Sueldo Asignado' || row.label === 'Sueldo Devengado') {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(row.label, labelX, y + 4.5);
+                    doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
                 } else {
                     doc.setFont('helvetica', 'normal');
+                    const maxTextWidth = middleX - labelX - 2;
+                    let currentFontSize = 10;
+                    doc.setFontSize(currentFontSize);
+                    while (doc.getTextWidth(row.label) > maxTextWidth && currentFontSize > 7) {
+                        currentFontSize -= 0.5;
+                        doc.setFontSize(currentFontSize);
+                    }
                     doc.text(row.label, labelX, y + 4.5);
+                    doc.setFontSize(10);
                     doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
                 }
                 y += rowHeight;
             });
 
             // Pie de Firma
-            y += 12;
+            y += 30;
             doc.setFont('helvetica', 'bold');
-            const fechaEmisionStr = document.getElementById('fechaEmision').value || "";
-            if (fechaEmisionStr) {
-                doc.setFontSize(9.5);
-                doc.setFont('helvetica', 'normal');
-                doc.text(`Fecha de emisión: Tegucigalpa M.D.C., ${fechaEmisionStr}`, tableLeft, y);
-                y += 12;
-            }
             doc.setFontSize(10.5);
             doc.setFont('helvetica', 'bold');
-            doc.text("Firma Autorizada: ___________________________", tableLeft, y);
+
+            const firmante = document.getElementById('cfgFirmante').value.trim();
+            const cargoF = document.getElementById('cfgCargoFirmante').value.trim();
+
+            if (firmante) {
+                doc.line(tableLeft, y - 5, tableLeft + 70, y - 5);
+                doc.text(firmante, tableLeft, y);
+                if (cargoF) {
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(cargoF, tableLeft, y + 4.5);
+                }
+            } else {
+                doc.text("Firma Autorizada: ___________________________", tableLeft, y);
+            }
 
             return doc;
         }
@@ -1404,7 +1716,27 @@
             if (!emp) return;
 
             const doc = await generarPDFEmpleado(emp, null, false);
+            
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
+
             doc.save(`Voucher_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Voucher (Contrato) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Vouchers (Contrato) por lote (${seleccionados.length} empleados)` : 'Se generó Voucher (Contrato)'));
+            }
+
         }
 
         async function generarPDFsSeleccionados() {
@@ -1421,9 +1753,36 @@
                 doc = await generarPDFEmpleado(seleccionados[i], doc, i > 0);
             }
 
+            
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
+
             doc.save(`Vouchers_Pago_Seleccionados.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Voucher (Contrato) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Vouchers (Contrato) por lote (${seleccionados.length} empleados)` : 'Se generó Voucher (Contrato)'));
+            }
+
         }
     </script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
 </body>
 
 </html>

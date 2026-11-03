@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Debug planilla2.xls</title>
+    <script src="../js/xlsx.full.min.js"></script>
+</head>
+<body>
+    <div id="output" style="font-family: monospace; white-space: pre;">Cargando planilla2.xls...</div>
+    <script>
+        fetch('../planilla2.xls')
+            .then(res => {
+                if (!res.ok) throw new Error("No se pudo cargar planilla2.xls");
+                return res.arrayBuffer();
+            })
+            .then(arrayBuffer => {
+                const data = new Uint8Array(arrayBuffer);
+                const workbook = XLSX.read(data, { type: 'array' });
+                let out = "HOJAS:\n" + JSON.stringify(workbook.SheetNames) + "\n\n";
+                
+                workbook.SheetNames.forEach(sheetName => {
+                    const sheet = workbook.Sheets[sheetName];
+                    const rows = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                    out += `=========================================\n`;
+                    out += `HOJA: "${sheetName}" (Total filas: ${rows.length})\n`;
+                    out += `=========================================\n`;
+                    rows.slice(0, 30).forEach((row, idx) => {
+                        const rowSlice = row.map(cell => cell !== undefined ? cell.toString().trim() : "");
+                        out += `Fila ${idx + 1}: [${rowSlice.join(" | ")}]\n`;
+                    });
+                    out += "\n\n";
+                });
+                document.getElementById('output').innerText = out;
+            })
+            .catch(err => {
+                document.getElementById('output').innerText = "Error: " + err.message;
+            });
+    </script>
+</body>
+</html>

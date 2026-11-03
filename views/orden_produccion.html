@@ -1,0 +1,1331 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Generación de Órdenes de Producción — ENAG</title>
+
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1100px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 18px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-container {
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        .btn-generate {
+            background-color: #22c55e;
+            color: white;
+            font-size: 1em;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            margin-left: auto;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-generate:hover {
+            background-color: #16a34a;
+        }
+
+        /* Form Sections */
+        .section-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .section-card h3 {
+            margin: 0 0 15px 0;
+            color: #0369a1;
+            font-size: 1.1em;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .grid-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 15px;
+        }
+
+        .grid-4 {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.85em;
+            color: #475569;
+        }
+
+        .form-group input[type="text"],
+        .form-group input[type="number"],
+        .form-group input[type="date"],
+        .form-group select {
+            padding: 10px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.95em;
+            background: white;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #002147;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .checkbox-group:hover {
+            border-color: #94a3b8;
+            background: #f1f5f9;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
+
+        .checkbox-group span {
+            font-size: 0.9em;
+            color: #333;
+            font-weight: 500;
+            flex-grow: 1;
+        }
+
+        /* Dynamic Tables */
+        .dynamic-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+
+        .dynamic-table th {
+            background-color: #002147;
+            color: white;
+            padding: 10px;
+            font-size: 0.85em;
+            text-align: left;
+        }
+
+        .dynamic-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .dynamic-table input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        .btn-add-row {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            padding: 8px 15px;
+            border-radius: 6px;
+            font-size: 0.85em;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .btn-add-row:hover {
+            background: #bae6fd;
+        }
+
+        .btn-delete-row {
+            background: #fee2e2;
+            color: #b91c1c;
+            border: 1px solid #fecaca;
+            padding: 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+    
+        /* Kanban / Dashboard Styles */
+        .dashboard-container {
+            max-width: 1100px;
+            margin: 0 auto 20px auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            border-top: 5px solid #0f172a;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 10px;
+        }
+
+        .dashboard-header h3 {
+            margin: 0;
+            color: #0f172a;
+            font-size: 1.3em;
+        }
+
+        .orders-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 15px;
+            max-height: 400px;
+            overflow-y: auto;
+            padding-right: 5px;
+        }
+
+        .order-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .order-card:hover {
+            border-color: #0ea5e9;
+            box-shadow: 0 4px 12px rgba(14, 165, 233, 0.15);
+            transform: translateY(-2px);
+        }
+
+        .order-card.active {
+            border-color: #2563eb;
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2);
+        }
+
+        .order-title {
+            font-weight: bold;
+            font-size: 1em;
+            color: #1e293b;
+            margin-bottom: 5px;
+        }
+
+        .order-meta {
+            font-size: 0.85em;
+            color: #64748b;
+            margin-bottom: 10px;
+        }
+
+        .order-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 20px;
+            font-size: 0.75em;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        
+        /* Status Colors */
+        .status-cotizada { background: #fef08a; color: #854d0e; }
+        .status-ingresada { background: #e0f2fe; color: #0369a1; }
+        .status-preprensa { background: #dbeafe; color: #1e40af; }
+        .status-impresion { background: #fce7f3; color: #be185d; }
+        .status-encuadernacion { background: #ffedd5; color: #c2410c; }
+        .status-entregada { background: #dcfce7; color: #166534; }
+
+        .tracking-panel {
+            margin-top: 20px;
+            background: #fff;
+            padding: 20px;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+        }
+        .tracking-steps {
+            display: flex;
+            justify-content: space-between;
+            position: relative;
+            margin-bottom: 20px;
+        }
+        .tracking-steps::before {
+            content: "";
+            position: absolute;
+            top: 15px;
+            left: 10%;
+            right: 10%;
+            height: 3px;
+            background: #e2e8f0;
+            z-index: 1;
+        }
+        .step {
+            position: relative;
+            z-index: 2;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            flex: 1;
+        }
+        .step-circle {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #fff;
+            border: 3px solid #cbd5e1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #cbd5e1;
+            transition: all 0.3s;
+        }
+        .step.active .step-circle {
+            border-color: #3b82f6;
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.2);
+        }
+        .step.completed .step-circle {
+            border-color: #10b981;
+            background: #10b981;
+            color: white;
+        }
+        .step-label {
+            font-size: 0.8em;
+            font-weight: 600;
+            color: #64748b;
+            text-align: center;
+        }
+        .step.active .step-label { color: #2563eb; }
+        .step.completed .step-label { color: #059669; }
+
+        .btn-advance {
+            background-color: #3b82f6;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            font-size: 1em;
+            transition: all 0.3s;
+        }
+        .btn-advance:hover { background-color: #2563eb; }
+        .btn-advance:disabled { background-color: #94a3b8; cursor: not-allowed; }
+
+    </style>
+</head>
+
+<body>
+    <div class="nav-container">
+        <button onclick="cerrarSesion()" class="btn-nav btn-nav-menu" style="background-color: #ef4444; color: white; border: none; cursor: pointer; height: 35px; line-height: 1;">🚪 Cerrar Sesión</button>
+        <button onclick="generarPDF()" class="btn-generate">
+            <svg width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+                <path
+                    d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
+                <path
+                    d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.102.198-.307.526-.568.897-.787a7.68 7.68 0 0 1 1.482-.645 19.697 19.697 0 0 0 1.062-2.227 7.269 7.269 0 0 1-.43-1.295c-.086-.4-.119-.796-.046-1.136.075-.354.274-.672.65-.823.192-.077.4-.12.602-.077a.7.7 0 0 1 .477.365c.088.164.12.356.127.538.007.188-.012.396-.047.614-.084.51-.27 1.134-.52 1.794a10.954 10.954 0 0 0 .98 1.686 5.753 5.753 0 0 1 1.334.05c.364.066.734.195.96.465.12.144.193.32.2.518.007.192-.047.382-.138.563a1.04 1.04 0 0 1-.354.416.856.856 0 0 1-.51.138c-.331-.014-.654-.196-.933-.417a5.712 5.712 0 0 1-.911-.95 11.651 11.651 0 0 0-1.997.406 11.307 11.307 0 0 1-1.02 1.51c-.292.35-.609.656-.927.787a.793.793 0 0 1-.58.029zm1.379-1.901c-.166.076-.32.156-.459.238-.328.194-.541.383-.647.547-.094.145-.096.25-.04.361.01.022.02.036.026.044a.266.266 0 0 0 .035-.012c.137-.056.355-.235.635-.572a8.18 8.18 0 0 0 .45-.606zm1.64-1.33a12.71 12.71 0 0 1 1.01-.193 11.744 11.744 0 0 1-.51-.858 20.801 20.801 0 0 1-.5 1.05zm2.446.45c.15.163.296.3.435.41.24.19.407.253.498.256a.107.107 0 0 0 .07-.015.307.307 0 0 0 .094-.125.436.436 0 0 0 .059-.2.095.095 0 0 0-.026-.063c-.052-.062-.2-.152-.518-.209a3.876 3.876 0 0 0-.612-.053zM8.078 7.8a6.7 6.7 0 0 0 .2-.828c.031-.188.043-.343.038-.465a.613.613 0 0 0-.032-.198.517.517 0 0 0-.145.04c-.087.035-.158.106-.196.283-.04.192-.03.469.046.822.024.111.054.227.09.346z" />
+            </svg>
+            Generar PDF de Orden
+        </button>
+    </div>
+
+    
+    <div class="dashboard-container">
+        <div class="dashboard-header">
+            <h3>📋 Órdenes Pendientes (Aprobadas por Cliente)</h3>
+            <button class="btn-generate" onclick="cargarOrdenes()" style="margin-left:0; background-color:#64748b; padding:8px 15px; font-size:0.85em;">🔄 Actualizar</button>
+        </div>
+        <div class="orders-grid" id="ordersGrid">
+            <div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">Cargando órdenes desde el sistema...</div>
+        </div>
+
+        <div class="tracking-panel" id="trackingPanel" style="display: none;">
+            <h4 style="margin-top:0; color:#0f172a; border-bottom:1px solid #eee; padding-bottom:10px;">Gestión de Estado (Tracking)</h4>
+            <div class="tracking-steps" id="trackingSteps">
+                <div class="step" data-phase="Ingresada">
+                    <div class="step-circle">1</div>
+                    <div class="step-label">Ingresada</div>
+                </div>
+                <div class="step" data-phase="Pre-Prensa">
+                    <div class="step-circle">2</div>
+                    <div class="step-label">Pre-Prensa</div>
+                </div>
+                <div class="step" data-phase="Impresión">
+                    <div class="step-circle">3</div>
+                    <div class="step-label">Impresión</div>
+                </div>
+                <div class="step" data-phase="Encuadernación">
+                    <div class="step-circle">4</div>
+                    <div class="step-label">Encuadernación</div>
+                </div>
+                <div class="step" data-phase="Entregada">
+                    <div class="step-circle">✓</div>
+                    <div class="step-label">Entregada</div>
+                </div>
+            </div>
+            <button id="btnAdvancePhase" class="btn-advance" onclick="avanzarFase()">Avanzar al siguiente departamento</button>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="form-header">
+            <h2>🏭 Creación de Orden de Producción</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Completa los datos para generar el documento PDF oficial de la
+                orden de producción.</p>
+        </div>
+
+        <div class="section-card">
+            <h3>Información General y Fechas</h3>
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>No. de Orden</label>
+                    <input type="text" id="noOrden" placeholder="Ej. 13993" style="font-weight: bold; color: #b91c1c;">
+                </div>
+                <div class="form-group">
+                    <label>Fecha de Ingreso COT. (DD/MM/YYYY)</label>
+                    <input type="text" id="fechaIngreso" placeholder="DD/MM/YYYY" maxlength="10">
+                </div>
+                <div class="form-group">
+                    <label>Producción (Fecha DD/MM/YYYY)</label>
+                    <input type="text" id="fechaProduccion" placeholder="DD/MM/YYYY" maxlength="10">
+                </div>
+            </div>
+
+            <div class="grid-3" style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Entrega (Fecha DD/MM/YYYY)</label>
+                    <input type="text" id="fechaEntrega" placeholder="DD/MM/YYYY" maxlength="10">
+                </div>
+                <div class="form-group">
+                    <label>Máquina</label>
+                    <input type="text" id="maquina" placeholder="Ej. CD-102 / GTO">
+                </div>
+                <div class="form-group">
+                    <!-- Espacio vacio para mantener el grid -->
+                </div>
+            </div>
+
+            <div style="margin-top: 15px;">
+                <div class="form-group">
+                    <label>Cliente</label>
+                    <input type="text" id="cliente" placeholder="Nombre del cliente">
+                </div>
+            </div>
+        </div>
+
+        <div class="section-card">
+            <h3>Detalle del Trabajo</h3>
+            <table class="dynamic-table" id="tablaTrabajo">
+                <thead>
+                    <tr>
+                        <th style="width:10%">Cantidad</th>
+                        <th style="width:40%">Descripción / Trabajo</th>
+                        <th style="width:15%">Tamaño</th>
+                        <th style="width:12%">No. Copias</th>
+                        <th style="width:10%">Juegos</th>
+                        <th style="width:10%">Color</th>
+                        <th style="width:3%"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyTrabajo">
+                    <!-- Filas dinámicas -->
+                </tbody>
+            </table>
+            <button class="btn-add-row" onclick="agregarFilaTrabajo()">+ Añadir Fila de Trabajo</button>
+        </div>
+
+        <div class="section-card">
+            <h3>Materiales a Utilizar</h3>
+            <table class="dynamic-table" id="tablaMateriales">
+                <thead>
+                    <tr>
+                        <th style="width:10%">Cantidad</th>
+                        <th style="width:40%">Materiales a Utilizar</th>
+                        <th style="width:15%">Tamaño</th>
+                        <th style="width:15%">N.C. Material</th>
+                        <th style="width:17%">Pendiente Entrega</th>
+                        <th style="width:3%"></th>
+                    </tr>
+                </thead>
+                <tbody id="tbodyMateriales">
+                    <!-- Filas dinámicas -->
+                </tbody>
+            </table>
+            <button class="btn-add-row" onclick="agregarFilaMaterial()">+ Añadir Fila de Material</button>
+        </div>
+
+        <div class="section-card">
+            <h3>Especificaciones Técnicas (Opcionales)</h3>
+
+            <!-- Offset / CTP -->
+            <div class="section-card" style="margin: 0; background: white;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Offset / CTP</h4>
+                <div class="grid-2">
+                    <label class="checkbox-group"><input type="checkbox" id="off_bn"> <span>1. Impresión
+                            B/N</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_fc"> <span>2. Full
+                            Color</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_pantone"> <span>3.
+                            PANTONE</span></label>
+                </div>
+                <h5 style="margin: 10px 0 5px 0; color: #555;">Máquina:</h5>
+                <div class="grid-2">
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_cd102">
+                        <span>CD-102</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_gto"> <span>GTO</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_kord"> <span>KORD</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="off_m_sord"> <span>SORD</span></label>
+                </div>
+            </div>
+        </div>
+
+
+
+        <div class="grid-3" style="margin-top: 15px;">
+            <!-- Tipografia -->
+            <div class="section-card" style="margin: 0; background: white;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Tipografía / Prensas</h4>
+                <div class="form-group">
+                    <label>1. Numerado</label>
+                    <div style="display: flex; gap: 8px; margin-bottom: 8px;">
+                        <input type="text" id="tipo_numerado_del" placeholder="Del: Ej. 0001">
+                        <input type="text" id="tipo_numerado_al" placeholder="Al: Ej. 1000">
+                    </div>
+                    <input type="text" id="tipo_color_num" placeholder="2. Color del Nº">
+                </div>
+                <div style="display:flex; flex-direction:column; gap:8px; margin-top:8px;">
+                    <label class="checkbox-group"><input type="checkbox" id="tipo_perf_lat"> <span>3. Perf.
+                            lateral</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="tipo_perf_arr"> <span>4. Perf.
+                            arriba</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="tipo_troquelado"> <span>5.
+                            Troquelado</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="tipo_sisado"> <span>6.
+                            Sisado</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="tipo_embosado"> <span>7.
+                            Embosado</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="tipo_estampado"> <span>8.
+                            Estampado</span></label>
+                </div>
+            </div>
+
+            <!-- Encuadernacion -->
+            <div class="section-card" style="margin: 0; background: white;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Encuadernación</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <label class="checkbox-group"><input type="checkbox" id="enc_peg_arr"> <span>1. Pegado
+                            arriba</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="enc_peg_lat"> <span>2. Pegado lateral
+                            izq.</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="enc_eng_arr"> <span>3. Engrapado
+                            arriba</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="enc_eng_lat"> <span>4. Engrapado
+                            lateral</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="enc_comp"> <span>5.
+                            Compaginar</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="enc_solo_orig"> <span>6. Sólo
+                            original</span></label>
+                </div>
+                <div class="form-group" style="margin-top:8px;">
+                    <input type="text" id="enc_copias" placeholder="7. Copias">
+                </div>
+            </div>
+
+            <!-- Empaste Fino -->
+            <div class="section-card" style="margin: 0; background: white;">
+                <h4 style="margin: 0 0 10px 0; color: #333;">Empaste Fino</h4>
+                <div style="display:flex; flex-direction:column; gap:8px;">
+                    <label class="checkbox-group"><input type="checkbox" id="emp_enc"> <span>1.
+                            Encuadernado</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="emp_empast"> <span>2.
+                            Empastado</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="emp_empast_est"> <span>3. Empaste con
+                            estam.</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="emp_engrap"> <span>4.
+                            Engrapado</span></label>
+                    <label class="checkbox-group"><input type="checkbox" id="emp_costur"> <span>5.
+                            Costurado</span></label>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section-card">
+        <h3>Observaciones</h3>
+        <div class="form-group">
+            <input type="text" id="observaciones" placeholder="Escriba aquí las observaciones finales..."
+                style="padding: 15px;">
+        </div>
+    </div>
+
+    </div>
+
+    <script>
+        // Init rows
+        
+        let ordenesGlobal = [];
+        let ordenSeleccionadaId = null;
+
+        const fases = ['Ingresada', 'Pre-Prensa', 'Impresión', 'Encuadernación', 'Entregada'];
+
+        async function cargarOrdenes() {
+            if (typeof dbFirestore === 'undefined') return;
+            const grid = document.getElementById('ordersGrid');
+            grid.innerHTML = '<div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">Cargando...</div>';
+            
+            try {
+                // Obtener cotizaciones aprobadas
+                const snapshot = await dbFirestore.collection('cotizaciones').where('estado', '==', 'Aprobada').get();
+                ordenesGlobal = [];
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    if(!data.faseProduccion) data.faseProduccion = 'Ingresada'; // Default
+                    ordenesGlobal.push({ id: doc.id, ...data });
+                });
+
+                // Ordenar por numero
+                ordenesGlobal.sort((a,b) => b.numero - a.numero);
+
+                dibujarGrid();
+            } catch (e) {
+                console.error("Error al cargar ordenes", e);
+                
+                try {
+                    const localData = localStorage.getItem('enag_cotizaciones');
+                    if (localData) {
+                        const localCotizaciones = JSON.parse(localData);
+                        ordenesGlobal = localCotizaciones.filter(c => c.estado === 'Aprobada');
+                        ordenesGlobal.forEach(c => {
+                            if (!c.faseProduccion) c.faseProduccion = 'Ingresada';
+                            c.id = String(c.numero);
+                        });
+                        dibujarGrid();
+                        return;
+                    } else {
+                        grid.innerHTML = '<div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">No hay órdenes pendientes. (Consejo: Asegúrate de guardar la cotización y cambiar su estado a "Aprobada" en el historial de cotizaciones).</div>';
+                        return;
+                    }
+                } catch(err){
+                    console.error("Error fallback local", err);
+                }
+
+                grid.innerHTML = '<div style="color: #ef4444; padding: 20px; text-align: center; grid-column: 1 / -1;">Error de conexión. Intente iniciar sesión.</div>';
+            }
+        }
+
+        function dibujarGrid() {
+            const grid = document.getElementById('ordersGrid');
+            grid.innerHTML = '';
+            
+            if(ordenesGlobal.length === 0) {
+                grid.innerHTML = '<div style="color: #64748b; padding: 20px; text-align: center; grid-column: 1 / -1;">No hay órdenes aprobadas pendientes.</div>';
+                return;
+            }
+
+            ordenesGlobal.forEach(orden => {
+                const card = document.createElement('div');
+                card.className = `order-card ${ordenSeleccionadaId === orden.id ? 'active' : ''}`;
+                card.onclick = () => seleccionarOrden(orden.id);
+                
+                const claseEstado = 'status-' + orden.faseProduccion.toLowerCase().replace(/[^a-z0-9]/g, '');
+
+                card.innerHTML = `
+                    <div class="order-title">Orden #${orden.numero}</div>
+                    <div class="order-meta">${orden.cliente?.nombre || 'Sin cliente'}</div>
+                    <div class="order-status ${claseEstado}">${orden.faseProduccion}</div>
+                `;
+                grid.appendChild(card);
+            });
+        }
+
+        function seleccionarOrden(id) {
+            ordenSeleccionadaId = id;
+            dibujarGrid(); // Update active class
+            
+            const orden = ordenesGlobal.find(o => o.id === id);
+            if(!orden) return;
+
+            // Fill form
+            document.getElementById('noOrden').value = orden.numero || '';
+            document.getElementById('cliente').value = orden.cliente?.nombre || '';
+            
+            if(orden.fecha) {
+                const d = new Date(orden.fecha);
+                const dia = String(d.getDate()).padStart(2, '0');
+                const mes = String(d.getMonth() + 1).padStart(2, '0');
+                const anio = d.getFullYear();
+                document.getElementById('fechaIngreso').value = `${dia}/${mes}/${anio}`;
+            }
+
+            // Fill table (Trabajo)
+            const tbodyTrabajo = document.getElementById('tbodyTrabajo');
+            tbodyTrabajo.innerHTML = '';
+            if(orden.items && orden.items.length > 0) {
+                orden.items.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td><input type="text" class="t_cant" value="${item.cantidad || ''}"></td>
+                        <td><input type="text" class="t_desc" value="${item.producto || ''} ${item.detalle ? '- ' + item.detalle : ''}"></td>
+                        <td><input type="text" class="t_tam"></td>
+                        <td><input type="text" class="t_copias"></td>
+                        <td><input type="text" class="t_juegos"></td>
+                        <td><input type="text" class="t_color"></td>
+                        <td><button type="button" class="btn-delete-row" onclick="this.closest('tr').remove()">X</button></td>
+                    `;
+                    tbodyTrabajo.appendChild(tr);
+                });
+            } else {
+                agregarFilaTrabajo();
+            }
+
+            // Show tracking
+            actualizarTrackingUI(orden.faseProduccion);
+        }
+
+        function actualizarTrackingUI(faseActual) {
+            document.getElementById('trackingPanel').style.display = 'block';
+            
+            let idxActual = fases.indexOf(faseActual);
+            if(idxActual === -1) idxActual = 0;
+
+            const steps = document.querySelectorAll('.tracking-steps .step');
+            steps.forEach((step, index) => {
+                step.classList.remove('active', 'completed');
+                if (index < idxActual) {
+                    step.classList.add('completed');
+                } else if (index === idxActual) {
+                    step.classList.add('active');
+                }
+            });
+
+            const btn = document.getElementById('btnAdvancePhase');
+            if (idxActual >= fases.length - 1) {
+                btn.disabled = true;
+                btn.innerText = "Orden completada y entregada";
+            } else {
+                btn.disabled = false;
+                btn.innerText = "Marcar salida e ingresar a " + fases[idxActual + 1];
+            }
+        }
+
+        async function avanzarFase() {
+            if(!ordenSeleccionadaId) return;
+            const orden = ordenesGlobal.find(o => o.id === ordenSeleccionadaId);
+            let idxActual = fases.indexOf(orden.faseProduccion);
+            if(idxActual === -1) idxActual = 0;
+
+            if(idxActual >= fases.length - 1) return; // Ya terminó
+
+            const nuevaFase = fases[idxActual + 1];
+            
+            try {
+                // Update Firestore
+                await dbFirestore.collection('cotizaciones').doc(ordenSeleccionadaId).update({
+                    faseProduccion: nuevaFase,
+                    ultimaActualizacion: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                // Registrar en Bitacora
+                if (window.registrarBitacora) {
+                    let msj = `La Orden #${orden.numero} avanzó a "${nuevaFase}"`;
+                    await window.registrarBitacora('Producción', 'Cambio de Estado', msj);
+                }
+
+                // Update Local
+                orden.faseProduccion = nuevaFase;
+                actualizarTrackingUI(nuevaFase);
+                dibujarGrid();
+                alert(`✅ La orden ha avanzado exitosamente al departamento: ${nuevaFase}`);
+
+            } catch(e) {
+                console.error("Error al avanzar fase", e);
+                alert("Hubo un error al guardar el cambio. Revisa tu conexión.");
+            }
+        }
+
+        // Init load
+        document.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                if(typeof dbFirestore !== 'undefined') {
+                    cargarOrdenes();
+                } else {
+                    // Try waiting a bit more for firebase to load
+                    setTimeout(cargarOrdenes, 1500);
+                }
+            }, 500);
+        });
+
+        window.onload = function () {
+            agregarFilaTrabajo();
+            agregarFilaTrabajo();
+            agregarFilaMaterial();
+            agregarFilaMaterial();
+        }
+
+        function agregarFilaTrabajo() {
+            const tbody = document.getElementById('tbodyTrabajo');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="t_cant"></td>
+                <td><input type="text" class="t_desc"></td>
+                <td><input type="text" class="t_tam"></td>
+                <td><input type="text" class="t_copias"></td>
+                <td><input type="text" class="t_juegos"></td>
+                <td><input type="text" class="t_color"></td>
+                <td><button type="button" class="btn-delete-row" onclick="this.closest('tr').remove()">X</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function agregarFilaMaterial() {
+            const tbody = document.getElementById('tbodyMateriales');
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td><input type="text" class="m_cant"></td>
+                <td><input type="text" class="m_mat"></td>
+                <td><input type="text" class="m_tam"></td>
+                <td><input type="text" class="m_nc"></td>
+                <td><input type="text" class="m_pend"></td>
+                <td><button type="button" class="btn-delete-row" onclick="this.closest('tr').remove()">X</button></td>
+            `;
+            tbody.appendChild(tr);
+        }
+
+        function formateaFechaPDF(fechaISO) {
+            if (!fechaISO) return { d: "", m: "", a: "" };
+            let partes = fechaISO.includes('/') ? fechaISO.split('/') : fechaISO.split('-');
+            let d, m, a;
+            if (partes[0] && partes[0].length === 4) {
+                a = partes[0]; m = partes[1]; d = partes[2];
+            } else {
+                d = partes[0]; m = partes[1]; a = partes[2];
+            }
+            return { d: d || "", m: m || "", a: a || "" };
+        }
+
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = 'Anonymous';
+            img.onload = () => {
+                const canvas = document.createElement('canvas');
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL('image/png'));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        async function generarPDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'legal');
+
+            let logoW = 0, logoH = 0;
+            const logoBgUrl = await getBase64FromUrl('../assets/logo.png');
+            if (logoBgUrl) {
+                const props = doc.getImageProperties(logoBgUrl);
+                logoH = 20;
+                logoW = (props.width * logoH) / props.height;
+                if (logoW > 50) {
+                    logoW = 50;
+                    logoH = (props.height * logoW) / props.width;
+                }
+                doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
+            }
+
+            // Constantes de diseño
+            const marginX = 15;
+            let currentY = 15;
+
+            // --- HEADER ---
+            // Centered below the logo
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(22);
+            doc.text("ORDEN DE PRODUCCIÓN", 107.5, 38, { align: 'center' });
+
+            // Nº de orden de producción, centrado
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            const noOrden = document.getElementById('noOrden').value || "13993";
+            const txtN = "Nº ";
+            const widthN = doc.getTextWidth(txtN);
+            const widthNum = doc.getTextWidth(noOrden);
+            const totalWidth = widthN + widthNum;
+            const startX = 107.5 - totalWidth / 2;
+
+            doc.text(txtN, startX, 44);
+            doc.setTextColor(200, 0, 0);
+            doc.text(noOrden, startX + widthN, 44);
+            doc.setTextColor(0, 0, 0);
+
+            // Caja de Máquina donde estaba el Nº (sigue a nivel del logo en y=18)
+            doc.rect(155, 18, 45, 10);
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(9);
+            doc.text("MÁQUINA:", 157, 24);
+            doc.setFont("helvetica", "normal");
+            doc.setFontSize(9);
+            const maquinaVal = document.getElementById('maquina').value || "";
+            doc.text(maquinaVal, 175, 24);
+
+            let lastPageCount = doc.internal.getNumberOfPages();
+
+            // INFORMACIÓN GENERAL Heading
+            currentY = 52;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(12);
+            doc.text("INFORMACIÓN GENERAL", marginX, currentY);
+
+            // Cliente Line (spans wider since phone inputs were removed)
+            currentY = 60;
+            doc.setFont("helvetica", "bold");
+            doc.setFontSize(10);
+            doc.text("CLIENTE:", marginX, currentY);
+            doc.setFont("helvetica", "normal");
+            const clienteVal = document.getElementById('cliente').value || "";
+            doc.text(clienteVal, 35, currentY);
+            doc.line(35, currentY + 1, 200, currentY + 1);
+
+            // Date boxes drawn horizontally below Cliente
+            const fechaIng = formateaFechaPDF(document.getElementById('fechaIngreso').value);
+            const fechaProd = formateaFechaPDF(document.getElementById('fechaProduccion').value);
+            const fechaEnt = formateaFechaPDF(document.getElementById('fechaEntrega').value);
+
+            function drawDateBox(x, y, label, d, m, a) {
+                doc.setFont("helvetica", "bold");
+                doc.setFontSize(7);
+                doc.text(label, x + 5, y - 2);
+                doc.rect(x, y, 30, 10);
+                doc.line(x + 10, y, x + 10, y + 10);
+                doc.line(x + 20, y, x + 20, y + 10);
+                doc.line(x, y + 5, x + 30, y + 5);
+
+                doc.text("DIA", x + 2, y + 4);
+                doc.text("MES", x + 12, y + 4);
+                doc.text("AÑO", x + 22, y + 4);
+
+                doc.setFont("helvetica", "normal");
+                doc.text(d || "", x + 3, y + 9);
+                doc.text(m || "", x + 13, y + 9);
+                doc.text(a || "", x + 22, y + 9);
+            }
+
+            const dateY = 71;
+            drawDateBox(15, dateY, "FECHA DE INGRESO COT.", fechaIng.d, fechaIng.m, fechaIng.a);
+            drawDateBox(92.5, dateY, "PRODUCCIÓN", fechaProd.d, fechaProd.m, fechaProd.a);
+            drawDateBox(170, dateY, "ENTREGA", fechaEnt.d, fechaEnt.m, fechaEnt.a);
+
+            // --- TABLAS ---
+            currentY = 88;
+
+            // Extract Trabajo
+            let rowTrabajo = [];
+            const trTrab = document.querySelectorAll('#tbodyTrabajo tr');
+            trTrab.forEach(tr => {
+                rowTrabajo.push([
+                    tr.querySelector('.t_cant').value,
+                    tr.querySelector('.t_desc').value,
+                    tr.querySelector('.t_tam').value,
+                    tr.querySelector('.t_copias').value,
+                    tr.querySelector('.t_juegos').value,
+                    tr.querySelector('.t_color').value
+                ]);
+            });
+
+            doc.autoTable({
+                startY: currentY,
+                head: [['CANTIDAD', 'DESCRIPCION / TRABAJO', 'TAMAÑO', 'No. COPIAS', 'JUEGOS', 'COLOR']],
+                body: rowTrabajo,
+                theme: 'grid',
+                headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
+                bodyStyles: { fontSize: 8, minCellHeight: 8, cellPadding: 2, textColor: [0, 0, 0] },
+                styles: { lineColor: [0, 0, 0], lineWidth: 0.3 },
+                margin: { top: 35, left: marginX, right: marginX },
+                willDrawPage: function (data) {
+                    const currentPage = doc.internal.getNumberOfPages();
+                    if (currentPage > lastPageCount) {
+                        if (logoBgUrl) {
+                            doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
+                        }
+                        lastPageCount = currentPage;
+                    }
+                }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 5;
+
+            // Extract Materiales
+            let rowMat = [];
+            const trMat = document.querySelectorAll('#tbodyMateriales tr');
+            trMat.forEach(tr => {
+                rowMat.push([
+                    tr.querySelector('.m_cant').value,
+                    tr.querySelector('.m_mat').value,
+                    tr.querySelector('.m_tam').value,
+                    tr.querySelector('.m_nc').value,
+                    tr.querySelector('.m_pend').value
+                ]);
+            });
+
+            doc.autoTable({
+                startY: currentY,
+                head: [['CANTIDAD', 'MATERIALES A UTILIZAR', 'TAMAÑO', 'N.C. MATERIAL', 'PENDIENTE DE ENTREGA']],
+                body: rowMat,
+                theme: 'grid',
+                headStyles: { fillColor: [0, 33, 71], halign: 'center', fontSize: 8 },
+                bodyStyles: { fontSize: 8, minCellHeight: 8, cellPadding: 2, textColor: [0, 0, 0] },
+                styles: { lineColor: [0, 0, 0], lineWidth: 0.3 },
+                margin: { top: 35, left: marginX, right: marginX },
+                willDrawPage: function (data) {
+                    const currentPage = doc.internal.getNumberOfPages();
+                    if (currentPage > lastPageCount) {
+                        if (logoBgUrl) {
+                            doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
+                        }
+                        lastPageCount = currentPage;
+                    }
+                }
+            });
+
+            currentY = doc.lastAutoTable.finalY + 5;
+
+            function checkPageBreak(requiredHeight) {
+                if (currentY + requiredHeight > doc.internal.pageSize.getHeight() - 20) {
+                    doc.addPage();
+                    lastPageCount = doc.internal.getNumberOfPages();
+                    if (logoBgUrl) {
+                        doc.addImage(logoBgUrl, 'PNG', 15, 10, logoW, logoH);
+                    }
+                    currentY = 40; // start drawing lower on new pages
+                }
+            }
+
+            // --- CAJAS DE OPCIONES ---
+            // Render checkboxes in 2 columns
+            doc.setFontSize(8);
+            const boxW = 90;
+            const boxH = 38; // Increased height to fit 7 lines in TIPOGRAFIA section
+            const gap = 5;
+
+            function drawCheckSection(title, x, y, options) {
+                doc.setDrawColor(0);
+                doc.rect(x, y, boxW, boxH);
+                doc.setFillColor(0, 33, 71);
+                doc.rect(x, y, boxW, 5, "F");
+                doc.setTextColor(255);
+                doc.setFont("helvetica", "bold");
+                doc.text(title, x + boxW / 2, y + 3.8, { align: 'center' });
+                doc.setTextColor(0);
+                doc.setFont("helvetica", "normal");
+
+                let optY = y + 8.5;
+                options.forEach(opt => {
+                    if (opt.isMachineGrid) {
+                        // Título de la subsección Máquina
+                        doc.setFont("helvetica", "bold");
+                        doc.text("Máquina:", x + 2, optY);
+                        doc.setFont("helvetica", "normal");
+                        optY += 4.5;
+
+                        // Fila 1: CD-102 y GTO
+                        doc.text("CD-102", x + 6, optY);
+                        doc.rect(x + 28, optY - 3, 4, 4);
+                        if (opt.machines[0].checked) {
+                            doc.text("X", x + 29, optY);
+                        }
+
+                        doc.text("GTO", x + 48, optY);
+                        doc.rect(x + 70, optY - 3, 4, 4);
+                        if (opt.machines[1].checked) {
+                            doc.text("X", x + 71, optY);
+                        }
+                        optY += 4.5;
+
+                        // Fila 2: KORD y SORD
+                        doc.text("KORD", x + 6, optY);
+                        doc.rect(x + 28, optY - 3, 4, 4);
+                        if (opt.machines[2].checked) {
+                            doc.text("X", x + 29, optY);
+                        }
+
+                        doc.text("SORD", x + 48, optY);
+                        doc.rect(x + 70, optY - 3, 4, 4);
+                        if (opt.machines[3].checked) {
+                            doc.text("X", x + 71, optY);
+                        }
+                        optY += 4.5;
+                    } else {
+                        doc.text(opt.label, x + 2, optY);
+                        doc.rect(x + boxW - 6, optY - 3, 4, 4);
+                        if (opt.checked) {
+                            doc.text("X", x + boxW - 5, optY);
+                        }
+                        optY += 4.5;
+                    }
+                });
+            }
+
+            checkPageBreak(boxH + gap);
+            // Row 1 of boxes
+            // Col 1: OFFSET / CTP
+            drawCheckSection("OFFSET / CTP", marginX, currentY, [
+                { label: "1- Impresión B/N", checked: document.getElementById('off_bn').checked },
+                { label: "2- Full Color", checked: document.getElementById('off_fc').checked },
+                { label: "3- PANTONE", checked: document.getElementById('off_pantone').checked },
+                {
+                    isMachineGrid: true,
+                    machines: [
+                        { checked: document.getElementById('off_m_cd102').checked },
+                        { checked: document.getElementById('off_m_gto').checked },
+                        { checked: document.getElementById('off_m_kord').checked },
+                        { checked: document.getElementById('off_m_sord').checked }
+                    ]
+                }
+            ]);
+
+            // Col 2: ENCUADERNACIÓN
+            drawCheckSection("ENCUADERNACIÓN", marginX + boxW + gap, currentY, [
+                { label: "1- Pegado arriba", checked: document.getElementById('enc_peg_arr').checked },
+                { label: "2- Pegado lateral izq", checked: document.getElementById('enc_peg_lat').checked },
+                { label: "3- Engrapado arriba", checked: document.getElementById('enc_eng_arr').checked },
+                { label: "4- Engrapado lateral", checked: document.getElementById('enc_eng_lat').checked },
+                { label: "5- Compaginar", checked: document.getElementById('enc_comp').checked },
+                { label: "6- Sólo original", checked: document.getElementById('enc_solo_orig').checked }
+            ]);
+
+            currentY += boxH + gap;
+
+            checkPageBreak(boxH + gap);
+            // Row 2 of boxes
+            // Col 1: TIPOGRAFIA / PRENSAS
+            drawCheckSection("TIPOGRAFIA / PRENSAS", marginX, currentY, [
+                {
+                    label: "1- Numerado del: " + (document.getElementById('tipo_numerado_del').value || "________") + " al: " + (document.getElementById('tipo_numerado_al').value || "________"),
+                    checked: !!(document.getElementById('tipo_numerado_del').value || document.getElementById('tipo_numerado_al').value)
+                },
+                {
+                    label: "2- Color de Nº: " + (document.getElementById('tipo_color_num').value || "_______________"),
+                    checked: !!document.getElementById('tipo_color_num').value
+                },
+                { label: "3- Perf. lateral", checked: document.getElementById('tipo_perf_lat').checked },
+                { label: "4- Perf. arriba", checked: document.getElementById('tipo_perf_arr').checked },
+                { label: "5- Troquelado", checked: document.getElementById('tipo_troquelado').checked },
+                { label: "6- Sisado", checked: document.getElementById('tipo_sisado').checked },
+                { label: "7- Embosado / Estam.", checked: (document.getElementById('tipo_embosado').checked || document.getElementById('tipo_estampado').checked) }
+            ]);
+
+            // Col 2: EMPASTE FINO
+            drawCheckSection("EMPASTE FINO", marginX + boxW + gap, currentY, [
+                { label: "1- Encuadernado", checked: document.getElementById('emp_enc').checked },
+                { label: "2- Empastado", checked: document.getElementById('emp_empast').checked },
+                { label: "3- Empaste con estam.", checked: document.getElementById('emp_empast_est').checked },
+                { label: "4- Engrapado", checked: document.getElementById('emp_engrap').checked },
+                { label: "5- Costurado", checked: document.getElementById('emp_costur').checked }
+            ]);
+
+            currentY += boxH + gap + 10;
+
+            checkPageBreak(60);
+            // Observaciones
+            doc.setFont("helvetica", "bold");
+            doc.text("OBSERVACIONES:", marginX, currentY);
+            doc.setFont("helvetica", "normal");
+            doc.text(document.getElementById('observaciones').value, marginX + 30, currentY);
+            doc.line(marginX + 30, currentY + 1, 200, currentY + 1);
+
+            // Firmas
+            currentY += 22;
+            doc.setFontSize(8);
+            doc.setFont("helvetica", "bold");
+
+            // Row 1 Signatures
+            doc.line(marginX, currentY, marginX + 45, currentY);
+            doc.text("Firma recibido Despacho PT", marginX + 22.5, currentY + 4, { align: 'center' });
+
+            doc.line(85, currentY, 130, currentY);
+            doc.text("Firma Almacén", 107.5, currentY + 4, { align: 'center' });
+
+            doc.line(155, currentY, 200, currentY);
+            doc.text("Firma Cotización", 177.5, currentY + 4, { align: 'center' });
+
+            currentY += 18;
+
+            // Row 2 Signatures (re-centered under Row 1 gaps)
+            doc.line(47.5, currentY, 97.5, currentY);
+            doc.text("Firma Control de Calidad", 72.5, currentY + 4, { align: 'center' });
+
+            doc.line(117.5, currentY, 167.5, currentY);
+            doc.text("Firma Subgerente de Producción", 142.5, currentY + 4, { align: 'center' });
+
+            // Save PDF
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFont("helvetica", "normal");
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, marginX, doc.internal.pageSize.getHeight() - 12);
+            }
+            doc.save(`Orden_Produccion_${noOrden}.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Producción', 'Generar PDF', 'Se generó un documento en el módulo Producción');
+            }
+
+        }
+    </script>
+    <script src="../js/soporte.js"></script>
+    <script src="../js/honduras-datepicker.js"></script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+
+    <script>
+        async function cerrarSesion() {
+            if (window.registrarBitacora) {
+                await window.registrarBitacora('Autenticación', 'Cerrar Sesión', 'El usuario ha cerrado su sesión desde Orden de Producción.');
+            }
+            firebase.auth().signOut().then(() => {
+                window.location.href = 'login.html';
+            });
+        }
+    </script>
+</body>
+
+</html>

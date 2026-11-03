@@ -1,0 +1,1753 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Generación de Vouchers de Pago (Acuerdo)</title>
+
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #002147;
+            min-height: 100vh;
+            color: #333;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 40%;
+            filter: blur(10px) opacity(0.15);
+            z-index: -1;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: auto;
+            background: rgba(255, 255, 255, 0.98);
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+            border-top: 8px solid #002147;
+            animation: fadeIn 0.8s ease-out;
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        h2 {
+            color: #002147;
+            margin: 0;
+            font-size: 1.6em;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .nav-container {
+            max-width: 1000px;
+            margin: 0 auto 20px auto;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .btn-nav {
+            text-decoration: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.9em;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+        }
+
+        .btn-nav-menu {
+            background-color: #6c757d;
+            color: white;
+        }
+
+        .btn-nav-menu:hover {
+            background-color: #5a6268;
+            transform: translateY(-1px);
+        }
+
+        /* Config panel */
+        .config-panel {
+            background: #f0f4f8;
+            border: 1px solid #d1dce8;
+            border-radius: 12px;
+            padding: 20px 24px;
+            margin-bottom: 25px;
+        }
+
+        .config-panel h3 {
+            margin: 0 0 16px 0;
+            color: #002147;
+            font-size: 1em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .config-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 14px;
+        }
+
+        .config-field label {
+            display: block;
+            font-weight: 600;
+            font-size: 0.87em;
+            color: #002147;
+            margin-bottom: 5px;
+        }
+
+        .config-field input,
+        .config-field select {
+            width: 100%;
+            padding: 9px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.93em;
+            box-sizing: border-box;
+            background: white;
+            color: #333;
+            transition: border-color 0.2s;
+        }
+
+        .config-field input:focus,
+        .config-field select:focus {
+            outline: none;
+            border-color: #002147;
+        }
+
+        /* Drag & Drop Area */
+        .upload-container {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .drop-zone {
+            flex: 2;
+            min-width: 300px;
+            border: 3px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: #f8fafc;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .drop-zone.dragover {
+            border-color: #002147;
+            background-color: #f0f4f8;
+        }
+
+        .drop-zone svg {
+            width: 48px;
+            height: 48px;
+            fill: #64748b;
+        }
+
+        .drop-zone p {
+            margin: 0;
+            font-size: 1.1em;
+            color: #475569;
+            font-weight: 500;
+        }
+
+        .drop-zone span {
+            font-size: 0.9em;
+            color: #94a3b8;
+        }
+
+        .actions-sidebar {
+            flex: 1;
+            min-width: 250px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 20px;
+            cursor: pointer;
+            border: none;
+            border-radius: 6px;
+            font-weight: bold;
+            font-size: 0.95em;
+            transition: all 0.3s;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn-template {
+            background-color: #0284c7;
+            color: white;
+        }
+
+        .btn-template:hover {
+            background-color: #0369a1;
+        }
+
+        .btn-generate {
+            background-color: #22c55e;
+            color: white;
+            font-size: 1.05em;
+        }
+
+        .btn-generate:hover {
+            background-color: #16a34a;
+        }
+
+        .btn-generate:disabled {
+            background-color: #cbd5e1;
+            cursor: not-allowed;
+            color: #64748b;
+        }
+
+        .btn-clear {
+            background-color: #ef4444;
+            color: white;
+        }
+
+        .btn-clear:hover {
+            background-color: #dc2626;
+        }
+
+        /* Filter & Search */
+        .filter-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+            gap: 15px;
+        }
+
+        .search-input {
+            padding: 10px 15px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            width: 100%;
+            max-width: 350px;
+            font-size: 0.95em;
+            box-sizing: border-box;
+        }
+
+        /* Table */
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            background: white;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            margin-top: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th,
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95em;
+        }
+
+        th {
+            background-color: #f8fafc;
+            color: #475569;
+            font-weight: 600;
+        }
+
+        tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .checkbox-cell {
+            text-align: center;
+            width: 40px;
+        }
+
+        .checkbox-cell input {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.8em;
+            font-weight: bold;
+        }
+
+        .badge-acuerdo {
+            background-color: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .badge-contrato {
+            background-color: #fef3c7;
+            color: #d97706;
+        }
+
+        .btn-action-small {
+            padding: 6px 10px;
+            font-size: 0.85em;
+            background-color: #f1f5f9;
+            color: #475569;
+            border: 1px solid #e2e8f0;
+            box-shadow: none;
+        }
+
+        .btn-action-small:hover {
+            background-color: #002147;
+            color: white;
+            border-color: #002147;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+            color: #94a3b8;
+        }
+
+        .empty-state svg {
+            width: 64px;
+            height: 64px;
+            margin-bottom: 10px;
+            fill: #cbd5e1;
+        }
+
+        .summary-info {
+            font-size: 0.95em;
+            font-weight: bold;
+            color: #475569;
+        }
+    </style>
+    <!-- Import libraries -->
+    <script src="../js/xlsx.full.min.js"></script>
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
+</head>
+
+<body>
+    <div class="nav-container">
+        <a href="../index.html" class="btn-nav btn-nav-menu">← Ir al Menú</a>
+        <a href="reporte_planilla.html" class="btn-nav" style="background-color: #0284c7; color: white;">📊 Reporte Resumen</a>
+    </div>
+
+    <div class="container">
+
+        <div class="form-header">
+            <h2>Generador de Vouchers de Pago</h2>
+            <p style="margin: 5px 0 0 0; color: #64748b;">Carga la planilla de salarios desde un archivo de Excel para
+                procesar e imprimir los comprobantes.</p>
+        </div>
+
+        <!-- Selector de Hoja de Excel (oculto por defecto) -->
+        <div id="sheetSelectorContainer"
+            style="display: none; margin-bottom: 25px; background: #fffbeb; padding: 20px; border-radius: 12px; border: 1px solid #fef3c7;">
+            <label
+                style="font-weight: bold; color: #b45309; margin-bottom: 6px; display: block; font-size: 0.95em;">Este
+                archivo contiene múltiples hojas. Selecciona la hoja con los datos:</label>
+            <select id="sheetSelect" onchange="cambiarHoja()"
+                style="padding: 10px; border: 1px solid #cbd5e1; border-radius: 6px; width: 100%; max-width: 450px; font-size: 1em; box-sizing: border-box; background: white; font-weight: bold; color: #333;">
+            </select>
+        </div>
+
+        <!-- Configuración del documento -->
+        <div class="config-panel">
+            <h3>⚙️ Configuración del Documento</h3>
+            <div class="config-grid">
+                <div class="config-field">
+                    <label>Mes Correspondiente</label>
+                    <input type="text" id="mesVoucher" placeholder="ej. marzo 2026" value="">
+                </div>
+
+                <div class="config-field">
+                    <label>Nombre del/la firmante</label>
+                    <input type="text" id="cfgFirmante" value="María José Valverde Bardales"
+                        placeholder="ej. María José Valverde Bardales">
+                </div>
+                <div class="config-field">
+                    <label>Cargo del/la firmante</label>
+                    <input type="text" id="cfgCargoFirmante" value="Jefe Interina de Recursos Humanos"
+                        placeholder="ej. Jefe Interina de Recursos Humanos">
+                </div>
+                <div class="config-field"
+                    style="grid-column: span 2; display: flex; align-items: center; margin-top: 10px;">
+                    <label
+                        style="display: flex; align-items: center; gap: 8px; font-weight: bold; cursor: pointer; color: #002147;">
+                        <input type="checkbox" id="showFechaIngreso"
+                            style="width: 18px; height: 18px; cursor: pointer;">
+                        Mostrar Fecha de Ingreso en PDF
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <div class="upload-container">
+            <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
+                <svg viewBox="0 0 24 24">
+                    <path
+                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                </svg>
+                <p>Arrastra tu archivo Excel aquí o haz clic para buscar</p>
+                <span>Soporta archivos .xlsx, .xls y .csv</span>
+                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;"
+                    onchange="handleFileSelect(event)">
+            </div>
+
+            <div class="actions-sidebar">
+                <button type="button" class="btn-template" onclick="descargarPlantilla()">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z" />
+                        <path
+                            d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z" />
+                    </svg>
+                    Descargar Plantilla Excel
+                </button>
+                <button type="button" class="btn-generate" id="btnGenerateBulk" onclick="generarPDFsSeleccionados()"
+                    disabled>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z" />
+                        <path
+                            d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z" />
+                    </svg>
+                    Generar PDFs Seleccionados (<span id="selectedCount">0</span>)
+                </button>
+                <button type="button" class="btn-generate" id="btnResumenPlanilla" onclick="abrirResumenPlanilla()"
+                    disabled style="background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);">
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path d="M11 2a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v12h.5a.5.5 0 0 1 0 1H.5a.5.5 0 0 1 0-1H1v-3a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v3h1V7a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1v7h1V2zm1 12h2V2h-2v12zm-5 0h2V7H7v7zm-5 0h2v-3H2v3z"/>
+                    </svg>
+                    Reporte Resumen
+                </button>
+                <button type="button" class="btn-clear" id="btnClearList" onclick="limpiarLista()" disabled>
+                    <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
+                        <path
+                            d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                        <path fill-rule="evenodd"
+                            d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.05 4H4.118zM2.5 3V2h11v1h-11z" />
+                    </svg>
+                    Limpiar Datos cargados
+                </button>
+            </div>
+        </div>
+
+        <div id="dataSection" style="display: none;">
+            <div class="filter-container">
+                <input type="text" id="searchInput" class="search-input" placeholder="Buscar empleado o cargo..."
+                    oninput="filtrarTabla()">
+                <div class="summary-info">
+                    Total Importados: <span id="totalImportados">0</span>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table id="planillaTable">
+                    <thead>
+                        <tr>
+                            <th class="checkbox-cell"><input type="checkbox" id="selectAll"
+                                    onchange="toggleSelectAll(this)"></th>
+                            <th>Nombre del Empleado</th>
+                            <th>Cargo</th>
+                            <th style="text-align: center;">N° Puesto</th>
+                            <th style="text-align: right;">Sueldo Devengado</th>
+                            <th style="text-align: right;">Deducciones</th>
+                            <th style="text-align: right;">Neto a Pagar</th>
+                            <th style="text-align: center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="planillaBody">
+                        <!-- Cargar dinámicamente -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="empty-state" id="emptyState">
+            <svg viewBox="0 0 24 24">
+                <path
+                    d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+            </svg>
+            <p>Aún no has cargado ningún archivo Excel</p>
+            <span>Usa el botón "Descargar Plantilla Excel" para ver el formato requerido.</span>
+        </div>
+    </div>
+
+    <script>
+        let empleados = [];
+        const dropZone = document.getElementById('drop-zone');
+
+        // Inicializar mes y fecha e intentar cargar planilla.xls
+        window.addEventListener('DOMContentLoaded', () => {
+            const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio", "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+            const fechaActual = new Date();
+            const mesActual = meses[fechaActual.getMonth()] + " " + fechaActual.getFullYear();
+            document.getElementById('mesVoucher').value = mesActual;
+
+            // Fecha de hoy formateada de forma natural en español
+            const dia = fechaActual.getDate();
+            const mesLetras = meses[fechaActual.getMonth()];
+            const anio = fechaActual.getFullYear();
+
+            // Auto-cargar planilla2.xls (o planilla.xls) si existe en el servidor
+            fetch('../templates/planilla2.xls')
+                .then(res => {
+                    if (res.ok) return res.arrayBuffer();
+                    return fetch('../templates/planilla.xls').then(res2 => {
+                        if (res2.ok) return res2.arrayBuffer();
+                        throw new Error("No default spreadsheet found");
+                    });
+                })
+                .then(arrayBuffer => {
+                    const data = new Uint8Array(arrayBuffer);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+                    construirMapaEmpleados(currentWorkbook);
+
+                    const sheetSelect = document.getElementById('sheetSelect');
+                    sheetSelect.innerHTML = '';
+                    currentWorkbook.SheetNames.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.innerText = name;
+                        sheetSelect.appendChild(opt);
+                    });
+
+                    if (currentWorkbook.SheetNames.length > 1) {
+                        document.getElementById('sheetSelectorContainer').style.display = 'block';
+                    } else {
+                        document.getElementById('sheetSelectorContainer').style.display = 'none';
+                    }
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
+                })
+                .catch(err => {
+                    console.log("Auto-carga omitida o fallida:", err.message);
+                });
+        });
+
+        // Drag and drop event handlers
+        ['dragenter', 'dragover'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.add('dragover');
+            }, false);
+        });
+
+        ['dragleave', 'drop'].forEach(eventName => {
+            dropZone.addEventListener(eventName, (e) => {
+                e.preventDefault();
+                dropZone.classList.remove('dragover');
+            }, false);
+        });
+
+        dropZone.addEventListener('drop', (e) => {
+            const dt = e.dataTransfer;
+            const files = dt.files;
+            if (files.length > 0) {
+                procesarArchivo(files[0]);
+            }
+        });
+
+        function handleFileSelect(e) {
+            const files = e.target.files;
+            if (files.length > 0) {
+                procesarArchivo(files[0]);
+            }
+        }
+
+        function formatMoneda(valor) {
+            return "L. " + Number(valor).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+        }
+
+        function normalize(str) {
+            if (!str) return "";
+            return str.toString().toLowerCase()
+                .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // remover acentos
+                .replace(/[^a-z0-9]/g, ""); // conservar solo alfanuméricos
+        }
+
+        // Convierte un valor de celda Excel a string de fecha legible en español.
+        // Excel almacena fechas como números seriales (días desde 1900-01-01).
+        function parsearFechaIngreso(val) {
+            if (val === undefined || val === null || val === "") return "";
+            // Si ya es un string con letras, devolver tal cual
+            if (typeof val === 'string' && /[a-zA-Z]/.test(val)) return val.trim();
+            // Si es un objeto Date (cellDates:true)
+            if (val instanceof Date) {
+                const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                    "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                return `${val.getDate()} de ${meses[val.getMonth()]} del ${val.getFullYear()}`;
+            }
+            // Si es un número entero positivo probable serial de Excel (entre 1 y 60000)
+            const num = parseFloat(val.toString().replace(/[^0-9.]/g, ""));
+            if (!isNaN(num) && num > 100 && num < 70000) {
+                // Convertir serial Excel a Date (Excel serial empieza el 1 ene 1900)
+                const date = new Date(Math.round((num - 25569) * 86400 * 1000));
+                if (!isNaN(date.getTime())) {
+                    const meses = ["enero", "febrero", "marzo", "abril", "mayo", "junio",
+                        "julio", "agosto", "septiembre", "octubre", "noviembre", "diciembre"];
+                    return `${date.getUTCDate()} de ${meses[date.getUTCMonth()]} del ${date.getUTCFullYear()}`;
+                }
+            }
+            // Cualquier otro caso: devolver como texto
+            return val.toString().trim();
+        }
+
+        function parseCleanFloat(val) {
+            if (val === undefined || val === null || val === "") return 0;
+            if (typeof val === 'number') return val;
+            const cleaned = val.toString()
+                .replace(/L\s*/gi, "") // remover L de Lempiras
+                .replace(/[^0-9.-]/g, ""); // remover comas, espacios y otros caracteres
+            const num = parseFloat(cleaned);
+            return isNaN(num) ? 0 : num;
+        }
+
+        function esColumnaDeduccion(header) {
+            if (!header) return false;
+            const norm = normalize(header);
+            if (!norm) return false;
+
+            // 1. Columnas de totales o netos (NUNCA son deducciones individuales)
+            if (
+                ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) ||
+                norm === "total" ||
+                norm.includes("sueldoneto") ||
+                norm.includes("netoapagar") ||
+                norm === "neto" ||
+                norm === "liquido" ||
+                norm.includes("totalliquido") ||
+                norm.includes("totalapagar")
+            ) {
+                return false;
+            }
+
+            // 2. Columnas de sueldos / devengados
+            if (
+                norm.includes("sueldoasignado") ||
+                norm.includes("sueldodevengado") ||
+                norm.includes("sueldobase") ||
+                norm.includes("salariobase") ||
+                norm.includes("sueldomensual") ||
+                norm.includes("sueldobruto") ||
+                norm.includes("totaldevengado") ||
+                norm.includes("salariodevengado") ||
+                norm === "asignado" ||
+                norm === "devengado" ||
+                norm === "sueldo" ||
+                norm === "salario"
+            ) {
+                return false;
+            }
+
+            // 3. Columnas de control de días / tiempo trabajado
+            if (
+                norm === "dias" ||
+                norm === "dt" ||
+                norm.includes("diastrabajad") ||
+                norm.includes("diaslaborad") ||
+                norm.includes("diaspagad") ||
+                norm.includes("diasdevengad") ||
+                norm.includes("diastrab") ||
+                norm.includes("diaslab") ||
+                norm.includes("diasdetrabajo") ||
+                norm.includes("tiempotrabajado") ||
+                norm.includes("diasalmes") ||
+                norm.includes("diashabiles")
+            ) {
+                return false;
+            }
+
+            // 4. Columnas informativas del empleado (nombre, cargo, puesto, fecha de ingreso, etc.)
+            if (
+                norm.includes("nombre") ||
+                norm.includes("empleado") ||
+                norm.includes("colaborador") ||
+                norm === "cargo" ||
+                norm === "cargoo puesto" ||
+                norm === "puesto" ||
+                norm === "puestocargo" ||
+                norm === "numero" ||
+                norm === "num" ||
+                norm === "no" ||
+                norm.includes("numerodepuesto") ||
+                norm.includes("numpuesto") ||
+                norm.includes("nopuesto") ||
+                norm === "ingreso" ||
+                norm === "fechaingreso" ||
+                norm === "fechadeingreso" ||
+                norm === "reingreso" ||
+                norm === "fechadereingreso" ||
+                norm.includes("identidad") ||
+                norm === "dni" ||
+                norm === "rtn" ||
+                norm === "periodo" ||
+                norm.includes("periododecontratacion") ||
+                norm.includes("periodocontratacion") ||
+                norm === "tipo" ||
+                norm === "contrato" ||
+                norm === "acuerdo" ||
+                norm.includes("observacion") ||
+                norm.includes("firma")
+            ) {
+                return false;
+            }
+
+            return true;
+        }
+
+        function obtenerHojaPredeterminada(workbook) {
+            const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            for (const name of workbook.SheetNames) {
+                const lower = name.toLowerCase();
+                if (keywords.some(kw => lower.includes(kw))) {
+                    return name;
+                }
+            }
+            return workbook.SheetNames[0];
+        }
+
+        function construirMapaEmpleados(workbook) {
+            window.empleadoCargoMap = {};
+            window.empleadoNumeroPuestoMap = {};
+            window.empleadoIngresoMap = {};
+
+            const keywords = ["planilla", "pago", "sueldo", "salario", "acuerdo", "contrato"];
+            const payrollSheets = workbook.SheetNames.filter(name => {
+                const lower = name.toLowerCase();
+                return keywords.some(kw => lower.includes(kw));
+            });
+            const sheetsToProcess = payrollSheets.length > 0 ? payrollSheets : workbook.SheetNames;
+
+            sheetsToProcess.forEach(sheetName => {
+                try {
+                    const sheet = workbook.Sheets[sheetName];
+                    const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+                    if (rowsData.length < 5) return;
+
+                    // Buscar fila de cabecera
+                    let headerRowIndex = -1;
+                    for (let r = 0; r < Math.min(rowsData.length, 15); r++) {
+                        const row = rowsData[r] || [];
+                        const hasNombre = row.some(cell => {
+                            const val = normalize(cell);
+                            return val === "nombre" || val === "nombredelempleado";
+                        });
+                        if (hasNombre) {
+                            headerRowIndex = r;
+                            break;
+                        }
+                    }
+                    if (headerRowIndex === -1) return;
+
+                    // Determinar si hay doble cabecera
+                    const h1 = rowsData[headerRowIndex] || [];
+                    const h2 = rowsData[headerRowIndex + 1] || [];
+                    const maxCols = Math.max(h1.length, h2.length);
+                    const headers = [];
+                    for (let c = 0; c < maxCols; c++) {
+                        const val1 = h1[c] ? h1[c].toString().trim() : "";
+                        const val2 = h2[c] ? h2[c].toString().trim() : "";
+                        if (val1 && val2) headers.push(val1 + " - " + val2);
+                        else if (val1) headers.push(val1);
+                        else if (val2) headers.push(val2);
+                        else headers.push("");
+                    }
+
+                    // Determinar índices
+                    let nombreIdx = -1, puestoIdx = -1, numeroPuestoIdx = -1, ingresoIdx = -1;
+                    headers.forEach((header, index) => {
+                        const norm = normalize(header);
+                        if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
+                        if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) puestoIdx = index;
+                        if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
+                        if ((norm.includes("ingreso") || norm.includes("contrata") || norm.includes("periododecontratacion")) && !norm.includes("reingreso")) ingresoIdx = index;
+                    });
+
+                    if (nombreIdx === -1) return;
+
+                    // Ver si es doble fila
+                    let esDobleFila = false;
+                    for (let k = headerRowIndex + 2; k < Math.min(rowsData.length, headerRowIndex + 14); k++) {
+                        const rowVal = rowsData[k] || [];
+                        const nextRowVal = rowsData[k + 1] || [];
+
+                        let foundNumberCol = -1;
+                        for (let c = 0; c < 3; c++) {
+                            const str = rowVal[c] ? rowVal[c].toString().trim() : "";
+                            if (str && /^\d+$/.test(str)) {
+                                foundNumberCol = c;
+                                break;
+                            }
+                        }
+
+                        if (foundNumberCol !== -1) {
+                            const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
+                            const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
+                            if (nextColVal === "" && hasNextData) {
+                                esDobleFila = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    let startRow = headerRowIndex + 2;
+                    if (esDobleFila) {
+                        let i = startRow;
+                        while (i < rowsData.length) {
+                            const rowA = rowsData[i];
+                            if (!rowA) { i++; continue; }
+
+                            let isEmployeeRow = false;
+                            for (let c = 0; c < 3; c++) {
+                                const str = rowA[c] ? rowA[c].toString().trim() : "";
+                                if (str && /^\d+$/.test(str)) {
+                                    isEmployeeRow = true;
+                                    break;
+                                }
+                            }
+
+                            if (isEmployeeRow) {
+                                const rowB = rowsData[i + 1];
+                                if (rowB) {
+                                    const empName = rowA[nombreIdx] ? rowA[nombreIdx].toString().trim().toUpperCase() : "";
+                                    if (empName) {
+                                        const cargo = puestoIdx !== -1 && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "";
+                                        const numPuesto = numeroPuestoIdx !== -1 && rowB[numeroPuestoIdx] ? rowB[numeroPuestoIdx].toString().trim() : "";
+                                        const ingreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
+
+                                        if (cargo) window.empleadoCargoMap[empName] = cargo;
+                                        if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
+                                        if (ingreso) window.empleadoIngresoMap[empName] = ingreso;
+                                    }
+                                    i += 2;
+                                } else {
+                                    i++;
+                                }
+                            } else {
+                                i++;
+                            }
+                        }
+                    } else {
+                        for (let i = startRow; i < rowsData.length; i++) {
+                            const row = rowsData[i];
+                            if (!row) continue;
+                            const empName = row[nombreIdx] ? row[nombreIdx].toString().trim().toUpperCase() : "";
+                            if (empName) {
+                                const cargo = puestoIdx !== -1 && row[puestoIdx] ? row[puestoIdx].toString().trim().toUpperCase() : "";
+                                const numPuesto = numeroPuestoIdx !== -1 && row[numeroPuestoIdx] ? row[numeroPuestoIdx].toString().trim() : "";
+
+                                if (cargo) window.empleadoCargoMap[empName] = cargo;
+                                if (numPuesto) window.empleadoNumeroPuestoMap[empName] = numPuesto;
+                            }
+                        }
+                    }
+                } catch (e) {
+                    console.error("Error al indexar hoja: " + sheetName, e);
+                }
+            });
+        }
+
+        let currentWorkbook = null;
+
+        function procesarArchivo(file) {
+            const reader = new FileReader();
+            reader.onload = function (e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    currentWorkbook = XLSX.read(data, { type: 'array' });
+                    construirMapaEmpleados(currentWorkbook);
+
+                    const sheetSelect = document.getElementById('sheetSelect');
+                    sheetSelect.innerHTML = '';
+
+                    currentWorkbook.SheetNames.forEach(name => {
+                        const opt = document.createElement('option');
+                        opt.value = name;
+                        opt.innerText = name;
+                        sheetSelect.appendChild(opt);
+                    });
+
+                    if (currentWorkbook.SheetNames.length > 1) {
+                        document.getElementById('sheetSelectorContainer').style.display = 'block';
+                    } else {
+                        document.getElementById('sheetSelectorContainer').style.display = 'none';
+                    }
+
+                    const defaultSheet = obtenerHojaPredeterminada(currentWorkbook);
+                    sheetSelect.value = defaultSheet;
+                    cargarHoja(defaultSheet);
+                } catch (err) {
+                    alert("Error al abrir el archivo Excel: " + err.message);
+                    console.error(err);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+            document.getElementById('excelFile').value = '';
+        }
+
+        function cambiarHoja() {
+            if (!currentWorkbook) return;
+            const sheetName = document.getElementById('sheetSelect').value;
+            cargarHoja(sheetName);
+        }
+
+        function cargarHoja(sheetName) {
+            try {
+                const sheet = currentWorkbook.Sheets[sheetName];
+                const rowsData = XLSX.utils.sheet_to_json(sheet, { header: 1, defval: "" });
+
+                if (rowsData.length < 2) {
+                    alert("La hoja de Excel '" + sheetName + "' no tiene suficientes filas de datos.");
+                    return;
+                }
+
+                // Escanear las primeras 15 filas para encontrar la fila de cabeceras reales
+                let headerRowIndex = -1;
+                for (let i = 0; i < Math.min(rowsData.length, 15); i++) {
+                    const row = rowsData[i] || [];
+                    const normalizedRow = row.map(cell => normalize(cell));
+
+                    // La fila debe contener la palabra nombre/empleado y además tener múltiples columnas ocupadas
+                    // para evitar confundirla con banners de sección como "EMPLEADOS POR ACUERDO"
+                    const tieneNombre = normalizedRow.some(cell =>
+                        cell.includes("nombre") || cell.includes("empleado") || cell.includes("colaborador")
+                    );
+                    const tieneMultiplesColumnas = row.filter(cell => cell !== undefined && cell.toString().trim() !== "").length >= 3;
+
+                    if (tieneNombre && tieneMultiplesColumnas) {
+                        headerRowIndex = i;
+                        break;
+                    }
+                }
+
+                if (headerRowIndex === -1) {
+                    const firstRowsSample = rowsData.slice(0, 5).map((row, idx) => `Fila ${idx + 1}: [${row.slice(0, 10).join(", ")}]`).join("\n");
+                    alert("No se pudo encontrar una fila de encabezados válida en la hoja '" + sheetName + "' (debe contener una columna como 'Nombre' y al menos 3 columnas llenas).\n\nPrimeras filas leídas:\n" + firstRowsSample + "\n\nPor favor, verifica el formato de tu archivo.");
+                    return;
+                }
+
+                let startRow = headerRowIndex + 1;
+                let headers = rowsData[headerRowIndex];
+
+                // Detectar si hay una segunda fila de cabecera (celdas combinadas)
+                const rowSiguiente = rowsData[headerRowIndex + 1] || [];
+                const rowSiguienteNorm = rowSiguiente.map(h => normalize(h));
+                const tieneSegundaCabecera = rowSiguienteNorm.some(h =>
+                    h === "cargo" || h.includes("ihss") || h.includes("seguro") || h.includes("retiro") || h.includes("sindicato")
+                );
+
+                if (tieneSegundaCabecera) {
+                    startRow = headerRowIndex + 2; // Los datos empiezan en la fila subsiguiente
+                    const h1 = rowsData[headerRowIndex];
+                    const h2 = rowsData[headerRowIndex + 1];
+                    headers = [];
+                    const maxCols = Math.max(h1.length, h2.length);
+                    for (let c = 0; c < maxCols; c++) {
+                        const val1 = h1[c] ? h1[c].toString().trim() : "";
+                        const val2 = h2[c] ? h2[c].toString().trim() : "";
+
+                        if (val1 && val2) {
+                            headers.push(val1 + " - " + val2);
+                        } else if (val1) {
+                            headers.push(val1);
+                        } else if (val2) {
+                            headers.push(val2);
+                        } else {
+                            headers.push("");
+                        }
+                    }
+                }
+
+                let nombreIdx = -1, puestoIdx = -1, tipoIdx = -1, mesIdx = -1, asignadoIdx = -1, devengadoIdx = -1, ingresoIdx = -1;
+                let numeroPuestoIdx = -1, totalDeduccionesIdx = -1, diasTrabajadosIdx = -1;
+
+                // Mapear cabeceras
+                headers.forEach((header, index) => {
+                    const norm = normalize(header);
+                    if (norm.includes("nombre") && nombreIdx === -1) nombreIdx = index;
+                    if ((norm.includes("cargo") || (norm.includes("puesto") && !norm.includes("impuesto"))) && !norm.includes("numero")) {
+                        puestoIdx = index;
+                    }
+                    if (norm.includes("tipo") || norm.includes("acuerdo") || norm.includes("contrato")) tipoIdx = index;
+                    if ((norm.includes("mes") || norm.includes("periodo")) && !norm.includes("contrat")) mesIdx = index;
+                    if ((norm.includes("diastrabaj") || norm.includes("diaslabor") || norm.includes("diaspag") || norm.includes("diastrab") || norm.includes("diaslab") || norm.includes("tiempotrabaj") || norm.includes("diasdetrabajo") || norm === "dias" || norm === "dt") && !norm.includes("deduc") && !norm.includes("descuento")) {
+                        diasTrabajadosIdx = index;
+                    }
+                    if ((norm.includes("asignado") || norm.includes("sueldobase") || norm.includes("salariobase") || norm.includes("sueldomensual")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
+                        asignadoIdx = index;
+                    }
+                    if ((norm.includes("devengado") || norm.includes("totaldevengado") || norm.includes("sueldodevengado") || norm.includes("salariodevengado")) && !norm.includes("dia") && !norm.includes("hora") && !norm.includes("deduc")) {
+                        devengadoIdx = index;
+                    }
+                    if (norm.includes("numerodepuesto") || (norm.includes("puesto") && norm.includes("num"))) numeroPuestoIdx = index;
+                    if ((norm.includes("total") || norm.startsWith("tot")) && (norm.includes("deduc") || norm.includes("descuent") || norm.includes("retenc"))) totalDeduccionesIdx = index;
+                    if ((norm.includes("ingreso") || norm.includes("contrata") || norm.includes("periododecontratacion")) && !norm.includes("reingreso")) ingresoIdx = index;
+                });
+
+                // Si no se mapearon adecuadamente por nombre completo, forzar defaults para el formato ENAG
+                if (nombreIdx === -1) nombreIdx = 2;
+                if (puestoIdx === -1) puestoIdx = 2;
+                if (numeroPuestoIdx === -1) numeroPuestoIdx = 1;
+                if (asignadoIdx === -1) asignadoIdx = 3;
+                if (devengadoIdx === -1) devengadoIdx = asignadoIdx !== -1 ? asignadoIdx : 4;
+
+                // Encontrar total deducciones dinámicamente
+                if (totalDeduccionesIdx === -1) {
+                    headers.forEach((header, index) => {
+                        const norm = normalize(header);
+                        if (norm.includes("neto") || norm.includes("liquido") || norm.includes("sueldoneto")) {
+                            totalDeduccionesIdx = index;
+                        }
+                    });
+                }
+                if (totalDeduccionesIdx === -1) {
+                    totalDeduccionesIdx = headers.length;
+                }
+
+                // Determinar si la hoja usa el formato de doble fila por empleado
+                let esDobleFila = false;
+                for (let k = startRow; k < Math.min(rowsData.length, startRow + 12); k++) {
+                    const rowVal = rowsData[k] || [];
+                    const nextRowVal = rowsData[k + 1] || [];
+
+                    let foundNumberCol = -1;
+                    for (let c = 0; c < 3; c++) {
+                        const str = rowVal[c] ? rowVal[c].toString().trim() : "";
+                        if (str && /^\d+$/.test(str)) {
+                            foundNumberCol = c;
+                            break;
+                        }
+                    }
+
+                    if (foundNumberCol !== -1) {
+                        const nextColVal = nextRowVal[foundNumberCol] ? nextRowVal[foundNumberCol].toString().trim() : "";
+                        const hasNextData = nextRowVal.some((cell, idx) => idx !== foundNumberCol && cell !== undefined && cell.toString().trim() !== "");
+                        if (nextColVal === "" && hasNextData) {
+                            esDobleFila = true;
+                            break;
+                        }
+                    }
+                }
+
+                empleados = [];
+                if (esDobleFila) {
+                    let i = startRow;
+                    while (i < rowsData.length) {
+                        const rowA = rowsData[i];
+                        if (!rowA) { i++; continue; }
+
+                        let isEmployeeRow = false;
+                        for (let c = 0; c < 3; c++) {
+                            const str = rowA[c] ? rowA[c].toString().trim() : "";
+                            if (str && /^\d+$/.test(str)) {
+                                isEmployeeRow = true;
+                                break;
+                            }
+                        }
+
+                        if (isEmployeeRow) {
+                            const rowB = rowsData[i + 1];
+                            if (rowB) {
+                                const sueldoAsignado = parseCleanFloat(rowA[asignadoIdx]);
+                                const sueldoDevengado = parseCleanFloat(rowA[devengadoIdx]);
+                                const deducciones = [];
+
+                                // Las deducciones se encuentran entre la columna "Sueldo Devengado" y "Total de Deducciones"
+                                headers.forEach((header, index) => {
+                                    if (index > devengadoIdx && index < totalDeduccionesIdx) {
+                                        if (!esColumnaDeduccion(header)) return;
+
+                                        const val = parseCleanFloat(rowA[index]);
+                                        if (val && !isNaN(val) && val > 0) {
+                                            // Reemplazar múltiples espacios internos por uno solo y limpiar prefijos
+                                            const cleanName = header.toString().replace(/\s+/g, ' ').trim()
+                                                .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
+                                                .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
+                                            if (cleanName && cleanName.trim() !== "") {
+                                                deducciones.push({
+                                                    nombre: cleanName,
+                                                    monto: val
+                                                });
+                                            }
+                                        }
+                                    }
+                                });
+                                const totalDeducciones = deducciones.reduce((sum, d) => sum + d.monto, 0);
+                                const netoPagar = sueldoDevengado - totalDeducciones;
+
+                                const empName = rowA[nombreIdx] ? rowA[nombreIdx].toString().trim().toUpperCase() : "";
+                                let empPuesto = puestoIdx !== -1 && rowB[puestoIdx] ? rowB[puestoIdx].toString().trim().toUpperCase() : "";
+                                if (!empPuesto && window.empleadoCargoMap && window.empleadoCargoMap[empName]) {
+                                    empPuesto = window.empleadoCargoMap[empName];
+                                }
+                                if (!empPuesto) empPuesto = "AUXILIAR DE CONTABILIDAD";
+
+                                let empNumPuesto = numeroPuestoIdx !== -1 && rowB[numeroPuestoIdx] ? rowB[numeroPuestoIdx].toString().trim() : "";
+                                if (!empNumPuesto && window.empleadoNumeroPuestoMap && window.empleadoNumeroPuestoMap[empName]) {
+                                    empNumPuesto = window.empleadoNumeroPuestoMap[empName];
+                                }
+                                if (!empNumPuesto) empNumPuesto = "N/D";
+
+                                const empTipo = "Acuerdo";
+
+                                let empIngreso = ingresoIdx !== -1 && rowA[ingresoIdx] !== undefined && rowA[ingresoIdx] !== "" ? parsearFechaIngreso(rowA[ingresoIdx]) : "";
+                                if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
+                                    empIngreso = window.empleadoIngresoMap[empName];
+                                }
+                                if (!empIngreso) empIngreso = "N/D";
+
+                                const diasTrab = diasTrabajadosIdx !== -1 && rowA[diasTrabajadosIdx] !== undefined ? parseCleanFloat(rowA[diasTrabajadosIdx]) : null;
+
+                                // Solo agregarlo si el nombre no está vacío
+                                if (empName !== "") {
+                                    empleados.push({
+                                        id: i,
+                                        nombre: empName,
+                                        puesto: empPuesto,
+                                        numeroPuesto: empNumPuesto,
+                                        ingreso: empIngreso,
+                                        tipo: empTipo,
+                                        diasTrabajados: diasTrab,
+                                        mes: mesIdx !== -1 && rowA[mesIdx] ? rowA[mesIdx].toString().trim() : "marzo 2026",
+                                        sueldoAsignado: sueldoAsignado,
+                                        sueldoDevengado: sueldoDevengado,
+                                        deducciones: deducciones,
+                                        totalDeducciones: totalDeducciones,
+                                        netoPagar: netoPagar,
+                                        selected: true
+                                    });
+                                }
+                                i += 2; // Avanzar 2 filas (hemos procesado A y B)
+                            } else {
+                                i++;
+                            }
+                        } else {
+                            i++;
+                        }
+                    }
+                } else {
+                    // Formato de una sola fila estándar
+                    for (let i = startRow; i < rowsData.length; i++) {
+                        const row = rowsData[i];
+                        if (!row || !row[nombreIdx] || row[nombreIdx].toString().trim() === "") continue;
+
+                        const sueldoAsignado = parseCleanFloat(row[asignadoIdx]);
+                        const sueldoDevengado = parseCleanFloat(row[devengadoIdx]);
+                        const deducciones = [];
+
+                        headers.forEach((header, index) => {
+                            if (index > devengadoIdx && index < totalDeduccionesIdx) {
+                                if (!esColumnaDeduccion(header)) return;
+
+                                const val = parseCleanFloat(row[index]);
+                                if (val && !isNaN(val) && val > 0) {
+                                    const cleanName = header.toString().replace(/\s+/g, ' ').trim()
+                                        .replace(/^(Deducciones|Deducción|Deduccion)\s*-\s*/i, "")
+                                        .replace(/\bI\s+H\s+S\s+S\b/gi, "I.H.S.S.");
+                                    if (cleanName && cleanName.trim() !== "") {
+                                        deducciones.push({
+                                            nombre: cleanName,
+                                            monto: val
+                                        });
+                                    }
+                                }
+                            }
+                        });
+
+                        const totalDeducciones = deducciones.reduce((sum, d) => sum + d.monto, 0);
+                        const netoPagar = sueldoDevengado - totalDeducciones;
+
+                        const empName = row[nombreIdx].toString().trim().toUpperCase();
+                        let empPuesto = puestoIdx !== -1 && row[puestoIdx] ? row[puestoIdx].toString().trim().toUpperCase() : "";
+                        if (!empPuesto && window.empleadoCargoMap && window.empleadoCargoMap[empName]) {
+                            empPuesto = window.empleadoCargoMap[empName];
+                        }
+                        if (!empPuesto) empPuesto = "AUXILIAR DE CONTABILIDAD";
+
+                        let empNumPuesto = numeroPuestoIdx !== -1 && row[numeroPuestoIdx] ? row[numeroPuestoIdx].toString().trim() : "";
+                        if (!empNumPuesto && window.empleadoNumeroPuestoMap && window.empleadoNumeroPuestoMap[empName]) {
+                            empNumPuesto = window.empleadoNumeroPuestoMap[empName];
+                        }
+                        if (!empNumPuesto) empNumPuesto = "N/D";
+
+                        const empTipo = "Acuerdo";
+
+                        let empIngreso = ingresoIdx !== -1 && row[ingresoIdx] !== undefined && row[ingresoIdx] !== "" ? parsearFechaIngreso(row[ingresoIdx]) : "";
+                        if (!empIngreso && window.empleadoIngresoMap && window.empleadoIngresoMap[empName]) {
+                            empIngreso = window.empleadoIngresoMap[empName];
+                        }
+                        if (!empIngreso) empIngreso = "N/D";
+
+                        const diasTrab = diasTrabajadosIdx !== -1 && row[diasTrabajadosIdx] !== undefined ? parseCleanFloat(row[diasTrabajadosIdx]) : null;
+
+                        empleados.push({
+                            id: i,
+                            nombre: empName,
+                            puesto: empPuesto,
+                            numeroPuesto: empNumPuesto,
+                            ingreso: empIngreso,
+                            tipo: empTipo,
+                            diasTrabajados: diasTrab,
+                            mes: mesIdx !== -1 && row[mesIdx] ? row[mesIdx].toString().trim() : "marzo 2026",
+                            sueldoAsignado: sueldoAsignado,
+                            sueldoDevengado: sueldoDevengado,
+                            deducciones: deducciones,
+                            totalDeducciones: totalDeducciones,
+                            netoPagar: netoPagar,
+                            selected: true
+                        });
+                    }
+                }
+
+                if (empleados.length === 0) {
+                    alert("No se cargaron registros válidos de la hoja '" + sheetName + "'.");
+                    return;
+                }
+
+                renderPlanilla();
+            } catch (err) {
+                alert("Error al procesar la hoja '" + sheetName + "': " + err.message);
+                console.error(err);
+            }
+        }
+
+        function limpiarLista() {
+            empleados = [];
+            currentWorkbook = null;
+            document.getElementById('sheetSelectorContainer').style.display = 'none';
+            document.getElementById('sheetSelect').innerHTML = '';
+            document.getElementById('dataSection').style.display = 'none';
+            document.getElementById('emptyState').style.display = 'block';
+            document.getElementById('btnGenerateBulk').disabled = true;
+            document.getElementById('btnClearList').disabled = true;
+            if (document.getElementById('btnResumenPlanilla')) document.getElementById('btnResumenPlanilla').disabled = true;
+            document.getElementById('excelFile').value = '';
+        }
+
+        function cambiarTipo(id, nuevoTipo) {
+            const emp = empleados.find(e => e.id === id);
+            if (emp) emp.tipo = nuevoTipo;
+        }
+
+        function renderPlanilla() {
+            const body = document.getElementById('planillaBody');
+            body.innerHTML = '';
+
+            empleados.forEach(emp => {
+                const tr = document.createElement('tr');
+                tr.setAttribute('data-id', emp.id);
+
+                tr.innerHTML = `
+                    <td class="checkbox-cell"><input type="checkbox" class="emp-checkbox" ${emp.selected ? 'checked' : ''} onchange="toggleSelect(${emp.id}, this.checked)"></td>
+                    <td><strong>${emp.nombre}</strong></td>
+                    <td style="color: #475569; font-size: 0.9em;">${emp.puesto}</td>
+                    <td style="color: #475569; font-size: 0.9em; text-align: center;">${emp.numeroPuesto}</td>
+                    <td style="text-align: right; font-family: monospace;">${formatMoneda(emp.sueldoDevengado)}</td>
+                    <td style="text-align: right; font-family: monospace; color: #ef4444;">${formatMoneda(emp.totalDeducciones)}</td>
+                    <td style="text-align: right; font-family: monospace; font-weight: bold; color: #16a34a;">${formatMoneda(emp.netoPagar)}</td>
+                    <td style="text-align: center;">
+                        <button type="button" class="btn-action-small" onclick="generarPDFIndividual(${emp.id})">Generar PDF</button>
+                    </td>
+                `;
+                body.appendChild(tr);
+            });
+
+            document.getElementById('totalImportados').innerText = empleados.length;
+            document.getElementById('emptyState').style.display = 'none';
+            document.getElementById('dataSection').style.display = 'block';
+
+            document.getElementById('btnGenerateBulk').disabled = false;
+            document.getElementById('btnClearList').disabled = false;
+            if (document.getElementById('btnResumenPlanilla')) document.getElementById('btnResumenPlanilla').disabled = false;
+
+            actualizarContadorSeleccionados();
+        }
+
+        function toggleSelect(id, selected) {
+            const emp = empleados.find(e => e.id === id);
+            if (emp) emp.selected = selected;
+            actualizarContadorSeleccionados();
+        }
+
+        function toggleSelectAll(checkbox) {
+            const visibleRows = document.querySelectorAll('#planillaBody tr');
+            visibleRows.forEach(tr => {
+                const id = parseInt(tr.getAttribute('data-id'));
+                const emp = empleados.find(e => e.id === id);
+                if (emp) {
+                    emp.selected = checkbox.checked;
+                    tr.querySelector('.emp-checkbox').checked = checkbox.checked;
+                }
+            });
+            actualizarContadorSeleccionados();
+        }
+
+        function actualizarContadorSeleccionados() {
+            const count = empleados.filter(e => e.selected).length;
+            document.getElementById('selectedCount').innerText = count;
+            document.getElementById('btnGenerateBulk').disabled = count === 0;
+
+            const allCheckbox = document.getElementById('selectAll');
+            if (count === 0) {
+                allCheckbox.checked = false;
+                allCheckbox.indeterminate = false;
+            } else if (count === empleados.length) {
+                allCheckbox.checked = true;
+                allCheckbox.indeterminate = false;
+            } else {
+                allCheckbox.checked = false;
+                allCheckbox.indeterminate = true;
+            }
+        }
+
+        function filtrarTabla() {
+            const query = normalize(document.getElementById('searchInput').value);
+            const rows = document.querySelectorAll('#planillaBody tr');
+
+            rows.forEach(tr => {
+                const id = parseInt(tr.getAttribute('data-id'));
+                const emp = empleados.find(e => e.id === id);
+                if (emp) {
+                    const match = normalize(emp.nombre).includes(query) || normalize(emp.puesto).includes(query);
+                    tr.style.display = match ? '' : 'none';
+                }
+            });
+        }
+
+        function abrirResumenPlanilla() {
+            if (!empleados || empleados.length === 0) {
+                alert("Primero carga una planilla de salarios para generar el reporte resumen.");
+                return;
+            }
+
+            const mapDeduc = {};
+            let totalAsignado = 0;
+            let totalDevengado = 0;
+            let totalDeducciones = 0;
+            let totalNeto = 0;
+
+            empleados.forEach(emp => {
+                totalAsignado += emp.sueldoAsignado || emp.sueldoDevengado;
+                totalDevengado += emp.sueldoDevengado;
+                totalDeducciones += emp.totalDeducciones;
+                totalNeto += emp.netoPagar;
+
+                emp.deducciones.forEach(d => {
+                    if (!mapDeduc[d.nombre]) {
+                        mapDeduc[d.nombre] = { nombre: d.nombre, count: 0, total: 0 };
+                    }
+                    mapDeduc[d.nombre].count++;
+                    mapDeduc[d.nombre].total += d.monto;
+                });
+            });
+
+            const listaDeduc = Object.values(mapDeduc).sort((a, b) => b.total - a.total);
+            const dataReporte = {
+                periodo: document.getElementById('mesVoucher').value || "Febrero 2026",
+                regimen: "ACUERDO",
+                totalEmpleados: empleados.length,
+                totalAsignado,
+                totalDevengado,
+                totalDeducciones,
+                totalNeto,
+                deducciones: listaDeduc,
+                empleados: empleados
+            };
+
+            sessionStorage.setItem('enag_planilla_resumen_data', JSON.stringify(dataReporte));
+            window.location.href = "reporte_planilla.html";
+        }
+
+        function descargarPlantilla() {
+            const headers = [
+                "No.",
+                "Numero de Puesto",
+                "Nombre",
+                "Cargo",
+                "Ingreso",
+                "Sueldo Asignado",
+                "Sueldo Devengado",
+                "I.H.S.S.",
+                "Plan de Retiro INJUPEMP 9.5%",
+                "INJUPEMP Prestamo Hipot",
+                "INJUPEMP Prestamo Personal.",
+                "INJUPEMP Reingreso",
+                "Impuesto Sobre la Renta",
+                "Embargo",
+                "Sindicato 1%",
+                "ANDEPH",
+                "Otras Deducciones (Ayudas Economicas/ Multas/Devoluciones /Subsidios por Incapacidad",
+                "Deduccion Tiempo",
+                "Optica",
+                "Colegio de Periodistas",
+                "Deduccion Partido (Partido Nacional)",
+                "Cooperativa Elga",
+                "Banco Cuscatlan",
+                "Cooperativa Sagrada Familia",
+                "Cooperativa 15 de Septiembre",
+                "Cooperativa \"Fe y Esperanza\"",
+                "Cooperativa Prosperidad Ltda",
+                "Total de Deducciones",
+                "Sueldo Neto"
+            ];
+
+            const data = [
+                headers,
+                [
+                    1,
+                    "1024",
+                    "DANIA MARÍA COLINDRES BARAHONA",
+                    "AUXILIAR DE CONTABILIDAD",
+                    "01/01/2020",
+                    18000.00,
+                    18000.00,
+                    297.58,
+                    1710.00,
+                    0.00,
+                    4933.47,
+                    0.00,
+                    0.00,
+                    0.00,
+                    180.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    4096.33,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    11207.38,
+                    6792.62
+                ],
+                [
+                    2,
+                    "1025",
+                    "PEDRO ANTONIO GÓMEZ REYES",
+                    "DISEÑADOR GRÁFICO",
+                    "15/06/2022",
+                    15000.00,
+                    15000.00,
+                    247.98,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    150.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    0.00,
+                    397.98,
+                    14602.02
+                ]
+            ];
+
+            const ws = XLSX.utils.aoa_to_sheet(data);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Planilla Ejemplo");
+            XLSX.writeFile(wb, "Plantilla_Vouchers_ENAG.xlsx");
+        }
+
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width; canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        function formatNombreOracion(str) {
+            if (!str) return "";
+            return str.toLowerCase().split(' ').map(word => {
+                if (!word) return "";
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                return isRoman ? word.toUpperCase() : word.charAt(0).toUpperCase() + word.slice(1);
+            }).join(' ');
+        }
+
+        async function generarPDFEmpleado(emp, doc, isBulk = false) {
+            const { jsPDF } = window.jspdf;
+
+            if (!doc) {
+                doc = new jsPDF('p', 'mm', 'a4');
+            } else if (isBulk) {
+                doc.addPage();
+            }
+
+            const logoBgUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+            if (logoBgUrl) {
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+                doc.addImage(logoBgUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+            }
+
+            // Configurar fuentes y título principal
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(13);
+            doc.text("Empresa Nacional de Artes Graficas", 105, 50, { align: "center" });
+            doc.text("Departamento de Recursos Humanos", 105, 56, { align: "center" });
+
+            // Datos del empleado
+            doc.setFontSize(10.5);
+            doc.text(`Nombre del Empleado: ${formatNombreOracion(emp.nombre)}`, 25, 66);
+            const puestoStr = emp.puesto || '';
+            const excepciones = ['de', 'del', 'y', 'en', 'el', 'la', 'los', 'las', 'a', 'con', 'por', 'para'];
+            const puestoOracion = puestoStr.toLowerCase().split(' ').map((word, i) => {
+                if (i > 0 && excepciones.includes(word)) return word;
+                const isRoman = /^(I|II|III|IV|V|VI|VII|VIII|IX|X|XI|XII|XIII|XIV|XV)$/i.test(word);
+                if (isRoman) return word.toUpperCase();
+                return word ? word.charAt(0).toUpperCase() + word.slice(1) : '';
+            }).join(' ');
+            doc.text(`Puesto: ${puestoOracion}`, 25, 72);
+            if (emp.numeroPuesto && emp.numeroPuesto !== "N/D") {
+                doc.text(`N° de Puesto: ${emp.numeroPuesto}`, 25, 78);
+                if (document.getElementById('showFechaIngreso').checked) {
+                    doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, 84);
+                }
+            } else {
+                if (document.getElementById('showFechaIngreso').checked) {
+                    doc.text(`Fecha de Ingreso: ${emp.ingreso}`, 25, 78);
+                }
+            }
+
+            // Mes del Voucher
+            const mesSeleccionado = document.getElementById('mesVoucher').value || "marzo 2026";
+            doc.setFontSize(11);
+            doc.text(`Voucher de Pago Correspondiente al Mes de ${mesSeleccionado}`, 105, 91, { align: "center" });
+
+            // Checkboxes Acuerdo/Contrato
+            doc.setFontSize(10);
+            doc.text(`Acuerdo (X)`, 55, 97);
+            doc.text(`Contrato ( )`, 125, 97);
+
+            // Tabla de Pagos y Deducciones (Dibujada manualmente para coincidir exactamente con el diseño provisto)
+            const tableLeft = 25;
+            const tableRight = 185;
+            const middleX = 145;
+            const labelX = 28;
+            const valueX = 182; // Alineado a la derecha
+            const rowHeight = 6.5;
+            let y = 103;
+
+            const tableRows = [];
+            tableRows.push({ type: 'normal', label: 'Sueldo Asignado', val: emp.sueldoAsignado });
+            tableRows.push({ type: 'normal', label: 'Sueldo Devengado', val: emp.sueldoDevengado });
+            tableRows.push({ type: 'header', label: 'Deducciones', val: null });
+
+            emp.deducciones.forEach(d => {
+                let labelText = d.nombre;
+                if (labelText.toLowerCase().includes("partido")) {
+                    labelText = "Otras Deducciones";
+                }
+                tableRows.push({ type: 'normal', label: labelText, val: d.monto });
+            });
+
+            tableRows.push({ type: 'total_deduc', label: 'Total Deducciones', val: emp.totalDeducciones });
+            tableRows.push({ type: 'total_pagar', label: 'Total a Pagar', val: emp.netoPagar });
+
+            tableRows.forEach(row => {
+                // Dibujar el cuadro y línea divisoria
+                doc.setLineWidth(0.3);
+                doc.setDrawColor(0, 0, 0);
+                doc.rect(tableLeft, y, tableRight - tableLeft, rowHeight);
+                doc.line(middleX, y, middleX, y + rowHeight);
+
+                if (row.type === 'header') {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(row.label, (tableLeft + middleX) / 2, y + 4.5, { align: 'center' });
+                } else if (row.type === 'total_deduc') {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text("Total Deducciones", middleX - 3, y + 4.5, { align: 'right' });
+                    doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
+                } else if (row.type === 'total_pagar') {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text("Total a Pagar", middleX - 3, y + 4.5, { align: 'right' });
+                    doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
+                } else if (row.label === 'Sueldo Asignado' || row.label === 'Sueldo Devengado') {
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(row.label, labelX, y + 4.5);
+                    doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
+                } else {
+                    doc.setFont('helvetica', 'normal');
+                    const maxTextWidth = middleX - labelX - 2;
+                    let currentFontSize = 10;
+                    doc.setFontSize(currentFontSize);
+                    while (doc.getTextWidth(row.label) > maxTextWidth && currentFontSize > 7) {
+                        currentFontSize -= 0.5;
+                        doc.setFontSize(currentFontSize);
+                    }
+                    doc.text(row.label, labelX, y + 4.5);
+                    doc.setFontSize(10);
+                    doc.text(formatMoneda(row.val), valueX, y + 4.5, { align: 'right' });
+                }
+                y += rowHeight;
+            });
+
+            // Pie de Firma
+            y += 30;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10.5);
+            doc.setFont('helvetica', 'bold');
+
+            const firmante = document.getElementById('cfgFirmante').value.trim();
+            const cargoF = document.getElementById('cfgCargoFirmante').value.trim();
+
+            if (firmante) {
+                doc.line(tableLeft, y - 5, tableLeft + 70, y - 5);
+                doc.text(firmante, tableLeft, y);
+                if (cargoF) {
+                    doc.setFontSize(9);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text(cargoF, tableLeft, y + 4.5);
+                }
+            } else {
+                doc.text("Firma Autorizada: ___________________________", tableLeft, y);
+            }
+
+            return doc;
+        }
+
+        async function generarPDFIndividual(id) {
+            const emp = empleados.find(e => e.id === id);
+            if (!emp) return;
+
+            const doc = await generarPDFEmpleado(emp, null, false);
+            
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
+
+            doc.save(`Voucher_${emp.nombre.replace(/\s+/g, '_')}.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Voucher (Acuerdo) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Vouchers (Acuerdo) por lote (${seleccionados.length} empleados)` : 'Se generó Voucher (Acuerdo)'));
+            }
+
+        }
+
+        async function generarPDFsSeleccionados() {
+            const seleccionados = empleados.filter(e => e.selected);
+            if (seleccionados.length === 0) {
+                alert("Por favor, selecciona al menos un empleado de la lista.");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            let doc = new jsPDF('p', 'mm', 'a4');
+
+            for (let i = 0; i < seleccionados.length; i++) {
+                doc = await generarPDFEmpleado(seleccionados[i], doc, i > 0);
+            }
+
+            
+            // Agregar leyenda de generacion en todas las paginas (Actualizado v4)
+            let userName = localStorage.getItem('enag_username');
+            if (!userName && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                userName = firebase.auth().currentUser.email;
+            }
+            if (!userName) userName = "Usuario Desconocido";
+            
+            const totalPages = doc.internal.getNumberOfPages();
+            for (let i = 1; i <= totalPages; i++) {
+                doc.setPage(i);
+                doc.setFontSize(8);
+                doc.setTextColor(100);
+                doc.text("Documento generado por: " + userName, 14, doc.internal.pageSize.getHeight() - 40);
+            }
+
+            doc.save(`Vouchers_Pago_Seleccionados.pdf`);
+            if (window.registrarBitacora) {
+                window.registrarBitacora('Planillas', 'Generar PDF', typeof emp !== 'undefined' ? `Se generó Voucher (Acuerdo) para: ${emp.nombre}` : (typeof seleccionados !== 'undefined' ? `Se generaron Vouchers (Acuerdo) por lote (${seleccionados.length} empleados)` : 'Se generó Voucher (Acuerdo)'));
+            }
+
+        }
+    </script>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+</body>
+
+</html>
