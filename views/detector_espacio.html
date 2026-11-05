@@ -330,8 +330,8 @@
             padding: 16px;
             border: 1.5px solid var(--border-color);
             border-radius: 12px;
-            font-family: 'Georgia', 'Times New Roman', serif;
-            font-size: 14.5px;
+            font-family: 'Times New Roman', Times, serif;
+            font-size: 14px;
             line-height: 1.6;
             color: #1e293b;
             resize: vertical;
@@ -922,7 +922,7 @@
         }
 
         .gaceta-column {
-            font-family: 'Times New Roman', 'Georgia', serif;
+            font-family: 'Times New Roman', Times, serif;
             font-size: 10px;
             /* Tamaño ampliado y nítido para legibilidad de imprenta */
             line-height: 1.38;
@@ -1473,7 +1473,7 @@
 
 <body>
 
-        <!-- Top Navigation Bar -->
+    <!-- Top Navigation Bar -->
     <div class="top-navbar">
         <div class="nav-left-group">
             <a href="../index.html" class="btn-nav btn-nav-back">
@@ -1584,6 +1584,31 @@
                         title="Detectar y separar automáticamente CONSIDERANDO, POR TANTO, DECRETA y ARTÍCULOS en párrafos oficiales">
                         <span>⚖️</span> Formato Ley
                     </button>
+
+                    <!-- Control Interactivo de Tamaño de Letra (Times New Roman) -->
+                    <div class="sangria-control-group" title="Aumentar o reducir el tamaño de la letra Times New Roman">
+                        <span>🔤 Tamaño Letra:</span>
+                        <button type="button" class="btn-tool-mini" onclick="ajustarTamanoLetraDelta(-1)"
+                            title="Reducir tamaño de letra (−)">−</button>
+                        <select id="selectTamanoLetra" class="select-sangria-tool"
+                            onchange="cambiarTamanoLetra(this.value)"
+                            title="Seleccionar tamaño de letra en Times New Roman">
+                            <option value="11">11 px (Muy pequeña)</option>
+                            <option value="12">12 px (Pequeña)</option>
+                            <option value="13">13 px</option>
+                            <option value="14" selected>14 px (Estándar)</option>
+                            <option value="15">15 px</option>
+                            <option value="16">16 px (Mediana)</option>
+                            <option value="17">17 px</option>
+                            <option value="18">18 px (Grande)</option>
+                            <option value="20">20 px (Muy grande)</option>
+                            <option value="22">22 px (Titular)</option>
+                            <option value="24">24 px</option>
+                            <option value="custom">Personalizado...</option>
+                        </select>
+                        <button type="button" class="btn-tool-mini" onclick="ajustarTamanoLetraDelta(1)"
+                            title="Aumentar tamaño de letra (+)">+</button>
+                    </div>
 
                     <!-- Control Interactivo de Espaciado entre Líneas (Interlineado) -->
                     <div class="sangria-control-group"
@@ -1750,6 +1775,11 @@
                                 <option value="2.0">2.0x (Doble espacio)</option>
                                 <option value="2.5">2.5x (Triple espacio)</option>
                             </select>
+                        </div>
+                        <div class="calib-group">
+                            <label for="calibTamanoLetra">Tamaño de letra (Times New Roman, px):</label>
+                            <input type="number" id="calibTamanoLetra" value="14" min="9" max="36" step="1"
+                                onchange="guardarCalibracion()">
                         </div>
                     </div>
                     <div style="margin-top: 12px; display: flex; justify-content: flex-end;">
@@ -2149,6 +2179,7 @@
             margenSeguridad: 10,
             sangria: 4,
             interlineado: 1.0,
+            tamanoLetra: 14, // Tamaño de letra en píxeles (Times New Roman)
             justificado: true, // Texto justificado activo por defecto (ambos márgenes alineados)
             tamanoMaqueta: 'tabloide', // 'compacto', 'tabloide', 'tall'
             tipoSeccion: 'seccion_a', // 'seccion_a', 'seccion_b', 'sin_seccion'
@@ -2237,6 +2268,7 @@
                     if (calibracion.tamanoMaqueta === undefined) calibracion.tamanoMaqueta = 'tabloide';
                     if (calibracion.sangria === undefined) calibracion.sangria = 4;
                     if (calibracion.interlineado === undefined) calibracion.interlineado = 1.0;
+                    if (calibracion.tamanoLetra === undefined) calibracion.tamanoLetra = 14;
                     if (calibracion.justificado === undefined) calibracion.justificado = true;
                     if (calibracion.tipoSeccion === undefined) calibracion.tipoSeccion = 'seccion_a';
                     if (calibracion.modoFecha === undefined) calibracion.modoFecha = 'oficial';
@@ -2265,8 +2297,12 @@
                     if (document.getElementById('calibInterlineado')) {
                         document.getElementById('calibInterlineado').value = calibracion.interlineado.toFixed(2);
                     }
+                    if (document.getElementById('calibTamanoLetra')) {
+                        document.getElementById('calibTamanoLetra').value = calibracion.tamanoLetra;
+                    }
                     actualizarSelectSangriaUI(calibracion.sangria);
                     actualizarSelectInterlineadoUI(calibracion.interlineado);
+                    actualizarSelectTamanoLetraUI(calibracion.tamanoLetra);
                     actualizarBotonesColumnasUI();
                     aplicarEstilosVisualesEditor();
                     cambiarTamanoMaqueta(calibracion.tamanoMaqueta || 'tabloide');
@@ -2280,6 +2316,7 @@
                 }
                 actualizarSelectSangriaUI(calibracion.sangria);
                 actualizarSelectInterlineadoUI(calibracion.interlineado);
+                actualizarSelectTamanoLetraUI(calibracion.tamanoLetra);
                 actualizarBotonesColumnasUI();
                 aplicarEstilosVisualesEditor();
                 cambiarTamanoMaqueta('tabloide');
@@ -2303,9 +2340,13 @@
             calibracion.margenSeguridad = parseInt(document.getElementById('calibMargenSeguridad').value) || 10;
             calibracion.sangria = parseInt(document.getElementById('calibSangria').value) || 0;
             calibracion.interlineado = parseFloat(document.getElementById('calibInterlineado').value) || 1.0;
+            if (document.getElementById('calibTamanoLetra')) {
+                calibracion.tamanoLetra = parseFloat(document.getElementById('calibTamanoLetra').value) || 14;
+            }
 
             actualizarSelectSangriaUI(calibracion.sangria);
             actualizarSelectInterlineadoUI(calibracion.interlineado);
+            actualizarSelectTamanoLetraUI(calibracion.tamanoLetra);
             actualizarBotonesColumnasUI();
             aplicarEstilosVisualesEditor();
             localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
@@ -2401,6 +2442,7 @@
                 margenSeguridad: 10,
                 sangria: 4,
                 interlineado: 1.0,
+                tamanoLetra: 14,
                 justificado: true,
                 tamanoMaqueta: 'tabloide',
                 tipoSeccion: 'seccion_a',
@@ -2430,8 +2472,12 @@
             if (document.getElementById('calibInterlineado')) {
                 document.getElementById('calibInterlineado').value = "1.00";
             }
+            if (document.getElementById('calibTamanoLetra')) {
+                document.getElementById('calibTamanoLetra').value = 14;
+            }
             actualizarSelectSangriaUI(4);
             actualizarSelectInterlineadoUI(1.0);
+            actualizarSelectTamanoLetraUI(14);
             actualizarBotonesColumnasUI();
             aplicarEstilosVisualesEditor();
             cambiarTamanoMaqueta('tabloide');
@@ -2583,7 +2629,9 @@
             const factorInter = parseFloat(calibracion.interlineado) || 1.0;
             const lineHeight = (1.45 * factorInter).toFixed(2);
             const marginBottom = (8 * factorInter).toFixed(1);
-            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: 13.5px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
+            const tamanoBase = parseFloat(calibracion.tamanoLetra) || 14;
+            const fontSizeModal = Math.max(9, (13.5 * (tamanoBase / 14))).toFixed(1);
+            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: ${fontSizeModal}px; font-family: 'Times New Roman', Times, serif; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
             const balance = balancearTextoEnColumnas(pagObj.texto, calibracion.columnas, calibracion.modoDistribucion);
 
@@ -2714,10 +2762,17 @@
             }
         }
 
-        // FUNCIONES DE CONTROL DE ESPACIO ENTRE LÍNEAS (INTERLINEADO) Y JUSTIFICACIÓN
+        // FUNCIONES DE CONTROL DE TIPOGRAFÍA TIMES NEW ROMAN, ESPACIADO Y JUSTIFICACIÓN
         function aplicarEstilosVisualesEditor() {
             const editor = document.getElementById('textoPublicacion');
             if (!editor) return;
+
+            // Garantizar tipografía Times New Roman oficial
+            editor.style.fontFamily = "'Times New Roman', Times, serif";
+
+            // Tamaño de letra dinámico
+            const tamano = parseFloat(calibracion.tamanoLetra) || 14;
+            editor.style.fontSize = tamano + 'px';
 
             const factor = parseFloat(calibracion.interlineado) || 1.0;
             // Alargar visiblemente la separación vertical entre líneas de texto en el editor
@@ -2728,6 +2783,73 @@
             editor.style.textAlign = esJustificado ? 'justify' : 'left';
             editor.style.textJustify = esJustificado ? 'inter-word' : 'auto';
             actualizarBotonJustificadoUI(esJustificado);
+        }
+
+        // FUNCIONES DE CONTROL DE TAMAÑO DE LETRA (TIMES NEW ROMAN)
+        function cambiarTamanoLetra(val) {
+            if (val === 'custom') {
+                const actual = calibracion.tamanoLetra || 14;
+                const res = prompt("Ingrese el tamaño de letra en píxeles (ej. 12, 14, 16, 18, 20):", actual);
+                if (res !== null) {
+                    const parsed = parseFloat(res);
+                    if (!isNaN(parsed) && parsed >= 9 && parsed <= 36) {
+                        aplicarValorTamanoLetra(parsed);
+                        showToast(`Tamaño de letra: ${parsed}px (Times New Roman)`, "success");
+                    } else {
+                        showToast("Tamaño no válido (debe ser entre 9px y 36px)", "warning");
+                        actualizarSelectTamanoLetraUI(calibracion.tamanoLetra);
+                    }
+                } else {
+                    actualizarSelectTamanoLetraUI(calibracion.tamanoLetra);
+                }
+                return;
+            }
+
+            const num = parseFloat(val) || 14;
+            aplicarValorTamanoLetra(num);
+            showToast(`Tamaño de letra: ${num}px (Times New Roman)`, "info");
+        }
+
+        function ajustarTamanoLetraDelta(delta) {
+            const actual = parseFloat(calibracion.tamanoLetra) || 14;
+            const nuevo = Math.min(36, Math.max(9, Math.round(actual + delta)));
+            if (nuevo !== actual) {
+                aplicarValorTamanoLetra(nuevo);
+                showToast(`Tamaño de letra: ${nuevo}px (Times New Roman)`, "info");
+            }
+        }
+
+        function aplicarValorTamanoLetra(valor) {
+            calibracion.tamanoLetra = valor;
+            const inputCalib = document.getElementById('calibTamanoLetra');
+            if (inputCalib) inputCalib.value = valor;
+            actualizarSelectTamanoLetraUI(valor);
+            aplicarEstilosVisualesEditor();
+            localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
+            actualizarMaquetaGaceta();
+        }
+
+        function actualizarSelectTamanoLetraUI(valor) {
+            const select = document.getElementById('selectTamanoLetra');
+            if (!select) return;
+
+            const valStr = String(valor);
+            for (let i = 0; i < select.options.length; i++) {
+                if (select.options[i].value === valStr) {
+                    select.selectedIndex = i;
+                    return;
+                }
+            }
+
+            let customOpt = select.querySelector('option[data-dynamic-font="true"]');
+            if (!customOpt) {
+                customOpt = document.createElement('option');
+                customOpt.setAttribute('data-dynamic-font', 'true');
+                select.insertBefore(customOpt, select.querySelector('option[value="custom"]'));
+            }
+            customOpt.value = String(valor);
+            customOpt.textContent = `${valor} px (Personalizado)`;
+            customOpt.selected = true;
         }
 
         function toggleJustificadoTexto() {
@@ -3688,13 +3810,20 @@
                 fillBadge.textContent = `${pctPagina.toFixed(0)}% ocupado (Pág. ${paginaActualPrevia})`;
             }
 
-            // Sangría e interlineado
+            // Sangría, interlineado y tamaño de fuente en Times New Roman
+            const tamanoBase = parseFloat(calibracion.tamanoLetra) || 14;
+            const fontMaquetaPx = Math.max(7.5, (10 * (tamanoBase / 14))).toFixed(1);
+            if (columnsContainer) {
+                columnsContainer.style.fontFamily = "'Times New Roman', Times, serif";
+                columnsContainer.style.fontSize = `${fontMaquetaPx}px`;
+            }
+
             const sangriaPx = (calibracion.sangria || 0) * 2.2;
             const factorInter = parseFloat(calibracion.interlineado) || 1.0;
             const lineHeightPx = (1.38 * factorInter).toFixed(2);
             const marginBottomPx = (5 * factorInter).toFixed(1);
 
-            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
+            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; font-family: 'Times New Roman', Times, serif; font-size: ${fontMaquetaPx}px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
             // Flujo equilibrado en columnas
             const balance = balancearTextoEnColumnas(pagActual.texto, calibracion.columnas, calibracion.modoDistribucion);
@@ -3987,10 +4116,10 @@
             doc.setFontSize(9);
             doc.setFont('helvetica', 'bold');
             doc.setTextColor(0, 33, 71);
-            doc.text("EXTRACTO DEL TEXTO INGRESADO PARA PUBLICACIÓN:", 15, textoY);
+            doc.text("EXTRACTO DEL TEXTO INGRESADO PARA PUBLICACIÓN (TIMES NEW ROMAN):", 15, textoY);
 
-            doc.setFont('helvetica', 'normal');
-            doc.setFontSize(8);
+            doc.setFont('times', 'normal');
+            doc.setFontSize(8.5);
             doc.setTextColor(70, 70, 70);
 
             const textoRaw = document.getElementById('textoPublicacion').value;
