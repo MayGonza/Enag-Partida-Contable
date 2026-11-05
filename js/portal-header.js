@@ -221,3 +221,4 @@
     // Exportar función por si se llama explícitamente tras login
     window.actualizarNavUsuario = renderizarUsuarioPortal;
 })();
+
