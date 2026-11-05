@@ -66,6 +66,7 @@
                 opacity: 0;
                 transform: translateY(20px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -465,6 +466,7 @@
             border-color: #bbf7d0;
             background: linear-gradient(135deg, #ffffff 0%, #f0fdf4 100%);
         }
+
         .kpi-card.kpi-neto::before {
             background: #10b981;
         }
@@ -473,6 +475,7 @@
             border-color: #bae6fd;
             background: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
         }
+
         .kpi-card.kpi-devengado::before {
             background: #0284c7;
         }
@@ -481,6 +484,7 @@
             border-color: #fed7aa;
             background: linear-gradient(135deg, #ffffff 0%, #fff7ed 100%);
         }
+
         .kpi-card.kpi-deducciones::before {
             background: #ea580c;
         }
@@ -489,6 +493,7 @@
             border-color: #cbd5e1;
             background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
         }
+
         .kpi-card.kpi-empleados::before {
             background: var(--primary-navy);
         }
@@ -520,14 +525,17 @@
             background: #dcfce7;
             color: #15803d;
         }
+
         .badge-blue {
             background: #e0f2fe;
             color: #0369a1;
         }
+
         .badge-orange {
             background: #ffedd5;
             color: #c2410c;
         }
+
         .badge-navy {
             background: #e2e8f0;
             color: #002147;
@@ -747,12 +755,35 @@
             text-transform: uppercase;
         }
 
-        .cat-prevision { background: #e0f2fe; color: #0369a1; }
-        .cat-seguridad { background: #dcfce7; color: #15803d; }
-        .cat-bancaria { background: #fef3c7; color: #b45309; }
-        .cat-judicial { background: #fee2e2; color: #b91c1c; }
-        .cat-gremial { background: #f3e8ff; color: #7e22ce; }
-        .cat-general { background: #f1f5f9; color: #475569; }
+        .cat-prevision {
+            background: #e0f2fe;
+            color: #0369a1;
+        }
+
+        .cat-seguridad {
+            background: #dcfce7;
+            color: #15803d;
+        }
+
+        .cat-bancaria {
+            background: #fef3c7;
+            color: #b45309;
+        }
+
+        .cat-judicial {
+            background: #fee2e2;
+            color: #b91c1c;
+        }
+
+        .cat-gremial {
+            background: #f3e8ff;
+            color: #7e22ce;
+        }
+
+        .cat-general {
+            background: #f1f5f9;
+            color: #475569;
+        }
 
         /* Pestañas para Detalle por Empleado */
         .tabs-container {
@@ -1004,28 +1035,37 @@
                 <div class="header-icon">📊</div>
                 <div class="header-texts">
                     <h1>Reporte Resumen de Planilla y Deducciones</h1>
-                    <p>Consolidado ejecutivo de valor total pagado, deducciones globales y desglose individual por concepto</p>
+                    <p>Consolidado ejecutivo de valor total pagado, deducciones globales y desglose individual por
+                        concepto</p>
                 </div>
             </div>
             <div class="header-actions">
-                <button type="button" class="btn-action btn-pdf" id="btnExportPDF" onclick="generarPDFReporte()" disabled>
+                <button type="button" class="btn-action btn-pdf" id="btnExportPDF" onclick="generarPDFReporte()"
+                    disabled>
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
-                        <path d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.127.208-.348.56-.63 1.007-.824.77-.333 1.833-.497 3.033-.497.666 0 1.258.046 1.764.13.43-.59.794-1.282 1.077-2.04.283-.758.45-1.554.498-2.355.03-.49.03-.947.001-1.353-.053-.74-.298-1.233-.762-1.42-.328-.133-.71-.122-1.075.053-.418.2-.767.575-1.026 1.076-.41.792-.61 1.776-.628 2.87-.015.89.066 1.775.244 2.627-.663.486-1.433.916-2.268 1.264-.424.177-.852.327-1.282.448l-.208.448z"/>
+                        <path
+                            d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
+                        <path
+                            d="M4.603 14.087a.81.81 0 0 1-.438-.42c-.195-.388-.13-.776.08-1.127.208-.348.56-.63 1.007-.824.77-.333 1.833-.497 3.033-.497.666 0 1.258.046 1.764.13.43-.59.794-1.282 1.077-2.04.283-.758.45-1.554.498-2.355.03-.49.03-.947.001-1.353-.053-.74-.298-1.233-.762-1.42-.328-.133-.71-.122-1.075.053-.418.2-.767.575-1.026 1.076-.41.792-.61 1.776-.628 2.87-.015.89.066 1.775.244 2.627-.663.486-1.433.916-2.268 1.264-.424.177-.852.327-1.282.448l-.208.448z" />
                     </svg>
                     Descargar Reporte PDF
                 </button>
-                <button type="button" class="btn-action btn-excel" id="btnExportExcel" onclick="exportarExcelResumen()" disabled>
+                <button type="button" class="btn-action btn-excel" id="btnExportExcel" onclick="exportarExcelResumen()"
+                    disabled>
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.748l2.116 2.572a.5.5 0 0 0 .768-.64L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.252 5.884 6.68z"/>
-                        <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+                        <path
+                            d="M5.884 6.68a.5.5 0 1 0-.768.64L7.349 10l-2.233 2.68a.5.5 0 0 0 .768.64L8 10.748l2.116 2.572a.5.5 0 0 0 .768-.64L8.651 10l2.233-2.68a.5.5 0 0 0-.768-.64L8 9.252 5.884 6.68z" />
+                        <path
+                            d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z" />
                     </svg>
                     Exportar Excel (.xlsx)
                 </button>
-                <button type="button" class="btn-action btn-print" id="btnPrintReport" onclick="window.print()" disabled>
+                <button type="button" class="btn-action btn-print" id="btnPrintReport" onclick="window.print()"
+                    disabled>
                     <svg width="18" height="18" fill="currentColor" viewBox="0 0 16 16">
-                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z"/>
-                        <path d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z"/>
+                        <path d="M2.5 8a.5.5 0 1 0 0-1 .5.5 0 0 0 0 1z" />
+                        <path
+                            d="M5 1a2 2 0 0 0-2 2v2H2a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h1v1a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2v-1h1a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-1V3a2 2 0 0 0-2-2H5zM4 3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1v2H4V3zm1 5a2 2 0 0 0-2 2v1H2a1 1 0 0 1-1-1V7a1 1 0 0 1 1-1h12a1 1 0 0 1 1 1v3a1 1 0 0 1-1 1h-1v-1a2 2 0 0 0-2-2H5zm7 2v3a1 1 0 0 1-1 1H5a1 1 0 0 1-1-1v-3a1 1 0 0 1 1-1h6a1 1 0 0 1 1 1z" />
                     </svg>
                     Imprimir
                 </button>
@@ -1036,11 +1076,13 @@
         <div class="upload-section">
             <div class="drop-zone" id="drop-zone" onclick="document.getElementById('excelFile').click()">
                 <svg viewBox="0 0 24 24">
-                    <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                    <path
+                        d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
                 </svg>
                 <p>Arrastra aquí cualquier archivo de Planilla Excel (.xls / .xlsx)</p>
                 <span>Compatible con nóminas de Acuerdo, Contrato o planillas institucionales ENAG</span>
-                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;" onchange="handleFileSelect(event)">
+                <input type="file" id="excelFile" accept=".xlsx, .xls, .csv" style="display: none;"
+                    onchange="handleFileSelect(event)">
             </div>
 
             <div class="upload-info-card">
@@ -1053,7 +1095,8 @@
                     </div>
                 </div>
                 <div style="margin-top: 15px;">
-                    <button type="button" class="btn-action btn-print" style="width: 100%; justify-content: center;" onclick="descargarPlantillaDemo()">
+                    <button type="button" class="btn-action btn-print" style="width: 100%; justify-content: center;"
+                        onclick="descargarPlantillaDemo()">
                         📥 Descargar Plantilla Modelo
                     </button>
                 </div>
@@ -1084,11 +1127,13 @@
             </div>
             <div class="config-group">
                 <label>Nombre Jefatura de RRHH</label>
-                <input type="text" id="cfgFirmanteRRHH" value="María José Valverde Bardales" placeholder="Nombre de quien autoriza">
+                <input type="text" id="cfgFirmanteRRHH" value="María José Valverde Bardales"
+                    placeholder="Nombre de quien autoriza">
             </div>
             <div class="config-group">
                 <label>Cargo de Jefatura de RRHH</label>
-                <input type="text" id="cfgCargoFirmanteRRHH" value="Jefe Interina de Recursos Humanos" placeholder="Cargo institucional">
+                <input type="text" id="cfgCargoFirmanteRRHH" value="Jefe Interina de Recursos Humanos"
+                    placeholder="Cargo institucional">
             </div>
         </div>
 
@@ -1168,9 +1213,12 @@
                 <div class="table-toolbar">
                     <div class="search-box">
                         <svg viewBox="0 0 16 16">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            <path
+                                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                         </svg>
-                        <input type="text" id="searchDeducInput" placeholder="Buscar deducción (IHSS, INJUPEMP, Bancos...)" oninput="filtrarTablaDeducciones()">
+                        <input type="text" id="searchDeducInput"
+                            placeholder="Buscar deducción (IHSS, INJUPEMP, Bancos...)"
+                            oninput="filtrarTablaDeducciones()">
                     </div>
                     <div style="font-size: 0.9em; font-weight: 700; color: #475569;">
                         Total Conceptos Identificados: <span id="numConceptosLabel" style="color: #002147;">0</span>
@@ -1196,7 +1244,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="3" style="text-align: right; text-transform: uppercase;">GRAN TOTAL DEDUCCIONES:</td>
+                                <td colspan="3" style="text-align: right; text-transform: uppercase;">GRAN TOTAL
+                                    DEDUCCIONES:</td>
                                 <td id="tfootTotalCasos" class="col-center">0</td>
                                 <td id="tfootTotalMonto" class="col-right">L. 0.00</td>
                                 <td class="col-right">100.00%</td>
@@ -1213,9 +1262,11 @@
                 <div class="table-toolbar">
                     <div class="search-box">
                         <svg viewBox="0 0 16 16">
-                            <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                            <path
+                                d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z" />
                         </svg>
-                        <input type="text" id="searchEmpInput" placeholder="Buscar empleado o cargo..." oninput="filtrarTablaEmpleados()">
+                        <input type="text" id="searchEmpInput" placeholder="Buscar empleado o cargo..."
+                            oninput="filtrarTablaEmpleados()">
                     </div>
                     <div style="font-size: 0.9em; font-weight: 700; color: #475569;">
                         Total Empleados Registrados: <span id="numEmpLabel" style="color: #002147;">0</span>
@@ -1241,7 +1292,8 @@
                         </tbody>
                         <tfoot>
                             <tr>
-                                <td colspan="3" style="text-align: right; text-transform: uppercase;">TOTALES DE NÓMINA:</td>
+                                <td colspan="3" style="text-align: right; text-transform: uppercase;">TOTALES DE NÓMINA:
+                                </td>
                                 <td id="tfootEmpAsignado" class="col-right">L. 0.00</td>
                                 <td id="tfootEmpDevengado" class="col-right">L. 0.00</td>
                                 <td id="tfootEmpDeducciones" class="col-right">L. 0.00</td>
@@ -1254,12 +1306,14 @@
             </div>
 
             <!-- FIRMAS INSTITUCIONALES -->
-            <div class="signatures-section" style="display: flex; justify-content: center; margin-top: 35px; border-top: 2px dashed #cbd5e1; padding-top: 25px;">
+            <div class="signatures-section"
+                style="display: flex; justify-content: center; margin-top: 35px; border-top: 2px dashed #cbd5e1; padding-top: 25px;">
                 <div class="sig-block" style="max-width: 360px; width: 100%;">
                     <div class="sig-line"></div>
                     <div class="sig-name" id="sigLabelRRHH">María José Valverde Bardales</div>
                     <div class="sig-role" id="sigLabelCargoRRHH">Jefe Interina de Recursos Humanos</div>
-                    <div style="font-size: 0.8em; color: #64748b; margin-top: 4px;">Departamento de Recursos Humanos — ENAG</div>
+                    <div style="font-size: 0.8em; color: #64748b; margin-top: 4px;">Departamento de Recursos Humanos —
+                        ENAG</div>
                 </div>
             </div>
 
@@ -1268,7 +1322,8 @@
         <!-- ESTADO VACÍO -->
         <div id="emptyState" class="empty-state">
             <svg viewBox="0 0 24 24">
-                <path d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
+                <path
+                    d="M14 2H6c-1.1 0-1.99.9-1.99 2L4 20c0 1.1.89 2 1.99 2H18c1.1 0 2-.9 2-2V8l-6-6zm2 16H8v-2h8v2zm0-4H8v-2h8v2zm-3-5V3.5L18.5 9H13z" />
             </svg>
             <h3>Aún no se ha cargado ninguna planilla</h3>
             <p>Arrastra tu archivo de Excel arriba o haz clic para seleccionarlo de tu equipo.</p>
@@ -1282,21 +1337,28 @@
             <div class="modal-header">
                 <div>
                     <h3 id="modalEmpNombre">Nombre del Colaborador</h3>
-                    <span id="modalEmpCargo" style="font-size: 0.85em; color: var(--text-muted); font-weight: 600;">Cargo</span>
+                    <span id="modalEmpCargo"
+                        style="font-size: 0.85em; color: var(--text-muted); font-weight: 600;">Cargo</span>
                 </div>
                 <button type="button" class="btn-close-modal" onclick="cerrarModalEmpDirect()">✕</button>
             </div>
-            <div style="margin-bottom: 16px; background: #f8fafc; padding: 14px 18px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div
+                style="margin-bottom: 16px; background: #f8fafc; padding: 14px 18px; border-radius: 12px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
                 <div>
-                    <span style="font-size: 0.78em; color: #64748b; font-weight: 700; text-transform: uppercase;">Sueldo Devengado</span>
-                    <div id="modalEmpDevengado" style="font-size: 1.15em; font-weight: 800; color: #002147;">L. 0.00</div>
+                    <span style="font-size: 0.78em; color: #64748b; font-weight: 700; text-transform: uppercase;">Sueldo
+                        Devengado</span>
+                    <div id="modalEmpDevengado" style="font-size: 1.15em; font-weight: 800; color: #002147;">L. 0.00
+                    </div>
                 </div>
                 <div>
-                    <span style="font-size: 0.78em; color: #64748b; font-weight: 700; text-transform: uppercase;">Neto a Pagar</span>
+                    <span style="font-size: 0.78em; color: #64748b; font-weight: 700; text-transform: uppercase;">Neto a
+                        Pagar</span>
                     <div id="modalEmpNeto" style="font-size: 1.15em; font-weight: 800; color: #10b981;">L. 0.00</div>
                 </div>
             </div>
-            <h4 style="margin: 0 0 10px 0; color: #002147; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px;">Desglose de Deducciones Aplicadas:</h4>
+            <h4
+                style="margin: 0 0 10px 0; color: #002147; font-size: 0.95em; text-transform: uppercase; letter-spacing: 0.5px;">
+                Desglose de Deducciones Aplicadas:</h4>
             <div class="table-responsive">
                 <table>
                     <thead>
