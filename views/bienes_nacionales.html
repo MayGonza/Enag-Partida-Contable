@@ -1362,8 +1362,12 @@
             </a>
             <span class="portal-badge">🏛️ Bienes Nacionales del Estado</span>
         </div>
-        <div>
-            <span id="badgeCurrentDate" style="color: rgba(255, 255, 255, 0.85); font-size: 0.88em; font-weight: 600;"></span>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Cargando...</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
         </div>
     </div>
 
@@ -4061,6 +4065,7 @@
         }
     </script>
 
+    <script src="../js/portal-header.js"></script>
 </body>
 
 </html>

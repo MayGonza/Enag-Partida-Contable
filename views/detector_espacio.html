@@ -1473,12 +1473,23 @@
 
 <body>
 
-    <div class="nav-container">
-        <a href="../index.html" class="btn-nav btn-nav-menu">← Volver al Portal Principal</a>
-        <div class="nav-actions">
-            <a href="cotizaciones.html" class="btn-nav btn-nav-cotiz">
-                <span>📄</span> Ir a Módulo de Cotizaciones
+        <!-- Top Navigation Bar -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Portal
             </a>
+            <span class="portal-badge">📏 Detector de Espacio y Tarifas</span>
+            <a href="cotizaciones.html" class="btn-nav" style="background-color: #0284c7; color: white;">
+                <span>📄</span> Cotizaciones
+            </a>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Cargando...</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
         </div>
     </div>
 
@@ -4306,6 +4317,7 @@ Secretaria`
             }
         });
     </script>
+    <script src="../js/portal-header.js"></script>
 </body>
 
 </html>

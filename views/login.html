@@ -529,7 +529,10 @@
                     }, { merge: true });
 
                     if (uDoc.exists) {
-                        localStorage.setItem('enag_username', uDoc.data().usuario || email);
+                        const ud = uDoc.data();
+                        localStorage.setItem('enag_username', ud.usuario || email);
+                        if (ud.nombre) localStorage.setItem('enag_user_nombre', ud.nombre);
+                        if (ud.departamento) localStorage.setItem('enag_user_depto', ud.departamento);
                     } else {
                         localStorage.setItem('enag_username', email);
                     }

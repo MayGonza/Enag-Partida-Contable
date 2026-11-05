@@ -148,6 +148,24 @@
 </head>
 
 <body>
+
+    <!-- Top Navigation Bar -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Portal
+            </a>
+            <span class="portal-badge">📢 Departamento de Comercialización</span>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Cargando...</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
+        </div>
+    </div>
+
     <div class="container">
         <img src="../assets/logo.png" alt="ENAG Logo" class="header-logo">
         <h1>Departamento de Comercialización</h1>
@@ -175,6 +193,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
+    <script src="../js/portal-header.js"></script>
 </body>
 
 </html>

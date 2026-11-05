@@ -167,9 +167,22 @@
 </head>
 
 <body>
-    <div class="nav-container">
-        <a href="../index.html" class="btn-nav">← Volver al Menú Principal</a>
-        <a href="login.html" class="btn-nav" id="btnCerrarSesion" onclick="cerrarSesion(event)">← Cerrar Sesión</a>
+        <!-- Top Navigation Bar -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Portal
+            </a>
+            <span class="portal-badge">⚙️ Parámetros del Sistema (TI)</span>
+            <a href="login.html" class="btn-nav" style="background-color: #dc2626; color: white;" onclick="cerrarSesion(event)">🚪 Cerrar Sesión</a>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Cargando...</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
+        </div>
     </div>
 
     <div class="container">
@@ -315,5 +328,6 @@
             }
         }
     </script>
+    <script src="../js/portal-header.js"></script>
 </body>
 </html>
