@@ -421,8 +421,21 @@
 </head>
 
 <body>
-    <div class="nav-container">
-        <a href="../index.html" class="btn-nav">← Regresar al Menú</a>
+        <!-- Top Navigation Bar -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Portal
+            </a>
+            <span class="portal-badge">👥 Solicitudes de Personal (RRHH)</span>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Cargando...</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
+        </div>
     </div>
 
     <div class="container">
@@ -930,6 +943,7 @@
             window.open(doc.output('bloburl'), '_blank');
         });
     </script>
+    <script src="../js/portal-header.js"></script>
 </body>
 
 </html>

@@ -193,7 +193,10 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
             try {
                 const uDoc = await dbFirestore.collection('usuarios').doc(user.uid).get();
                 if (uDoc.exists) {
-                    localStorage.setItem('enag_username', uDoc.data().usuario || user.email);
+                    const uData = uDoc.data();
+                    localStorage.setItem('enag_username', uData.usuario || user.email);
+                    if (uData.nombre) localStorage.setItem('enag_user_nombre', uData.nombre);
+                    if (uData.departamento) localStorage.setItem('enag_user_depto', uData.departamento);
                 } else {
                     localStorage.setItem('enag_username', user.email);
                 }
@@ -202,6 +205,8 @@ if (typeof firebase !== 'undefined' && firebase.auth) {
             }
         } else if (!user) {
             localStorage.removeItem('enag_username');
+            localStorage.removeItem('enag_user_nombre');
+            localStorage.removeItem('enag_user_depto');
             localStorage.removeItem('enag_session_id');
             if (sessionUnsubscribe) {
                 sessionUnsubscribe();

@@ -584,10 +584,24 @@
 <body>
 
     <div class="main-container">
-        <div style="display: flex; justify-content: flex-end; margin-bottom: -20px;">
-            <button onclick="cerrarSesion()"
-                style="background-color: #dc2626; color: white; border: none; padding: 8px 16px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit;">Cerrar
-                Sesión</button>
+                <!-- Top Bar Oficial ENAG -->
+        <div class="top-navbar" style="margin-bottom: 25px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 8px 12px; background: rgba(0, 33, 71, 0.04); border-radius: 12px; border: 1px solid rgba(0, 33, 71, 0.1);">
+            <div class="nav-left-group" style="display: flex; align-items: center; gap: 10px;">
+                <span class="portal-badge" style="background: rgba(0, 33, 71, 0.08); color: #002147 !important; border: 1px solid rgba(0, 33, 71, 0.2); font-weight: 700; padding: 6px 14px; border-radius: 20px; font-size: 0.84em; display: inline-flex; align-items: center; gap: 6px;">
+                    🏛️ Sistema de Gestión ENAG
+                </span>
+            </div>
+            <div class="nav-right-group" style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+                <span id="badgeCurrentUser" class="portal-user-badge" style="background: rgba(0, 33, 71, 0.08); color: #002147 !important; border: 1px solid rgba(0, 33, 71, 0.2); font-weight: 600; padding: 6px 14px; border-radius: 20px; font-size: 0.84em; display: inline-flex; align-items: center; gap: 8px;">
+                    <span class="user-status-dot" style="display: inline-block; width: 8px; height: 8px; background-color: #10b981; border-radius: 50%; box-shadow: 0 0 6px #10b981;"></span>
+                    <span id="navUserName">👤 Cargando usuario...</span>
+                </span>
+                <span id="badgeCurrentDate" class="portal-date-badge" style="color: #334155; font-size: 0.88em; font-weight: 600;"></span>
+                <button onclick="cerrarSesion()"
+                    style="background-color: #dc2626; color: white; border: none; padding: 7px 14px; border-radius: 6px; cursor: pointer; font-weight: bold; font-family: inherit; font-size: 0.86em; transition: all 0.2s; box-shadow: 0 2px 4px rgba(220, 38, 38, 0.25);">
+                    🚪 Cerrar Sesión
+                </button>
+            </div>
         </div>
         <img src="assets/logo.png" alt="ENAG Logo" class="header-logo">
         <h1 id="menuTitle">Portal Administrativo</h1>
@@ -1341,6 +1355,7 @@
         }
     </script>
     <script src="js/soporte.js"></script>
+    <script src="js/portal-header.js"></script>
 </body>
 
 </html>
