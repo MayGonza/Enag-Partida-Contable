@@ -12,6 +12,7 @@
       "**/node_modules/**",
       ".git/**",
       "*.xls",
+      "*.pdf",
       "*.log"
     ],
     "headers": [
