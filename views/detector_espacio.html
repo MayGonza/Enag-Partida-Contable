@@ -2270,12 +2270,10 @@
         // =========================================================================
         function limpiarSaltosDeLinea(texto) {
             if (!texto) return '';
-            return texto
-                .replace(/(\w+)-\s*[\r\n]+\s*(\w+)/g, '$1$2') // Reúne palabras cortadas con guión al final de línea
-                .replace(/[\r\n]+/g, ' ')                      // Convierte todos los saltos de línea en un solo espacio
-                .replace(/[\t ]+/g, ' ')                       // Colapsa espacios múltiples o tabulaciones
-                .replace(/\s+([.,;:!?])/g, '$1')               // Quita espacios antes de signos de puntuación
-                .trim();
+            // Reconstruye el texto unificando saltos huérfanos dentro de cada párrafo
+            // pero preservando los saltos dobles entre cláusulas legales y párrafos reales.
+            const parrafos = segmentarTextoEnParrafos(texto);
+            return parrafos.join('\n\n');
         }
 
         function eliminarSaltosEditor() {
@@ -2325,17 +2323,17 @@
                 try {
                     calibracion = Object.assign(calibracion, JSON.parse(guardado));
                     // Si el usuario tenía calibración anterior con formato carta o sin tipoPapel, actualizar al estándar Tabloide
-                    if (!calibracion.tipoPapel) {
+                    if (!calibracion.tipoPapel || calibracion.tipoPapel === 'carta') {
                         calibracion.tipoPapel = 'tabloide';
                         calibracion.palabrasPorPagina = 2000;
                         calibracion.charsPorLinea = 50;
                     }
-                    if (calibracion.tipoPapel === 'tabloide' && (calibracion.palabrasPorPagina === 1050 || calibracion.palabrasPorPagina === 1800)) {
+                    if (calibracion.tipoPapel === 'tabloide' && (!calibracion.palabrasPorPagina || calibracion.palabrasPorPagina < 1900)) {
                         calibracion.palabrasPorPagina = 2000;
                         calibracion.charsPorLinea = 50;
                     }
-                    if (calibracion.margenSeguridad === 10) {
-                        calibracion.margenSeguridad = 0; // Migrar de 10% a 0% para cotización de espacio exacto
+                    if (calibracion.margenSeguridad === undefined || calibracion.margenSeguridad > 5) {
+                        calibracion.margenSeguridad = 0; // Migrar a 0% para cotización de espacio exacto
                     }
                     if (calibracion.tamanoMaqueta === undefined) calibracion.tamanoMaqueta = 'tabloide';
                     if (calibracion.sangria === undefined) calibracion.sangria = 4;
@@ -2488,9 +2486,9 @@
         function cambiarFormatoPapel(tipo) {
             calibracion.tipoPapel = tipo;
             if (tipo === 'tabloide') {
-                calibracion.palabrasPorPagina = 1800;
-                calibracion.charsPorLinea = calibracion.columnas === 3 ? 32 : (calibracion.columnas === 1 ? 75 : 45);
-                document.getElementById('calibPalabrasPorPagina').value = 1800;
+                calibracion.palabrasPorPagina = 2000;
+                calibracion.charsPorLinea = calibracion.columnas === 3 ? 32 : (calibracion.columnas === 1 ? 80 : 50);
+                document.getElementById('calibPalabrasPorPagina').value = 2000;
                 document.getElementById('calibCharsPorLinea').value = calibracion.charsPorLinea;
                 showToast("Formato ajustado a TABLOIDE OFICIAL (11\" × 17\" • 279 × 432 mm)", "success");
             } else {
@@ -2506,12 +2504,12 @@
         function restablecerCalibracion() {
             calibracion = {
                 tipoPapel: 'tabloide',
-                palabrasPorPagina: 1800,
-                charsPorLinea: 45,
+                palabrasPorPagina: 2000,
+                charsPorLinea: 50,
                 columnas: 2,
                 modoDistribucion: 'balanceado',
                 tipoPublicacion: 'texto',
-                margenSeguridad: 10,
+                margenSeguridad: 0,
                 sangria: 4,
                 interlineado: 1.0,
                 tamanoLetra: 14,
@@ -2526,8 +2524,8 @@
             if (document.getElementById('calibTipoPapel')) {
                 document.getElementById('calibTipoPapel').value = 'tabloide';
             }
-            document.getElementById('calibPalabrasPorPagina').value = 1800;
-            document.getElementById('calibCharsPorLinea').value = 45;
+            document.getElementById('calibPalabrasPorPagina').value = 2000;
+            document.getElementById('calibCharsPorLinea').value = 50;
             if (document.getElementById('calibColumnas')) {
                 document.getElementById('calibColumnas').value = 2;
             }
@@ -3209,22 +3207,73 @@
             showToast("Estructura legal organizada en párrafos oficiales (CONSIDERANDO, POR TANTO, DECRETA, ARTÍCULOS).", "success");
         }
 
-        // SEGMENTADOR INTELIGENTE DE PÁRRAFOS Y CLÁUSULAS
+        // SEGMENTADOR EDITORIAL INTELIGENTE DE PÁRRAFOS Y CLÁUSULAS (DIARIO OFICIAL LA GACETA)
+        // Detecta cláusulas oficiales, repara saltos de línea huérfanos generados al copiar desde PDF o Word,
+        // y agrupa las oraciones en sus verdaderos párrafos oficiales sin inflar artificialmente el número de líneas.
         function segmentarTextoEnParrafos(texto) {
             if (!texto || !texto.trim()) return [];
 
-            const lineas = texto.split(/\r?\n/).map(l => l.trim()).filter(l => l.length > 0);
-            const parrafos = [];
-            const patronLegal = /(?=(?:\bCONSIDERANDO:|\bPOR\s+TANTO[;:]|\bDECRETA:|\bACUERDA:|\bRESUELVE:|\bART[IÍ]CULO\s+\d+[\.\-:]|\bCOMUN[IÍ]QUESE|\bDADO\s+EN\b))/gi;
+            // Patrón de cláusulas maestras oficiales que abren párrafo
+            const patronClausulaMaestra = /^(?:CONSIDERANDO:?|POR\s+TANTO[;:]?|DECRETA:?|ACUERDA:?|RESUELVE:?|CERTIFICA:?|ART[IÍ]CULO\s+\d+[\.\-:]|COMUN[IÍ]QUESE|DADO\s+EN\b|PUBL[IÍ]QUESE\b|(?:ACUERDO|DECRETO|RESOLUCI[OÓ]N)\s+EJECUTIV[OA]\b)/i;
 
-            lineas.forEach(linea => {
-                const partesLegales = linea.split(patronLegal).map(p => p.trim()).filter(p => p.length > 0);
-                if (partesLegales.length > 1) {
-                    parrafos.push(...partesLegales);
-                } else {
-                    parrafos.push(linea);
+            // Patrón dentro de línea para desdoblar cláusulas si vienen pegadas en una sola línea
+            const patronSeparadorInterno = /(?=(?:\bCONSIDERANDO:|\bPOR\s+TANTO[;:]|\bDECRETA:|\bACUERDA:|\bRESUELVE:|\bART[IÍ]CULO\s+\d+[\.\-:]|\bCOMUN[IÍ]QUESE|\bDADO\s+EN\b))/gi;
+
+            const lineasCrudas = texto.replace(/\r\n/g, '\n').replace(/\r/g, '\n').split('\n');
+            const parrafos = [];
+            let parrafoActual = '';
+
+            for (let i = 0; i < lineasCrudas.length; i++) {
+                let linea = lineasCrudas[i].trim();
+
+                // Línea vacía: corte intencional de párrafo
+                if (!linea) {
+                    if (parrafoActual) {
+                        parrafos.push(parrafoActual.trim());
+                        parrafoActual = '';
+                    }
+                    continue;
                 }
-            });
+
+                // Si la línea contiene varias cláusulas legales pegadas, separarlas
+                const subpartes = linea.split(patronSeparadorInterno).map(p => p.trim()).filter(p => p.length > 0);
+                if (subpartes.length > 1) {
+                    if (parrafoActual) {
+                        parrafos.push(parrafoActual.trim());
+                        parrafoActual = '';
+                    }
+                    for (let s = 0; s < subpartes.length - 1; s++) {
+                        parrafos.push(subpartes[s]);
+                    }
+                    linea = subpartes[subpartes.length - 1];
+                }
+
+                const esClausulaMaestra = patronClausulaMaestra.test(linea);
+
+                if (esClausulaMaestra && parrafoActual) {
+                    // Siempre inicia párrafo nuevo si es cláusula oficial
+                    parrafos.push(parrafoActual.trim());
+                    parrafoActual = linea;
+                } else if (!parrafoActual) {
+                    parrafoActual = linea;
+                } else {
+                    // Si el párrafo anterior era solo el encabezado ("DECRETA:", "ACUERDA:", "RESUELVE:", "POR TANTO;")
+                    if (/^(?:DECRETA:|ACUERDA:|RESUELVE:|POR\s+TANTO[;:]?)$/i.test(parrafoActual)) {
+                        parrafos.push(parrafoActual.trim());
+                        parrafoActual = linea;
+                    } else if (parrafoActual.endsWith('-')) {
+                        // Palabra cortada con guión al borde de línea (ej: "Admi-" + "nistración")
+                        parrafoActual = parrafoActual.slice(0, -1) + linea;
+                    } else {
+                        // Línea continuada del mismo párrafo
+                        parrafoActual += ' ' + linea;
+                    }
+                }
+            }
+
+            if (parrafoActual) {
+                parrafos.push(parrafoActual.trim());
+            }
 
             return parrafos;
         }
@@ -3288,7 +3337,7 @@
                     numero: 1,
                     texto: '',
                     palabras: 0,
-                    limite: 1800,
+                    limite: 2000,
                     porcentaje: 0
                 }];
             }
@@ -3297,7 +3346,7 @@
             const factorSeg = 1 + ((calib.margenSeguridad || 0) / 100);
             const factorEfectivo = factorInter * factorSeg;
 
-            const basePalabras = calib.tipoPapel === 'tabloide' ? (calib.palabrasPorPagina || 1800) : (calib.palabrasPorPagina || 1050);
+            const basePalabras = calib.tipoPapel === 'tabloide' ? (calib.palabrasPorPagina || 2000) : (calib.palabrasPorPagina || 1050);
 
             // Capacidad neta completa de página para cotización de espacio (sin membrete que consuma espacio)
             const limitePorPagina = Math.max(250, Math.round(basePalabras / factorEfectivo));
@@ -3389,8 +3438,15 @@
                 return `<p style="text-align: center; font-weight: 800; font-family: 'Times New Roman', serif; font-size: 1.05em; text-transform: uppercase; margin: 10px 0 6px 0; letter-spacing: 0.5px; line-height: 1.25;">${trimmed}</p>`;
             }
             // Cláusulas de encabezado legal
-            if (/^(?:CONSIDERANDO:|POR TANTO[;:]?|DECRETA:|ACUERDA:|RESUELVE:)$/i.test(trimmed)) {
+            if (/^(?:CONSIDERANDO:?|POR\s+TANTO[;:]?|DECRETA:?|ACUERDA:?|RESUELVE:?)$/i.test(trimmed)) {
                 return `<p style="text-align: center; font-weight: 800; font-family: 'Times New Roman', serif; font-size: 0.98em; margin: 8px 0 4px 0; letter-spacing: 1px;">${trimmed}</p>`;
+            }
+            // Párrafo de CONSIDERANDO con encabezado resaltado en negrita
+            if (/^CONSIDERANDO:\s*/i.test(trimmed)) {
+                const parts = trimmed.match(/^(CONSIDERANDO:\s*)([\s\S]*)$/i);
+                if (parts) {
+                    return `<p ${estiloP}><strong>${parts[1]}</strong>${parts[2]}</p>`;
+                }
             }
             // Artículos con número resaltado
             if (/^ART[IÍ]CULO\s+\d+[\.\-:]/i.test(trimmed)) {
@@ -3601,12 +3657,17 @@
             const factorInterlineado = parseFloat(calibracion.interlineado) || 1.0;
             const totalLineasConInterlineado = Math.ceil(totalLineasEstimadas * factorInterlineado);
 
-            // 3. Cálculo de Ocupación con factor de seguridad e interlineado
+            // 3. Cálculo de Ocupación con factor de seguridad e interlineado (Dual Metric: Palabras vs Líneas de Pliego)
             const factorSeguridad = 1 + (calibracion.margenSeguridad / 100);
             const palabrasEfectivas = cantPalabras * factorSeguridad * factorInterlineado;
+            const porcentajePalabras = (palabrasEfectivas / calibracion.palabrasPorPagina) * 100;
 
-            // Porcentaje respecto a 1 página completa
-            const porcentajeOcupacion = (palabrasEfectivas / calibracion.palabrasPorPagina) * 100;
+            const lineasPorColumna = calibracion.tipoPapel === 'tabloide' ? 115 : 72;
+            const lineasTotalesPagina = (calibracion.columnas || 2) * lineasPorColumna;
+            const porcentajeLineas = (totalLineasConInterlineado / lineasTotalesPagina) * 100;
+
+            // La ocupación física real en el pliego de imprenta es el máximo entre la masa de palabras y las líneas verticales de columna
+            const porcentajeOcupacion = Math.max(porcentajePalabras, porcentajeLineas);
             const clampedPercent = Math.min(porcentajeOcupacion, 100);
 
             // 4. Medidas Físicas Reales de Papel de Imprenta (La Gaceta)
@@ -3750,7 +3811,7 @@
                 badgeEstado.textContent = "Exento de Pago";
                 badgeEstado.style.background = '#0284c7';
             } else {
-                const pct = paginasCalculadas[0] ? paginasCalculadas[0].porcentaje : 0;
+                const pct = totalPaginasPrevia === 1 ? porcentajeOcupacion : (paginasCalculadas[0] ? paginasCalculadas[0].porcentaje : 0);
                 const fraccionTarget = (espacioRecomendado.fraccion || 0.25) * 100;
                 const ratioEnFormato = (pct / fraccionTarget) * 100;
 
@@ -3938,7 +3999,7 @@ function actualizarCalculoFinanciero() {
             }
 
             // Ajustar altura de la capa verde de ocupación en la página activa
-            const pctPagina = pagActual.porcentaje || 0;
+            const pctPagina = (analisisActual && typeof analisisActual.porcentajePagina === 'number') ? analisisActual.porcentajePagina : (pagActual.porcentaje || 0);
             if (fillOverlay && fillBadge) {
                 fillOverlay.style.height = `${pctPagina}%`;
                 fillBadge.textContent = `${pctPagina.toFixed(0)}% ocupado (Pág. ${paginaActualPrevia})`;
