@@ -781,17 +781,21 @@
         }
 
         /* Barra de Control del Membrete Oficial */
-        .membrete-controls-bar {
+        .columnas-controls-bar {
             display: flex;
             align-items: center;
-            justify-content: space-between;
-            gap: 10px;
+            justify-content: flex-start;
+            gap: 12px;
             margin-bottom: 12px;
-            padding: 8px 12px;
+            padding: 8px 14px;
             background: #f8fafc;
             border: 1px solid #e2e8f0;
             border-radius: 10px;
             flex-wrap: wrap;
+        }
+
+        .membrete-controls-bar {
+            display: none !important;
         }
 
         .membrete-ctrl-group {
@@ -1014,13 +1018,154 @@
         .pagination-bar {
             display: flex;
             align-items: center;
-            justify-content: center;
+            justify-content: space-between;
             gap: 12px;
-            background: #f1f5f9;
+            background: #f8fafc;
             border: 1px solid #cbd5e1;
-            border-radius: 8px;
-            padding: 6px 14px;
-            margin-bottom: 10px;
+            border-radius: 10px;
+            padding: 8px 16px;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+        }
+
+        .pagination-nav-group {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .pagination-pills {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-page-pill {
+            background: #ffffff;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            padding: 5px 11px;
+            font-size: 0.8em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-page-pill:hover {
+            background: #f1f5f9;
+            border-color: #0284c7;
+            color: #0284c7;
+            transform: translateY(-1px);
+        }
+
+        .btn-page-pill.active {
+            background: #002147;
+            color: #ffffff;
+            border-color: #002147;
+            box-shadow: 0 2px 6px rgba(0, 33, 71, 0.25);
+        }
+
+        .btn-page-pill .pill-tag {
+            font-size: 0.75em;
+            padding: 1px 6px;
+            border-radius: 4px;
+            background: rgba(0, 0, 0, 0.08);
+        }
+
+        .btn-page-pill.active .pill-tag {
+            background: rgba(255, 255, 255, 0.25);
+            color: #ffffff;
+        }
+
+        .page-type-badge {
+            font-size: 0.78em;
+            font-weight: 700;
+            padding: 4px 12px;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            letter-spacing: 0.3px;
+            transition: all 0.25s ease;
+        }
+
+        .page-type-badge.badge-portada {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .page-type-badge.badge-interior {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .modal-page-nav {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+        }
+
+        .pliego-divider {
+            border: none;
+            border-top: 3px dashed #78716c;
+            margin: 40px 0;
+            position: relative;
+        }
+
+        .pliego-divider::after {
+            content: "✂ CORTE DE PLIEGO / SIGUIENTE PÁGINA (PÁGINA INTERIOR — SIN ENCABEZADO)";
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #e2e8f0;
+            color: #475569;
+            font-size: 10px;
+            font-weight: 800;
+            padding: 2px 12px;
+            border-radius: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-page-nav {
+            background: #002147;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            padding: 5px 12px;
+            font-size: 0.82em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .btn-page-nav:hover:not(:disabled) {
+            background: #0284c7;
+            transform: translateY(-1px);
+        }
+
+        .btn-page-nav:disabled {
+            background: #cbd5e1;
+            cursor: not-allowed;
+            color: #94a3b8;
+            transform: none;
+        }
+
+        .page-indicator {
+            font-size: 0.85em;
+            font-weight: 800;
+            color: #002147;
         }
 
         .btn-page-nav {
@@ -1181,6 +1326,63 @@
             flex-direction: column;
         }
 
+        @media print {
+            body {
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            body::before,
+            .nav-container,
+            .main-container,
+            .modal-tabloide-header,
+            .toast-notification {
+                display: none !important;
+            }
+
+            .modal-tabloide,
+            .modal-tabloide.active {
+                display: block !important;
+                position: static !important;
+                width: 100% !important;
+                height: auto !important;
+                background: white !important;
+                padding: 0 !important;
+            }
+
+            .modal-tabloide-content {
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                border-radius: 0 !important;
+            }
+
+            .modal-tabloide-body {
+                background: white !important;
+                padding: 0 !important;
+                display: block !important;
+            }
+
+            .modal-tabloide-sheet {
+                border: none !important;
+                box-shadow: none !important;
+                padding: 20px 0 !important;
+                width: 100% !important;
+                max-width: 100% !important;
+                page-break-after: always;
+            }
+
+            .pliego-divider {
+                page-break-after: always;
+                border: none !important;
+            }
+
+            .pliego-divider::after {
+                display: none !important;
+            }
+        }
+
         .toast-notification {
             position: fixed;
             bottom: 25px;
@@ -1309,8 +1511,13 @@
                 <!-- Barra de Herramientas -->
                 <div class="toolbar">
                     <button type="button" class="btn-tool btn-tool-accent" onclick="pegarPortapapeles()"
-                        title="Pegar contenido del portapapeles">
+                        title="Pegar contenido del portapapeles en flujo continuo sin saltos de línea">
                         <span>📋</span> Pegar Texto
+                    </button>
+
+                    <button type="button" class="btn-tool" onclick="eliminarSaltosEditor()"
+                        title="Eliminar saltos de línea y unir todo el texto en flujo continuo para que el software calcule con exactitud el espacio">
+                        <span>🔗</span> Sin Saltos
                     </button>
 
                     <label class="btn-tool" style="cursor: pointer;" title="Cargar archivo de texto">
@@ -1670,84 +1877,64 @@
                         </button>
                     </div>
 
-                    <!-- Controles Interactivos de Columnas, Membrete y Fecha Oficial -->
-                    <div class="membrete-controls-bar">
-                        <div class="membrete-ctrl-group">
-                            <span class="ctrl-label">🏛️ Membrete:</span>
-                            <div class="preview-btn-group">
-                                <button type="button" class="btn-size-toggle active" id="btnSecA"
-                                    onclick="cambiarSeccionMembrete('seccion_a')"
-                                    title="Sección A (Decretos y Leyes Oficiales)">
-                                    Sección A
-                                </button>
-                                <button type="button" class="btn-size-toggle" id="btnSecB"
-                                    onclick="cambiarSeccionMembrete('seccion_b')" title="Sección B (Avisos Legales)">
-                                    Sección B (Avisos)
-                                </button>
-                                <button type="button" class="btn-size-toggle" id="btnSecNone"
-                                    onclick="cambiarSeccionMembrete('sin_seccion')"
-                                    title="Encabezado sin franja de sección">
-                                    Sin Sección
-                                </button>
-                            </div>
-                        </div>
-                        <div class="membrete-ctrl-group">
-                            <span class="ctrl-label">📰 Columnas:</span>
-                            <div class="preview-btn-group">
-                                <button type="button" class="btn-size-toggle active" id="btnCols2"
-                                    onclick="cambiarColumnasDiagramacion(2)"
-                                    title="2 Columnas (Estándar Diario La Gaceta)">
-                                    2 Cols (Estándar)
-                                </button>
-                                <button type="button" class="btn-size-toggle" id="btnCols1"
-                                    onclick="cambiarColumnasDiagramacion(1)" title="1 Columna (Vertical continua)">
-                                    1 Col
-                                </button>
-                                <button type="button" class="btn-size-toggle" id="btnCols3"
-                                    onclick="cambiarColumnasDiagramacion(3)"
-                                    title="3 Columnas (Marcas y Patentes / Edictos)">
-                                    3 Cols (Marcas)
-                                </button>
-                            </div>
-                        </div>
-                        <div class="membrete-ctrl-group">
-                            <span class="ctrl-label">📅 Fecha:</span>
-                            <select id="selectFechaMembrete" class="select-membrete-tool"
-                                onchange="cambiarModoFechaMembrete(this.value)" title="Cambiar fecha del membrete">
-                                <option value="oficial" selected>Edición Oficial (27 Abr 2026)</option>
-                                <option value="hoy">Fecha de Hoy (Dinámica)</option>
-                            </select>
+                    <!-- Controles Interactivos de Columnas de Cotización -->
+                    <div class="columnas-controls-bar">
+                        <span class="ctrl-label">📰 Columnas de Cotización:</span>
+                        <div class="preview-btn-group">
+                            <button type="button" class="btn-size-toggle active" id="btnCols2"
+                                onclick="cambiarColumnasDiagramacion(2)"
+                                title="2 Columnas (Estándar Diario La Gaceta — 11.5 cm)">
+                                2 Cols (Estándar Texto)
+                            </button>
+                            <button type="button" class="btn-size-toggle" id="btnCols1"
+                                onclick="cambiarColumnasDiagramacion(1)" title="1 Columna (Ancho Completo)">
+                                1 Columna
+                            </button>
+                            <button type="button" class="btn-size-toggle" id="btnCols3"
+                                onclick="cambiarColumnasDiagramacion(3)"
+                                title="3 Columnas (Marcas y Patentes / Edictos — 7.5 cm)">
+                                3 Cols (Marcas)
+                            </button>
                         </div>
                     </div>
 
-                    <!-- Barra de Paginación para Documentos Multi-Página -->
+                    <!-- Barra de Paginación Editorial para Documentos Multi-Página -->
                     <div id="paginationBar" class="pagination-bar" style="display: none;">
-                        <button type="button" class="btn-page-nav" id="btnPrevPage" onclick="cambiarPaginaPrevia(-1)">◀
-                            Pág. Anterior</button>
-                        <span id="labelNumeroPagina" class="page-indicator">Página 1 de 1</span>
-                        <button type="button" class="btn-page-nav" id="btnNextPage"
-                            onclick="cambiarPaginaPrevia(1)">Pág. Siguiente ▶</button>
+                        <div class="pagination-nav-group">
+                            <button type="button" class="btn-page-nav" id="btnPrevPage"
+                                onclick="cambiarPaginaPrevia(-1)">◀
+                                Pág. Anterior</button>
+                            <span id="labelNumeroPagina" class="page-indicator">Página 1 de 1</span>
+                            <button type="button" class="btn-page-nav" id="btnNextPage"
+                                onclick="cambiarPaginaPrevia(1)">Pág. Siguiente ▶</button>
+                        </div>
+                        <div id="paginationPills" class="pagination-pills">
+                            <!-- Pestañas dinámicas de cada página generadas por JavaScript -->
+                        </div>
+                        <div id="pageTypeBadge" class="page-type-badge badge-portada">
+                            🏛️ Portada Oficial (Pág. 1)
+                        </div>
                     </div>
 
                     <div class="gaceta-page page-size-tabloide" id="gacetaPage">
                         <!-- Líneas guía de corte en formato Tabloide con medidas en centímetros -->
                         <div class="cutline" style="top: 20%;" title="1/5 de Página Tabloide (20%) — Tarifa: L. 800.00">
-                            <span class="cutline-label">1/5 Pág Tabloide (20%) • ~7.6 cm</span>
+                            <span class="cutline-label" id="cutlineLabel1_5">1/5 Pág Tabloide (20%) • ~7.6 cm</span>
                         </div>
                         <div class="cutline" style="top: 25%;"
                             title="1/4 de Página Tabloide (25%) — Tarifa: L. 1,200.00">
-                            <span class="cutline-label">1/4 Pág Tabloide (25%) • ~9.5 cm</span>
+                            <span class="cutline-label" id="cutlineLabel1_4">1/4 Pág Tabloide (25%) • ~9.5 cm</span>
                         </div>
                         <div class="cutline" style="top: 33.33%;"
                             title="1/3 de Página Tabloide (33.3%) — Tarifa: L. 1,400.00">
-                            <span class="cutline-label">1/3 Pág Tabloide (33.3%) • ~12.7 cm</span>
+                            <span class="cutline-label" id="cutlineLabel1_3">1/3 Pág Tabloide (33.3%) • ~12.7 cm</span>
                         </div>
                         <div class="cutline" style="top: 50%;" title="1/2 Página Tabloide (50%) — Tarifa: L. 1,800.00">
-                            <span class="cutline-label">1/2 Pág Tabloide (50%) • ~19.0 cm</span>
+                            <span class="cutline-label" id="cutlineLabel1_2">1/2 Pág Tabloide (50%) • ~19.0 cm</span>
                         </div>
                         <div class="cutline" style="top: 66.67%;"
                             title="2/3 de Página Tabloide (66.7%) — Tarifa: L. 2,800.00">
-                            <span class="cutline-label">2/3 Pág Tabloide (66.7%) • ~25.3 cm</span>
+                            <span class="cutline-label" id="cutlineLabel2_3">2/3 Pág Tabloide (66.7%) • ~25.3 cm</span>
                         </div>
 
                         <!-- Capa animada de ocupación dinámica en la página Tabloide -->
@@ -1755,30 +1942,7 @@
                             <span id="gacetaFillBadge" class="gaceta-fill-label">0% ocupado</span>
                         </div>
 
-                        <!-- Membrete Oficial Auténtico del Diario La Gaceta (ENAG) -->
-                        <div class="gaceta-masthead" id="gacetaMasthead"
-                            title="Membrete Oficial Diario La Gaceta — Empresa Nacional de Artes Gráficas">
-                            <img id="imgMembreteGaceta" src="../assets/membrete_gaceta_oficial.png"
-                                alt="Membrete Oficial Diario La Gaceta" class="gaceta-masthead-img">
-                            <div id="overlayFechaDinamica" class="gaceta-masthead-date-overlay" style="display: none;">
-                                <span class="meta-left">AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
-                                <span class="meta-center" id="textoFechaDinamica">LUNES 27 DE ABRIL DEL 2026.</span>
-                                <span class="meta-right">NUM. 37,127</span>
-                            </div>
-                        </div>
-
-                        <!-- Cintillo Oficial para Páginas Interiores (Páginas 2+) -->
-                        <div class="gaceta-interior-header" id="gacetaInteriorHeader" style="display: none;">
-                            <div class="interior-header-line">
-                                <span id="interiorHeaderSec" class="interior-sec">Sección A</span>
-                                <span class="interior-center"><em>La Gaceta</em> &nbsp;•&nbsp; REPÚBLICA DE HONDURAS -
-                                    TEGUCIGALPA, M. D. C., <span id="interiorHeaderFecha">27 DE ABRIL DEL 2026</span>
-                                    &nbsp;•&nbsp; NUM. 37,127</span>
-                                <span id="interiorHeaderFolio" class="interior-folio">Pág. A. 2</span>
-                            </div>
-                        </div>
-
-                        <!-- Columnas de texto tipográfico simulado Tabloide -->
+                        <!-- Columnas de texto tipográfico simulado Tabloide (100% de espacio útil para cotización) -->
                         <div class="gaceta-columns cols-2" id="gacetaColumns">
                             <div class="gaceta-column" id="gacetaCol1">
                                 [El texto ingresado fluirá automáticamente en las columnas del pliego tabloide para que
@@ -1793,11 +1957,7 @@
                             </div>
                         </div>
 
-                        <!-- Pie de Página Institucional para Páginas Interiores -->
-                        <div class="gaceta-interior-footer" id="gacetaInteriorFooter" style="display: none;">
-                            <span>Empresa Nacional de Artes Gráficas (E.N.A.G.) &nbsp;•&nbsp; PBX: 2230-1120 / 2230-2525
-                                &nbsp;•&nbsp; Tegucigalpa, M.D.C., Honduras</span>
-                        </div>
+
                     </div>
                 </div>
 
@@ -1822,6 +1982,18 @@
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 10px;">
+                    <div id="modalPageNav" class="modal-page-nav" style="display: none;">
+                        <button type="button" class="btn-page-nav" id="btnModalPrev" onclick="cambiarPaginaModal(-1)"
+                            style="padding: 4px 10px; font-size: 0.78em;">◀ Ant</button>
+                        <span id="modalPageIndicator" style="font-size: 0.82em; font-weight: 700; color: white;">Pág. 1
+                            de 1</span>
+                        <button type="button" class="btn-page-nav" id="btnModalNext" onclick="cambiarPaginaModal(1)"
+                            style="padding: 4px 10px; font-size: 0.78em;">Sig ▶</button>
+                        <button type="button" id="btnModalModoPliego" class="btn-tool" onclick="toggleModoModalPliego()"
+                            style="font-size: 0.78em; padding: 4px 10px; background: rgba(2, 132, 199, 0.4); border: 1px solid #0284c7; color: white;">
+                            📰 Ver Pliego Completo
+                        </button>
+                    </div>
                     <button type="button" class="btn-tool" onclick="window.print()"
                         style="background: rgba(255,255,255,0.15); color: white; border: 1px solid rgba(255,255,255,0.3); font-size: 0.82em;">
                         🖨️ Imprimir Simulación
@@ -1972,13 +2144,67 @@
             modoFecha: 'oficial' // 'oficial' o 'hoy'
         };
 
-        // Estado de Paginación de la Maqueta
+        // Estado de Paginación Editorial de la Maqueta
         let paginaActualPrevia = 1;
         let totalPaginasPrevia = 1;
+        let paginasCalculadas = [];
+        let modoModalPliegoCompleto = false;
+        let paginaModalActual = 1;
 
         // Inicialización
+        // =========================================================================
+        // LIMPIEZA INTELIGENTE DE SALTOS DE LÍNEA AL PEGAR TEXTO
+        // Une el texto en un flujo continuo y natural eliminando saltos de línea huérfanos,
+        // garantizando que el detector calcule con máxima precisión el espacio real.
+        // =========================================================================
+        function limpiarSaltosDeLinea(texto) {
+            if (!texto) return '';
+            return texto
+                .replace(/(\w+)-\s*[\r\n]+\s*(\w+)/g, '$1$2') // Reúne palabras cortadas con guión al final de línea
+                .replace(/[\r\n]+/g, ' ')                      // Convierte todos los saltos de línea en un solo espacio
+                .replace(/[\t ]+/g, ' ')                       // Colapsa espacios múltiples o tabulaciones
+                .replace(/\s+([.,;:!?])/g, '$1')               // Quita espacios antes de signos de puntuación
+                .trim();
+        }
+
+        function eliminarSaltosEditor() {
+            const editor = document.getElementById('textoPublicacion');
+            if (!editor.value.trim()) {
+                showToast("No hay texto para limpiar en el editor.", "info");
+                return;
+            }
+            editor.value = limpiarSaltosDeLinea(editor.value);
+            analizarTexto();
+            showToast("Saltos de línea eliminados: texto unificado en flujo continuo para mejor detección de espacio.", "success");
+        }
+
         window.addEventListener('DOMContentLoaded', () => {
             cargarCalibracionGuardada();
+
+            // Interceptor automático al pegar en el editor de texto
+            const editor = document.getElementById('textoPublicacion');
+            if (editor) {
+                editor.addEventListener('paste', function (e) {
+                    e.preventDefault();
+                    const clipData = e.clipboardData || window.clipboardData;
+                    if (!clipData) return;
+                    const pastedText = clipData.getData('text');
+                    if (!pastedText) return;
+
+                    const cleanText = limpiarSaltosDeLinea(pastedText);
+
+                    // Insertar texto limpio en la posición del cursor
+                    const start = this.selectionStart;
+                    const end = this.selectionEnd;
+                    const val = this.value;
+                    this.value = val.substring(0, start) + cleanText + val.substring(end);
+                    this.selectionStart = this.selectionEnd = start + cleanText.length;
+
+                    analizarTexto();
+                    showToast("Texto pegado en flujo continuo (sin saltos de línea)", "success");
+                });
+            }
+
             analizarTexto();
         });
 
@@ -2123,9 +2349,15 @@
         function cambiarPaginaPrevia(delta) {
             const nueva = paginaActualPrevia + delta;
             if (nueva >= 1 && nueva <= totalPaginasPrevia) {
-                paginaActualPrevia = nueva;
-                const rawText = document.getElementById('textoPublicacion').value;
-                actualizarMaquetaGaceta(rawText, Math.min(analisisActual.porcentajePagina, 100));
+                irAPagina(nueva);
+            }
+        }
+
+        function irAPagina(num) {
+            if (num >= 1 && num <= totalPaginasPrevia) {
+                paginaActualPrevia = num;
+                actualizarNavegacionPaginacionUI();
+                actualizarMaquetaGaceta();
             }
         }
 
@@ -2311,51 +2543,49 @@
         function abrirModalTabloide() {
             const modal = document.getElementById('modalTabloide');
             const sheet = document.getElementById('modalTabloideSheet');
-            const rawText = document.getElementById('textoPublicacion').value;
+            const modalNav = document.getElementById('modalPageNav');
 
             if (!modal || !sheet) return;
+
+            paginaModalActual = paginaActualPrevia;
+
+            if (modalNav) {
+                if (totalPaginasPrevia > 1) {
+                    modalNav.style.display = 'flex';
+                    actualizarNavModalUI();
+                } else {
+                    modalNav.style.display = 'none';
+                }
+            }
+
+            renderizarContenidoModal();
+
+            modal.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function renderizarHtmlPliegoPagina(pagNum) {
+            const pagObj = paginasCalculadas[pagNum - 1] || paginasCalculadas[0];
+            if (!pagObj) return '';
 
             const sangriaPx = (calibracion.sangria || 0) * 3.5;
             const factorInter = parseFloat(calibracion.interlineado) || 1.0;
             const lineHeight = (1.45 * factorInter).toFixed(2);
             const marginBottom = (8 * factorInter).toFixed(1);
-
             const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: 13.5px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
-            const textoPagina = obtenerTextoParaPagina(rawText, paginaActualPrevia, totalPaginasPrevia);
-            const balance = balancearTextoEnColumnas(textoPagina, calibracion.columnas, calibracion.modoDistribucion);
+            const balance = balancearTextoEnColumnas(pagObj.texto, calibracion.columnas, calibracion.modoDistribucion);
 
-            const rutaMembrete = obtenerRutaMembreteActual();
-            const esFechaHoy = calibracion.modoFecha === 'hoy';
-            const fechaStr = formatearFechaOficialGaceta(new Date());
-            const esSinSeccion = calibracion.tipoSeccion === 'sin_seccion';
-            const secLetra = calibracion.tipoSeccion === 'seccion_b' ? 'B' : 'A';
-            const secNombre = calibracion.tipoSeccion === 'seccion_b' ? 'Sección B' : 'Sección A';
-
-            // Cabecera: Página 1 (Membrete oficial) vs Páginas Interiores (Folio)
-            let headerHtml = '';
-            if (paginaActualPrevia > 1) {
-                headerHtml = `
-                    <div style="border-bottom: 2px solid #111; padding-bottom: 6px; margin-bottom: 24px; display: flex; justify-content: space-between; align-items: baseline; font-family: 'Times New Roman', serif; font-size: 14px; font-weight: 700; color: #111; letter-spacing: 0.5px;">
-                        <span>${secNombre}</span>
-                        <span style="font-size: 16px; font-weight: 900; letter-spacing: 2px;">La Gaceta &nbsp;•&nbsp; REPÚBLICA DE HONDURAS &nbsp;•&nbsp; TEGUCIGALPA, M. D. C.</span>
-                        <span style="background: #111; color: #fff; padding: 2px 8px; border-radius: 2px;">Pág. ${secLetra}. ${paginaActualPrevia}</span>
+            // Cabecera limpia de cotización de espacio (SIN membrete)
+            const headerHtml = `
+                <div style="border-bottom: 2px solid #002147; padding-bottom: 8px; margin-bottom: 22px; display: flex; justify-content: space-between; align-items: center; font-family: 'Segoe UI', sans-serif;">
+                    <div>
+                        <span style="font-weight: 800; font-size: 15px; color: #002147;">DIARIO OFICIAL LA GACETA — COTIZACIÓN DE ESPACIO</span>
+                        <span style="font-size: 12px; color: #64748b; margin-left: 8px;">(Pliego Tabloide Oficial 11" × 17")</span>
                     </div>
-                `;
-            } else {
-                headerHtml = `
-                    <div class="gaceta-masthead-modal" style="margin-bottom: 22px; position: relative; background: #fff; box-shadow: 0 4px 15px rgba(0,0,0,0.08); border-radius: 2px; overflow: hidden;">
-                        <img src="${rutaMembrete}" alt="Membrete Oficial Diario La Gaceta" style="width: 100%; height: auto; display: block;">
-                        ${esFechaHoy ? `
-                            <div style="position: absolute; bottom: ${esSinSeccion ? '0%' : '13.3%'}; left: 0; width: 100%; height: 6.8%; background: #eaeaea; display: flex; justify-content: space-between; align-items: center; padding: 0 12px; font-family: 'Times New Roman', serif; font-size: 12.5px; font-weight: 800; color: #111; border-top: 1px solid #111; border-bottom: 1px solid #111; box-sizing: border-box; letter-spacing: 0.3px;">
-                                <span>AÑO CXLVIII TEGUCIGALPA, M. D. C., HONDURAS, C. A.</span>
-                                <span>${fechaStr}</span>
-                                <span>NUM. 37,127</span>
-                            </div>
-                        ` : ''}
-                    </div>
-                `;
-            }
+                    <span style="background: #002147; color: #fff; font-size: 12px; font-weight: 700; padding: 3px 10px; border-radius: 4px;">Pág. ${pagNum} de ${totalPaginasPrevia}</span>
+                </div>
+            `;
 
             // Contenido según número de columnas
             let colsHtml = '';
@@ -2390,18 +2620,64 @@
                 `;
             }
 
-            // Pie de página interior si página > 1
-            const footerHtml = paginaActualPrevia > 1 ? `
-                <div style="margin-top: 25px; padding-top: 8px; border-top: 1px solid #111; display: flex; justify-content: space-between; font-family: 'Times New Roman', serif; font-size: 11px; font-weight: 700; color: #333;">
-                    <span>DIARIO OFICIAL LA GACETA — EMPRESA NACIONAL DE ARTES GRÁFICAS (ENAG)</span>
-                    <span>Pág. ${secLetra}. ${paginaActualPrevia}</span>
-                </div>
-            ` : '';
+            return `<div class="pliego-page-container" style="display: flex; flex-direction: column; min-height: 980px;">
+                ${headerHtml}
+                ${colsHtml}
+            </div>`;
+        }
 
-            sheet.innerHTML = headerHtml + colsHtml + footerHtml;
+        function renderizarContenidoModal() {
+            const sheet = document.getElementById('modalTabloideSheet');
+            if (!sheet) return;
 
-            modal.classList.add('active');
-            document.body.style.overflow = 'hidden';
+            if (modoModalPliegoCompleto && totalPaginasPrevia > 1) {
+                let htmlTotal = '';
+                for (let i = 1; i <= totalPaginasPrevia; i++) {
+                    if (i > 1) {
+                        htmlTotal += '<div class="pliego-divider"></div>';
+                    }
+                    htmlTotal += renderizarHtmlPliegoPagina(i);
+                }
+                sheet.innerHTML = htmlTotal;
+            } else {
+                sheet.innerHTML = renderizarHtmlPliegoPagina(paginaModalActual);
+            }
+        }
+
+        function cambiarPaginaModal(delta) {
+            const nueva = paginaModalActual + delta;
+            if (nueva >= 1 && nueva <= totalPaginasPrevia) {
+                paginaModalActual = nueva;
+                actualizarNavModalUI();
+                renderizarContenidoModal();
+            }
+        }
+
+        function toggleModoModalPliego() {
+            modoModalPliegoCompleto = !modoModalPliegoCompleto;
+            const btn = document.getElementById('btnModalModoPliego');
+            if (btn) {
+                btn.textContent = modoModalPliegoCompleto ? '📄 Ver Página Activa' : '📰 Ver Pliego Completo';
+                btn.style.background = modoModalPliegoCompleto ? '#059669' : 'rgba(2, 132, 199, 0.4)';
+            }
+            actualizarNavModalUI();
+            renderizarContenidoModal();
+        }
+
+        function actualizarNavModalUI() {
+            const indicator = document.getElementById('modalPageIndicator');
+            const btnPrev = document.getElementById('btnModalPrev');
+            const btnNext = document.getElementById('btnModalNext');
+
+            if (indicator) {
+                if (modoModalPliegoCompleto) {
+                    indicator.textContent = `Pliego Completo (${totalPaginasPrevia} Páginas)`;
+                } else {
+                    indicator.textContent = `Pág. ${paginaModalActual} de ${totalPaginasPrevia} (${paginaModalActual === 1 ? 'Portada' : 'Interior'})`;
+                }
+            }
+            if (btnPrev) btnPrev.disabled = modoModalPliegoCompleto || (paginaModalActual <= 1);
+            if (btnNext) btnNext.disabled = modoModalPliegoCompleto || (paginaModalActual >= totalPaginasPrevia);
         }
 
         function cerrarModalTabloide() {
@@ -2748,16 +3024,152 @@
             return parrafos;
         }
 
-        // BALANCEADOR EQUITATIVO DE TEXTO EN COLUMNAS (TABLOIDE LA GACETA)
+        // =========================================================================
+        // MOTOR EDITORIAL DE COTIZACIÓN DE ESPACIO (DIARIO OFICIAL LA GACETA)
+        // Regla: 100% de espacio útil en cada página sin membrete para detección
+        // exacta de tarifas. Si sobrepasa 1 página (100%), desborda a la siguiente
+        // página completa (también limpia sin encabezado).
+        // =========================================================================
+        function segmentarEnUnidadesDiagramacion(p) {
+            const words = (p.trim().match(/\S+/g) || []).length;
+            if (words <= 120) {
+                return [{ texto: p, palabras: words, esOracionContinuada: false }];
+            }
+            // 1. Intentar por oraciones con punto
+            const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
+            if (oraciones.length > 1) {
+                const res = [];
+                oraciones.forEach((or, idx) => {
+                    const orWords = (or.match(/\S+/g) || []).length;
+                    if (orWords > 120) {
+                        res.push(...segmentarEnUnidadesDiagramacion(or));
+                    } else {
+                        res.push({ texto: or, palabras: orWords, esOracionContinuada: (idx > 0) });
+                    }
+                });
+                return res;
+            }
+            // 2. Intentar por punto y coma o dos puntos
+            const clausulas = p.split(/(?<=[;:])\s+/g).map(s => s.trim()).filter(s => s.length > 0);
+            if (clausulas.length > 1) {
+                const res = [];
+                clausulas.forEach((cl, idx) => {
+                    const clWords = (cl.match(/\S+/g) || []).length;
+                    if (clWords > 120) {
+                        res.push(...segmentarEnUnidadesDiagramacion(cl));
+                    } else {
+                        res.push({ texto: cl, palabras: clWords, esOracionContinuada: (idx > 0) });
+                    }
+                });
+                return res;
+            }
+            // 3. Bloques de palabras si no hay puntuación
+            const tokens = p.split(/\s+/);
+            const res = [];
+            for (let i = 0; i < tokens.length; i += 80) {
+                const chunk = tokens.slice(i, i + 80).join(' ');
+                res.push({
+                    texto: chunk,
+                    palabras: (chunk.match(/\S+/g) || []).length,
+                    esOracionContinuada: (i > 0)
+                });
+            }
+            return res;
+        }
+
+        function paginarTextoEditorialGaceta(rawText, calib) {
+            if (!rawText || !rawText.trim()) {
+                return [{
+                    numero: 1,
+                    texto: '',
+                    palabras: 0,
+                    limite: 1800,
+                    porcentaje: 0
+                }];
+            }
+
+            const factorInter = parseFloat(calib.interlineado) || 1.0;
+            const factorSeg = 1 + ((calib.margenSeguridad || 0) / 100);
+            const factorEfectivo = factorInter * factorSeg;
+
+            const basePalabras = calib.tipoPapel === 'tabloide' ? (calib.palabrasPorPagina || 1800) : (calib.palabrasPorPagina || 1050);
+
+            // Capacidad neta completa de página para cotización de espacio (sin membrete que consuma espacio)
+            const limitePorPagina = Math.max(250, Math.round(basePalabras / factorEfectivo));
+
+            const parrafos = segmentarTextoEnParrafos(rawText);
+
+            // Unidades atómicas de diagramación para cortes de página limpios
+            const unidades = [];
+            parrafos.forEach(p => {
+                unidades.push(...segmentarEnUnidadesDiagramacion(p));
+            });
+
+            const paginas = [];
+            let bufferActual = [];
+            let palabrasAcumuladas = 0;
+
+            for (let i = 0; i < unidades.length; i++) {
+                const u = unidades[i];
+
+                if (palabrasAcumuladas + u.palabras > limitePorPagina && palabrasAcumuladas > 0) {
+                    // Cerrar página actual (llena al 100%)
+                    const textoPagina = ensamblarTextoUnidades(bufferActual);
+                    const pct = Math.min(100, (palabrasAcumuladas / limitePorPagina) * 100);
+                    paginas.push({
+                        numero: paginas.length + 1,
+                        texto: textoPagina,
+                        palabras: palabrasAcumuladas,
+                        limite: limitePorPagina,
+                        porcentaje: pct
+                    });
+
+                    // Iniciar página siguiente
+                    bufferActual = [u];
+                    palabrasAcumuladas = u.palabras;
+                } else {
+                    bufferActual.push(u);
+                    palabrasAcumuladas += u.palabras;
+                }
+            }
+
+            // Guardar última página remanente
+            if (bufferActual.length > 0) {
+                const textoPagina = ensamblarTextoUnidades(bufferActual);
+                const pct = Math.min(100, (palabrasAcumuladas / limitePorPagina) * 100);
+                paginas.push({
+                    numero: paginas.length + 1,
+                    texto: textoPagina,
+                    palabras: palabrasAcumuladas,
+                    limite: limitePorPagina,
+                    porcentaje: pct
+                });
+            }
+
+            return paginas;
+        }
+
+        function ensamblarTextoUnidades(unidades) {
+            if (!unidades || unidades.length === 0) return '';
+            let resultado = '';
+            for (let i = 0; i < unidades.length; i++) {
+                const u = unidades[i];
+                if (i === 0) {
+                    resultado += u.texto;
+                } else if (u.esOracionContinuada) {
+                    resultado += ' ' + u.texto;
+                } else {
+                    resultado += '\n\n' + u.texto;
+                }
+            }
+            return resultado;
+        }
+
         function obtenerTextoParaPagina(texto, pag, totalPags) {
-            if (!texto || !texto.trim() || totalPags <= 1) return texto;
-            const parrafos = segmentarTextoEnParrafos(texto);
-            if (parrafos.length === 0) return '';
-            const porPag = Math.ceil(parrafos.length / totalPags);
-            const inicio = (pag - 1) * porPag;
-            const fin = Math.min(inicio + porPag, parrafos.length);
-            const slice = parrafos.slice(inicio, fin);
-            return slice.join('\n\n');
+            if (paginasCalculadas && paginasCalculadas[pag - 1]) {
+                return paginasCalculadas[pag - 1].texto;
+            }
+            return texto;
         }
 
         function formatearParrafoConJerarquia(p, estiloP) {
@@ -3085,48 +3497,53 @@
                 }
             }
 
-            // Control de paginación del simulador
-            totalPaginasPrevia = numPaginasCompletas;
+            // Paginación Editorial Inteligente (Portada vs Páginas Interiores)
+            paginasCalculadas = paginarTextoEditorialGaceta(rawText, calibracion);
+            totalPaginasPrevia = paginasCalculadas.length;
             if (paginaActualPrevia > totalPaginasPrevia) paginaActualPrevia = 1;
+            if (paginaActualPrevia < 1) paginaActualPrevia = 1;
 
-            const paginationBar = document.getElementById('paginationBar');
-            const pageIndicator = document.getElementById('pageIndicator');
-            const btnPrevPage = document.getElementById('btnPrevPage');
-            const btnNextPage = document.getElementById('btnNextPage');
-            if (paginationBar) {
-                if (totalPaginasPrevia > 1) {
-                    paginationBar.style.display = 'flex';
-                    if (pageIndicator) pageIndicator.textContent = `Página ${paginaActualPrevia} de ${totalPaginasPrevia}`;
-                    if (btnPrevPage) btnPrevPage.disabled = (paginaActualPrevia <= 1);
-                    if (btnNextPage) btnNextPage.disabled = (paginaActualPrevia >= totalPaginasPrevia);
-                } else {
-                    paginationBar.style.display = 'none';
-                }
+            if (totalPaginasPrevia > 1) {
+                esMultiPagina = true;
+                numPaginasCompletas = totalPaginasPrevia;
+                espacioRecomendado = {
+                    id: 'multi',
+                    desc: `${totalPaginasPrevia} PÁGINAS TABLOIDE (PUBLICACIONES - TEXTO)`,
+                    precio: 3200.00 * totalPaginasPrevia,
+                    fraccion: totalPaginasPrevia,
+                    nombreCorto: `${totalPaginasPrevia} Páginas Tabloide`,
+                    alturaEstimadaCm: `${(totalPaginasPrevia * 38.0).toFixed(0)} cm (${totalPaginasPrevia} págs)`
+                };
             }
 
-            // Alerta de margen de seguridad
+            // Actualizar Navegación y Pestañas de Páginas
+            actualizarNavegacionPaginacionUI();
+
+            // Detección de Espacio y Feedback
             const feedbackElem = document.getElementById('capacityFeedback');
             const badgeEstado = document.getElementById('badgeEstadoEspacio');
 
-            if (esMultiPagina) {
-                feedbackElem.innerHTML = `⚠️ <strong style="color: #ea580c;">Extensión Multi-Página Tabloide:</strong> El texto sobrepasa un pliego tabloide completo (${porcentajeOcupacion.toFixed(1)}% de ocupación). Se calculan ${numPaginasCompletas} páginas tabloide completas.`;
-                badgeEstado.textContent = `${numPaginasCompletas} Páginas Tabloide`;
-                badgeEstado.style.background = '#ea580c';
+            if (totalPaginasPrevia > 1) {
+                const ultPagPct = paginasCalculadas[totalPaginasPrevia - 1].porcentaje;
+                feedbackElem.innerHTML = `📰 <strong style="color: #0369a1;">Extensión Multi-Página Tabloide:</strong> El texto consta de <strong>${cantPalabras.toLocaleString()} palabras</strong> y ocupa <strong>${totalPaginasPrevia} páginas tabloide completas</strong> (Pág. 1 al 100%, Pág. ${totalPaginasPrevia} al ${ultPagPct.toFixed(0)}%). Utilice las pestañas para verificar la distribución en cada pliego.`;
+                badgeEstado.textContent = `${totalPaginasPrevia} Páginas Tabloide`;
+                badgeEstado.style.background = '#0284c7';
             } else if (tipoPub === 'junta_agua') {
                 feedbackElem.innerHTML = `🛡️ <strong style="color: #0284c7;">Exención de Ley Aplicada:</strong> Las Juntas de Agua gozan de tasa 0 por decreto de ley de protección social.`;
                 badgeEstado.textContent = "Exento de Pago";
                 badgeEstado.style.background = '#0284c7';
             } else {
+                const pct = paginasCalculadas[0] ? paginasCalculadas[0].porcentaje : 0;
                 const fraccionTarget = (espacioRecomendado.fraccion || 0.2) * 100;
-                const ratioEnFormato = (porcentajeOcupacion / fraccionTarget) * 100;
+                const ratioEnFormato = (pct / fraccionTarget) * 100;
 
                 if (ratioEnFormato > 88) {
-                    feedbackElem.innerHTML = `🟡 <strong style="color: #b45309;">Cercano al límite:</strong> Ocupa el ${ratioEnFormato.toFixed(0)}% del espacio de ${espacioRecomendado.nombreCorto}. Si agrega más texto pasará al siguiente formato.`;
+                    feedbackElem.innerHTML = `🟡 <strong style="color: #b45309;">Cercano al límite:</strong> Ocupa el ${ratioEnFormato.toFixed(0)}% de ${espacioRecomendado.nombreCorto}. Si agrega más texto pasará a la siguiente tarifa o plana.`;
                     badgeEstado.textContent = "Límite Máximo";
                     badgeEstado.style.background = '#f59e0b';
                 } else {
-                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Espacio Óptimo:</strong> Holgura segura del ${(100 - ratioEnFormato).toFixed(0)}% en ${espacioRecomendado.nombreCorto} para márgenes de corte y firmas.`;
-                    badgeEstado.textContent = "Espacio Óptimo";
+                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Espacio de Cotización:</strong> El texto ocupa el <strong>${pct.toFixed(0)}%</strong> de 1 página tabloide completa. Tarifa oficial recomendada: <strong>${espacioRecomendado.nombreCorto}</strong>.`;
+                    badgeEstado.textContent = espacioRecomendado.nombreCorto;
                     badgeEstado.style.background = '#10b981';
                 }
             }
@@ -3147,7 +3564,7 @@
             actualizarCalculoFinanciero();
 
             // Actualizar Maqueta Visual de La Gaceta
-            actualizarMaquetaGaceta(rawText, clampedPercent);
+            actualizarMaquetaGaceta();
         }
 
         function obtenerExtractoTexto(text) {
@@ -3201,8 +3618,13 @@
             document.getElementById('tarifaTotalGeneral').textContent = formatMoneda(totalGeneral);
         }
 
-        // RENDERIZADOR DE LA MAQUETA DE LA GACETA (FORMATO TABLOIDE OFICIAL)
-        function actualizarMaquetaGaceta(texto, porcentaje) {
+        // RENDERIZADOR DE MAQUETA LIMPIA DE ESPACIOS (SIN MEMBRETE PARA COTIZACIÓN)
+        function actualizarMaquetaGaceta() {
+            const rawText = document.getElementById('textoPublicacion').value;
+            if (!rawText.trim() || paginasCalculadas.length === 0) {
+                return;
+            }
+
             const fillOverlay = document.getElementById('gacetaFillOverlay');
             const fillBadge = document.getElementById('gacetaFillBadge');
             const col1 = document.getElementById('gacetaCol1');
@@ -3210,43 +3632,33 @@
             const col3 = document.getElementById('gacetaCol3');
             const columnsContainer = document.getElementById('gacetaColumns');
             const simLabel = document.getElementById('simFractionLabel');
-            const masthead = document.getElementById('gacetaMasthead');
-            const interiorHeader = document.getElementById('gacetaInteriorHeader');
-            const interiorFooter = document.getElementById('gacetaInteriorFooter');
-            const interiorSecNombre = document.getElementById('interiorSecNombre');
-            const interiorFolioNum = document.getElementById('interiorFolioNum');
 
-            // Formato y título de simulación
+            const pagActual = paginasCalculadas[paginaActualPrevia - 1] || paginasCalculadas[0];
+
+            // Título de simulación
             if (simLabel) {
                 const colStr = calibracion.columnas === 1 ? '1 Columna' : (calibracion.columnas === 3 ? '3 Cols (Marcas/Patentes)' : '2 Columnas');
+                const tipoStr = calibracion.tipoPapel === 'tabloide' ? 'Tabloide Oficial (11" × 17" • 279 × 432 mm)' : 'Carta Reducido (8.5" × 11" • 216 × 279 mm)';
+                const pagStr = totalPaginasPrevia > 1 ? ` • Pág. ${paginaActualPrevia} de ${totalPaginasPrevia}` : '';
+                simLabel.innerHTML = `📰 ${tipoStr} — ${colStr}${pagStr}`;
                 if (calibracion.tipoPapel === 'tabloide') {
-                    simLabel.innerHTML = `📰 Tabloide Oficial (11" × 17" • 279 × 432 mm) — ${colStr}`;
                     simLabel.style.background = '#e0f2fe';
                     simLabel.style.color = '#0369a1';
                     simLabel.style.borderColor = '#bae6fd';
                 } else {
-                    simLabel.innerHTML = `📄 Carta Reducido (8.5" × 11" • 216 × 279 mm) — ${colStr}`;
                     simLabel.style.background = '#f1f5f9';
                     simLabel.style.color = '#475569';
                     simLabel.style.borderColor = '#cbd5e1';
                 }
             }
 
-            // Alternar Cabecera: Página 1 (Membrete oficial grande) vs Página 2+ (Folio interior de La Gaceta)
-            const secLetra = calibracion.tipoSeccion === 'seccion_b' ? 'B' : 'A';
-            const secNombre = calibracion.tipoSeccion === 'seccion_b' ? 'Sección B' : 'Sección A';
-
-            if (paginaActualPrevia > 1) {
-                if (masthead) masthead.style.display = 'none';
-                if (interiorHeader) interiorHeader.style.display = 'block';
-                if (interiorFooter) interiorFooter.style.display = 'flex';
-                if (interiorSecNombre) interiorSecNombre.textContent = secNombre;
-                if (interiorFolioNum) interiorFolioNum.textContent = `Pág. ${secLetra}. ${paginaActualPrevia}`;
-            } else {
-                if (masthead) masthead.style.display = 'block';
-                if (interiorHeader) interiorHeader.style.display = 'none';
-                if (interiorFooter) interiorFooter.style.display = 'none';
-            }
+            // Ocultar cualquier membrete (solo cotización de espacio)
+            const masthead = document.getElementById('gacetaMasthead');
+            const interiorHeader = document.getElementById('gacetaInteriorHeader');
+            const interiorFooter = document.getElementById('gacetaInteriorFooter');
+            if (masthead) masthead.style.display = 'none';
+            if (interiorHeader) interiorHeader.style.display = 'none';
+            if (interiorFooter) interiorFooter.style.display = 'none';
 
             // Clases de columnas
             if (columnsContainer) {
@@ -3258,13 +3670,14 @@
                 col3.style.display = calibracion.columnas === 3 ? 'block' : 'none';
             }
 
-            // Ajustar altura de la capa verde de ocupación
+            // Ajustar altura de la capa verde de ocupación en la página activa
+            const pctPagina = pagActual.porcentaje || 0;
             if (fillOverlay && fillBadge) {
-                fillOverlay.style.height = `${porcentaje}%`;
-                fillBadge.textContent = `${porcentaje.toFixed(0)}% ocupado`;
+                fillOverlay.style.height = `${pctPagina}%`;
+                fillBadge.textContent = `${pctPagina.toFixed(0)}% ocupado (Pág. ${paginaActualPrevia})`;
             }
 
-            // Establecer sangría visual e interlineado de las columnas
+            // Sangría e interlineado
             const sangriaPx = (calibracion.sangria || 0) * 2.2;
             const factorInter = parseFloat(calibracion.interlineado) || 1.0;
             const lineHeightPx = (1.38 * factorInter).toFixed(2);
@@ -3272,11 +3685,8 @@
 
             const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
-            // Extraer texto para la página activa
-            const textoPagina = obtenerTextoParaPagina(texto, paginaActualPrevia, totalPaginasPrevia);
-
-            // Flujo equilibrado del texto en las columnas
-            const balance = balancearTextoEnColumnas(textoPagina, calibracion.columnas, calibracion.modoDistribucion);
+            // Flujo equilibrado en columnas
+            const balance = balancearTextoEnColumnas(pagActual.texto, calibracion.columnas, calibracion.modoDistribucion);
             if (balance.col1.length === 0 && balance.col2.length === 0 && balance.col3.length === 0) {
                 if (col1) col1.innerHTML = "<p>[Texto de la publicación en columna 1 del pliego tabloide...]</p>";
                 if (col2) col2.innerHTML = calibracion.columnas >= 2 ? "<p>[Columna 2...]</p>" : "";
@@ -3294,6 +3704,76 @@
                 col3.innerHTML = balance.col3.length > 0
                     ? balance.col3.map(p => formatearParrafoConJerarquia(p, estiloP)).join('')
                     : '<p style="color: #94a3b8; font-style: italic;">[Columna 3 disponible...]</p>';
+            }
+        }
+
+        function actualizarNavegacionPaginacionUI() {
+            const paginationBar = document.getElementById('paginationBar');
+            const pageIndicator = document.getElementById('labelNumeroPagina');
+            const btnPrevPage = document.getElementById('btnPrevPage');
+            const btnNextPage = document.getElementById('btnNextPage');
+            const pillsContainer = document.getElementById('paginationPills');
+            const pageBadge = document.getElementById('pageTypeBadge');
+
+            if (!paginationBar) return;
+
+            if (totalPaginasPrevia > 1) {
+                paginationBar.style.display = 'flex';
+
+                if (pageIndicator) {
+                    pageIndicator.textContent = `Página ${paginaActualPrevia} de ${totalPaginasPrevia}`;
+                }
+                if (btnPrevPage) {
+                    btnPrevPage.disabled = (paginaActualPrevia <= 1);
+                }
+                if (btnNextPage) {
+                    btnNextPage.disabled = (paginaActualPrevia >= totalPaginasPrevia);
+                }
+
+                const pagActual = paginasCalculadas[paginaActualPrevia - 1] || paginasCalculadas[0];
+                const pct = pagActual ? pagActual.porcentaje : 0;
+
+                if (pageBadge) {
+                    pageBadge.innerHTML = `📄 <strong>Página ${paginaActualPrevia} de ${totalPaginasPrevia}</strong> (${pct.toFixed(0)}% ocupado)`;
+                    pageBadge.className = 'page-type-badge badge-interior';
+                }
+
+                if (pillsContainer) {
+                    pillsContainer.innerHTML = paginasCalculadas.map((p, idx) => {
+                        const num = idx + 1;
+                        const esActiva = (num === paginaActualPrevia);
+                        const label = `📄 Pág. ${num}`;
+                        const pctStr = `${p.porcentaje.toFixed(0)}%`;
+                        return `<button type="button" class="btn-page-pill ${esActiva ? 'active' : ''}" onclick="irAPagina(${num})" title="Ver ${label} (${pctStr} ocupado)">
+                            <span>${label}</span>
+                            <span class="pill-tag">${pctStr}</span>
+                        </button>`;
+                    }).join('');
+                }
+            } else {
+                paginationBar.style.display = 'none';
+            }
+        }
+
+        function actualizarGuiasCorte(esPortada) {
+            const l1_5 = document.getElementById('cutlineLabel1_5');
+            const l1_4 = document.getElementById('cutlineLabel1_4');
+            const l1_3 = document.getElementById('cutlineLabel1_3');
+            const l1_2 = document.getElementById('cutlineLabel1_2');
+            const l2_3 = document.getElementById('cutlineLabel2_3');
+
+            if (esPortada) {
+                if (l1_5) l1_5.textContent = '1/5 Pág Tabloide (20%) • ~7.6 cm';
+                if (l1_4) l1_4.textContent = '1/4 Pág Tabloide (25%) • ~9.5 cm';
+                if (l1_3) l1_3.textContent = '1/3 Pág Tabloide (33.3%) • ~12.7 cm';
+                if (l1_2) l1_2.textContent = '1/2 Pág Tabloide (50%) • ~19.0 cm';
+                if (l2_3) l2_3.textContent = '2/3 Pág Tabloide (66.7%) • ~25.3 cm';
+            } else {
+                if (l1_5) l1_5.textContent = '1/5 Pág Interior (20%)';
+                if (l1_4) l1_4.textContent = '1/4 Pág Interior (25%)';
+                if (l1_3) l1_3.textContent = '1/3 Pág Interior (33.3%)';
+                if (l1_2) l1_2.textContent = '1/2 Pág Interior (50%)';
+                if (l2_3) l2_3.textContent = '2/3 Pág Interior (66.7%)';
             }
         }
 
@@ -3317,6 +3797,7 @@
             if (paginationBar) paginationBar.style.display = 'none';
             paginaActualPrevia = 1;
             totalPaginasPrevia = 1;
+            paginasCalculadas = [];
 
             document.getElementById('tarifaTitulo').textContent = 'Sin texto ingresado';
             document.getElementById('tarifaPrecioBase').textContent = 'L. 0.00';
@@ -3565,9 +4046,11 @@ ${analisisActual.descuentoPorcentaje > 0 ? `🎁 *Descuento Aplicado (${analisis
             try {
                 const text = await navigator.clipboard.readText();
                 if (text) {
-                    document.getElementById('textoPublicacion').value = text;
+                    const cleanText = limpiarSaltosDeLinea(text);
+                    const editor = document.getElementById('textoPublicacion');
+                    editor.value = cleanText;
                     analizarTexto();
-                    showToast("Texto pegado desde el portapapeles", "success");
+                    showToast("Texto pegado en flujo continuo (sin saltos de línea)", "success");
                 }
             } catch (err) {
                 showToast("Por favor use Ctrl + V para pegar en el cuadro de texto.", "info");
@@ -3603,9 +4086,10 @@ ${analisisActual.descuentoPorcentaje > 0 ? `🎁 *Descuento Aplicado (${analisis
 
             const reader = new FileReader();
             reader.onload = function (e) {
-                document.getElementById('textoPublicacion').value = e.target.result;
+                const clean = limpiarSaltosDeLinea(e.target.result);
+                document.getElementById('textoPublicacion').value = clean;
                 analizarTexto();
-                showToast(`Archivo "${file.name}" cargado exitosamente`, "success");
+                showToast(`Archivo "${file.name}" cargado en flujo continuo`, "success");
             };
             reader.readAsText(file);
         }
