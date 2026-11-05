@@ -1244,24 +1244,93 @@
             position: absolute;
             left: 0;
             width: 100%;
-            border-top: 1.5px dashed rgba(220, 38, 38, 0.5);
-            pointer-events: none;
-            z-index: 7;
+            border-top: 2px dashed rgba(220, 38, 38, 0.6);
+            pointer-events: auto;
+            cursor: pointer;
+            z-index: 15;
+            transition: all 0.2s ease;
+        }
+
+        .cutline:hover {
+            border-top: 2.5px solid #0284c7;
+        }
+
+        .cutline:hover .cutline-label {
+            background: #0284c7;
+            color: white;
+            border-color: #0284c7;
+            box-shadow: 0 2px 8px rgba(2, 132, 199, 0.45);
+            transform: scale(1.06);
         }
 
         .cutline-label {
             position: absolute;
             right: 10px;
             top: -10px;
-            font-size: 9px;
+            font-size: 9.5px;
             font-weight: 800;
             color: #b91c1c;
             background: #ffffff;
             border: 1px solid #fca5a5;
             border-radius: 4px;
-            padding: 1px 7px;
-            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+            padding: 2px 8px;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
             letter-spacing: 0.3px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            user-select: none;
+        }
+
+        /* Selector Rápido de Tarifa / Forzar Espacio */
+        .espacio-selector-container {
+            margin: 10px 0 14px 0;
+            padding: 9px 12px;
+            background: #f8fafc;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .espacio-selector-label {
+            font-size: 0.76em;
+            font-weight: 700;
+            color: #475569;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 7px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .espacio-selector-pills {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .btn-espacio-pill {
+            padding: 5px 12px;
+            border-radius: 16px;
+            border: 1px solid #cbd5e1;
+            background: white;
+            color: #334155;
+            font-size: 0.82em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-espacio-pill:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
+        .btn-espacio-pill.active {
+            background: #002147;
+            color: white;
+            border-color: #002147;
+            box-shadow: 0 2px 5px rgba(0, 33, 71, 0.25);
         }
 
         /* Modal de Inspección Tabloide a Pantalla Completa */
@@ -1731,12 +1800,12 @@
                         </div>
                         <div class="calib-group">
                             <label for="calibPalabrasPorPagina">Palabras por Página Completa:</label>
-                            <input type="number" id="calibPalabrasPorPagina" value="1800" min="500" max="3500"
+                            <input type="number" id="calibPalabrasPorPagina" value="2000" min="500" max="3500"
                                 onchange="guardarCalibracion()">
                         </div>
                         <div class="calib-group">
                             <label for="calibCharsPorLinea">Caracteres por línea de columna:</label>
-                            <input type="number" id="calibCharsPorLinea" value="45" min="25" max="75"
+                            <input type="number" id="calibCharsPorLinea" value="50" min="25" max="75"
                                 onchange="guardarCalibracion()">
                         </div>
                         <div class="calib-group">
@@ -1756,7 +1825,7 @@
                         </div>
                         <div class="calib-group">
                             <label for="calibMargenSeguridad">Margen holgura de corte/firmas (%):</label>
-                            <input type="number" id="calibMargenSeguridad" value="10" min="0" max="25"
+                            <input type="number" id="calibMargenSeguridad" value="0" min="0" max="25"
                                 onchange="guardarCalibracion()">
                         </div>
                         <div class="calib-group">
@@ -1795,8 +1864,24 @@
                 <!-- TARJETA DE RECOMENDACIÓN Y TARIFA -->
                 <div class="tarifa-card">
                     <span id="badgeEstadoEspacio" class="tarifa-badge-tag">En Espera</span>
-                    <h3>Espacio Detectado Automáticamente</h3>
+                    <h3>Espacio Detectado y Tarifa Oficial</h3>
                     <div id="tarifaTitulo" class="tarifa-title">Sin texto ingresado</div>
+
+                    <!-- Selector Rápido de Espacio / Ajuste Editorial del Diagramador -->
+                    <div class="espacio-selector-container">
+                        <div class="espacio-selector-label">
+                            <span>Ajuste Editorial de Tarifa:</span>
+                            <span id="labelModoEspacio" style="color: #0284c7; text-transform: none; font-weight: 600;">Modo Automático</span>
+                        </div>
+                        <div class="espacio-selector-pills">
+                            <button type="button" class="btn-espacio-pill active" id="btnEspacioAuto" onclick="forzarEspacioEditorial('auto')" title="Detección automática calibrada">⚡ Auto</button>
+                            <button type="button" class="btn-espacio-pill" id="btnEspacio1_4" onclick="forzarEspacioEditorial('1/4')" title="Fijar en 1/4 de Página (L. 1,200.00)">1/4 Pág</button>
+                            <button type="button" class="btn-espacio-pill" id="btnEspacio1_3" onclick="forzarEspacioEditorial('1/3')" title="Fijar en 1/3 de Página (L. 1,400.00)">1/3 Pág</button>
+                            <button type="button" class="btn-espacio-pill" id="btnEspacio1_2" onclick="forzarEspacioEditorial('1/2')" title="Fijar en 1/2 Página (L. 1,800.00)">1/2 Pág</button>
+                            <button type="button" class="btn-espacio-pill" id="btnEspacio2_3" onclick="forzarEspacioEditorial('2/3')" title="Fijar en 2/3 de Página (L. 2,800.00)">2/3 Pág</button>
+                            <button type="button" class="btn-espacio-pill" id="btnEspacio1" onclick="forzarEspacioEditorial('1')" title="Fijar en 1 Página Completa (L. 3,200.00)">1 Pág</button>
+                        </div>
+                    </div>
 
                     <!-- Desglose Financiero -->
                     <div class="tarifa-breakdown">
@@ -1959,20 +2044,21 @@
 
                     <div class="gaceta-page page-size-tabloide" id="gacetaPage">
                         <!-- Líneas guía de corte en formato Tabloide con medidas en centímetros -->
-                        <div class="cutline" style="top: 25%;"
-                            title="1/4 de Página Tabloide (25%) — Tarifa: L. 1,200.00">
-                            <span class="cutline-label" id="cutlineLabel1_4">1/4 Pág Tabloide (25%) • ~9.5 cm</span>
+                        <div class="cutline" style="top: 25%;" onclick="forzarEspacioEditorial('1/4')"
+                            title="Clic para fijar: 1/4 de Página Tabloide (25%) — Tarifa: L. 1,200.00">
+                            <span class="cutline-label" id="cutlineLabel1_4">1/4 Pág Tabloide (25%) • ~9.5 cm 👆</span>
                         </div>
-                        <div class="cutline" style="top: 33.33%;"
-                            title="1/3 de Página Tabloide (33.3%) — Tarifa: L. 1,400.00">
-                            <span class="cutline-label" id="cutlineLabel1_3">1/3 Pág Tabloide (33.3%) • ~12.7 cm</span>
+                        <div class="cutline" style="top: 33.33%;" onclick="forzarEspacioEditorial('1/3')"
+                            title="Clic para fijar: 1/3 de Página Tabloide (33.3%) — Tarifa: L. 1,400.00">
+                            <span class="cutline-label" id="cutlineLabel1_3">1/3 Pág Tabloide (33.3%) • ~12.7 cm 👆</span>
                         </div>
-                        <div class="cutline" style="top: 50%;" title="1/2 Página Tabloide (50%) — Tarifa: L. 1,800.00">
-                            <span class="cutline-label" id="cutlineLabel1_2">1/2 Pág Tabloide (50%) • ~19.0 cm</span>
+                        <div class="cutline" style="top: 50%;" onclick="forzarEspacioEditorial('1/2')"
+                            title="Clic para fijar: 1/2 Página Tabloide (50%) — Tarifa: L. 1,800.00">
+                            <span class="cutline-label" id="cutlineLabel1_2">1/2 Pág Tabloide (50%) • ~19.0 cm 👆</span>
                         </div>
-                        <div class="cutline" style="top: 66.67%;"
-                            title="2/3 de Página Tabloide (66.7%) — Tarifa: L. 2,800.00">
-                            <span class="cutline-label" id="cutlineLabel2_3">2/3 Pág Tabloide (66.7%) • ~25.3 cm</span>
+                        <div class="cutline" style="top: 66.67%;" onclick="forzarEspacioEditorial('2/3')"
+                            title="Clic para fijar: 2/3 de Página Tabloide (66.7%) — Tarifa: L. 2,800.00">
+                            <span class="cutline-label" id="cutlineLabel2_3">2/3 Pág Tabloide (66.7%) • ~25.3 cm 👆</span>
                         </div>
 
                         <!-- Capa animada de ocupación dinámica en la página Tabloide -->
@@ -2152,12 +2238,12 @@
         // Parámetros de Calibración
         let calibracion = {
             tipoPapel: 'tabloide', // 'tabloide' (11"x17") o 'carta' (8.5"x11")
-            palabrasPorPagina: 1800, // 1800 palabras en Tabloide oficial (antes 1050 para carta)
-            charsPorLinea: 45, // 45 caracteres promedio por línea de columna tabloide
+            palabrasPorPagina: 2000, // 2000 palabras capacidad neta Tabloide oficial La Gaceta
+            charsPorLinea: 50, // 50 caracteres promedio por línea columna Times New Roman 10pt
             columnas: 2, // 1, 2 o 3 columnas
             modoDistribucion: 'balanceado', // 'balanceado' (horizontal) o 'columna_unica' (vertical)
             tipoPublicacion: 'texto', // 'texto', 'marcas', 'junta_agua'
-            margenSeguridad: 10,
+            margenSeguridad: 0, // 0% de penalización por defecto para cotización de espacio exacto
             sangria: 4,
             interlineado: 1.0,
             tamanoLetra: 14, // Tamaño de letra en píxeles (Times New Roman)
@@ -2166,6 +2252,8 @@
             tipoSeccion: 'seccion_a', // 'seccion_a', 'seccion_b', 'sin_seccion'
             modoFecha: 'oficial' // 'oficial' o 'hoy'
         };
+
+        let espacioForzadoManual = null; // 'auto', '1/4', '1/3', '1/2', '2/3', '1'
 
         // Estado de Paginación Editorial de la Maqueta
         let paginaActualPrevia = 1;
@@ -2239,12 +2327,15 @@
                     // Si el usuario tenía calibración anterior con formato carta o sin tipoPapel, actualizar al estándar Tabloide
                     if (!calibracion.tipoPapel) {
                         calibracion.tipoPapel = 'tabloide';
-                        calibracion.palabrasPorPagina = 1800;
-                        calibracion.charsPorLinea = 45;
+                        calibracion.palabrasPorPagina = 2000;
+                        calibracion.charsPorLinea = 50;
                     }
-                    if (calibracion.tipoPapel === 'tabloide' && calibracion.palabrasPorPagina === 1050) {
-                        calibracion.palabrasPorPagina = 1800;
-                        calibracion.charsPorLinea = 45;
+                    if (calibracion.tipoPapel === 'tabloide' && (calibracion.palabrasPorPagina === 1050 || calibracion.palabrasPorPagina === 1800)) {
+                        calibracion.palabrasPorPagina = 2000;
+                        calibracion.charsPorLinea = 50;
+                    }
+                    if (calibracion.margenSeguridad === 10) {
+                        calibracion.margenSeguridad = 0; // Migrar de 10% a 0% para cotización de espacio exacto
                     }
                     if (calibracion.tamanoMaqueta === undefined) calibracion.tamanoMaqueta = 'tabloide';
                     if (calibracion.sangria === undefined) calibracion.sangria = 4;
@@ -3571,7 +3662,7 @@
                 };
             } else if (tipoPub === 'marcas') {
                 // Tarifas de Propiedad Intelectual: 3 Publicaciones de Ley en Sección B (cotizaciones.html)
-                if (porcentajeOcupacion <= 33.33) {
+                if (porcentajeOcupacion <= 37.5) {
                     espacioRecomendado = TARIFAS_MARCAS_PATENTES['1/4'];
                 } else {
                     espacioRecomendado = {
@@ -3584,16 +3675,21 @@
                     };
                 }
             } else {
-                // Tarifa Estándar de Publicaciones de Texto (Acuerdo Ejecutivo 249-2010)
-                if (porcentajeOcupacion <= 25) {
+                // Tarifa Estándar con Tolerancia Editorial de Taller de La Gaceta
+                // 1/4 (25% nominal): hasta 26.5% (~530 palabras)
+                // 1/3 (33.3% nominal): hasta 37.5% (~750 palabras cabe en 1/3 con ajuste tipográfico)
+                // 1/2 (50% nominal): hasta 53.5% (~1070 palabras)
+                // 2/3 (66.7% nominal): hasta 70.0% (~1400 palabras)
+                // 1 pág (100% nominal): hasta 104.0% (~2080 palabras)
+                if (porcentajeOcupacion <= 26.5) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/4');
-                } else if (porcentajeOcupacion <= 33.33) {
+                } else if (porcentajeOcupacion <= 37.5) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/3');
-                } else if (porcentajeOcupacion <= 50) {
+                } else if (porcentajeOcupacion <= 53.5) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/2');
-                } else if (porcentajeOcupacion <= 66.67) {
+                } else if (porcentajeOcupacion <= 70.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '2/3');
-                } else if (porcentajeOcupacion <= 100) {
+                } else if (porcentajeOcupacion <= 104.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1');
                 } else {
                     espacioRecomendado = {
@@ -3604,6 +3700,17 @@
                         nombreCorto: `${numPaginasCompletas} Páginas Tabloide`,
                         alturaEstimadaCm: `${(numPaginasCompletas * 38.0).toFixed(0)} cm (${numPaginasCompletas} págs)`
                     };
+                }
+            }
+
+            // Aplicar selección manual del diagramador si está fijada
+            if (espacioForzadoManual && tipoPub === 'texto') {
+                const manualItem = ESPACIOS_DISPONIBLES.find(e => e.id === espacioForzadoManual);
+                if (manualItem) {
+                    espacioRecomendado = Object.assign({}, manualItem, {
+                        desc: manualItem.desc,
+                        esFijadoManual: true
+                    });
                 }
             }
 
@@ -3647,12 +3754,16 @@
                 const fraccionTarget = (espacioRecomendado.fraccion || 0.25) * 100;
                 const ratioEnFormato = (pct / fraccionTarget) * 100;
 
-                if (ratioEnFormato > 88) {
-                    feedbackElem.innerHTML = `🟡 <strong style="color: #b45309;">Cercano al límite:</strong> Ocupa el ${ratioEnFormato.toFixed(0)}% de ${espacioRecomendado.nombreCorto}. Si agrega más texto pasará a la siguiente tarifa o plana.`;
-                    badgeEstado.textContent = "Límite Máximo";
+                if (espacioForzadoManual) {
+                    feedbackElem.innerHTML = `🔵 <strong style="color: #002147;">Ajuste Editorial Manual:</strong> Tarifa fijada por el diagramador en <strong>${espacioRecomendado.nombreCorto}</strong> (${pct.toFixed(1)}% real ocupado en la plana).`;
+                    badgeEstado.textContent = `${espacioRecomendado.nombreCorto} (Fijado)`;
+                    badgeEstado.style.background = '#002147';
+                } else if (ratioEnFormato > 93) {
+                    feedbackElem.innerHTML = `🟡 <strong style="color: #b45309;">Cercano al límite:</strong> Ocupa el ${ratioEnFormato.toFixed(0)}% de ${espacioRecomendado.nombreCorto}. Con ajuste de diagramación cabe perfectamente en esta fracción.`;
+                    badgeEstado.textContent = "Límite Fracción";
                     badgeEstado.style.background = '#f59e0b';
                 } else {
-                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Espacio de Cotización:</strong> El texto ocupa el <strong>${pct.toFixed(0)}%</strong> de 1 página tabloide completa. Tarifa oficial recomendada: <strong>${espacioRecomendado.nombreCorto}</strong>.`;
+                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Espacio de Cotización:</strong> El texto ocupa el <strong>${pct.toFixed(1)}%</strong> de 1 página tabloide completa. Tarifa oficial recomendada: <strong>${espacioRecomendado.nombreCorto}</strong>.`;
                     badgeEstado.textContent = espacioRecomendado.nombreCorto;
                     badgeEstado.style.background = '#10b981';
                 }
@@ -3683,7 +3794,53 @@
             return clean.substring(0, 110) + '...';
         }
 
-        function actualizarCalculoFinanciero() {
+                // GESTIÓN DE AJUSTE EDITORIAL MANUAL (FORZAR TARIFA)
+        function forzarEspacioEditorial(espacioId) {
+            if (espacioId === 'auto') {
+                espacioForzadoManual = null;
+                showToast("Modo automático activado (cálculo proporcional)", "info");
+            } else {
+                espacioForzadoManual = espacioId;
+                const nombres = {
+                    '1/4': '1/4 de Página (L. 1,200.00)',
+                    '1/3': '1/3 de Página (L. 1,400.00)',
+                    '1/2': '1/2 Página (L. 1,800.00)',
+                    '2/3': '2/3 de Página (L. 2,800.00)',
+                    '1': '1 Página Completa (L. 3,200.00)'
+                };
+                showToast(`Espacio fijado manualmente: ${nombres[espacioId] || espacioId}`, "success");
+            }
+            actualizarBotonesEspacioPills();
+            analizarTexto();
+        }
+
+        function actualizarBotonesEspacioPills() {
+            const pills = ['Auto', '1_4', '1_3', '1_2', '2_3', '1'];
+            pills.forEach(p => {
+                const btn = document.getElementById(`btnEspacio${p}`);
+                if (!btn) return;
+                if (!espacioForzadoManual && p === 'Auto') {
+                    btn.classList.add('active');
+                } else if (espacioForzadoManual && p.replace('_', '/') === espacioForzadoManual) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+
+            const lblModo = document.getElementById('labelModoEspacio');
+            if (lblModo) {
+                if (espacioForzadoManual) {
+                    lblModo.textContent = `Fijado en ${espacioForzadoManual} pág`;
+                    lblModo.style.color = '#059669';
+                } else {
+                    lblModo.textContent = 'Modo Automático';
+                    lblModo.style.color = '#0284c7';
+                }
+            }
+        }
+
+function actualizarCalculoFinanciero() {
             if (!analisisActual.espacioSeleccionado) return;
 
             const espacio = analisisActual.espacioSeleccionado;
