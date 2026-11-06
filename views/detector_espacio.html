@@ -2270,10 +2270,14 @@
         // =========================================================================
         function limpiarSaltosDeLinea(texto) {
             if (!texto) return '';
-            // Reconstruye el texto unificando saltos huérfanos dentro de cada párrafo
-            // pero preservando los saltos dobles entre cláusulas legales y párrafos reales.
-            const parrafos = segmentarTextoEnParrafos(texto);
-            return parrafos.join('\n\n');
+            // Elimina por completo todos los saltos de línea huérfanos y de párrafo,
+            // unificando el texto en un flujo continuo 100% puro sin saltos para medición exacta.
+            return texto
+                .replace(/(\w+)-\s*[\r\n]+\s*(\w+)/g, '$1$2') // Reúne palabras cortadas con guión
+                .replace(/[\r\n]+/g, ' ')                      // Convierte TODOS los saltos de línea en un solo espacio
+                .replace(/[\t ]+/g, ' ')                       // Colapsa espacios múltiples o tabulaciones
+                .replace(/\s+([.,;:!?])/g, '$1')               // Quita espacios antes de signos de puntuación
+                .trim();
         }
 
         function eliminarSaltosEditor() {
@@ -2322,19 +2326,15 @@
             if (guardado) {
                 try {
                     calibracion = Object.assign(calibracion, JSON.parse(guardado));
-                    // Si el usuario tenía calibración anterior con formato carta o sin tipoPapel, actualizar al estándar Tabloide
-                    if (!calibracion.tipoPapel || calibracion.tipoPapel === 'carta') {
-                        calibracion.tipoPapel = 'tabloide';
-                        calibracion.palabrasPorPagina = 2000;
-                        calibracion.charsPorLinea = 50;
-                    }
-                    if (calibracion.tipoPapel === 'tabloide' && (!calibracion.palabrasPorPagina || calibracion.palabrasPorPagina < 1900)) {
-                        calibracion.palabrasPorPagina = 2000;
-                        calibracion.charsPorLinea = 50;
-                    }
-                    if (calibracion.margenSeguridad === undefined || calibracion.margenSeguridad > 5) {
-                        calibracion.margenSeguridad = 0; // Migrar a 0% para cotización de espacio exacto
-                    }
+                    // Forzar siempre el estándar oficial Tabloide a 2 Columnas para cotizaciones exactas
+                    calibracion.tipoPapel = 'tabloide';
+                    calibracion.palabrasPorPagina = 2000;
+                    calibracion.charsPorLinea = 50;
+                    calibracion.columnas = 2;
+                    calibracion.interlineado = 1.0;
+                    calibracion.margenSeguridad = 0;
+                    calibracion.modoDistribucion = 'balanceado';
+                    calibracion.tamanoLetra = 14;
                     if (calibracion.tamanoMaqueta === undefined) calibracion.tamanoMaqueta = 'tabloide';
                     if (calibracion.sangria === undefined) calibracion.sangria = 4;
                     if (calibracion.interlineado === undefined) calibracion.interlineado = 1.0;
@@ -3820,9 +3820,9 @@
                     badgeEstado.textContent = `${espacioRecomendado.nombreCorto} (Fijado)`;
                     badgeEstado.style.background = '#002147';
                 } else if (ratioEnFormato > 93) {
-                    feedbackElem.innerHTML = `🟡 <strong style="color: #b45309;">Cercano al límite:</strong> Ocupa el ${ratioEnFormato.toFixed(0)}% de ${espacioRecomendado.nombreCorto}. Con ajuste de diagramación cabe perfectamente en esta fracción.`;
-                    badgeEstado.textContent = "Límite Fracción";
-                    badgeEstado.style.background = '#f59e0b';
+                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Espacio Óptimo de Taller:</strong> Ocupa el ${pct.toFixed(1)}% de la plana. Cabe perfectamente en ${espacioRecomendado.nombreCorto} con ajuste de diagramación estándar.`;
+                    badgeEstado.textContent = espacioRecomendado.nombreCorto;
+                    badgeEstado.style.background = '#059669';
                 } else {
                     feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Espacio de Cotización:</strong> El texto ocupa el <strong>${pct.toFixed(1)}%</strong> de 1 página tabloide completa. Tarifa oficial recomendada: <strong>${espacioRecomendado.nombreCorto}</strong>.`;
                     badgeEstado.textContent = espacioRecomendado.nombreCorto;
