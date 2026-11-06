@@ -1800,12 +1800,12 @@
                         </div>
                         <div class="calib-group">
                             <label for="calibPalabrasPorPagina">Palabras por Página Completa:</label>
-                            <input type="number" id="calibPalabrasPorPagina" value="2000" min="500" max="3500"
+                            <input type="number" id="calibPalabrasPorPagina" value="580" min="200" max="1500"
                                 onchange="guardarCalibracion()">
                         </div>
                         <div class="calib-group">
                             <label for="calibCharsPorLinea">Caracteres por línea de columna:</label>
-                            <input type="number" id="calibCharsPorLinea" value="50" min="25" max="75"
+                            <input type="number" id="calibCharsPorLinea" value="46" min="25" max="75"
                                 onchange="guardarCalibracion()">
                         </div>
                         <div class="calib-group">
@@ -2140,12 +2140,12 @@
     <script>
         // TARIFAS OFICIALES SEGÚN ACUERDO EJECUTIVO N° 249-2010 (ENAG) - FORMATO TABLOIDE
         const ESPACIOS_DISPONIBLES = [
-                        {
+            {
                 id: '1/4',
                 desc: '1/4 PÁGINA TABLOIDE (PUBLICACIONES- TEXTO)',
                 precio: 1200.00,
                 fraccion: 0.25,
-                maxPalabrasFactor: 0.25, // ~450 palabras en tabloide
+                maxPalabrasFactor: 0.25, // ~145 palabras en tabloide
                 nombreCorto: '1/4 de Página Tabloide',
                 alturaEstimadaCm: 9.5,
                 alturaColumnaUnicaCm: 19.0
@@ -2155,7 +2155,7 @@
                 desc: '1/3 PÁGINA TABLOIDE (PUBLICACIONES- TEXTO)',
                 precio: 1400.00,
                 fraccion: 0.3333,
-                maxPalabrasFactor: 0.3333, // ~600 palabras en tabloide
+                maxPalabrasFactor: 0.3333, // ~195 palabras en tabloide
                 nombreCorto: '1/3 de Página Tabloide',
                 alturaEstimadaCm: 12.7,
                 alturaColumnaUnicaCm: 25.3
@@ -2165,7 +2165,7 @@
                 desc: '1/2 PÁGINA TABLOIDE (PUBLICACIONES- TEXTO)',
                 precio: 1800.00,
                 fraccion: 0.50,
-                maxPalabrasFactor: 0.50, // ~900 palabras en tabloide
+                maxPalabrasFactor: 0.50, // ~290 palabras en tabloide
                 nombreCorto: '1/2 Página Tabloide',
                 alturaEstimadaCm: 19.0,
                 alturaColumnaUnicaCm: 38.0
@@ -2175,7 +2175,7 @@
                 desc: '2/3 PÁGINA TABLOIDE (PUBLICACIONES- TEXTO)',
                 precio: 2800.00,
                 fraccion: 0.6667,
-                maxPalabrasFactor: 0.6667, // ~1200 palabras en tabloide
+                maxPalabrasFactor: 0.6667, // ~385 palabras en tabloide
                 nombreCorto: '2/3 de Página Tabloide',
                 alturaEstimadaCm: 25.3,
                 alturaColumnaUnicaCm: 50.6
@@ -2185,7 +2185,7 @@
                 desc: '1 PÁGINA TABLOIDE COMPLETA (PUBLICACIONES - TEXTO)',
                 precio: 3200.00,
                 fraccion: 1.00,
-                maxPalabrasFactor: 1.00, // ~1800 palabras en tabloide
+                maxPalabrasFactor: 1.00, // ~580 palabras en tabloide (Gaceta No. 37,260)
                 nombreCorto: '1 Página Tabloide Completa',
                 alturaEstimadaCm: 38.0,
                 alturaColumnaUnicaCm: 76.0
@@ -2238,8 +2238,8 @@
         // Parámetros de Calibración
         let calibracion = {
             tipoPapel: 'tabloide', // 'tabloide' (11"x17") o 'carta' (8.5"x11")
-            palabrasPorPagina: 2000, // 2000 palabras capacidad neta Tabloide oficial La Gaceta
-            charsPorLinea: 50, // 50 caracteres promedio por línea columna Times New Roman 10pt
+            palabrasPorPagina: 580, // Capacidad real oficial certificada La Gaceta No. 37,260 (~580 palabras/plana)
+            charsPorLinea: 46, // 46 caracteres promedio por línea de columna Times New Roman
             columnas: 2, // 1, 2 o 3 columnas
             modoDistribucion: 'balanceado', // 'balanceado' (horizontal) o 'columna_unica' (vertical)
             tipoPublicacion: 'texto', // 'texto', 'marcas', 'junta_agua'
@@ -2326,11 +2326,13 @@
             if (guardado) {
                 try {
                     calibracion = Object.assign(calibracion, JSON.parse(guardado));
-                    // Forzar siempre el estándar oficial Tabloide a 2 Columnas para cotizaciones exactas
+                    // Calibración oficial certificada según La Gaceta No. 37,260 (Octubre 2026)
                     calibracion.tipoPapel = 'tabloide';
-                    calibracion.palabrasPorPagina = 2000;
-                    calibracion.charsPorLinea = 50;
+                    if (!calibracion.palabrasPorPagina || calibracion.palabrasPorPagina > 750 || calibracion.palabrasPorPagina < 350) {
+                        calibracion.palabrasPorPagina = 580;
+                    }
                     calibracion.columnas = 2;
+                    calibracion.charsPorLinea = 46;
                     calibracion.interlineado = 1.0;
                     calibracion.margenSeguridad = 0;
                     calibracion.modoDistribucion = 'balanceado';
@@ -2398,8 +2400,8 @@
             if (document.getElementById('calibTipoPapel')) {
                 calibracion.tipoPapel = document.getElementById('calibTipoPapel').value || 'tabloide';
             }
-            calibracion.palabrasPorPagina = parseInt(document.getElementById('calibPalabrasPorPagina').value) || 1800;
-            calibracion.charsPorLinea = parseInt(document.getElementById('calibCharsPorLinea').value) || 45;
+            calibracion.palabrasPorPagina = parseInt(document.getElementById('calibPalabrasPorPagina').value) || 580;
+            calibracion.charsPorLinea = parseInt(document.getElementById('calibCharsPorLinea').value) || 46;
             calibracion.columnas = parseInt(document.getElementById('calibColumnas').value) || 2;
             if (document.getElementById('calibModoDistribucion')) {
                 calibracion.modoDistribucion = document.getElementById('calibModoDistribucion').value || 'balanceado';
@@ -2431,7 +2433,7 @@
             } else if (calibracion.columnas === 1) {
                 calibracion.charsPorLinea = 75;
             } else {
-                calibracion.charsPorLinea = 45;
+                calibracion.charsPorLinea = 46;
             }
             const inputChars = document.getElementById('calibCharsPorLinea');
             if (inputChars) inputChars.value = calibracion.charsPorLinea;
@@ -2486,15 +2488,15 @@
         function cambiarFormatoPapel(tipo) {
             calibracion.tipoPapel = tipo;
             if (tipo === 'tabloide') {
-                calibracion.palabrasPorPagina = 2000;
-                calibracion.charsPorLinea = calibracion.columnas === 3 ? 32 : (calibracion.columnas === 1 ? 80 : 50);
-                document.getElementById('calibPalabrasPorPagina').value = 2000;
+                calibracion.palabrasPorPagina = 580;
+                calibracion.charsPorLinea = calibracion.columnas === 3 ? 32 : (calibracion.columnas === 1 ? 75 : 46);
+                document.getElementById('calibPalabrasPorPagina').value = 580;
                 document.getElementById('calibCharsPorLinea').value = calibracion.charsPorLinea;
                 showToast("Formato ajustado a TABLOIDE OFICIAL (11\" × 17\" • 279 × 432 mm)", "success");
             } else {
-                calibracion.palabrasPorPagina = 1050;
-                calibracion.charsPorLinea = calibracion.columnas === 3 ? 28 : (calibracion.columnas === 1 ? 65 : 40);
-                document.getElementById('calibPalabrasPorPagina').value = 1050;
+                calibracion.palabrasPorPagina = 350;
+                calibracion.charsPorLinea = calibracion.columnas === 3 ? 28 : (calibracion.columnas === 1 ? 60 : 38);
+                document.getElementById('calibPalabrasPorPagina').value = 350;
                 document.getElementById('calibCharsPorLinea').value = calibracion.charsPorLinea;
                 showToast("Formato ajustado a CARTA REDUCIDO (8.5\" × 11\" • 216 × 279 mm)", "info");
             }
@@ -2504,8 +2506,8 @@
         function restablecerCalibracion() {
             calibracion = {
                 tipoPapel: 'tabloide',
-                palabrasPorPagina: 2000,
-                charsPorLinea: 50,
+                palabrasPorPagina: 580,
+                charsPorLinea: 46,
                 columnas: 2,
                 modoDistribucion: 'balanceado',
                 tipoPublicacion: 'texto',
@@ -2524,8 +2526,8 @@
             if (document.getElementById('calibTipoPapel')) {
                 document.getElementById('calibTipoPapel').value = 'tabloide';
             }
-            document.getElementById('calibPalabrasPorPagina').value = 2000;
-            document.getElementById('calibCharsPorLinea').value = 50;
+            document.getElementById('calibPalabrasPorPagina').value = 580;
+            document.getElementById('calibCharsPorLinea').value = 46;
             if (document.getElementById('calibColumnas')) {
                 document.getElementById('calibColumnas').value = 2;
             }
@@ -3337,7 +3339,7 @@
                     numero: 1,
                     texto: '',
                     palabras: 0,
-                    limite: 2000,
+                    limite: 580,
                     porcentaje: 0
                 }];
             }
@@ -3346,10 +3348,10 @@
             const factorSeg = 1 + ((calib.margenSeguridad || 0) / 100);
             const factorEfectivo = factorInter * factorSeg;
 
-            const basePalabras = calib.tipoPapel === 'tabloide' ? (calib.palabrasPorPagina || 2000) : (calib.palabrasPorPagina || 1050);
+            const basePalabras = calib.tipoPapel === 'tabloide' ? (calib.palabrasPorPagina || 580) : (calib.palabrasPorPagina || 350);
 
             // Capacidad neta completa de página para cotización de espacio (sin membrete que consuma espacio)
-            const limitePorPagina = Math.max(250, Math.round(basePalabras / factorEfectivo));
+            const limitePorPagina = Math.max(150, Math.round(basePalabras / factorEfectivo));
 
             const parrafos = segmentarTextoEnParrafos(rawText);
 
@@ -3662,7 +3664,8 @@
             const palabrasEfectivas = cantPalabras * factorSeguridad * factorInterlineado;
             const porcentajePalabras = (palabrasEfectivas / calibracion.palabrasPorPagina) * 100;
 
-            const lineasPorColumna = calibracion.tipoPapel === 'tabloide' ? 115 : 72;
+            // 46 líneas por columna en Tabloide (92 líneas totales en 2 columnas = 1 página completa La Gaceta No. 37,260)
+            const lineasPorColumna = calibracion.tipoPapel === 'tabloide' ? 46 : 30;
             const lineasTotalesPagina = (calibracion.columnas || 2) * lineasPorColumna;
             const porcentajeLineas = (totalLineasConInterlineado / lineasTotalesPagina) * 100;
 
@@ -3737,20 +3740,21 @@
                 }
             } else {
                 // Tarifa Estándar con Tolerancia Editorial de Taller de La Gaceta
-                // 1/4 (25% nominal): hasta 26.5% (~530 palabras)
-                // 1/3 (33.3% nominal): hasta 37.5% (~750 palabras cabe en 1/3 con ajuste tipográfico)
-                // 1/2 (50% nominal): hasta 53.5% (~1070 palabras)
-                // 2/3 (66.7% nominal): hasta 70.0% (~1400 palabras)
-                // 1 pág (100% nominal): hasta 104.0% (~2080 palabras)
-                if (porcentajeOcupacion <= 26.5) {
+                // Basado en el Diario Oficial No. 37,260 (Edición Oficial Octubre 2026):
+                // 1/4 (25% nominal): hasta 28.0% (~145 palabras / ~24 líneas) -> L. 1,200.00
+                // 1/3 (33.3% nominal): hasta 38.0% (~200 palabras / ~33 líneas) -> L. 1,400.00
+                // 1/2 (50% nominal): hasta 55.0% (~290 palabras / ~48 líneas) -> L. 1,800.00
+                // 2/3 (66.7% nominal): hasta 73.0% (~385 palabras / ~64 líneas) -> L. 2,800.00
+                // 1 pág (100% nominal): hasta 105.0% (~580 palabras / ~92 líneas) -> L. 3,200.00
+                if (porcentajeOcupacion <= 28.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/4');
-                } else if (porcentajeOcupacion <= 37.5) {
+                } else if (porcentajeOcupacion <= 38.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/3');
-                } else if (porcentajeOcupacion <= 53.5) {
+                } else if (porcentajeOcupacion <= 55.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/2');
-                } else if (porcentajeOcupacion <= 70.0) {
+                } else if (porcentajeOcupacion <= 73.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '2/3');
-                } else if (porcentajeOcupacion <= 104.0) {
+                } else if (porcentajeOcupacion <= 105.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1');
                 } else {
                     espacioRecomendado = {
