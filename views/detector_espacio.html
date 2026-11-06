@@ -2270,14 +2270,24 @@
         // =========================================================================
         function limpiarSaltosDeLinea(texto) {
             if (!texto) return '';
-            // Elimina por completo todos los saltos de línea huérfanos y de párrafo,
-            // unificando el texto en un flujo continuo 100% puro sin saltos para medición exacta.
-            return texto
-                .replace(/(\w+)-\s*[\r\n]+\s*(\w+)/g, '$1$2') // Reúne palabras cortadas con guión
-                .replace(/[\r\n]+/g, ' ')                      // Convierte TODOS los saltos de línea en un solo espacio
-                .replace(/[\t ]+/g, ' ')                       // Colapsa espacios múltiples o tabulaciones
-                .replace(/\s+([.,;:!?])/g, '$1')               // Quita espacios antes de signos de puntuación
-                .trim();
+            let res = texto
+                // Reúne palabras cortadas con guión al borde de línea sin romper acentos ni eñes
+                .replace(/([\p{L}]+)-\s*[\r\n]+\s*([\p{L}]+)/gu, '$1$2')
+                .replace(/\r\n/g, '\n')
+                .replace(/\r/g, '\n');
+
+            // Separar bloques por saltos de línea dobles intencionales
+            const bloques = res.split(/\n{2,}/);
+            const bloquesLimpios = bloques.map(b => {
+                // Elimina saltos de línea suaves huérfanos de PDF/Word dentro del párrafo
+                return b.replace(/\n+/g, ' ').replace(/[\t ]+/g, ' ').trim();
+            }).filter(b => b.length > 0);
+
+            let limpio = bloquesLimpios.join('\n\n');
+
+            // Garantiza estructura legal oficial separando cláusulas maestras en párrafos íntegros
+            limpio = formatearEstructuraLegal(limpio);
+            return limpio;
         }
 
         function eliminarSaltosEditor() {
@@ -3402,20 +3412,19 @@
                 }];
             }
 
+            const parrafos = segmentarTextoEnParrafos(rawText);
             const totalPalabras = (rawText.trim().match(/\S+/g) || []).length;
             const factorInter = parseFloat(calib.interlineado) || 1.0;
             const factorSeg = 1 + ((calib.margenSeguridad || 0) / 100);
             const factorEfectivo = factorInter * factorSeg;
+            const basePalabras = Math.round((calib.palabrasPorPagina || 580) / factorEfectivo);
 
-            const basePalabras = Math.round((calib.tipoPapel === 'tabloide' ? (calib.palabrasPorPagina || 580) : 350) / factorEfectivo);
-
-            // Regla del Diagramador: Jugar con los espacios (tolerancia de taller del 10% = ~638 palabras)
+            // Tolerancia del Diagramador: Jugar con los espacios (hasta 10% = ~638 palabras) para caber en 1 sola plana completa
             const toleranciaEditorialPagina1 = Math.round(basePalabras * 1.10);
-
             if (totalPalabras <= toleranciaEditorialPagina1) {
                 return [{
                     numero: 1,
-                    texto: rawText.trim(),
+                    texto: parrafos.join('\n\n'),
                     palabras: totalPalabras,
                     limite: basePalabras,
                     porcentaje: Math.min(100, Math.round((totalPalabras / basePalabras) * 100)),
@@ -3423,38 +3432,80 @@
                 }];
             }
 
-            // Desborde genuino multi-página: llena cada plana al 100% sin dejar huecos vacíos
-            const parrafos = segmentarTextoEnParrafos(rawText);
-            const microUnidades = extraerMicroUnidadesEditorial(parrafos);
-
+            // Paginación por párrafos completos e íntegros (NUNCA CORTA PALABRAS NI ORACIONES A MITAD)
             const paginas = [];
             let buffer = [];
             let palabrasEnPagina = 0;
 
-            for (let i = 0; i < microUnidades.length; i++) {
-                const u = microUnidades[i];
+            for (let i = 0; i < parrafos.length; i++) {
+                const p = parrafos[i];
+                const pWords = (p.match(/\S+/g) || []).length;
 
-                if (palabrasEnPagina + u.palabras > basePalabras && palabrasEnPagina >= (basePalabras * 0.98)) {
+                // Si el párrafo actual sobrepasa el límite y la página ya tiene más del 70% de carga:
+                // Cierra la plana y deja el párrafo completo para la siguiente página sin trocearlo
+                if (palabrasEnPagina + pWords > basePalabras && palabrasEnPagina >= (basePalabras * 0.70)) {
                     paginas.push({
                         numero: paginas.length + 1,
-                        texto: ensamblarMicroUnidades(buffer),
+                        texto: buffer.join('\n\n'),
                         palabras: palabrasEnPagina,
                         limite: basePalabras,
-                        porcentaje: 100
+                        porcentaje: Math.min(100, Math.round((palabrasEnPagina / basePalabras) * 100))
                     });
-                    buffer = [u];
-                    palabrasEnPagina = u.palabras;
+                    buffer = [p];
+                    palabrasEnPagina = pWords;
+                } else if (pWords > (basePalabras * 0.75)) {
+                    // Párrafo individual excepcionalmente extenso (más de 400 palabras):
+                    // Se subdivide por oraciones completas con punto final, NUNCA a mitad de palabra
+                    const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
+                    let trozo1 = [], trozo2 = [];
+                    let wTrozo1 = 0;
+                    const metaTrozo = basePalabras - palabrasEnPagina;
+
+                    if (oraciones.length <= 1) {
+                        const palabrasArray = p.split(/\s+/);
+                        const trozoPalabras = Math.max(50, basePalabras - palabrasEnPagina);
+                        trozo1 = [palabrasArray.slice(0, trozoPalabras).join(' ')];
+                        trozo2 = [palabrasArray.slice(trozoPalabras).join(' ')];
+                        wTrozo1 = trozoPalabras;
+                    } else {
+                        for (let or of oraciones) {
+                            const wOr = (or.match(/\S+/g) || []).length;
+                            if (wTrozo1 + wOr <= metaTrozo || trozo1.length === 0) {
+                                trozo1.push(or);
+                                wTrozo1 += wOr;
+                            } else {
+                                trozo2.push(or);
+                            }
+                        }
+                    }
+
+                    if (trozo1.length > 0 && trozo2.length > 0) {
+                        buffer.push(trozo1.join(' '));
+                        palabrasEnPagina += wTrozo1;
+                        paginas.push({
+                            numero: paginas.length + 1,
+                            texto: buffer.join('\n\n'),
+                            palabras: palabrasEnPagina,
+                            limite: basePalabras,
+                            porcentaje: 100
+                        });
+                        buffer = [trozo2.join(' ')];
+                        palabrasEnPagina = (trozo2.join(' ').match(/\S+/g) || []).length;
+                    } else {
+                        buffer.push(p);
+                        palabrasEnPagina += pWords;
+                    }
                 } else {
-                    buffer.push(u);
-                    palabrasEnPagina += u.palabras;
+                    buffer.push(p);
+                    palabrasEnPagina += pWords;
                 }
             }
 
             if (buffer.length > 0) {
-                // Regla del Diagramador: si el remanente en la última página es pequeño (menos de 10% = ~58 palabras), la anterior lo absorbe jugando con los espacios
-                if (paginas.length >= 1 && palabrasEnPagina <= (basePalabras * 0.10)) {
+                // Tolerancia editorial de remanente: si la última página tiene menos de 12% (~70 palabras), la anterior lo absorbe
+                if (paginas.length >= 1 && palabrasEnPagina <= (basePalabras * 0.12)) {
                     const anterior = paginas[paginas.length - 1];
-                    anterior.texto += '\n\n' + ensamblarMicroUnidades(buffer);
+                    anterior.texto += '\n\n' + buffer.join('\n\n');
                     anterior.palabras += palabrasEnPagina;
                     anterior.porcentaje = 100;
                     anterior.ajusteEditorialAplicado = true;
@@ -3462,7 +3513,7 @@
                     const pctUlt = Math.min(100, Math.round((palabrasEnPagina / basePalabras) * 100));
                     paginas.push({
                         numero: paginas.length + 1,
-                        texto: ensamblarMicroUnidades(buffer),
+                        texto: buffer.join('\n\n'),
                         palabras: palabrasEnPagina,
                         limite: basePalabras,
                         porcentaje: pctUlt
@@ -3516,7 +3567,7 @@
             return `<p ${estiloP}>${trimmed}</p>`;
         }
 
-        function balancearTextoEnColumnas(texto, numCols = 2, modo = 'balanceado') {
+        function balancearTextoEnColumnas(texto, numCols = 2) {
             if (!texto || !texto.trim()) {
                 return { col1: [], col2: [], col3: [] };
             }
@@ -3529,183 +3580,108 @@
                 return { col1: parrafos, col2: [], col3: [] };
             }
 
-            // MODO SECUENCIAL CONTINUO (Páginas intermedias de La Gaceta o Columna Única)
-            // Llena Columna 1 primero de arriba a abajo (46 líneas / ~290 palabras), y luego Columna 2 de arriba a abajo.
-            // Esto asegura que NUNCA quede un hueco vacío al pie de la plana en páginas intermedias.
-            if (modo === 'secuencial' || modo === 'columna_unica') {
-                const lineasColumna = 46;
-                const charsPorLin = calibracion.charsPorLinea || 46;
-                let c1 = [], c2 = [], c3 = [];
-                let lineasCol1 = 0;
-                let colActiva = 1;
-
-                for (let i = 0; i < parrafos.length; i++) {
-                    const p = parrafos[i];
-                    const linP = Math.max(1, Math.ceil((p.length + 4) / charsPorLin));
-
-                    if (colActiva === 1) {
-                        if (lineasCol1 + linP <= lineasColumna || c1.length === 0) {
-                            c1.push(p);
-                            lineasCol1 += linP + 1;
-                        } else {
-                            const linDisp = Math.max(0, lineasColumna - lineasCol1);
-                            if (linDisp >= 2) {
-                                const charsDisp = linDisp * charsPorLin;
-                                const words = p.split(/\s+/);
-                                let w1 = [], w2 = [];
-                                let accLen = 0;
-                                for (let w of words) {
-                                    if (accLen + w.length + 1 <= charsDisp) {
-                                        w1.push(w);
-                                        accLen += w.length + 1;
-                                    } else {
-                                        w2.push(w);
-                                    }
-                                }
-                                if (w1.length > 0 && w2.length > 0) {
-                                    c1.push(w1.join(' '));
-                                    c2.push(w2.join(' '));
-                                    colActiva = 2;
-                                    continue;
-                                }
-                            }
-                            colActiva = 2;
-                            c2.push(p);
-                        }
-                    } else if (colActiva === 2 && numCols === 3) {
-                        if (c2.length < 5) {
-                            c2.push(p);
-                        } else {
-                            c3.push(p);
-                        }
-                    } else if (colActiva === 2) {
-                        c2.push(p);
-                    } else {
-                        c3.push(p);
-                    }
+            // Si solo hay 1 párrafo: solo si es muy largo se divide por oración completa con punto
+            if (parrafos.length === 1) {
+                const p = parrafos[0];
+                const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
+                if (oraciones.length >= 2) {
+                    const mitad = Math.ceil(oraciones.length / 2);
+                    return {
+                        col1: [oraciones.slice(0, mitad).join(' ')],
+                        col2: [oraciones.slice(mitad).join(' ')],
+                        col3: []
+                    };
                 }
-                return { col1: c1, col2: c2, col3: c3 };
-            }
-
-            // Modo balanceado a 3 Columnas (Marcas y Patentes)
-            if (numCols === 3) {
-                const totalChars = parrafos.reduce((acc, p) => acc + p.length, 0);
-                if (parrafos.length <= 2 && totalChars < 180) {
-                    return { col1: parrafos, col2: [], col3: [] };
-                }
-
-                let unidades = [...parrafos];
-                if (unidades.length === 1 && unidades[0].length > 150) {
-                    const p = unidades[0];
-                    const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                    if (oraciones.length >= 3) {
-                        unidades = oraciones;
-                    } else {
-                        const palabras = p.split(/\s+/);
-                        const tercio = Math.ceil(palabras.length / 3);
-                        unidades = [
-                            palabras.slice(0, tercio).join(' '),
-                            palabras.slice(tercio, tercio * 2).join(' '),
-                            palabras.slice(tercio * 2).join(' ')
-                        ];
-                    }
-                }
-
-                const tercioMeta = totalChars / 3;
-                let col1 = [], col2 = [], col3 = [];
-                let acum1 = 0, acum2 = 0;
-                let target = 1;
-
-                unidades.forEach(u => {
-                    if (target === 1) {
-                        col1.push(u);
-                        acum1 += u.length;
-                        if (acum1 >= tercioMeta && col1.length >= 1) target = 2;
-                    } else if (target === 2) {
-                        col2.push(u);
-                        acum2 += u.length;
-                        if (acum2 >= tercioMeta && col2.length >= 1) target = 3;
-                    } else {
-                        col3.push(u);
-                    }
-                });
-
-                if (col2.length === 0 && col1.length >= 2) {
-                    col2.push(col1.pop());
-                }
-                if (col3.length === 0 && col2.length >= 2) {
-                    col3.push(col2.pop());
-                }
-
-                return { col1, col2, col3 };
-            }
-
-            // Modo balanceado a 2 Columnas (Estándar de La Gaceta)
-            const totalCaracteres = parrafos.reduce((acc, p) => acc + p.length, 0);
-            if (totalCaracteres < 160 && parrafos.length <= 1) {
                 return { col1: parrafos, col2: [], col3: [] };
             }
 
-            let unidades = [...parrafos];
-            if (unidades.length === 1 && unidades[0].length > 120) {
-                const p = unidades[0];
-                const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                if (oraciones.length > 1) {
-                    unidades = oraciones;
-                } else {
-                    const palabras = p.split(/\s+/);
-                    const mitad = Math.ceil(palabras.length / 2);
-                    unidades = [
-                        palabras.slice(0, mitad).join(' '),
-                        palabras.slice(mitad).join(' ')
-                    ];
-                }
+            // 3 Columnas (Marcas y Patentes)
+            if (numCols === 3) {
+                const totalChars = parrafos.reduce((a, b) => a + b.length, 0);
+                const tercio = totalChars / 3;
+                let c1 = [], c2 = [], c3 = [];
+                let acc1 = 0, acc2 = 0;
+                let target = 1;
+                parrafos.forEach(p => {
+                    if (target === 1) {
+                        c1.push(p); acc1 += p.length;
+                        if (acc1 >= tercio && c1.length >= 1) target = 2;
+                    } else if (target === 2) {
+                        c2.push(p); acc2 += p.length;
+                        if (acc2 >= tercio && c2.length >= 1) target = 3;
+                    } else {
+                        c3.push(p);
+                    }
+                });
+                return { col1: c1, col2: c2, col3: c3 };
             }
 
-            const mitadMeta = totalCaracteres / 2;
-            let mejorIndice = 1;
-            let menorDiff = Infinity;
+            // 2 Columnas (Estándar de La Gaceta):
+            // Distribuye PÁRRAFOS COMPLETOS respetando la integridad de las cláusulas legales.
+            // NUNCA divide un párrafo o una oración a mitad de palabra entre columnas.
+            const totalChars = parrafos.reduce((a, b) => a + b.length, 0);
+            const mitadMeta = totalChars / 2;
             let acum = 0;
+            let mejorIdx = 1;
+            let menorDiff = Infinity;
 
-            for (let i = 0; i < unidades.length; i++) {
-                acum += unidades[i].length;
+            for (let i = 0; i < parrafos.length; i++) {
+                acum += parrafos[i].length;
                 const diff = Math.abs(acum - mitadMeta);
                 if (diff < menorDiff) {
                     menorDiff = diff;
-                    mejorIndice = i + 1;
+                    mejorIdx = i + 1;
                 }
             }
 
-            if (unidades.length >= 2) {
-                if (mejorIndice >= unidades.length) mejorIndice = unidades.length - 1;
-                if (mejorIndice <= 0) mejorIndice = 1;
-            }
-
-            let col1 = unidades.slice(0, mejorIndice);
-            let col2 = unidades.slice(mejorIndice);
+            mejorIdx = Math.max(1, Math.min(parrafos.length - 1, mejorIdx));
+            let col1 = parrafos.slice(0, mejorIdx);
+            let col2 = parrafos.slice(mejorIdx);
 
             const len1 = col1.reduce((a, b) => a + b.length, 0);
             const len2 = col2.reduce((a, b) => a + b.length, 0);
 
-            if (col2.length === 0 && col1.length > 0) {
-                const unico = col1[0];
-                const palabras = unico.split(/\s+/);
-                const mitad = Math.ceil(palabras.length / 2);
-                col1 = [palabras.slice(0, mitad).join(' ')];
-                col2 = [palabras.slice(mitad).join(' ')];
-            } else if (col1.length === 1 && len1 > totalCaracteres * 0.75) {
-                const p = col1[0];
-                const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                if (oraciones.length > 1) {
-                    col1 = [oraciones[0]];
-                    col2 = [...oraciones.slice(1), ...col2];
+            // Si una columna queda notablemente desbalanceada (> 68% del total) y contiene un párrafo largo,
+            // se equilibra dividiendo ese párrafo por ORACIÓN COMPLETA con punto final (NUNCA a mitad de palabra ni de oración).
+            if (len1 > totalChars * 0.68 && col1.length >= 1) {
+                const pLargo = col1[col1.length - 1];
+                const oraciones = pLargo.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(Boolean);
+                if (oraciones.length >= 2) {
+                    const metaCol1 = mitadMeta - (len1 - pLargo.length);
+                    let o1 = [], o2 = [];
+                    let accO = 0;
+                    for (let or of oraciones) {
+                        if (accO + or.length <= metaCol1 || o1.length === 0) {
+                            o1.push(or);
+                            accO += or.length;
+                        } else {
+                            o2.push(or);
+                        }
+                    }
+                    if (o1.length > 0 && o2.length > 0) {
+                        col1[col1.length - 1] = o1.join(' ');
+                        col2.unshift(o2.join(' '));
+                    }
                 }
-            } else if (col2.length === 1 && len2 > totalCaracteres * 0.75) {
-                const p = col2[0];
-                const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                if (oraciones.length > 1) {
-                    col1 = [...col1, ...oraciones.slice(0, Math.ceil(oraciones.length / 2))];
-                    col2 = oraciones.slice(Math.ceil(oraciones.length / 2));
+            } else if (len2 > totalChars * 0.68 && col2.length >= 1) {
+                const pLargo = col2[0];
+                const oraciones = pLargo.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(Boolean);
+                if (oraciones.length >= 2) {
+                    const metaCol1 = mitadMeta - len1;
+                    let o1 = [], o2 = [];
+                    let accO = 0;
+                    for (let or of oraciones) {
+                        if (accO + or.length <= metaCol1 || o1.length === 0) {
+                            o1.push(or);
+                            accO += or.length;
+                        } else {
+                            o2.push(or);
+                        }
+                    }
+                    if (o1.length > 0 && o2.length > 0) {
+                        col1.push(o1.join(' '));
+                        col2[0] = o2.join(' ');
+                    }
                 }
             }
 
