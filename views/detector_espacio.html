@@ -2328,14 +2328,12 @@
                     calibracion = Object.assign(calibracion, JSON.parse(guardado));
                     // Calibración oficial certificada según La Gaceta No. 37,260 (Octubre 2026)
                     calibracion.tipoPapel = 'tabloide';
-                    if (!calibracion.palabrasPorPagina || calibracion.palabrasPorPagina > 750 || calibracion.palabrasPorPagina < 350) {
-                        calibracion.palabrasPorPagina = 580;
-                    }
-                    calibracion.columnas = 2;
+                    // Garantizar capacidad oficial exacta inamovible: 580 palabras por página tabloide
+                    calibracion.palabrasPorPagina = 580;
+                    calibracion.columnas = calibracion.columnas || 2;
                     calibracion.charsPorLinea = 46;
                     calibracion.interlineado = 1.0;
-                    calibracion.margenSeguridad = 0;
-                    calibracion.modoDistribucion = 'balanceado';
+                    calibracion.margenSeguridad = 0; // 0% holgura por defecto para cotización de espacio exacto
                     calibracion.tamanoLetra = 14;
                     if (calibracion.tamanoMaqueta === undefined) calibracion.tamanoMaqueta = 'tabloide';
                     if (calibracion.sangria === undefined) calibracion.sangria = 4;
@@ -2344,9 +2342,11 @@
                     if (calibracion.justificado === undefined) calibracion.justificado = true;
                     if (calibracion.tipoSeccion === undefined) calibracion.tipoSeccion = 'seccion_a';
                     if (calibracion.modoFecha === undefined) calibracion.modoFecha = 'oficial';
-                    if (calibracion.columnas === undefined) calibracion.columnas = 2;
                     if (calibracion.modoDistribucion === undefined) calibracion.modoDistribucion = 'balanceado';
                     if (calibracion.tipoPublicacion === undefined) calibracion.tipoPublicacion = 'texto';
+
+                    // Saneamiento de localStorage
+                    localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
 
                     if (document.getElementById('calibTipoPapel')) {
                         document.getElementById('calibTipoPapel').value = calibracion.tipoPapel;
@@ -2409,7 +2409,7 @@
             if (document.getElementById('tipoPublicacion')) {
                 calibracion.tipoPublicacion = document.getElementById('tipoPublicacion').value || 'texto';
             }
-            calibracion.margenSeguridad = parseInt(document.getElementById('calibMargenSeguridad').value) || 10;
+            calibracion.margenSeguridad = parseInt(document.getElementById('calibMargenSeguridad').value) || 0;
             calibracion.sangria = parseInt(document.getElementById('calibSangria').value) || 0;
             calibracion.interlineado = parseFloat(document.getElementById('calibInterlineado').value) || 1.0;
             if (document.getElementById('calibTamanoLetra')) {
@@ -2537,7 +2537,7 @@
             if (document.getElementById('tipoPublicacion')) {
                 document.getElementById('tipoPublicacion').value = 'texto';
             }
-            document.getElementById('calibMargenSeguridad').value = 10;
+            document.getElementById('calibMargenSeguridad').value = 0;
             if (document.getElementById('calibSangria')) {
                 document.getElementById('calibSangria').value = 4;
             }
@@ -2705,7 +2705,9 @@
             const fontSizeModal = Math.max(9, (13.5 * (tamanoBase / 14))).toFixed(1);
             const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: ${fontSizeModal}px; font-family: 'Times New Roman', Times, serif; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
-            const balance = balancearTextoEnColumnas(pagObj.texto, calibracion.columnas, calibracion.modoDistribucion);
+            const esUltimaModal = (pagNum === totalPaginasPrevia);
+            const modoColModal = esUltimaModal ? (calibracion.modoDistribucion || 'balanceado') : 'secuencial';
+            const balance = balancearTextoEnColumnas(pagObj.texto, calibracion.columnas, modoColModal);
 
             // Cabecera limpia de cotización de espacio (SIN membrete)
             const headerHtml = `
@@ -3432,7 +3434,7 @@
             for (let i = 0; i < microUnidades.length; i++) {
                 const u = microUnidades[i];
 
-                if (palabrasEnPagina + u.palabras > basePalabras && palabrasEnPagina >= (basePalabras * 0.95)) {
+                if (palabrasEnPagina + u.palabras > basePalabras && palabrasEnPagina >= (basePalabras * 0.98)) {
                     paginas.push({
                         numero: paginas.length + 1,
                         texto: ensamblarMicroUnidades(buffer),
@@ -3449,8 +3451,8 @@
             }
 
             if (buffer.length > 0) {
-                // Si el remanente en la última página es muy pequeño (menos de 40 palabras) y la anterior puede absorberlo:
-                if (paginas.length >= 1 && palabrasEnPagina <= (basePalabras * 0.08)) {
+                // Regla del Diagramador: si el remanente en la última página es pequeño (menos de 10% = ~58 palabras), la anterior lo absorbe jugando con los espacios
+                if (paginas.length >= 1 && palabrasEnPagina <= (basePalabras * 0.10)) {
                     const anterior = paginas[paginas.length - 1];
                     anterior.texto += '\n\n' + ensamblarMicroUnidades(buffer);
                     anterior.palabras += palabrasEnPagina;
@@ -3527,27 +3529,62 @@
                 return { col1: parrafos, col2: [], col3: [] };
             }
 
-            // Modo columna única sucesiva (llena columna por columna)
-            if (modo === 'columna_unica') {
-                const limiteCharsCol = (calibracion.tipoPapel === 'tabloide' ? 2400 : 1400) / numCols;
-                let col1 = [], col2 = [], col3 = [];
-                let count1 = 0, count2 = 0;
+            // MODO SECUENCIAL CONTINUO (Páginas intermedias de La Gaceta o Columna Única)
+            // Llena Columna 1 primero de arriba a abajo (46 líneas / ~290 palabras), y luego Columna 2 de arriba a abajo.
+            // Esto asegura que NUNCA quede un hueco vacío al pie de la plana en páginas intermedias.
+            if (modo === 'secuencial' || modo === 'columna_unica') {
+                const lineasColumna = 46;
+                const charsPorLin = calibracion.charsPorLinea || 46;
+                let c1 = [], c2 = [], c3 = [];
+                let lineasCol1 = 0;
+                let colActiva = 1;
 
-                parrafos.forEach(p => {
-                    if (count1 < limiteCharsCol) {
-                        col1.push(p);
-                        count1 += p.length;
-                    } else if (numCols === 3 && count2 < limiteCharsCol) {
-                        col2.push(p);
-                        count2 += p.length;
-                    } else if (numCols === 3) {
-                        col3.push(p);
+                for (let i = 0; i < parrafos.length; i++) {
+                    const p = parrafos[i];
+                    const linP = Math.max(1, Math.ceil((p.length + 4) / charsPorLin));
+
+                    if (colActiva === 1) {
+                        if (lineasCol1 + linP <= lineasColumna || c1.length === 0) {
+                            c1.push(p);
+                            lineasCol1 += linP + 1;
+                        } else {
+                            const linDisp = Math.max(0, lineasColumna - lineasCol1);
+                            if (linDisp >= 2) {
+                                const charsDisp = linDisp * charsPorLin;
+                                const words = p.split(/\s+/);
+                                let w1 = [], w2 = [];
+                                let accLen = 0;
+                                for (let w of words) {
+                                    if (accLen + w.length + 1 <= charsDisp) {
+                                        w1.push(w);
+                                        accLen += w.length + 1;
+                                    } else {
+                                        w2.push(w);
+                                    }
+                                }
+                                if (w1.length > 0 && w2.length > 0) {
+                                    c1.push(w1.join(' '));
+                                    c2.push(w2.join(' '));
+                                    colActiva = 2;
+                                    continue;
+                                }
+                            }
+                            colActiva = 2;
+                            c2.push(p);
+                        }
+                    } else if (colActiva === 2 && numCols === 3) {
+                        if (c2.length < 5) {
+                            c2.push(p);
+                        } else {
+                            c3.push(p);
+                        }
+                    } else if (colActiva === 2) {
+                        c2.push(p);
                     } else {
-                        col2.push(p);
-                        count2 += p.length;
+                        c3.push(p);
                     }
-                });
-                return { col1, col2, col3 };
+                }
+                return { col1: c1, col2: c2, col3: c3 };
             }
 
             // Modo balanceado a 3 Columnas (Marcas y Patentes)
@@ -4075,7 +4112,11 @@ function actualizarCalculoFinanciero() {
             // Ajustar altura de la capa verde de ocupación en la página activa
             let pctPagina = 0;
             if (totalPaginasPrevia > 1) {
-                pctPagina = (paginaActualPrevia < totalPaginasPrevia) ? 100 : Math.min(100, Math.round(pagActual.porcentaje || 0));
+                if (paginaActualPrevia < totalPaginasPrevia) {
+                    pctPagina = 100; // Páginas intermedias están 100% llenas
+                } else {
+                    pctPagina = Math.min(100, Math.round(pagActual.porcentaje || 0)); // Última página refleja su porcentaje real
+                }
             } else {
                 pctPagina = Math.min(100, Math.round(pagActual.porcentaje || clampedPercent || 0));
             }
@@ -4099,8 +4140,10 @@ function actualizarCalculoFinanciero() {
 
             const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; font-family: 'Times New Roman', Times, serif; font-size: ${fontMaquetaPx}px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
-            // Flujo equilibrado en columnas
-            const balance = balancearTextoEnColumnas(pagActual.texto, calibracion.columnas, calibracion.modoDistribucion);
+            // Flujo editorial de imprenta: secuencial en páginas intermedias, balanceado en la última página
+            const esUltimaPagina = (paginaActualPrevia === totalPaginasPrevia);
+            const modoCol = esUltimaPagina ? (calibracion.modoDistribucion || 'balanceado') : 'secuencial';
+            const balance = balancearTextoEnColumnas(pagActual.texto, calibracion.columnas, modoCol);
             if (balance.col1.length === 0 && balance.col2.length === 0 && balance.col3.length === 0) {
                 if (col1) col1.innerHTML = "<p>[Texto de la publicación en columna 1 del pliego tabloide...]</p>";
                 if (col2) col2.innerHTML = calibracion.columnas >= 2 ? "<p>[Columna 2...]</p>" : "";
