@@ -635,6 +635,12 @@
                 <p>Control de inventario estatal, fichas por usuario y emisión de etiquetas con QR y Códigos de Barra.</p>
             </div>
 
+            <div class="card area-card" onclick="window.location.href='views/memorandums.html?v=1'" style="border-top: 4px solid #0284c7;">
+                <div class="icon">📑</div>
+                <h2>Memorándums Oficiales</h2>
+                <p>Generación institucional con correlativo automático por departamento y formato oficial en PDF.</p>
+            </div>
+
             <div class="card area-card" id="cardTI" onclick="solicitarAcceso('ti')" style="display:none;">
                 <div class="icon">💻</div>
                 <h2>Tecnología (TI)</h2>
@@ -786,6 +792,11 @@
         </div>
 
         <div id="menuTI" class="grid-container sub-menu" style="display: none;">
+            <a href="views/memorandums.html?v=1" class="card" style="border-left: 5px solid #0284c7;">
+                <div class="icon">📑</div>
+                <h2>Emisión de Memorándums</h2>
+                <p>Generación institucional de memorandos con correlativo automático por departamento y PDF oficial.</p>
+            </a>
             <a href="views/bitacora.html?v=5" class="card">
                 <div class="icon">📝</div>
                 <h2>Bitácora Global del Sistema</h2>

@@ -1,0 +1,2206 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Emisión de Memorándums Oficiales — ENAG</title>
+    <meta name="description"
+        content="Formulario para la emisión de memorándums oficiales con correlativo automático por departamento, vista previa en tiempo real y descarga de PDF para la Empresa Nacional de Artes Gráficas (ENAG).">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --primary-accent: #0f172a;
+            --bg-body: #002147;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 30px 15px;
+            background-color: var(--bg-body);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        /* Fondo institucional difuminado */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 38%;
+            filter: blur(10px) opacity(0.14);
+            z-index: -1;
+        }
+
+        .main-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            padding: 28px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Encabezado del Módulo */
+        .module-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo-img {
+            max-height: 48px;
+            width: auto;
+        }
+
+        .header-text h1 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.65em;
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .header-text p {
+            margin: 4px 0 0 0;
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .header-quick-stats {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #f1f5f9;
+            color: var(--primary);
+            padding: 8px 14px;
+            border-radius: 8px;
+            font-size: 0.85em;
+            font-weight: 700;
+            border: 1px solid #cbd5e1;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Layout Principal a 2 Columnas */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.15fr 0.85fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1080px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Secciones y Tarjetas del Formulario */
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 18px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            transition: all 0.2s ease;
+        }
+
+        .form-card:hover {
+            border-color: #cbd5e1;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .card-title {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin: 0 0 16px 0;
+            font-size: 1.05em;
+            font-weight: 700;
+            color: var(--primary);
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 8px;
+        }
+
+        .card-title span.badge-num {
+            background: #0284c7;
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8em;
+            margin-right: 8px;
+        }
+
+        /* Grillas de campos */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+            gap: 14px;
+            margin-bottom: 14px;
+        }
+
+        .form-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+        }
+
+        .form-group label .req {
+            color: var(--danger);
+            font-weight: 900;
+        }
+
+        .form-control {
+            padding: 9px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.92em;
+            font-family: inherit;
+            color: #1e293b;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            width: 100%;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #0284c7;
+            box-shadow: 0 0 0 3px rgba(2, 132, 199, 0.15);
+        }
+
+        select.form-control {
+            cursor: pointer;
+            background-color: #f8fafc;
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 140px;
+            line-height: 1.5;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        /* Bloque de Correlativo Automático */
+        .correlativo-box {
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+            border: 1.5px dashed #0284c7;
+            border-radius: 10px;
+            padding: 16px;
+            margin-bottom: 18px;
+        }
+
+        .correlativo-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .correlativo-display {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 1.35em;
+            font-weight: 900;
+            color: #0369a1;
+            letter-spacing: 1px;
+            background: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            border: 1px solid #7dd3fc;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .correlativo-status {
+            font-size: 0.8em;
+            font-weight: 700;
+            padding: 4px 10px;
+            border-radius: 12px;
+        }
+
+        .status-ok {
+            background: #dcfce7;
+            color: #15803d;
+            border: 1px solid #86efac;
+        }
+
+        .status-warn {
+            background: #fef3c7;
+            color: #b45309;
+            border: 1px solid #fde68a;
+        }
+
+        /* Toolbar del editor */
+        .editor-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 8px;
+            flex-wrap: wrap;
+            background: #f8fafc;
+            padding: 6px 10px;
+            border-radius: 6px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .btn-tool {
+            background: white;
+            border: 1px solid #cbd5e1;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.82em;
+            font-weight: 600;
+            color: #334155;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-tool:hover {
+            background: #f1f5f9;
+            border-color: #94a3b8;
+            color: #0f172a;
+        }
+
+        /* Botonera de acciones */
+        .action-bar {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .btn-action {
+            flex: 1;
+            min-width: 170px;
+            padding: 12px 18px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, #002147 0%, #003470 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 33, 71, 0.25);
+        }
+
+        .btn-primary-action:hover {
+            background: linear-gradient(135deg, #001833 0%, #002147 100%);
+            transform: translateY(-1px);
+            box-shadow: 0 6px 16px rgba(0, 33, 71, 0.35);
+        }
+
+        .btn-save-action {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-save-action:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-action {
+            background: white;
+            color: #475569;
+            border: 1.5px solid #cbd5e1;
+        }
+
+        .btn-outline-action:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+            border-color: #94a3b8;
+        }
+
+        /* ==============================================================
+           VISTA PREVIA EN VIVO (HOJA CARTA OFICIAL ENAG)
+           ============================================================== */
+        .preview-pane-container {
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 0 4px;
+        }
+
+        .preview-header-bar h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.05em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .paper-preview {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            aspect-ratio: 8.5 / 11;
+            padding: 32px 36px 36px 36px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+        }
+
+        /* Marca de agua tenue oficial en el centro de la hoja */
+        .paper-watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 72%;
+            height: auto;
+            opacity: 0.065;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .paper-content-wrap {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Cabecera institucional de la hoja */
+        .preview-inst-header {
+            text-align: center;
+            margin-bottom: 12px;
+        }
+
+        .preview-inst-logo {
+            max-width: 82%;
+            height: auto;
+            display: inline-block;
+        }
+
+        /* Título del Memorando */
+        .preview-memo-title {
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 1.15em;
+            font-weight: 900;
+            letter-spacing: 0.5px;
+            margin: 8px 0 14px 0;
+            text-transform: uppercase;
+            color: #000000;
+        }
+
+        /* Regla horizontal superior e inferior */
+        .preview-memo-rule {
+            border: none;
+            border-top: 1.6px solid #000000;
+            margin: 6px 0;
+        }
+
+        /* Tabla de metadatos (PARA, DE, FECHA, ASUNTO) */
+        .preview-meta-table {
+            width: 100%;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.78em;
+            line-height: 1.35;
+            margin: 6px 0;
+            border-collapse: collapse;
+        }
+
+        .preview-meta-table td {
+            padding: 3px 0;
+            vertical-align: top;
+        }
+
+        .preview-meta-label {
+            font-weight: 800;
+            width: 78px;
+            color: #000000;
+        }
+
+        .preview-meta-val {
+            color: #000000;
+            font-weight: 400;
+        }
+
+        .preview-meta-val strong {
+            font-weight: 700;
+        }
+
+        .preview-meta-cargo {
+            font-style: italic;
+            font-size: 0.94em;
+            color: #334155;
+            display: block;
+        }
+
+        /* Cuerpo del memorando en la vista previa */
+        .preview-body-container {
+            margin-top: 14px;
+            font-size: 0.85em;
+            line-height: 1.45;
+            text-align: justify;
+            color: #111827;
+            flex: 1;
+        }
+
+        .preview-saludo {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+
+        .preview-parrafo {
+            margin-bottom: 10px;
+            text-indent: 0;
+        }
+
+        .preview-lista-item {
+            margin-left: 24px;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: flex-start;
+            gap: 8px;
+        }
+
+        .preview-despedida {
+            margin-top: 14px;
+            margin-bottom: 24px;
+        }
+
+        /* Firma */
+        .preview-firma-box {
+            margin-top: 15px;
+            display: inline-block;
+        }
+
+        .preview-firma-line {
+            width: 190px;
+            border-top: 1px solid #475569;
+            margin-bottom: 4px;
+        }
+
+        .preview-firma-name {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.82em;
+            font-weight: 700;
+        }
+
+        .preview-firma-cargo {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.74em;
+            color: #475569;
+            font-style: italic;
+        }
+
+        /* Pie de página de la hoja (C.C. y Dirección) */
+        .preview-paper-footer {
+            margin-top: auto;
+            position: relative;
+            z-index: 2;
+        }
+
+        .preview-cc-block {
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.65em;
+            color: #475569;
+            margin-bottom: 10px;
+            line-height: 1.35;
+        }
+
+        .preview-address-block {
+            border-top: 0.8px solid #cbd5e1;
+            padding-top: 6px;
+            text-align: center;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.64em;
+            color: #64748b;
+            line-height: 1.3;
+        }
+
+        .preview-footer-bar {
+            background: #5b6f8c;
+            color: white;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.62em;
+            padding: 3px 12px;
+            margin-top: 4px;
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* ==============================================================
+           HISTORIAL DE MEMORÁNDUMS EMITIDOS
+           ============================================================== */
+        .history-section {
+            margin-top: 36px;
+            border-top: 2px solid #e2e8f0;
+            padding-top: 24px;
+        }
+
+        .history-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .history-header h2 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.35em;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .history-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .search-input {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-width: 240px;
+        }
+
+        .filter-select {
+            padding: 8px 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 0.9em;
+            background: white;
+            cursor: pointer;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            background: white;
+        }
+
+        .history-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88em;
+            text-align: left;
+        }
+
+        .history-table th {
+            background: #f8fafc;
+            color: #334155;
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 1.5px solid #cbd5e1;
+            white-space: nowrap;
+        }
+
+        .history-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .history-table tr:hover {
+            background: #f8fafc;
+        }
+
+        .badge-memo {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 800;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+            white-space: nowrap;
+            font-size: 0.95em;
+        }
+
+        .btn-hist-action {
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.82em;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            margin-right: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-hist-load {
+            background: #dbeafe;
+            color: #1e40af;
+        }
+
+        .btn-hist-load:hover {
+            background: #bfdbfe;
+        }
+
+        .btn-hist-pdf {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .btn-hist-pdf:hover {
+            background: #fde68a;
+        }
+
+        .btn-hist-delete {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+
+        .btn-hist-delete:hover {
+            background: #fca5a5;
+        }
+
+        /* Notificaciones Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            padding: 12px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            font-size: 0.92em;
+            box-shadow: 0 6px 18px rgba(0, 0, 0, 0.25);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+        }
+
+        .toast-notification.show {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .toast-success {
+            background: #059669;
+        }
+
+        .toast-error {
+            background: #dc2626;
+        }
+
+        .toast-info {
+            background: #0284c7;
+        }
+
+        .toast-warning {
+            background: #d97706;
+        }
+    </style>
+
+    <!-- Librerías de PDF y Exportación -->
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script src="../js/jspdf-autotable.min.js"></script>
+    <script src="../js/xlsx.full.min.js"></script>
+</head>
+
+<body>
+    <!-- Barra de Navegación Superior Unificada -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Portal
+            </a>
+            <span class="portal-badge">📑 Emisión de Memorándums Oficiales</span>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="labelLoggedUser">Cargando usuario...</span>
+            </span>
+            <span id="badgeOficialDate" class="portal-date-badge">📅 Tegucigalpa, M.D.C.</span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- Encabezado del Módulo -->
+        <div class="module-header">
+            <div class="header-title-group">
+                <img src="../assets/logo.png" alt="ENAG Logo" class="header-logo-img">
+                <div class="header-text">
+                    <h1>Emisión de Memorándums Oficiales</h1>
+                    <p>Formulario con correlativo automático por departamento, vista previa en tiempo real y descarga de PDF oficial.</p>
+                </div>
+            </div>
+            <div class="header-quick-stats">
+                <span class="stat-badge" id="badgeTotalMemos">📁 0 Memorándums</span>
+                <span class="stat-badge" id="badgeUltimoCorrelativo" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">
+                    🔢 Último: N/A
+                </span>
+            </div>
+        </div>
+
+        <!-- Área de Trabajo Principal (Formulario + Vista Previa) -->
+        <div class="workspace-grid">
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+            <div class="form-column">
+                
+                <!-- 1. CORRELATIVO AUTOMÁTICO -->
+                <div class="correlativo-box">
+                    <div class="correlativo-header">
+                        <div style="display:flex; align-items:center; gap:8px;">
+                            <span style="font-size:1.2em;">⚙️</span>
+                            <strong style="color:var(--primary); font-size:0.95em;">Correlativo Automático de Memorándum:</strong>
+                        </div>
+                        <span id="statusCorrelativo" class="correlativo-status status-ok">🟢 Correlativo Disponible</span>
+                    </div>
+
+                    <div class="form-row" style="grid-template-columns: 1.4fr 1fr 1fr auto;">
+                        <div class="form-group">
+                            <label for="selectDepartamento">Departamento / Área <span class="req">*</span></label>
+                            <select id="selectDepartamento" class="form-control" onchange="cambiarDepartamentoEmisor(this.value)">
+                                <option value="INFO" selected>INFO — Informática / Soporte Técnico</option>
+                                <option value="ADMON">ADMON — Sub-Gerencia Administrativa</option>
+                                <option value="RRHH">RRHH — Recursos Humanos</option>
+                                <option value="PROD">PROD — Producción / Talleres</option>
+                                <option value="COM">COM — Comercialización y Ventas</option>
+                                <option value="BN">BN — Bienes Nacionales</option>
+                                <option value="CONT">CONT — Contabilidad y Presupuesto</option>
+                                <option value="DG">DG — Dirección General</option>
+                                <option value="AUD">AUD — Auditoría Interna</option>
+                                <option value="OTRO">OTRO — Prefijo Personalizado...</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group" id="groupPrefijoPersonalizado" style="display:none;">
+                            <label for="inputPrefijoPersonalizado">Siglas Prefijo <span class="req">*</span></label>
+                            <input type="text" id="inputPrefijoPersonalizado" class="form-control" placeholder="Ej: LOGIS" maxlength="10" oninput="actualizarCodigoCompleto()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputNumeroCorrelativo">Número Secuencial <span class="req">*</span></label>
+                            <input type="number" id="inputNumeroCorrelativo" class="form-control" min="1" value="51" oninput="validarNumeroCorrelativoManual()">
+                        </div>
+
+                        <div class="form-group">
+                            <label for="inputSufijoInstitucional">Sufijo Institución</label>
+                            <input type="text" id="inputSufijoInstitucional" class="form-control" value="ENAG" oninput="actualizarCodigoCompleto()">
+                        </div>
+
+                        <div class="form-group" style="justify-content: flex-end;">
+                            <button type="button" class="btn-tool" onclick="sugerirSiguienteCorrelativo()" title="Recalcular automáticamente el siguiente número correlativo">
+                                🔄 Sugerir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:0.85em; color:#0369a1; font-weight:600;">Código resultante que figurará en el documento:</span>
+                        <div class="correlativo-display" id="displayCodigoCompleto">
+                            MEMORANDO INFO-51-ENAG
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. DATOS DEL DESTINATARIO Y REMITENTE -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">1</span> Destinatario y Remitente</div>
+                        <span style="font-size:0.8em; font-weight:normal; color:var(--text-muted);">Encabezado Formal</span>
+                    </h3>
+
+                    <div class="form-row">
+                        <!-- PARA -->
+                        <div class="form-group">
+                            <label for="inputParaNombre">PARA (Nombre del Destinatario) <span class="req">*</span></label>
+                            <input type="text" id="inputParaNombre" class="form-control" placeholder="Ej: Jorge Valladares Sierra" value="Jorge Valladares Sierra" oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputParaCargo">Cargo / Puesto del Destinatario <span class="req">*</span></label>
+                            <input type="text" id="inputParaCargo" class="form-control" placeholder="Ej: Sub-Gerente Administrativo" value="Sub-Gerente Administrativo" oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="margin-top:10px;">
+                        <!-- DE -->
+                        <div class="form-group">
+                            <label for="inputDeNombre">DE (Nombre del Remitente) <span class="req">*</span></label>
+                            <input type="text" id="inputDeNombre" class="form-control" placeholder="Ej: Michael Steven Gonzales Castillo" value="Michael Steven Gonzales Castillo" oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDeCargo">Cargo / Puesto del Remitente <span class="req">*</span></label>
+                            <input type="text" id="inputDeCargo" class="form-control" placeholder="Ej: Auxiliar de soporte técnico" value="Auxiliar de soporte técnico" oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. FECHA Y ASUNTO -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">2</span> Fecha y Asunto Oficial</div>
+                    </h3>
+
+                    <div class="form-row" style="grid-template-columns: 1fr 1.6fr;">
+                        <div class="form-group">
+                            <label for="inputFechaCalendario">Fecha del Documento <span class="req">*</span></label>
+                            <input type="date" id="inputFechaCalendario" class="form-control" onchange="actualizarFechaDesdeInput(this.value)">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFechaTextoOficial">Formato Oficial de Fecha (Editable)</label>
+                            <input type="text" id="inputFechaTextoOficial" class="form-control" placeholder="Ej: Miércoles 4 de Noviembre de 2026" oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:12px;">
+                        <label for="inputAsunto">ASUNTO <span class="req">*</span></label>
+                        <input type="text" id="inputAsunto" class="form-control" placeholder="Ej: Compra de Cámaras de Videovigilancia" value="Compra de Cámaras de Videovigilancia" oninput="actualizarVistaPrevia()" style="font-weight:600;">
+                    </div>
+                </div>
+
+                <!-- 4. CONTENIDO Y CUERPO DEL MEMORANDO -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">3</span> Redacción y Cuerpo del Memorando</div>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn-tool" onclick="cargarPlantillaCamaras()" title="Cargar ejemplo exacto de la foto (Compra de Cámaras)">
+                                📹 Plantilla Cámaras
+                            </button>
+                            <button type="button" class="btn-tool" onclick="cargarPlantillaMantenimiento()" title="Plantilla de Soporte y Mantenimiento TI">
+                                🛠️ Mantenimiento
+                            </button>
+                        </div>
+                    </h3>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label for="inputSaludo">Tratamiento / Saludo Inicial</label>
+                        <div style="display:flex; gap:8px;">
+                            <input type="text" id="inputSaludo" class="form-control" placeholder="Ej: Estimado Sr. Valladares:" value="Estimado Sr. Valladares:" oninput="actualizarVistaPrevia()">
+                            <button type="button" class="btn-tool" onclick="generarSaludoAutomatico()" title="Sugerir saludo a partir del nombre del destinatario">
+                                ⚡ Sugerir
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="editor-toolbar">
+                            <button type="button" class="btn-tool" onclick="insertarVineta()">
+                                ➕ Añadir Viñeta (-)
+                            </button>
+                            <button type="button" class="btn-tool" onclick="insertarParrafoCierre()">
+                                ✍️ Frase de Agradecimiento
+                            </button>
+                            <span style="flex:1;"></span>
+                            <span style="font-size:0.78em; color:var(--text-muted);" id="charCountDisplay">0 caracteres</span>
+                        </div>
+                        <label for="textareaCuerpo">Contenido del Memorando <span class="req">*</span></label>
+                        <textarea id="textareaCuerpo" class="form-control" placeholder="Escriba aquí los párrafos explicativos, requerimientos, solicitudes o viñetas..." oninput="actualizarVistaPrevia()"></textarea>
+                    </div>
+
+                    <div class="form-row" style="margin-top:14px; grid-template-columns: 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="inputDespedida">Despedida Formal</label>
+                            <input type="text" id="inputDespedida" class="form-control" value="Atentamente," oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="selectEspacioFirma">Espacio para Firma</label>
+                            <select id="selectEspacioFirma" class="form-control" onchange="actualizarVistaPrevia()">
+                                <option value="normal" selected>Normal (Línea de firma y sello)</option>
+                                <option value="compacto">Compacto (Para memorandos extensos)</option>
+                                <option value="solo_texto">Solo Nombre y Cargo (Sin línea)</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 5. COPIAS Y ARCHIVO (C.C.) -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">4</span> Distribución y Copias</div>
+                        <span style="font-size:0.8em; font-weight:normal; color:var(--text-muted);">Pie de página oficial</span>
+                    </h3>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="inputCopiaOriginal">Destino Original</label>
+                            <input type="text" id="inputCopiaOriginal" class="form-control" value="Original Administración." oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputCopia1">Con Copia (C.C.) 1</label>
+                            <input type="text" id="inputCopia1" class="form-control" value="C.C. Archivo." oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputCopia2">Con Copia (C.C.) 2 (Opcional)</label>
+                            <input type="text" id="inputCopia2" class="form-control" placeholder="Ej: C.C. Auditoría Interna." oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BARRA DE ACCIONES -->
+                <div class="action-bar">
+                    <button type="button" class="btn-action btn-primary-action" onclick="generarPDFMemorandoOficial()" id="btnDescargarPDF">
+                        <span>📄</span> Descargar PDF Oficial
+                    </button>
+                    <button type="button" class="btn-action btn-save-action" onclick="guardarMemorandoEnFirestore()" id="btnGuardarMemo">
+                        <span>💾</span> Guardar Memorándum
+                    </button>
+                    <button type="button" class="btn-action btn-outline-action" onclick="imprimirVistaPreviaDirecta()">
+                        <span>🖨️</span> Imprimir
+                    </button>
+                    <button type="button" class="btn-action btn-outline-action" onclick="limpiarFormularioNuevo()">
+                        <span>🧹</span> Nuevo / Limpiar
+                    </button>
+                </div>
+
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA EN VIVO (PAPEL CARTA OFICIAL ENAG) -->
+            <div class="preview-pane-container">
+                <div class="preview-header-bar">
+                    <h3><span>👁️</span> Vista Previa en Vivo (Formato Carta Oficial)</h3>
+                    <span style="font-size:0.82em; color:var(--text-muted); font-weight:600;">La Gaceta • ENAG</span>
+                </div>
+
+                <!-- HOJA CARTA DE PAPEL OFICIAL -->
+                <div class="paper-preview" id="paperPreviewElement">
+                    <!-- Marca de agua de fondo (Escudo Nacional de Honduras) -->
+                    <img src="../assets/logo.png" alt="Marca de Agua" class="paper-watermark">
+
+                    <div class="paper-content-wrap">
+                        <!-- Membrete institucional superior -->
+                        <div class="preview-inst-header">
+                            <img src="../assets/logo.png" alt="Gobierno de la República de Honduras • ENAG" class="preview-inst-logo">
+                        </div>
+
+                        <!-- Título del Memorando con Correlativo -->
+                        <div class="preview-memo-title" id="prevTituloMemorando">
+                            MEMORANDO INFO-51-ENAG
+                        </div>
+
+                        <!-- Línea horizontal superior gruesa -->
+                        <hr class="preview-memo-rule">
+
+                        <!-- Bloque de Encabezado Formal -->
+                        <table class="preview-meta-table">
+                            <tr>
+                                <td class="preview-meta-label">PARA:</td>
+                                <td class="preview-meta-val">
+                                    <span id="prevParaNombre">Jorge Valladares Sierra</span>
+                                    <span class="preview-meta-cargo" id="prevParaCargo">Sub-Gerente Administrativo</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="preview-meta-label">DE:</td>
+                                <td class="preview-meta-val">
+                                    <span id="prevDeNombre">Michael Steven Gonzales Castillo</span>
+                                    <span class="preview-meta-cargo" id="prevDeCargo">Auxiliar de soporte técnico</span>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="preview-meta-label">FECHA:</td>
+                                <td class="preview-meta-val" id="prevFecha">
+                                    Miércoles 4 de Noviembre de 2026
+                                </td>
+                            </tr>
+                            <tr>
+                                <td class="preview-meta-label">ASUNTO:</td>
+                                <td class="preview-meta-val">
+                                    <strong id="prevAsunto">Compra de Cámaras de Videovigilancia</strong>
+                                </td>
+                            </tr>
+                        </table>
+
+                        <!-- Línea horizontal inferior gruesa -->
+                        <hr class="preview-memo-rule">
+
+                        <!-- Cuerpo del Memorando -->
+                        <div class="preview-body-container" id="prevCuerpoContainer">
+                            <div class="preview-saludo" id="prevSaludo">Estimado Sr. Valladares:</div>
+                            <div id="prevCuerpoDinamico">
+                                <!-- Párrafos y viñetas renderizados en tiempo real -->
+                            </div>
+                            <div class="preview-despedida" id="prevDespedida">Atentamente,</div>
+
+                            <!-- Firma Remitente -->
+                            <div class="preview-firma-box" id="prevFirmaBox">
+                                <div class="preview-firma-line"></div>
+                                <div class="preview-firma-name" id="prevFirmaNombre">Michael Steven Gonzales Castillo</div>
+                                <div class="preview-firma-cargo" id="prevFirmaCargo">Auxiliar de soporte técnico</div>
+                            </div>
+                        </div>
+
+                        <!-- Pie de página de la hoja (C.C. y Dirección) -->
+                        <div class="preview-paper-footer">
+                            <div class="preview-cc-block" id="prevCcBlock">
+                                <div>Original Administración.</div>
+                                <div>C.C. Archivo.</div>
+                            </div>
+
+                            <div class="preview-address-block">
+                                Colonia Miraflores Sur, Centro Cívico Gubernamental<br>
+                                contiguo a la Corte Suprema de Justicia, Tegucigalpa, M.D.C., Honduras.
+                            </div>
+
+                            <div class="preview-footer-bar">
+                                <div>📘 ✖️ 📷 🎥</div>
+                                <div style="font-weight:700; letter-spacing:0.5px;">www.enag.gob.hn</div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE HISTORIAL DE MEMORÁNDUMS EMITIDOS -->
+        <div class="history-section">
+            <div class="history-header">
+                <h2><span>🗂️</span> Historial de Memorándums Registrados</h2>
+                <div class="history-controls">
+                    <input type="text" id="filtroBusqueda" class="search-input" placeholder="🔍 Buscar por código, asunto, destinatario..." oninput="filtrarHistorialMemorandums()">
+                    <select id="filtroDeptoHistorial" class="filter-select" onchange="filtrarHistorialMemorandums()">
+                        <option value="TODOS">Todos los Departamentos</option>
+                        <option value="INFO">INFO — Informática / TI</option>
+                        <option value="ADMON">ADMON — Administración</option>
+                        <option value="RRHH">RRHH — Recursos Humanos</option>
+                        <option value="PROD">PROD — Producción</option>
+                        <option value="COM">COM — Comercialización</option>
+                        <option value="BN">BN — Bienes Nacionales</option>
+                        <option value="CONT">CONT — Contabilidad</option>
+                    </select>
+                    <button type="button" class="btn-tool" onclick="exportarHistorialExcel()" title="Descargar reporte en formato Excel">
+                        📊 Exportar Excel
+                    </button>
+                    <button type="button" class="btn-tool" onclick="cargarHistorialDesdeFirestore()" title="Actualizar lista de memorándums">
+                        🔄 Refrescar
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="history-table" id="tablaHistorialMemos">
+                    <thead>
+                        <tr>
+                            <th>Correlativo</th>
+                            <th>Fecha</th>
+                            <th>Destinatario (PARA)</th>
+                            <th>Remitente (DE)</th>
+                            <th>Asunto</th>
+                            <th>Elaborado Por</th>
+                            <th style="text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyHistorialMemos">
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 25px; color:var(--text-muted);">
+                                ⏳ Cargando historial de memorándums...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES TOAST -->
+    <div id="toastNotification" class="toast-notification"></div>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <!-- SCRIPTS DEL MÓDULO DE MEMORÁNDUMS -->
+    <script>
+        // Estado Global del Módulo
+        let memorandumsGlobal = [];
+        let memorandoEnEdicionId = null;
+        let dbFirestore = null;
+
+        // Inicialización al cargar el DOM
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarFechaHoy();
+            cargarPerfilRemitenteGuardado();
+            cargarPlantillaCamaras(); // Precarga el ejemplo exacto solicitado
+            conectarFirebaseYEscuchar();
+        });
+
+        // 1. Manejo de Fechas Oficiales en Español
+        function inicializarFechaHoy() {
+            const hoy = new Date();
+            const yyyy = hoy.getFullYear();
+            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+            const dd = String(hoy.getDate()).padStart(2, '0');
+            document.getElementById('inputFechaCalendario').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('inputFechaTextoOficial').value = formatearFechaOficialEspanol(hoy);
+        }
+
+        function actualizarFechaDesdeInput(fechaIso) {
+            if (!fechaIso) return;
+            const partes = fechaIso.split('-');
+            const anio = parseInt(partes[0], 10);
+            const mes = parseInt(partes[1], 10) - 1;
+            const dia = parseInt(partes[2], 10);
+            const fecha = new Date(anio, mes, dia);
+            document.getElementById('inputFechaTextoOficial').value = formatearFechaOficialEspanol(fecha);
+            actualizarVistaPrevia();
+        }
+
+        function formatearFechaOficialEspanol(dateObj) {
+            const diasSemana = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
+            const meses = [
+                'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
+                'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
+            ];
+            const diaNombre = diasSemana[dateObj.getDay()];
+            const diaNum = dateObj.getDate();
+            const mesNombre = meses[dateObj.getMonth()];
+            const anio = dateObj.getFullYear();
+            return `${diaNombre} ${diaNum} de ${mesNombre} de ${anio}`;
+        }
+
+        // 2. Correlativo Automático
+        function obtenerPrefijoActual() {
+            const sel = document.getElementById('selectDepartamento').value;
+            if (sel === 'OTRO') {
+                const manual = document.getElementById('inputPrefijoPersonalizado').value.trim().toUpperCase();
+                return manual || 'MEMO';
+            }
+            return sel;
+        }
+
+        function cambiarDepartamentoEmisor(val) {
+            const groupOtro = document.getElementById('groupPrefijoPersonalizado');
+            if (val === 'OTRO') {
+                groupOtro.style.display = 'flex';
+                document.getElementById('inputPrefijoPersonalizado').focus();
+            } else {
+                groupOtro.style.display = 'none';
+            }
+            sugerirSiguienteCorrelativo();
+        }
+
+        function construirCodigoCompleto() {
+            const prefijo = obtenerPrefijoActual();
+            const num = parseInt(document.getElementById('inputNumeroCorrelativo').value, 10) || 1;
+            const sufijo = document.getElementById('inputSufijoInstitucional').value.trim().toUpperCase() || 'ENAG';
+            return `MEMORANDO ${prefijo}-${num}-${sufijo}`;
+        }
+
+        function actualizarCodigoCompleto() {
+            const codigo = construirCodigoCompleto();
+            document.getElementById('displayCodigoCompleto').textContent = codigo;
+            document.getElementById('prevTituloMemorando').textContent = codigo;
+            validarNumeroCorrelativoManual();
+        }
+
+        function sugerirSiguienteCorrelativo() {
+            const prefijo = obtenerPrefijoActual();
+            let maxNum = 0;
+
+            // Buscar en memorándums ya cargados (de Firestore y LocalStorage)
+            memorandumsGlobal.forEach(m => {
+                if (m.prefijo === prefijo && typeof m.numero === 'number') {
+                    if (m.numero > maxNum) maxNum = m.numero;
+                }
+            });
+
+            // Si es INFO y no hay registros previos, inicializar en 51 (como en la foto de ejemplo)
+            let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 51 : 1);
+
+            document.getElementById('inputNumeroCorrelativo').value = siguiente;
+            actualizarCodigoCompleto();
+        }
+
+        function validarNumeroCorrelativoManual() {
+            const prefijo = obtenerPrefijoActual();
+            const num = parseInt(document.getElementById('inputNumeroCorrelativo').value, 10);
+            const statusElem = document.getElementById('statusCorrelativo');
+
+            const existe = memorandumsGlobal.find(m => m.prefijo === prefijo && m.numero === num && m.id !== memorandoEnEdicionId);
+
+            if (existe) {
+                statusElem.textContent = `⚠️ Ya usado el ${existe.fecha || 'anteriormente'}`;
+                statusElem.className = 'correlativo-status status-warn';
+            } else {
+                statusElem.textContent = '🟢 Correlativo Disponible';
+                statusElem.className = 'correlativo-status status-ok';
+            }
+        }
+
+        // 3. Cargar Perfil del Remitente de la Sesión
+        function cargarPerfilRemitenteGuardado() {
+            let nombreUsuario = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+            let cargoGuardado = localStorage.getItem('enag_memo_remitente_cargo');
+
+            if (nombreUsuario && !document.getElementById('inputDeNombre').value) {
+                document.getElementById('inputDeNombre').value = nombreUsuario;
+            }
+            if (cargoGuardado && !document.getElementById('inputDeCargo').value) {
+                document.getElementById('inputDeCargo').value = cargoGuardado;
+            }
+        }
+
+        function guardarPerfilRemitente() {
+            const cargo = document.getElementById('inputDeCargo').value.trim();
+            if (cargo) {
+                localStorage.setItem('enag_memo_remitente_cargo', cargo);
+            }
+        }
+
+        // 4. Plantillas y Asistentes de Redacción
+        function cargarPlantillaCamaras() {
+            document.getElementById('selectDepartamento').value = 'INFO';
+            document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
+            document.getElementById('inputNumeroCorrelativo').value = 51;
+            document.getElementById('inputSufijoInstitucional').value = 'ENAG';
+
+            document.getElementById('inputParaNombre').value = 'Jorge Valladares Sierra';
+            document.getElementById('inputParaCargo').value = 'Sub-Gerente Administrativo';
+            document.getElementById('inputDeNombre').value = 'Michael Steven Gonzales Castillo';
+            document.getElementById('inputDeCargo').value = 'Auxiliar de soporte técnico';
+
+            document.getElementById('inputFechaTextoOficial').value = 'Miércoles 4 de Noviembre de 2026';
+            document.getElementById('inputAsunto').value = 'Compra de Cámaras de Videovigilancia';
+            document.getElementById('inputSaludo').value = 'Estimado Sr. Valladares:';
+
+            const textoCuerpo = `Por medio del presente, me dirijo a usted con el debido respeto a fin de solicitarle la compra del siguiente equipo:
+
+- 2 cámaras de vigilancia tipo domo, IPOE IP.
+- 10 cámaras de vigilancia tipo Bullet, IPOE IP.
+
+Este equipo será instalado principalmente en la planta de producción, para la supervisión de la misma, 2 de ellas estarán ubicadas en el área que actualmente es ocupado por el departamento de bienes nacionales.
+
+Agradezco de antemano su atención y apoyo a esta solicitud.`;
+
+            document.getElementById('textareaCuerpo').value = textoCuerpo;
+            document.getElementById('inputDespedida').value = 'Atentamente,';
+            document.getElementById('inputCopiaOriginal').value = 'Original Administración.';
+            document.getElementById('inputCopia1').value = 'C.C. Archivo.';
+            document.getElementById('inputCopia2').value = '';
+
+            actualizarCodigoCompleto();
+            actualizarVistaPrevia();
+            showToast("Plantilla de Solicitud de Cámaras cargada con éxito.", "info");
+        }
+
+        function cargarPlantillaMantenimiento() {
+            document.getElementById('selectDepartamento').value = 'INFO';
+            document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
+            document.getElementById('inputAsunto').value = 'Mantenimiento Preventivo de Equipos de Cómputo e Impresoras';
+            generarSaludoAutomatico();
+
+            const textoCuerpo = `Por medio del presente, me dirijo a usted para notificarle que se estará llevando a cabo la jornada de mantenimiento preventivo y actualización de software en los equipos de cómputo institucionales.
+
+Dicho mantenimiento abarcará los siguientes puntos:
+- Limpieza física interna y externa de terminales de trabajo.
+- Optimización de sistema operativo, eliminación de temporales y actualización de antivirus.
+- Verificación de puntos de red y conexión a los sistemas de producción de La Gaceta.
+
+Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
+
+            document.getElementById('textareaCuerpo').value = textoCuerpo;
+            actualizarCodigoCompleto();
+            actualizarVistaPrevia();
+            showToast("Plantilla de Mantenimiento cargada.", "info");
+        }
+
+        function generarSaludoAutomatico() {
+            const para = document.getElementById('inputParaNombre').value.trim();
+            if (!para) {
+                document.getElementById('inputSaludo').value = 'Estimado(a) Señor(a):';
+            } else {
+                const palabras = para.split(/\s+/);
+                const apellido = palabras.length > 1 ? palabras[palabras.length - 1] : palabras[0];
+                document.getElementById('inputSaludo').value = `Estimado Sr. ${apellido}:`;
+            }
+            actualizarVistaPrevia();
+        }
+
+        function insertarVineta() {
+            const textarea = document.getElementById('textareaCuerpo');
+            const start = textarea.selectionStart;
+            const end = textarea.selectionEnd;
+            const text = textarea.value;
+            const insertText = (start > 0 && text[start - 1] !== '\n' ? '\n' : '') + '- ';
+            textarea.value = text.substring(0, start) + insertText + text.substring(end);
+            textarea.focus();
+            textarea.selectionStart = textarea.selectionEnd = start + insertText.length;
+            actualizarVistaPrevia();
+        }
+
+        function insertarParrafoCierre() {
+            const textarea = document.getElementById('textareaCuerpo');
+            const insertText = '\n\nAgradezco de antemano su atención y apoyo a esta solicitud.';
+            textarea.value = textarea.value.trim() + insertText;
+            actualizarVistaPrevia();
+        }
+
+        // 5. Actualización de la Vista Previa en Vivo (Live Paper Preview)
+        function actualizarVistaPrevia() {
+            const codigo = construirCodigoCompleto();
+            document.getElementById('prevTituloMemorando').textContent = codigo;
+
+            const paraNombre = document.getElementById('inputParaNombre').value.trim() || '[Nombre del Destinatario]';
+            const paraCargo = document.getElementById('inputParaCargo').value.trim() || '[Cargo del Destinatario]';
+            document.getElementById('prevParaNombre').textContent = paraNombre;
+            document.getElementById('prevParaCargo').textContent = paraCargo;
+
+            const deNombre = document.getElementById('inputDeNombre').value.trim() || '[Nombre del Remitente]';
+            const deCargo = document.getElementById('inputDeCargo').value.trim() || '[Cargo del Remitente]';
+            document.getElementById('prevDeNombre').textContent = deNombre;
+            document.getElementById('prevDeCargo').textContent = deCargo;
+            document.getElementById('prevFirmaNombre').textContent = deNombre;
+            document.getElementById('prevFirmaCargo').textContent = deCargo;
+
+            const fecha = document.getElementById('inputFechaTextoOficial').value.trim() || '[Fecha del Memorando]';
+            document.getElementById('prevFecha').textContent = fecha;
+
+            const asunto = document.getElementById('inputAsunto').value.trim() || '[Asunto del Memorando]';
+            document.getElementById('prevAsunto').textContent = asunto;
+
+            const saludo = document.getElementById('inputSaludo').value.trim();
+            const prevSaludoElem = document.getElementById('prevSaludo');
+            if (saludo) {
+                prevSaludoElem.style.display = 'block';
+                prevSaludoElem.textContent = saludo;
+            } else {
+                prevSaludoElem.style.display = 'none';
+            }
+
+            // Renderizar Cuerpo del Memorando (Párrafos y Viñetas)
+            const cuerpoRaw = document.getElementById('textareaCuerpo').value;
+            document.getElementById('charCountDisplay').textContent = `${cuerpoRaw.length} caracteres`;
+
+            const contenedorCuerpo = document.getElementById('prevCuerpoDinamico');
+            contenedorCuerpo.innerHTML = '';
+
+            const lineas = cuerpoRaw.split('\n');
+            let parrafoBuffer = [];
+
+            lineas.forEach(linea => {
+                const trimmed = linea.trim();
+                if (/^[-*•]\s+/.test(trimmed)) {
+                    // Si había un párrafo acumulado antes, renderizarlo
+                    if (parrafoBuffer.length > 0) {
+                        const p = document.createElement('div');
+                        p.className = 'preview-parrafo';
+                        p.textContent = parrafoBuffer.join(' ');
+                        contenedorCuerpo.appendChild(p);
+                        parrafoBuffer = [];
+                    }
+                    // Renderizar viñeta
+                    const item = document.createElement('div');
+                    item.className = 'preview-lista-item';
+                    const bullet = document.createElement('span');
+                    bullet.textContent = '-';
+                    bullet.style.fontWeight = 'bold';
+                    bullet.style.marginRight = '4px';
+                    const texto = document.createElement('span');
+                    texto.textContent = trimmed.replace(/^[-*•]\s+/, '');
+                    item.appendChild(bullet);
+                    item.appendChild(texto);
+                    contenedorCuerpo.appendChild(item);
+                } else if (trimmed === '') {
+                    if (parrafoBuffer.length > 0) {
+                        const p = document.createElement('div');
+                        p.className = 'preview-parrafo';
+                        p.textContent = parrafoBuffer.join(' ');
+                        contenedorCuerpo.appendChild(p);
+                        parrafoBuffer = [];
+                    }
+                } else {
+                    parrafoBuffer.push(trimmed);
+                }
+            });
+
+            if (parrafoBuffer.length > 0) {
+                const p = document.createElement('div');
+                p.className = 'preview-parrafo';
+                p.textContent = parrafoBuffer.join(' ');
+                contenedorCuerpo.appendChild(p);
+            }
+
+            const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
+            document.getElementById('prevDespedida').textContent = despedida;
+
+            // Manejo de estilo de firma
+            const modoFirma = document.getElementById('selectEspacioFirma').value;
+            const firmaBox = document.getElementById('prevFirmaBox');
+            const firmaLine = firmaBox.querySelector('.preview-firma-line');
+            if (modoFirma === 'solo_texto') {
+                firmaLine.style.display = 'none';
+            } else {
+                firmaLine.style.display = 'block';
+            }
+
+            // Copias
+            const orig = document.getElementById('inputCopiaOriginal').value.trim();
+            const c1 = document.getElementById('inputCopia1').value.trim();
+            const c2 = document.getElementById('inputCopia2').value.trim();
+
+            const ccContainer = document.getElementById('prevCcBlock');
+            ccContainer.innerHTML = '';
+            if (orig) {
+                const d = document.createElement('div');
+                d.textContent = orig;
+                ccContainer.appendChild(d);
+            }
+            if (c1) {
+                const d = document.createElement('div');
+                d.textContent = c1;
+                ccContainer.appendChild(d);
+            }
+            if (c2) {
+                const d = document.createElement('div');
+                d.textContent = c2;
+                ccContainer.appendChild(d);
+            }
+        }
+
+        // 6. Conversión de Imágenes para jsPDF
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext("2d");
+                ctx.drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        // 7. GENERADOR DE PDF OFICIAL (ALTA RESOLUCIÓN Y FIDELIDAD)
+        async function generarPDFMemorandoOficial() {
+            const btn = document.getElementById('btnDescargarPDF');
+            const textoOriginal = btn.innerHTML;
+            btn.innerHTML = '<span>⏳</span> Generando PDF...';
+            btn.disabled = true;
+
+            try {
+                const { jsPDF } = window.jspdf;
+                // Formato Carta Oficial (Letter: 215.9 x 279.4 mm)
+                const doc = new jsPDF({
+                    orientation: 'portrait',
+                    unit: 'mm',
+                    format: 'letter'
+                });
+
+                const pageWidth = doc.internal.pageSize.getWidth();
+                const pageHeight = doc.internal.pageSize.getHeight();
+
+                // 1. Cargar fondo membretado oficial con escudo y pie de imprenta (Logo odoo.png)
+                const bgPapelUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+                if (bgPapelUrl) {
+                    doc.addImage(bgPapelUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+                }
+
+                // 2. Título Central: MEMORANDO {PREFIJO}-{NUMERO}-{SUFIJO}
+                const codigoCompleto = construirCodigoCompleto();
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(15);
+                doc.setTextColor(15, 23, 42);
+                doc.text(codigoCompleto, pageWidth / 2, 45, { align: 'center' });
+
+                // 3. Regla horizontal superior
+                const margenIzq = 22;
+                const margenDer = pageWidth - 22;
+                const anchoUtil = margenDer - margenIzq;
+
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(1.1);
+                doc.line(margenIzq, 53, margenDer, 53);
+
+                // 4. Bloque de Encabezado: PARA, DE, FECHA, ASUNTO
+                let curY = 59;
+                const colEtiqueta = margenIzq;
+                const colValor = margenIzq + 20;
+                const valorWidth = anchoUtil - 20;
+
+                const paraNombre = document.getElementById('inputParaNombre').value.trim();
+                const paraCargo = document.getElementById('inputParaCargo').value.trim();
+                const deNombre = document.getElementById('inputDeNombre').value.trim();
+                const deCargo = document.getElementById('inputDeCargo').value.trim();
+                const fechaTexto = document.getElementById('inputFechaTextoOficial').value.trim();
+                const asuntoTexto = document.getElementById('inputAsunto').value.trim();
+
+                // Fila PARA:
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text("PARA:", colEtiqueta, curY);
+
+                doc.setFont('helvetica', 'normal');
+                doc.text(paraNombre, colValor, curY);
+                curY += 4.5;
+
+                if (paraCargo) {
+                    doc.setFont('helvetica', 'italic');
+                    doc.setFontSize(8.8);
+                    doc.setTextColor(70, 70, 70);
+                    doc.text(paraCargo, colValor, curY);
+                    curY += 6;
+                } else {
+                    curY += 3;
+                }
+
+                // Fila DE:
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text("DE:", colEtiqueta, curY);
+
+                doc.setFont('helvetica', 'normal');
+                doc.text(deNombre, colValor, curY);
+                curY += 4.5;
+
+                if (deCargo) {
+                    doc.setFont('helvetica', 'italic');
+                    doc.setFontSize(8.8);
+                    doc.setTextColor(70, 70, 70);
+                    doc.text(deCargo, colValor, curY);
+                    curY += 6;
+                } else {
+                    curY += 3;
+                }
+
+                // Fila FECHA:
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text("FECHA:", colEtiqueta, curY);
+
+                doc.setFont('helvetica', 'normal');
+                doc.text(fechaTexto, colValor, curY);
+                curY += 6;
+
+                // Fila ASUNTO:
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text("ASUNTO:", colEtiqueta, curY);
+
+                doc.setFont('helvetica', 'bold');
+                const asuntoLines = doc.splitTextToSize(asuntoTexto, valorWidth);
+                doc.text(asuntoLines, colValor, curY);
+                curY += (asuntoLines.length * 4.5) + 3;
+
+                // 5. Regla horizontal inferior
+                doc.setDrawColor(0, 0, 0);
+                doc.setLineWidth(1.1);
+                doc.line(margenIzq, curY, margenDer, curY);
+                curY += 9;
+
+                // 6. Saludo
+                const saludo = document.getElementById('inputSaludo').value.trim();
+                if (saludo) {
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(10);
+                    doc.setTextColor(0, 0, 0);
+                    doc.text(saludo, margenIzq, curY);
+                    curY += 7.5;
+                }
+
+                // 7. Cuerpo del Memorando (Párrafos y Viñetas)
+                const cuerpoRaw = document.getElementById('textareaCuerpo').value;
+                const lineas = cuerpoRaw.split('\n');
+                let parrafoBuffer = [];
+
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(20, 20, 20);
+
+                const imprimirParrafoAcumulado = () => {
+                    if (parrafoBuffer.length === 0) return;
+                    const parrafoStr = parrafoBuffer.join(' ');
+                    const lines = doc.splitTextToSize(parrafoStr, anchoUtil);
+                    doc.text(lines, margenIzq, curY, { align: 'justify', maxWidth: anchoUtil });
+                    curY += (lines.length * 4.8) + 4;
+                    parrafoBuffer = [];
+                };
+
+                for (let i = 0; i < lineas.length; i++) {
+                    const l = lineas[i].trim();
+                    if (/^[-*•]\s+/.test(l)) {
+                        imprimirParrafoAcumulado();
+                        const bulletText = l.replace(/^[-*•]\s+/, '');
+                        const bulletLines = doc.splitTextToSize(bulletText, anchoUtil - 10);
+                        
+                        // Dibujar guión de viñeta
+                        doc.setFont('helvetica', 'bold');
+                        doc.text("-", margenIzq + 4, curY);
+                        doc.setFont('helvetica', 'normal');
+                        doc.text(bulletLines, margenIzq + 8, curY);
+                        curY += (bulletLines.length * 4.8) + 1.5;
+                    } else if (l === '') {
+                        imprimirParrafoAcumulado();
+                    } else {
+                        parrafoBuffer.push(l);
+                    }
+                }
+                imprimirParrafoAcumulado();
+
+                // 8. Despedida
+                curY += 3;
+                const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(despedida, margenIzq, curY);
+                curY += 18;
+
+                // 9. Firma del Remitente
+                const modoFirma = document.getElementById('selectEspacioFirma').value;
+                if (curY > 230) curY = 225; // Prevenir superposición con el pie de página
+
+                if (modoFirma !== 'solo_texto') {
+                    doc.setDrawColor(80, 80, 80);
+                    doc.setLineWidth(0.5);
+                    doc.line(margenIzq, curY, margenIzq + 55, curY);
+                    curY += 4.5;
+                }
+
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9.5);
+                doc.text(deNombre, margenIzq, curY);
+                curY += 4;
+
+                if (deCargo) {
+                    doc.setFont('helvetica', 'italic');
+                    doc.setFontSize(8.5);
+                    doc.setTextColor(70, 70, 70);
+                    doc.text(deCargo, margenIzq, curY);
+                }
+
+                // 10. Bloque C.C. y Original (Abajo a la izquierda, fijo a 244mm)
+                const yCC = 244;
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(7.5);
+                doc.setTextColor(90, 90, 90);
+
+                let ccOffset = 0;
+                const orig = document.getElementById('inputCopiaOriginal').value.trim();
+                const c1 = document.getElementById('inputCopia1').value.trim();
+                const c2 = document.getElementById('inputCopia2').value.trim();
+
+                if (orig) {
+                    doc.text(orig, margenIzq, yCC + ccOffset);
+                    ccOffset += 3.8;
+                }
+                if (c1) {
+                    doc.text(c1, margenIzq, yCC + ccOffset);
+                    ccOffset += 3.8;
+                }
+                if (c2) {
+                    doc.text(c2, margenIzq, yCC + ccOffset);
+                }
+
+                // 11. Firma de Auditoría Obligatoria del Sistema (Usuario que lo generó)
+                let usuarioAuditoria = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+                if (!usuarioAuditoria && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                    usuarioAuditoria = firebase.auth().currentUser.email;
+                }
+                if (!usuarioAuditoria) usuarioAuditoria = "Usuario del Sistema";
+
+                const fechaHoraAudit = new Date().toLocaleString('es-HN');
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(6.5);
+                doc.setTextColor(140, 150, 165);
+                doc.text(`Documento emitido por: ${usuarioAuditoria} • Sistema de Gestión ENAG • ${fechaHoraAudit}`, pageWidth / 2, 273.5, { align: 'center' });
+
+                // Descargar el documento PDF
+                const fileName = `${codigoCompleto.replace(/\s+/g, '_')}.pdf`;
+                doc.save(fileName);
+
+                // Auto-guardar y registrar en bitácora
+                await registrarEmisionMemorando(codigoCompleto, asuntoTexto, paraNombre);
+
+                showToast(`¡Memorándum descargado con éxito: ${fileName}!`, "success");
+            } catch (err) {
+                console.error("Error al generar PDF del memorando:", err);
+                showToast("Error al generar PDF: " + err.message, "error");
+            } finally {
+                btn.innerHTML = textoOriginal;
+                btn.disabled = false;
+            }
+        }
+
+        function imprimirVistaPreviaDirecta() {
+            window.print();
+        }
+
+        // 8. PERSISTENCIA EN FIRESTORE Y BITÁCORA DEL SISTEMA
+        function conectarFirebaseYEscuchar() {
+            if (typeof firebase === 'undefined') {
+                console.warn("Firebase SDK no cargado todavía.");
+                cargarHistorialLocalStorage();
+                return;
+            }
+
+            firebase.auth().onAuthStateChanged((user) => {
+                if (user) {
+                    document.getElementById('labelLoggedUser').textContent = user.displayName || user.email;
+                } else {
+                    const localUser = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || 'Personal ENAG';
+                    document.getElementById('labelLoggedUser').textContent = localUser;
+                }
+
+                try {
+                    dbFirestore = firebase.firestore();
+                    escucharMemorandumsFirestore();
+                } catch (e) {
+                    console.error("Error conectando Firestore:", e);
+                    cargarHistorialLocalStorage();
+                }
+            });
+        }
+
+        function escucharMemorandumsFirestore() {
+            if (!dbFirestore) return;
+
+            dbFirestore.collection('memorandums').orderBy('timestamp', 'desc').limit(200)
+                .onSnapshot((snapshot) => {
+                    const lista = [];
+                    snapshot.forEach((doc) => {
+                        lista.push({ id: doc.id, ...doc.data() });
+                    });
+                    memorandumsGlobal = lista;
+                    actualizarEstadisticasYTabla();
+                }, (err) => {
+                    console.warn("Fallo lectura en tiempo real de Firestore, usando LocalStorage:", err);
+                    cargarHistorialLocalStorage();
+                });
+        }
+
+        async function guardarMemorandoEnFirestore() {
+            const btn = document.getElementById('btnGuardarMemo');
+            btn.disabled = true;
+
+            try {
+                const codigo = construirCodigoCompleto();
+                const prefijo = obtenerPrefijoActual();
+                const num = parseInt(document.getElementById('inputNumeroCorrelativo').value, 10);
+                const sufijo = document.getElementById('inputSufijoInstitucional').value.trim().toUpperCase();
+
+                const paraNombre = document.getElementById('inputParaNombre').value.trim();
+                const paraCargo = document.getElementById('inputParaCargo').value.trim();
+                const deNombre = document.getElementById('inputDeNombre').value.trim();
+                const deCargo = document.getElementById('inputDeCargo').value.trim();
+                const fecha = document.getElementById('inputFechaTextoOficial').value.trim();
+                const asunto = document.getElementById('inputAsunto').value.trim();
+                const saludo = document.getElementById('inputSaludo').value.trim();
+                const cuerpo = document.getElementById('textareaCuerpo').value;
+                const despedida = document.getElementById('inputDespedida').value.trim();
+                const copiaOriginal = document.getElementById('inputCopiaOriginal').value.trim();
+                const copia1 = document.getElementById('inputCopia1').value.trim();
+                const copia2 = document.getElementById('inputCopia2').value.trim();
+
+                if (!paraNombre || !deNombre || !asunto || !cuerpo.trim()) {
+                    showToast("Por favor complete los campos obligatorios (Destinatario, Remitente, Asunto y Cuerpo).", "warning");
+                    btn.disabled = false;
+                    return;
+                }
+
+                guardarPerfilRemitente();
+
+                let usuarioActivo = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+                if (!usuarioActivo && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                    usuarioActivo = firebase.auth().currentUser.email;
+                }
+                if (!usuarioActivo) usuarioActivo = "Usuario del Sistema";
+
+                const memoData = {
+                    codigo,
+                    prefijo,
+                    numero: num,
+                    sufijo,
+                    para: { nombre: paraNombre, cargo: paraCargo },
+                    de: { nombre: deNombre, cargo: deCargo },
+                    fecha,
+                    asunto,
+                    saludo,
+                    cuerpo,
+                    despedida,
+                    copias: { original: copiaOriginal, copia1, copia2 },
+                    elaboradoPor: usuarioActivo,
+                    fechaActualizacion: new Date().toISOString()
+                };
+
+                const docId = memorandoEnEdicionId || `${prefijo}-${num}-${sufijo}`;
+
+                if (dbFirestore) {
+                    await dbFirestore.collection('memorandums').doc(docId).set({
+                        ...memoData,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                }
+
+                // Guardar en respaldo local
+                guardarRespaldoLocal(docId, memoData);
+
+                // Registrar en Bitácora
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Administración', 'Guardar Memorando', `Se registró/actualizó el ${codigo} con asunto: "${asunto}" para ${paraNombre}`);
+                }
+
+                memorandoEnEdicionId = docId;
+                showToast(`¡Memorándum ${codigo} guardado exitosamente!`, "success");
+                actualizarEstadisticasYTabla();
+            } catch (error) {
+                console.error("Error guardando memorándum:", error);
+                showToast("Error al guardar: " + error.message, "error");
+            } finally {
+                btn.disabled = false;
+            }
+        }
+
+        async function registrarEmisionMemorando(codigo, asunto, para) {
+            try {
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Administración', 'Emisión de Memorándum', `Se emitió y descargó el ${codigo} para ${para} (Asunto: ${asunto})`);
+                }
+                guardarMemorandoEnFirestore();
+            } catch (e) {
+                console.error("Error registrando en bitácora:", e);
+            }
+        }
+
+        function guardarRespaldoLocal(id, data) {
+            try {
+                let local = JSON.parse(localStorage.getItem('enag_memorandums_local') || '[]');
+                const idx = local.findIndex(m => m.id === id);
+                if (idx >= 0) {
+                    local[idx] = { id, ...data };
+                } else {
+                    local.unshift({ id, ...data });
+                }
+                localStorage.setItem('enag_memorandums_local', JSON.stringify(local));
+            } catch (e) {
+                console.warn("Fallo guardando en LocalStorage", e);
+            }
+        }
+
+        function cargarHistorialLocalStorage() {
+            try {
+                const local = JSON.parse(localStorage.getItem('enag_memorandums_local') || '[]');
+                memorandumsGlobal = local;
+                actualizarEstadisticasYTabla();
+            } catch (e) {
+                console.warn("Error leyendo historial local:", e);
+            }
+        }
+
+        // 9. Renderizado y Filtros de la Tabla de Historial
+        function actualizarEstadisticasYTabla() {
+            document.getElementById('badgeTotalMemos').textContent = `📁 ${memorandumsGlobal.length} Memorándums`;
+            
+            // Hallar el último correlativo registrado
+            if (memorandumsGlobal.length > 0) {
+                const ultimo = memorandumsGlobal[0];
+                document.getElementById('badgeUltimoCorrelativo').textContent = `🔢 Último: ${ultimo.codigo || (ultimo.prefijo + '-' + ultimo.numero)}`;
+            } else {
+                document.getElementById('badgeUltimoCorrelativo').textContent = `🔢 Último: N/A`;
+            }
+
+            filtrarHistorialMemorandums();
+        }
+
+        function filtrarHistorialMemorandums() {
+            const query = document.getElementById('filtroBusqueda').value.toLowerCase().trim();
+            const depto = document.getElementById('filtroDeptoHistorial').value;
+
+            const filtrados = memorandumsGlobal.filter(m => {
+                const matchDepto = (depto === 'TODOS' || m.prefijo === depto);
+                if (!matchDepto) return false;
+
+                if (!query) return true;
+                const textoCompleto = `${m.codigo || ''} ${m.asunto || ''} ${m.para ? m.para.nombre : ''} ${m.de ? m.de.nombre : ''} ${m.elaboradoPor || ''}`.toLowerCase();
+                return textoCompleto.includes(query);
+            });
+
+            renderizarTablaHistorial(filtrados);
+        }
+
+        function renderizarTablaHistorial(lista) {
+            const tbody = document.getElementById('tbodyHistorialMemos');
+            tbody.innerHTML = '';
+
+            if (lista.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 24px; color:var(--text-muted);">
+                            No se encontraron memorándums registrados.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            lista.forEach(m => {
+                const tr = document.createElement('tr');
+                const cod = m.codigo || `${m.prefijo}-${m.numero}-${m.sufijo || 'ENAG'}`;
+                const paraStr = m.para ? `<strong>${m.para.nombre}</strong><br><small style="color:#64748b;">${m.para.cargo || ''}</small>` : 'N/A';
+                const deStr = m.de ? `<strong>${m.de.nombre}</strong><br><small style="color:#64748b;">${m.de.cargo || ''}</small>` : 'N/A';
+
+                tr.innerHTML = `
+                    <td><span class="badge-memo">${cod}</span></td>
+                    <td style="white-space:nowrap;">${m.fecha || ''}</td>
+                    <td>${paraStr}</td>
+                    <td>${deStr}</td>
+                    <td style="max-width:260px;"><strong>${m.asunto || ''}</strong></td>
+                    <td style="white-space:nowrap; font-size:0.88em; color:#475569;">${m.elaboradoPor || 'Sistema'}</td>
+                    <td style="text-align:center; white-space:nowrap;">
+                        <button type="button" class="btn-hist-action btn-hist-load" onclick="cargarMemorandoAlFormulario('${m.id}')" title="Cargar y editar memorándum">
+                            👁️ Cargar
+                        </button>
+                        <button type="button" class="btn-hist-action btn-hist-pdf" onclick="descargarPDFDesdeHistorial('${m.id}')" title="Descargar PDF oficial">
+                            📄 PDF
+                        </button>
+                        <button type="button" class="btn-hist-action btn-hist-delete" onclick="eliminarMemorando('${m.id}')" title="Eliminar memorándum">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // 10. Acciones del Historial (Cargar, Re-emitir PDF, Eliminar)
+        function cargarMemorandoAlFormulario(id) {
+            const m = memorandumsGlobal.find(item => item.id === id);
+            if (!m) return;
+
+            memorandoEnEdicionId = m.id;
+
+            // Prefijo y departamento
+            const selectDepto = document.getElementById('selectDepartamento');
+            const existeOption = Array.from(selectDepto.options).some(o => o.value === m.prefijo);
+            if (existeOption) {
+                selectDepto.value = m.prefijo;
+                document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
+            } else {
+                selectDepto.value = 'OTRO';
+                document.getElementById('groupPrefijoPersonalizado').style.display = 'flex';
+                document.getElementById('inputPrefijoPersonalizado').value = m.prefijo || '';
+            }
+
+            document.getElementById('inputNumeroCorrelativo').value = m.numero || 1;
+            document.getElementById('inputSufijoInstitucional').value = m.sufijo || 'ENAG';
+
+            document.getElementById('inputParaNombre').value = m.para ? m.para.nombre : '';
+            document.getElementById('inputParaCargo').value = m.para ? m.para.cargo : '';
+            document.getElementById('inputDeNombre').value = m.de ? m.de.nombre : '';
+            document.getElementById('inputDeCargo').value = m.de ? m.de.cargo : '';
+
+            document.getElementById('inputFechaTextoOficial').value = m.fecha || '';
+            document.getElementById('inputAsunto').value = m.asunto || '';
+            document.getElementById('inputSaludo').value = m.saludo || '';
+            document.getElementById('textareaCuerpo').value = m.cuerpo || '';
+            document.getElementById('inputDespedida').value = m.despedida || 'Atentamente,';
+
+            if (m.copias) {
+                document.getElementById('inputCopiaOriginal').value = m.copias.original || '';
+                document.getElementById('inputCopia1').value = m.copias.copia1 || '';
+                document.getElementById('inputCopia2').value = m.copias.copia2 || '';
+            }
+
+            actualizarCodigoCompleto();
+            actualizarVistaPrevia();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast(`Memorándum ${m.codigo || id} cargado al formulario.`, "info");
+        }
+
+        async function descargarPDFDesdeHistorial(id) {
+            cargarMemorandoAlFormulario(id);
+            setTimeout(() => {
+                generarPDFMemorandoOficial();
+            }, 300);
+        }
+
+        async function eliminarMemorando(id) {
+            const m = memorandumsGlobal.find(item => item.id === id);
+            const cod = m ? m.codigo : id;
+
+            if (!confirm(`¿Está seguro de eliminar el memorándum ${cod}? Esta acción no se puede deshacer.`)) {
+                return;
+            }
+
+            try {
+                if (dbFirestore) {
+                    await dbFirestore.collection('memorandums').doc(id).delete();
+                }
+
+                // Borrar de local
+                memorandumsGlobal = memorandumsGlobal.filter(item => item.id !== id);
+                localStorage.setItem('enag_memorandums_local', JSON.stringify(memorandumsGlobal));
+
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Administración', 'Eliminar Memorando', `Se eliminó el memorándum ${cod}`);
+                }
+
+                showToast(`Memorándum ${cod} eliminado con éxito.`, "success");
+                actualizarEstadisticasYTabla();
+            } catch (err) {
+                console.error("Error al eliminar memorándum:", err);
+                showToast("Error al eliminar: " + err.message, "error");
+            }
+        }
+
+        function limpiarFormularioNuevo() {
+            memorandoEnEdicionId = null;
+            document.getElementById('inputAsunto').value = '';
+            document.getElementById('textareaCuerpo').value = '';
+            inicializarFechaHoy();
+            cargarPerfilRemitenteGuardado();
+            sugerirSiguienteCorrelativo();
+            generarSaludoAutomatico();
+            actualizarVistaPrevia();
+            showToast("Formulario listo para redactar un nuevo memorándum.", "info");
+        }
+
+        function exportarHistorialExcel() {
+            if (memorandumsGlobal.length === 0) {
+                showToast("No hay registros para exportar a Excel.", "warning");
+                return;
+            }
+
+            const dataExport = memorandumsGlobal.map(m => ({
+                "Correlativo": m.codigo || `${m.prefijo}-${m.numero}`,
+                "Fecha": m.fecha || '',
+                "Destinatario (PARA)": m.para ? m.para.nombre : '',
+                "Cargo Destinatario": m.para ? m.para.cargo : '',
+                "Remitente (DE)": m.de ? m.de.nombre : '',
+                "Cargo Remitente": m.de ? m.de.cargo : '',
+                "Asunto": m.asunto || '',
+                "Elaborado Por": m.elaboradoPor || '',
+                "Fecha Registro": m.fechaActualizacion || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dataExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Memorandums_ENAG");
+            XLSX.writeFile(wb, `Reporte_Memorandums_ENAG_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            showToast("Reporte Excel generado correctamente.", "success");
+        }
+
+        // 11. Toast Notifications
+        function showToast(mensaje, tipo = "info") {
+            const toast = document.getElementById('toastNotification');
+            toast.textContent = mensaje;
+            toast.className = `toast-notification toast-${tipo} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+    <script src="../js/portal-header.js"></script>
+</body>
+
+</html>
