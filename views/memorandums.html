@@ -622,6 +622,79 @@
         }
 
         /* ==============================================================
+           ESTILOS DE IMPRESIÓN OFICIAL (@media print)
+           ============================================================== */
+        @media print {
+            @page {
+                size: letter portrait;
+                margin: 0;
+            }
+
+            html, body {
+                background: #ffffff !important;
+                background-color: #ffffff !important;
+                color: #000000 !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                min-height: 100vh !important;
+                -webkit-print-color-adjust: exact !important;
+                print-color-adjust: exact !important;
+            }
+
+            body::before {
+                display: none !important;
+            }
+
+            .top-navbar,
+            .module-header,
+            .form-column,
+            .preview-header-bar,
+            .history-section,
+            .action-bar,
+            .toast-notification {
+                display: none !important;
+            }
+
+            .main-container {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                max-width: 100% !important;
+                background: #ffffff !important;
+            }
+
+            .workspace-grid {
+                display: block !important;
+                grid-template-columns: 1fr !important;
+                gap: 0 !important;
+            }
+
+            .preview-pane-container {
+                position: static !important;
+                width: 100% !important;
+            }
+
+            .paper-preview {
+                box-shadow: none !important;
+                border: none !important;
+                width: 100% !important;
+                max-width: 215.9mm !important;
+                min-height: 279.4mm !important;
+                margin: 0 auto !important;
+                padding: 24mm 24mm !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+                aspect-ratio: auto !important;
+                overflow: visible !important;
+            }
+
+            .paper-watermark {
+                opacity: 0.08 !important;
+            }
+        }
+
+        /* ==============================================================
            HISTORIAL DE MEMORÁNDUMS EMITIDOS
            ============================================================== */
         .history-section {
@@ -777,11 +850,13 @@
             opacity: 0;
             transform: translateY(20px);
             transition: all 0.3s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            pointer-events: none;
         }
 
         .toast-notification.show {
             opacity: 1;
             transform: translateY(0);
+            pointer-events: auto;
         }
 
         .toast-success {
@@ -801,8 +876,13 @@
         }
     </style>
 
-    <!-- Librerías de PDF y Exportación -->
+    <!-- Librerías de PDF y Exportación con Fallback CDN -->
     <script src="../js/jspdf.umd.min.js"></script>
+    <script>
+        if (!window.jspdf && !window.jsPDF) {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
+        }
+    </script>
     <script src="../js/jspdf-autotable.min.js"></script>
     <script src="../js/xlsx.full.min.js"></script>
 </head>
@@ -819,9 +899,9 @@
         <div class="nav-right-group">
             <span id="badgeCurrentUser" class="portal-user-badge">
                 <span class="user-status-dot"></span>
-                <span id="labelLoggedUser">Cargando usuario...</span>
+                <span id="labelLoggedUser">Personal ENAG</span>
             </span>
-            <span id="badgeOficialDate" class="portal-date-badge">📅 Tegucigalpa, M.D.C.</span>
+            <span id="badgeCurrentDate" class="portal-date-badge">📅 Tegucigalpa, M.D.C.</span>
         </div>
     </div>
 
@@ -1220,12 +1300,40 @@
         let memorandoEnEdicionId = null;
         let dbFirestore = null;
 
-        // Inicialización al cargar el DOM
+        // Función para resolver el constructor jsPDF de forma universal
+        function obtenerConstructorJsPDF() {
+            if (typeof window !== 'undefined') {
+                if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+                if (window.jsPDF) return window.jsPDF;
+            }
+            return null;
+        }
+
+        // Inicialización al cargar el DOM con manejo seguro de excepciones
         document.addEventListener('DOMContentLoaded', () => {
-            inicializarFechaHoy();
-            cargarPerfilRemitenteGuardado();
-            cargarPlantillaCamaras(); // Precarga el ejemplo exacto solicitado
-            conectarFirebaseYEscuchar();
+            try {
+                inicializarFechaHoy();
+            } catch (e) {
+                console.warn("Fallo al inicializar fecha:", e);
+            }
+
+            try {
+                cargarPerfilRemitenteGuardado();
+            } catch (e) {
+                console.warn("Fallo al cargar perfil:", e);
+            }
+
+            try {
+                cargarPlantillaCamaras(); // Precarga el ejemplo exacto solicitado
+            } catch (e) {
+                console.warn("Fallo al cargar plantilla:", e);
+            }
+
+            try {
+                conectarFirebaseYEscuchar();
+            } catch (e) {
+                console.warn("Fallo al conectar Firebase:", e);
+            }
         });
 
         // 1. Manejo de Fechas Oficiales en Español
@@ -1234,8 +1342,10 @@
             const yyyy = hoy.getFullYear();
             const mm = String(hoy.getMonth() + 1).padStart(2, '0');
             const dd = String(hoy.getDate()).padStart(2, '0');
-            document.getElementById('inputFechaCalendario').value = `${yyyy}-${mm}-${dd}`;
-            document.getElementById('inputFechaTextoOficial').value = formatearFechaOficialEspanol(hoy);
+            const dateInput = document.getElementById('inputFechaCalendario');
+            if (dateInput) dateInput.value = `${yyyy}-${mm}-${dd}`;
+            const textInput = document.getElementById('inputFechaTextoOficial');
+            if (textInput) textInput.value = formatearFechaOficialEspanol(hoy);
         }
 
         function actualizarFechaDesdeInput(fechaIso) {
@@ -1245,7 +1355,8 @@
             const mes = parseInt(partes[1], 10) - 1;
             const dia = parseInt(partes[2], 10);
             const fecha = new Date(anio, mes, dia);
-            document.getElementById('inputFechaTextoOficial').value = formatearFechaOficialEspanol(fecha);
+            const textInput = document.getElementById('inputFechaTextoOficial');
+            if (textInput) textInput.value = formatearFechaOficialEspanol(fecha);
             actualizarVistaPrevia();
         }
 
@@ -1264,7 +1375,8 @@
 
         // 2. Correlativo Automático
         function obtenerPrefijoActual() {
-            const sel = document.getElementById('selectDepartamento').value;
+            const selElem = document.getElementById('selectDepartamento');
+            const sel = selElem ? selElem.value : 'INFO';
             if (sel === 'OTRO') {
                 const manual = document.getElementById('inputPrefijoPersonalizado').value.trim().toUpperCase();
                 return manual || 'MEMO';
@@ -1274,26 +1386,33 @@
 
         function cambiarDepartamentoEmisor(val) {
             const groupOtro = document.getElementById('groupPrefijoPersonalizado');
-            if (val === 'OTRO') {
-                groupOtro.style.display = 'flex';
-                document.getElementById('inputPrefijoPersonalizado').focus();
-            } else {
-                groupOtro.style.display = 'none';
+            if (groupOtro) {
+                if (val === 'OTRO') {
+                    groupOtro.style.display = 'flex';
+                    const inp = document.getElementById('inputPrefijoPersonalizado');
+                    if (inp) inp.focus();
+                } else {
+                    groupOtro.style.display = 'none';
+                }
             }
             sugerirSiguienteCorrelativo();
         }
 
         function construirCodigoCompleto() {
             const prefijo = obtenerPrefijoActual();
-            const num = parseInt(document.getElementById('inputNumeroCorrelativo').value, 10) || 1;
-            const sufijo = document.getElementById('inputSufijoInstitucional').value.trim().toUpperCase() || 'ENAG';
+            const numElem = document.getElementById('inputNumeroCorrelativo');
+            const num = numElem ? (parseInt(numElem.value, 10) || 1) : 1;
+            const sufElem = document.getElementById('inputSufijoInstitucional');
+            const sufijo = sufElem ? (sufElem.value.trim().toUpperCase() || 'ENAG') : 'ENAG';
             return `MEMORANDO ${prefijo}-${num}-${sufijo}`;
         }
 
         function actualizarCodigoCompleto() {
             const codigo = construirCodigoCompleto();
-            document.getElementById('displayCodigoCompleto').textContent = codigo;
-            document.getElementById('prevTituloMemorando').textContent = codigo;
+            const dispElem = document.getElementById('displayCodigoCompleto');
+            if (dispElem) dispElem.textContent = codigo;
+            const prevElem = document.getElementById('prevTituloMemorando');
+            if (prevElem) prevElem.textContent = codigo;
             validarNumeroCorrelativoManual();
         }
 
@@ -1301,24 +1420,25 @@
             const prefijo = obtenerPrefijoActual();
             let maxNum = 0;
 
-            // Buscar en memorándums ya cargados (de Firestore y LocalStorage)
             memorandumsGlobal.forEach(m => {
                 if (m.prefijo === prefijo && typeof m.numero === 'number') {
                     if (m.numero > maxNum) maxNum = m.numero;
                 }
             });
 
-            // Si es INFO y no hay registros previos, inicializar en 51 (como en la foto de ejemplo)
             let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 51 : 1);
 
-            document.getElementById('inputNumeroCorrelativo').value = siguiente;
+            const numInput = document.getElementById('inputNumeroCorrelativo');
+            if (numInput) numInput.value = siguiente;
             actualizarCodigoCompleto();
         }
 
         function validarNumeroCorrelativoManual() {
             const prefijo = obtenerPrefijoActual();
-            const num = parseInt(document.getElementById('inputNumeroCorrelativo').value, 10);
+            const numElem = document.getElementById('inputNumeroCorrelativo');
+            const num = numElem ? parseInt(numElem.value, 10) : 1;
             const statusElem = document.getElementById('statusCorrelativo');
+            if (!statusElem) return;
 
             const existe = memorandumsGlobal.find(m => m.prefijo === prefijo && m.numero === num && m.id !== memorandoEnEdicionId);
 
@@ -1333,30 +1453,46 @@
 
         // 3. Cargar Perfil del Remitente de la Sesión
         function cargarPerfilRemitenteGuardado() {
-            let nombreUsuario = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
-            let cargoGuardado = localStorage.getItem('enag_memo_remitente_cargo');
+            try {
+                let nombreUsuario = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+                let cargoGuardado = localStorage.getItem('enag_memo_remitente_cargo');
 
-            if (nombreUsuario && !document.getElementById('inputDeNombre').value) {
-                document.getElementById('inputDeNombre').value = nombreUsuario;
-            }
-            if (cargoGuardado && !document.getElementById('inputDeCargo').value) {
-                document.getElementById('inputDeCargo').value = cargoGuardado;
+                const deNombreInput = document.getElementById('inputDeNombre');
+                if (nombreUsuario && deNombreInput && !deNombreInput.value) {
+                    deNombreInput.value = nombreUsuario;
+                }
+                const deCargoInput = document.getElementById('inputDeCargo');
+                if (cargoGuardado && deCargoInput && !deCargoInput.value) {
+                    deCargoInput.value = cargoGuardado;
+                }
+            } catch (e) {
+                console.warn("No se pudo acceder a localStorage para perfil:", e);
             }
         }
 
         function guardarPerfilRemitente() {
-            const cargo = document.getElementById('inputDeCargo').value.trim();
-            if (cargo) {
-                localStorage.setItem('enag_memo_remitente_cargo', cargo);
+            try {
+                const deCargoInput = document.getElementById('inputDeCargo');
+                const cargo = deCargoInput ? deCargoInput.value.trim() : '';
+                if (cargo) {
+                    localStorage.setItem('enag_memo_remitente_cargo', cargo);
+                }
+            } catch (e) {
+                console.warn("No se pudo guardar en localStorage:", e);
             }
         }
 
         // 4. Plantillas y Asistentes de Redacción
         function cargarPlantillaCamaras() {
-            document.getElementById('selectDepartamento').value = 'INFO';
-            document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
-            document.getElementById('inputNumeroCorrelativo').value = 51;
-            document.getElementById('inputSufijoInstitucional').value = 'ENAG';
+            const deptoSel = document.getElementById('selectDepartamento');
+            if (deptoSel) deptoSel.value = 'INFO';
+            const groupOtro = document.getElementById('groupPrefijoPersonalizado');
+            if (groupOtro) groupOtro.style.display = 'none';
+
+            const numInput = document.getElementById('inputNumeroCorrelativo');
+            if (numInput) numInput.value = 51;
+            const sufInput = document.getElementById('inputSufijoInstitucional');
+            if (sufInput) sufInput.value = 'ENAG';
 
             document.getElementById('inputParaNombre').value = 'Jorge Valladares Sierra';
             document.getElementById('inputParaCargo').value = 'Sub-Gerente Administrativo';
@@ -1384,12 +1520,12 @@ Agradezco de antemano su atención y apoyo a esta solicitud.`;
 
             actualizarCodigoCompleto();
             actualizarVistaPrevia();
-            showToast("Plantilla de Solicitud de Cámaras cargada con éxito.", "info");
         }
 
         function cargarPlantillaMantenimiento() {
             document.getElementById('selectDepartamento').value = 'INFO';
-            document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
+            const groupOtro = document.getElementById('groupPrefijoPersonalizado');
+            if (groupOtro) groupOtro.style.display = 'none';
             document.getElementById('inputAsunto').value = 'Mantenimiento Preventivo de Equipos de Cómputo e Impresoras';
             generarSaludoAutomatico();
 
@@ -1410,18 +1546,22 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         function generarSaludoAutomatico() {
             const para = document.getElementById('inputParaNombre').value.trim();
+            const saludoInput = document.getElementById('inputSaludo');
+            if (!saludoInput) return;
+
             if (!para) {
-                document.getElementById('inputSaludo').value = 'Estimado(a) Señor(a):';
+                saludoInput.value = 'Estimado(a) Señor(a):';
             } else {
                 const palabras = para.split(/\s+/);
                 const apellido = palabras.length > 1 ? palabras[palabras.length - 1] : palabras[0];
-                document.getElementById('inputSaludo').value = `Estimado Sr. ${apellido}:`;
+                saludoInput.value = `Estimado Sr. ${apellido}:`;
             }
             actualizarVistaPrevia();
         }
 
         function insertarVineta() {
             const textarea = document.getElementById('textareaCuerpo');
+            if (!textarea) return;
             const start = textarea.selectionStart;
             const end = textarea.selectionEnd;
             const text = textarea.value;
@@ -1434,6 +1574,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         function insertarParrafoCierre() {
             const textarea = document.getElementById('textareaCuerpo');
+            if (!textarea) return;
             const insertText = '\n\nAgradezco de antemano su atención y apoyo a esta solicitud.';
             textarea.value = textarea.value.trim() + insertText;
             actualizarVistaPrevia();
@@ -1442,7 +1583,8 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         // 5. Actualización de la Vista Previa en Vivo (Live Paper Preview)
         function actualizarVistaPrevia() {
             const codigo = construirCodigoCompleto();
-            document.getElementById('prevTituloMemorando').textContent = codigo;
+            const prevTit = document.getElementById('prevTituloMemorando');
+            if (prevTit) prevTit.textContent = codigo;
 
             const paraNombre = document.getElementById('inputParaNombre').value.trim() || '[Nombre del Destinatario]';
             const paraCargo = document.getElementById('inputParaCargo').value.trim() || '[Cargo del Destinatario]';
@@ -1464,120 +1606,420 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             const saludo = document.getElementById('inputSaludo').value.trim();
             const prevSaludoElem = document.getElementById('prevSaludo');
-            if (saludo) {
-                prevSaludoElem.style.display = 'block';
-                prevSaludoElem.textContent = saludo;
-            } else {
-                prevSaludoElem.style.display = 'none';
+            if (prevSaludoElem) {
+                if (saludo) {
+                    prevSaludoElem.style.display = 'block';
+                    prevSaludoElem.textContent = saludo;
+                } else {
+                    prevSaludoElem.style.display = 'none';
+                }
             }
 
-            // Renderizar Cuerpo del Memorando (Párrafos y Viñetas)
             const cuerpoRaw = document.getElementById('textareaCuerpo').value;
-            document.getElementById('charCountDisplay').textContent = `${cuerpoRaw.length} caracteres`;
+            const charCount = document.getElementById('charCountDisplay');
+            if (charCount) charCount.textContent = `${cuerpoRaw.length} caracteres`;
 
             const contenedorCuerpo = document.getElementById('prevCuerpoDinamico');
-            contenedorCuerpo.innerHTML = '';
+            if (contenedorCuerpo) {
+                contenedorCuerpo.innerHTML = '';
+                const lineas = cuerpoRaw.split('\n');
+                let parrafoBuffer = [];
 
-            const lineas = cuerpoRaw.split('\n');
-            let parrafoBuffer = [];
+                lineas.forEach(linea => {
+                    const trimmed = linea.trim();
+                    if (/^[-*•]\s+/.test(trimmed)) {
+                        if (parrafoBuffer.length > 0) {
+                            const p = document.createElement('div');
+                            p.className = 'preview-parrafo';
+                            p.textContent = parrafoBuffer.join(' ');
+                            contenedorCuerpo.appendChild(p);
+                            parrafoBuffer = [];
+                        }
+                        const item = document.createElement('div');
+                        item.className = 'preview-lista-item';
+                        const bullet = document.createElement('span');
+                        bullet.textContent = '-';
+                        bullet.style.fontWeight = 'bold';
+                        bullet.style.marginRight = '4px';
+                        const texto = document.createElement('span');
+                        texto.textContent = trimmed.replace(/^[-*•]\s+/, '');
+                        item.appendChild(bullet);
+                        item.appendChild(texto);
+                        contenedorCuerpo.appendChild(item);
+                    } else if (trimmed === '') {
+                        if (parrafoBuffer.length > 0) {
+                            const p = document.createElement('div');
+                            p.className = 'preview-parrafo';
+                            p.textContent = parrafoBuffer.join(' ');
+                            contenedorCuerpo.appendChild(p);
+                            parrafoBuffer = [];
+                        }
+                    } else {
+                        parrafoBuffer.push(trimmed);
+                    }
+                });
 
-            lineas.forEach(linea => {
-                const trimmed = linea.trim();
-                if (/^[-*•]\s+/.test(trimmed)) {
-                    // Si había un párrafo acumulado antes, renderizarlo
-                    if (parrafoBuffer.length > 0) {
-                        const p = document.createElement('div');
-                        p.className = 'preview-parrafo';
-                        p.textContent = parrafoBuffer.join(' ');
-                        contenedorCuerpo.appendChild(p);
-                        parrafoBuffer = [];
-                    }
-                    // Renderizar viñeta
-                    const item = document.createElement('div');
-                    item.className = 'preview-lista-item';
-                    const bullet = document.createElement('span');
-                    bullet.textContent = '-';
-                    bullet.style.fontWeight = 'bold';
-                    bullet.style.marginRight = '4px';
-                    const texto = document.createElement('span');
-                    texto.textContent = trimmed.replace(/^[-*•]\s+/, '');
-                    item.appendChild(bullet);
-                    item.appendChild(texto);
-                    contenedorCuerpo.appendChild(item);
-                } else if (trimmed === '') {
-                    if (parrafoBuffer.length > 0) {
-                        const p = document.createElement('div');
-                        p.className = 'preview-parrafo';
-                        p.textContent = parrafoBuffer.join(' ');
-                        contenedorCuerpo.appendChild(p);
-                        parrafoBuffer = [];
-                    }
-                } else {
-                    parrafoBuffer.push(trimmed);
+                if (parrafoBuffer.length > 0) {
+                    const p = document.createElement('div');
+                    p.className = 'preview-parrafo';
+                    p.textContent = parrafoBuffer.join(' ');
+                    contenedorCuerpo.appendChild(p);
                 }
-            });
-
-            if (parrafoBuffer.length > 0) {
-                const p = document.createElement('div');
-                p.className = 'preview-parrafo';
-                p.textContent = parrafoBuffer.join(' ');
-                contenedorCuerpo.appendChild(p);
             }
 
             const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
-            document.getElementById('prevDespedida').textContent = despedida;
+            const prevDesp = document.getElementById('prevDespedida');
+            if (prevDesp) prevDesp.textContent = despedida;
 
-            // Manejo de estilo de firma
             const modoFirma = document.getElementById('selectEspacioFirma').value;
             const firmaBox = document.getElementById('prevFirmaBox');
-            const firmaLine = firmaBox.querySelector('.preview-firma-line');
-            if (modoFirma === 'solo_texto') {
-                firmaLine.style.display = 'none';
-            } else {
-                firmaLine.style.display = 'block';
+            if (firmaBox) {
+                const firmaLine = firmaBox.querySelector('.preview-firma-line');
+                if (firmaLine) {
+                    firmaLine.style.display = (modoFirma === 'solo_texto') ? 'none' : 'block';
+                }
             }
 
-            // Copias
             const orig = document.getElementById('inputCopiaOriginal').value.trim();
             const c1 = document.getElementById('inputCopia1').value.trim();
             const c2 = document.getElementById('inputCopia2').value.trim();
 
             const ccContainer = document.getElementById('prevCcBlock');
-            ccContainer.innerHTML = '';
-            if (orig) {
-                const d = document.createElement('div');
-                d.textContent = orig;
-                ccContainer.appendChild(d);
-            }
-            if (c1) {
-                const d = document.createElement('div');
-                d.textContent = c1;
-                ccContainer.appendChild(d);
-            }
-            if (c2) {
-                const d = document.createElement('div');
-                d.textContent = c2;
-                ccContainer.appendChild(d);
+            if (ccContainer) {
+                ccContainer.innerHTML = '';
+                if (orig) {
+                    const d = document.createElement('div');
+                    d.textContent = orig;
+                    ccContainer.appendChild(d);
+                }
+                if (c1) {
+                    const d = document.createElement('div');
+                    d.textContent = c1;
+                    ccContainer.appendChild(d);
+                }
+                if (c2) {
+                    const d = document.createElement('div');
+                    d.textContent = c2;
+                    ccContainer.appendChild(d);
+                }
             }
         }
 
-        // 6. Conversión de Imágenes para jsPDF
-        const getBase64FromUrl = (url) => new Promise((resolve) => {
-            const img = new Image();
-            img.crossOrigin = "Anonymous";
-            img.onload = () => {
-                const canvas = document.createElement("canvas");
-                canvas.width = img.width;
-                canvas.height = img.height;
-                const ctx = canvas.getContext("2d");
-                ctx.drawImage(img, 0, 0);
-                resolve(canvas.toDataURL("image/png"));
-            };
-            img.onerror = () => resolve(null);
-            img.src = url;
-        });
+        // 6. Conversión Robusta de Imágenes a Base64 (Sin cuelgues ni errores de CORS)
+        async function getBase64FromUrl(url) {
+            // Método 1: Fetch directo a Blob y FileReader (100% seguro contra canvas taint)
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 1800);
+                const res = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeoutId);
+                if (res.ok) {
+                    const blob = await res.blob();
+                    return await new Promise((resolve) => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => resolve(reader.result);
+                        reader.onerror = () => resolve(null);
+                        reader.readAsDataURL(blob);
+                    });
+                }
+            } catch (e) {
+                // Continuar al método de Image si fetch es bloqueado
+            }
 
-        // 7. GENERADOR DE PDF OFICIAL (ALTA RESOLUCIÓN Y FIDELIDAD)
+            // Método 2: Elemento Image con canvas y timeout garantizado
+            return new Promise((resolve) => {
+                let terminado = false;
+                const timer = setTimeout(() => {
+                    if (!terminado) {
+                        terminado = true;
+                        resolve(null);
+                    }
+                }, 1800);
+
+                try {
+                    const img = new Image();
+                    img.onload = () => {
+                        if (terminado) return;
+                        terminado = true;
+                        clearTimeout(timer);
+                        try {
+                            const canvas = document.createElement("canvas");
+                            canvas.width = img.width;
+                            canvas.height = img.height;
+                            const ctx = canvas.getContext("2d");
+                            ctx.drawImage(img, 0, 0);
+                            resolve(canvas.toDataURL("image/png"));
+                        } catch (err) {
+                            resolve(null);
+                        }
+                    };
+                    img.onerror = () => {
+                        if (terminado) return;
+                        terminado = true;
+                        clearTimeout(timer);
+                        resolve(null);
+                    };
+                    img.src = url;
+                } catch (err) {
+                    if (!terminado) {
+                        terminado = true;
+                        clearTimeout(timer);
+                        resolve(null);
+                    }
+                }
+            });
+        }
+
+        // 7. CONSTRUCTOR CENTRAL DEL DOCUMENTO PDF
+        async function construirDocumentoPDF() {
+            const jsPDFClass = obtenerConstructorJsPDF();
+            if (!jsPDFClass) {
+                throw new Error("La librería jsPDF no está disponible en este momento. Por favor recargue la página.");
+            }
+
+            // Formato Carta Oficial (Letter: 215.9 x 279.4 mm)
+            const doc = new jsPDFClass('p', 'mm', 'letter');
+            const pageWidth = doc.internal.pageSize.getWidth();
+            const pageHeight = doc.internal.pageSize.getHeight();
+
+            // 1. Cargar fondo membretado oficial (Logo odoo.png o logo.png)
+            const bgPapelUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+            if (bgPapelUrl) {
+                try {
+                    doc.addImage(bgPapelUrl, 'PNG', 0, 0, pageWidth, pageHeight);
+                } catch (e) {
+                    console.warn("No se pudo agregar fondo membretado completo:", e);
+                }
+            } else {
+                // Fallback: Logo de cabecera estándar
+                const logoUrl = await getBase64FromUrl('../assets/logo.png');
+                if (logoUrl) {
+                    try {
+                        doc.addImage(logoUrl, 'PNG', 22, 10, 171.9, 28);
+                    } catch (e) {
+                        console.warn("No se pudo agregar logo de cabecera:", e);
+                    }
+                }
+            }
+
+            // 2. Título Central: MEMORANDO {PREFIJO}-{NUMERO}-{SUFIJO}
+            const codigoCompleto = construirCodigoCompleto();
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(15);
+            doc.setTextColor(15, 23, 42);
+            doc.text(codigoCompleto, pageWidth / 2, 45, { align: 'center' });
+
+            // 3. Reglas horizontales y Márgenes
+            const margenIzq = 22;
+            const margenDer = pageWidth - 22;
+            const anchoUtil = margenDer - margenIzq; // 171.9 mm
+
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(1.1);
+            doc.line(margenIzq, 53, margenDer, 53);
+
+            // 4. Bloque de Encabezado: PARA, DE, FECHA, ASUNTO
+            let curY = 59;
+            const colEtiqueta = margenIzq;
+            const colValor = margenIzq + 20;
+            const valorWidth = anchoUtil - 20;
+
+            const paraNombre = document.getElementById('inputParaNombre').value.trim() || ' ';
+            const paraCargo = document.getElementById('inputParaCargo').value.trim() || '';
+            const deNombre = document.getElementById('inputDeNombre').value.trim() || ' ';
+            const deCargo = document.getElementById('inputDeCargo').value.trim() || '';
+            const fechaTexto = document.getElementById('inputFechaTextoOficial').value.trim() || ' ';
+            const asuntoTexto = document.getElementById('inputAsunto').value.trim() || ' ';
+
+            // Fila PARA:
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text("PARA:", colEtiqueta, curY);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(paraNombre, colValor, curY);
+            curY += 4.5;
+
+            if (paraCargo) {
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(8.8);
+                doc.setTextColor(70, 70, 70);
+                doc.text(paraCargo, colValor, curY);
+                curY += 6;
+            } else {
+                curY += 3;
+            }
+
+            // Fila DE:
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text("DE:", colEtiqueta, curY);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(deNombre, colValor, curY);
+            curY += 4.5;
+
+            if (deCargo) {
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(8.8);
+                doc.setTextColor(70, 70, 70);
+                doc.text(deCargo, colValor, curY);
+                curY += 6;
+            } else {
+                curY += 3;
+            }
+
+            // Fila FECHA:
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text("FECHA:", colEtiqueta, curY);
+
+            doc.setFont('helvetica', 'normal');
+            doc.text(fechaTexto, colValor, curY);
+            curY += 6;
+
+            // Fila ASUNTO:
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text("ASUNTO:", colEtiqueta, curY);
+
+            doc.setFont('helvetica', 'bold');
+            const asuntoLines = doc.splitTextToSize(asuntoTexto, valorWidth);
+            doc.text(asuntoLines, colValor, curY);
+            curY += (asuntoLines.length * 4.5) + 3;
+
+            // 5. Regla horizontal inferior
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(1.1);
+            doc.line(margenIzq, curY, margenDer, curY);
+            curY += 9;
+
+            // 6. Saludo
+            const saludo = document.getElementById('inputSaludo').value.trim();
+            if (saludo) {
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(10);
+                doc.setTextColor(0, 0, 0);
+                doc.text(saludo, margenIzq, curY);
+                curY += 7.5;
+            }
+
+            // 7. Cuerpo del Memorando (Párrafos y Viñetas)
+            const cuerpoRaw = document.getElementById('textareaCuerpo').value;
+            const lineas = cuerpoRaw.split('\n');
+            let parrafoBuffer = [];
+
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(20, 20, 20);
+
+            const imprimirParrafoAcumulado = () => {
+                if (parrafoBuffer.length === 0) return;
+                const parrafoStr = parrafoBuffer.join(' ');
+                const lines = doc.splitTextToSize(parrafoStr, anchoUtil);
+                doc.text(lines, margenIzq, curY);
+                curY += (lines.length * 4.8) + 4;
+                parrafoBuffer = [];
+            };
+
+            for (let i = 0; i < lineas.length; i++) {
+                const l = lineas[i].trim();
+                if (/^[-*•]\s+/.test(l)) {
+                    imprimirParrafoAcumulado();
+                    const bulletText = l.replace(/^[-*•]\s+/, '');
+                    const bulletLines = doc.splitTextToSize(bulletText, anchoUtil - 12);
+                    doc.setFont('helvetica', 'bold');
+                    doc.text("-", margenIzq + 4, curY);
+                    doc.setFont('helvetica', 'normal');
+                    doc.text(bulletLines, margenIzq + 8, curY);
+                    curY += (bulletLines.length * 4.8) + 1.5;
+                } else if (l === '') {
+                    imprimirParrafoAcumulado();
+                } else {
+                    parrafoBuffer.push(l);
+                }
+            }
+            imprimirParrafoAcumulado();
+
+            // 8. Despedida
+            curY += 3;
+            const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text(despedida, margenIzq, curY);
+            curY += 18;
+
+            // 9. Firma del Remitente
+            const modoFirma = document.getElementById('selectEspacioFirma').value;
+            if (curY > 230) curY = 225;
+
+            if (modoFirma !== 'solo_texto') {
+                doc.setDrawColor(80, 80, 80);
+                doc.setLineWidth(0.5);
+                doc.line(margenIzq, curY, margenIzq + 55, curY);
+                curY += 4.5;
+            }
+
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9.5);
+            doc.text(deNombre, margenIzq, curY);
+            curY += 4;
+
+            if (deCargo) {
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(8.5);
+                doc.setTextColor(70, 70, 70);
+                doc.text(deCargo, margenIzq, curY);
+            }
+
+            // 10. Bloque C.C. y Original (Abajo a la izquierda)
+            const yCC = 244;
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(7.5);
+            doc.setTextColor(90, 90, 90);
+
+            let ccOffset = 0;
+            const orig = document.getElementById('inputCopiaOriginal').value.trim();
+            const c1 = document.getElementById('inputCopia1').value.trim();
+            const c2 = document.getElementById('inputCopia2').value.trim();
+
+            if (orig) {
+                doc.text(orig, margenIzq, yCC + ccOffset);
+                ccOffset += 3.8;
+            }
+            if (c1) {
+                doc.text(c1, margenIzq, yCC + ccOffset);
+                ccOffset += 3.8;
+            }
+            if (c2) {
+                doc.text(c2, margenIzq, yCC + ccOffset);
+            }
+
+            // 11. Firma de Auditoría Obligatoria del Sistema
+            let usuarioAuditoria = '';
+            try {
+                usuarioAuditoria = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+            } catch (e) {}
+            if (!usuarioAuditoria && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+                usuarioAuditoria = firebase.auth().currentUser.email;
+            }
+            if (!usuarioAuditoria) usuarioAuditoria = "Usuario del Sistema";
+
+            const fechaHoraAudit = new Date().toLocaleString('es-HN');
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(6.5);
+            doc.setTextColor(140, 150, 165);
+            doc.text(`Documento emitido por: ${usuarioAuditoria} • Sistema de Gestión ENAG • ${fechaHoraAudit}`, pageWidth / 2, 273.5, { align: 'center' });
+
+            return doc;
+        }
+
+        // 8. DESCARGA OFICIAL DE PDF
         async function generarPDFMemorandoOficial() {
             const btn = document.getElementById('btnDescargarPDF');
             const textoOriginal = btn.innerHTML;
@@ -1585,258 +2027,69 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             btn.disabled = true;
 
             try {
-                const { jsPDF } = window.jspdf;
-                // Formato Carta Oficial (Letter: 215.9 x 279.4 mm)
-                const doc = new jsPDF({
-                    orientation: 'portrait',
-                    unit: 'mm',
-                    format: 'letter'
-                });
-
-                const pageWidth = doc.internal.pageSize.getWidth();
-                const pageHeight = doc.internal.pageSize.getHeight();
-
-                // 1. Cargar fondo membretado oficial con escudo y pie de imprenta (Logo odoo.png)
-                const bgPapelUrl = await getBase64FromUrl('../assets/Logo odoo.png');
-                if (bgPapelUrl) {
-                    doc.addImage(bgPapelUrl, 'PNG', 0, 0, pageWidth, pageHeight);
-                }
-
-                // 2. Título Central: MEMORANDO {PREFIJO}-{NUMERO}-{SUFIJO}
+                const doc = await construirDocumentoPDF();
                 const codigoCompleto = construirCodigoCompleto();
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(15);
-                doc.setTextColor(15, 23, 42);
-                doc.text(codigoCompleto, pageWidth / 2, 45, { align: 'center' });
-
-                // 3. Regla horizontal superior
-                const margenIzq = 22;
-                const margenDer = pageWidth - 22;
-                const anchoUtil = margenDer - margenIzq;
-
-                doc.setDrawColor(0, 0, 0);
-                doc.setLineWidth(1.1);
-                doc.line(margenIzq, 53, margenDer, 53);
-
-                // 4. Bloque de Encabezado: PARA, DE, FECHA, ASUNTO
-                let curY = 59;
-                const colEtiqueta = margenIzq;
-                const colValor = margenIzq + 20;
-                const valorWidth = anchoUtil - 20;
-
-                const paraNombre = document.getElementById('inputParaNombre').value.trim();
-                const paraCargo = document.getElementById('inputParaCargo').value.trim();
-                const deNombre = document.getElementById('inputDeNombre').value.trim();
-                const deCargo = document.getElementById('inputDeCargo').value.trim();
-                const fechaTexto = document.getElementById('inputFechaTextoOficial').value.trim();
-                const asuntoTexto = document.getElementById('inputAsunto').value.trim();
-
-                // Fila PARA:
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text("PARA:", colEtiqueta, curY);
-
-                doc.setFont('helvetica', 'normal');
-                doc.text(paraNombre, colValor, curY);
-                curY += 4.5;
-
-                if (paraCargo) {
-                    doc.setFont('helvetica', 'italic');
-                    doc.setFontSize(8.8);
-                    doc.setTextColor(70, 70, 70);
-                    doc.text(paraCargo, colValor, curY);
-                    curY += 6;
-                } else {
-                    curY += 3;
-                }
-
-                // Fila DE:
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text("DE:", colEtiqueta, curY);
-
-                doc.setFont('helvetica', 'normal');
-                doc.text(deNombre, colValor, curY);
-                curY += 4.5;
-
-                if (deCargo) {
-                    doc.setFont('helvetica', 'italic');
-                    doc.setFontSize(8.8);
-                    doc.setTextColor(70, 70, 70);
-                    doc.text(deCargo, colValor, curY);
-                    curY += 6;
-                } else {
-                    curY += 3;
-                }
-
-                // Fila FECHA:
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text("FECHA:", colEtiqueta, curY);
-
-                doc.setFont('helvetica', 'normal');
-                doc.text(fechaTexto, colValor, curY);
-                curY += 6;
-
-                // Fila ASUNTO:
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text("ASUNTO:", colEtiqueta, curY);
-
-                doc.setFont('helvetica', 'bold');
-                const asuntoLines = doc.splitTextToSize(asuntoTexto, valorWidth);
-                doc.text(asuntoLines, colValor, curY);
-                curY += (asuntoLines.length * 4.5) + 3;
-
-                // 5. Regla horizontal inferior
-                doc.setDrawColor(0, 0, 0);
-                doc.setLineWidth(1.1);
-                doc.line(margenIzq, curY, margenDer, curY);
-                curY += 9;
-
-                // 6. Saludo
-                const saludo = document.getElementById('inputSaludo').value.trim();
-                if (saludo) {
-                    doc.setFont('helvetica', 'normal');
-                    doc.setFontSize(10);
-                    doc.setTextColor(0, 0, 0);
-                    doc.text(saludo, margenIzq, curY);
-                    curY += 7.5;
-                }
-
-                // 7. Cuerpo del Memorando (Párrafos y Viñetas)
-                const cuerpoRaw = document.getElementById('textareaCuerpo').value;
-                const lineas = cuerpoRaw.split('\n');
-                let parrafoBuffer = [];
-
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(10);
-                doc.setTextColor(20, 20, 20);
-
-                const imprimirParrafoAcumulado = () => {
-                    if (parrafoBuffer.length === 0) return;
-                    const parrafoStr = parrafoBuffer.join(' ');
-                    const lines = doc.splitTextToSize(parrafoStr, anchoUtil);
-                    doc.text(lines, margenIzq, curY, { align: 'justify', maxWidth: anchoUtil });
-                    curY += (lines.length * 4.8) + 4;
-                    parrafoBuffer = [];
-                };
-
-                for (let i = 0; i < lineas.length; i++) {
-                    const l = lineas[i].trim();
-                    if (/^[-*•]\s+/.test(l)) {
-                        imprimirParrafoAcumulado();
-                        const bulletText = l.replace(/^[-*•]\s+/, '');
-                        const bulletLines = doc.splitTextToSize(bulletText, anchoUtil - 10);
-                        
-                        // Dibujar guión de viñeta
-                        doc.setFont('helvetica', 'bold');
-                        doc.text("-", margenIzq + 4, curY);
-                        doc.setFont('helvetica', 'normal');
-                        doc.text(bulletLines, margenIzq + 8, curY);
-                        curY += (bulletLines.length * 4.8) + 1.5;
-                    } else if (l === '') {
-                        imprimirParrafoAcumulado();
-                    } else {
-                        parrafoBuffer.push(l);
-                    }
-                }
-                imprimirParrafoAcumulado();
-
-                // 8. Despedida
-                curY += 3;
-                const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(10);
-                doc.setTextColor(0, 0, 0);
-                doc.text(despedida, margenIzq, curY);
-                curY += 18;
-
-                // 9. Firma del Remitente
-                const modoFirma = document.getElementById('selectEspacioFirma').value;
-                if (curY > 230) curY = 225; // Prevenir superposición con el pie de página
-
-                if (modoFirma !== 'solo_texto') {
-                    doc.setDrawColor(80, 80, 80);
-                    doc.setLineWidth(0.5);
-                    doc.line(margenIzq, curY, margenIzq + 55, curY);
-                    curY += 4.5;
-                }
-
-                doc.setFont('helvetica', 'bold');
-                doc.setFontSize(9.5);
-                doc.text(deNombre, margenIzq, curY);
-                curY += 4;
-
-                if (deCargo) {
-                    doc.setFont('helvetica', 'italic');
-                    doc.setFontSize(8.5);
-                    doc.setTextColor(70, 70, 70);
-                    doc.text(deCargo, margenIzq, curY);
-                }
-
-                // 10. Bloque C.C. y Original (Abajo a la izquierda, fijo a 244mm)
-                const yCC = 244;
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(7.5);
-                doc.setTextColor(90, 90, 90);
-
-                let ccOffset = 0;
-                const orig = document.getElementById('inputCopiaOriginal').value.trim();
-                const c1 = document.getElementById('inputCopia1').value.trim();
-                const c2 = document.getElementById('inputCopia2').value.trim();
-
-                if (orig) {
-                    doc.text(orig, margenIzq, yCC + ccOffset);
-                    ccOffset += 3.8;
-                }
-                if (c1) {
-                    doc.text(c1, margenIzq, yCC + ccOffset);
-                    ccOffset += 3.8;
-                }
-                if (c2) {
-                    doc.text(c2, margenIzq, yCC + ccOffset);
-                }
-
-                // 11. Firma de Auditoría Obligatoria del Sistema (Usuario que lo generó)
-                let usuarioAuditoria = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
-                if (!usuarioAuditoria && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
-                    usuarioAuditoria = firebase.auth().currentUser.email;
-                }
-                if (!usuarioAuditoria) usuarioAuditoria = "Usuario del Sistema";
-
-                const fechaHoraAudit = new Date().toLocaleString('es-HN');
-                doc.setFont('helvetica', 'normal');
-                doc.setFontSize(6.5);
-                doc.setTextColor(140, 150, 165);
-                doc.text(`Documento emitido por: ${usuarioAuditoria} • Sistema de Gestión ENAG • ${fechaHoraAudit}`, pageWidth / 2, 273.5, { align: 'center' });
-
-                // Descargar el documento PDF
                 const fileName = `${codigoCompleto.replace(/\s+/g, '_')}.pdf`;
+
+                // Descargar el documento PDF directamente
                 doc.save(fileName);
 
-                // Auto-guardar y registrar en bitácora
-                await registrarEmisionMemorando(codigoCompleto, asuntoTexto, paraNombre);
+                // Auto-guardar en segundo plano sin bloquear la descarga
+                const asuntoTexto = document.getElementById('inputAsunto').value.trim();
+                const paraNombre = document.getElementById('inputParaNombre').value.trim();
+                registrarEmisionMemorando(codigoCompleto, asuntoTexto, paraNombre).catch(e => console.warn(e));
 
-                showToast(`¡Memorándum descargado con éxito: ${fileName}!`, "success");
+                showToast(`¡Memorándum descargado: ${fileName}!`, "success");
             } catch (err) {
                 console.error("Error al generar PDF del memorando:", err);
                 showToast("Error al generar PDF: " + err.message, "error");
+                alert("Error al generar el PDF: " + err.message);
             } finally {
                 btn.innerHTML = textoOriginal;
                 btn.disabled = false;
             }
         }
 
-        function imprimirVistaPreviaDirecta() {
+        // 9. IMPRESIÓN DIRECTA OFICIAL DE ALTA RESOLUCIÓN
+        async function imprimirVistaPreviaDirecta() {
+            showToast("Preparando documento para impresión...", "info");
+            try {
+                const doc = await construirDocumentoPDF();
+                if (doc) {
+                    doc.autoPrint();
+                    const blobUrl = doc.output('bloburl');
+
+                    // Crear iframe invisible para lanzar el cuadro de impresión nativo del navegador
+                    let printFrame = document.getElementById('memoPrintIframe');
+                    if (!printFrame) {
+                        printFrame = document.createElement('iframe');
+                        printFrame.id = 'memoPrintIframe';
+                        printFrame.style.position = 'fixed';
+                        printFrame.style.right = '0';
+                        printFrame.style.bottom = '0';
+                        printFrame.style.width = '0';
+                        printFrame.style.height = '0';
+                        printFrame.style.border = '0';
+                        document.body.appendChild(printFrame);
+                    }
+                    printFrame.src = blobUrl;
+                    printFrame.onload = function () {
+                        try {
+                            printFrame.contentWindow.focus();
+                            printFrame.contentWindow.print();
+                        } catch (e) {
+                            window.open(blobUrl, '_blank');
+                        }
+                    };
+                    return;
+                }
+            } catch (err) {
+                console.warn("Fallo impresión por PDF blob, usando impresión de ventana:", err);
+            }
             window.print();
         }
 
-        // 8. PERSISTENCIA EN FIRESTORE Y BITÁCORA DEL SISTEMA
+        // 10. PERSISTENCIA EN FIRESTORE Y BITÁCORA DEL SISTEMA
         function conectarFirebaseYEscuchar() {
             if (typeof firebase === 'undefined') {
                 console.warn("Firebase SDK no cargado todavía.");
@@ -1846,10 +2099,15 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             firebase.auth().onAuthStateChanged((user) => {
                 if (user) {
-                    document.getElementById('labelLoggedUser').textContent = user.displayName || user.email;
+                    const labelUser = document.getElementById('labelLoggedUser');
+                    if (labelUser) labelUser.textContent = user.displayName || user.email;
                 } else {
-                    const localUser = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || 'Personal ENAG';
-                    document.getElementById('labelLoggedUser').textContent = localUser;
+                    let localUser = 'Personal ENAG';
+                    try {
+                        localUser = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || 'Personal ENAG';
+                    } catch (e) {}
+                    const labelUser = document.getElementById('labelLoggedUser');
+                    if (labelUser) labelUser.textContent = localUser;
                 }
 
                 try {
@@ -1881,7 +2139,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         async function guardarMemorandoEnFirestore() {
             const btn = document.getElementById('btnGuardarMemo');
-            btn.disabled = true;
+            if (btn) btn.disabled = true;
 
             try {
                 const codigo = construirCodigoCompleto();
@@ -1904,14 +2162,17 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
                 if (!paraNombre || !deNombre || !asunto || !cuerpo.trim()) {
                     showToast("Por favor complete los campos obligatorios (Destinatario, Remitente, Asunto y Cuerpo).", "warning");
-                    btn.disabled = false;
+                    if (btn) btn.disabled = false;
                     return;
                 }
 
                 guardarPerfilRemitente();
 
-                let usuarioActivo = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
-                if (!usuarioActivo && typeof firebase !== 'undefined' && firebase.auth().currentUser) {
+                let usuarioActivo = 'Usuario del Sistema';
+                try {
+                    usuarioActivo = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+                } catch (e) {}
+                if (!usuarioActivo && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
                     usuarioActivo = firebase.auth().currentUser.email;
                 }
                 if (!usuarioActivo) usuarioActivo = "Usuario del Sistema";
@@ -1942,10 +2203,8 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     }, { merge: true });
                 }
 
-                // Guardar en respaldo local
                 guardarRespaldoLocal(docId, memoData);
 
-                // Registrar en Bitácora
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Administración', 'Guardar Memorando', `Se registró/actualizó el ${codigo} con asunto: "${asunto}" para ${paraNombre}`);
                 }
@@ -1957,7 +2216,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 console.error("Error guardando memorándum:", error);
                 showToast("Error al guardar: " + error.message, "error");
             } finally {
-                btn.disabled = false;
+                if (btn) btn.disabled = false;
             }
         }
 
@@ -1997,24 +2256,29 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             }
         }
 
-        // 9. Renderizado y Filtros de la Tabla de Historial
+        // 11. Renderizado y Filtros de la Tabla de Historial
         function actualizarEstadisticasYTabla() {
-            document.getElementById('badgeTotalMemos').textContent = `📁 ${memorandumsGlobal.length} Memorándums`;
-            
-            // Hallar el último correlativo registrado
-            if (memorandumsGlobal.length > 0) {
-                const ultimo = memorandumsGlobal[0];
-                document.getElementById('badgeUltimoCorrelativo').textContent = `🔢 Último: ${ultimo.codigo || (ultimo.prefijo + '-' + ultimo.numero)}`;
-            } else {
-                document.getElementById('badgeUltimoCorrelativo').textContent = `🔢 Último: N/A`;
+            const badgeTotal = document.getElementById('badgeTotalMemos');
+            if (badgeTotal) badgeTotal.textContent = `📁 ${memorandumsGlobal.length} Memorándums`;
+
+            const badgeUltimo = document.getElementById('badgeUltimoCorrelativo');
+            if (badgeUltimo) {
+                if (memorandumsGlobal.length > 0) {
+                    const ultimo = memorandumsGlobal[0];
+                    badgeUltimo.textContent = `🔢 Último: ${ultimo.codigo || (ultimo.prefijo + '-' + ultimo.numero)}`;
+                } else {
+                    badgeUltimo.textContent = `🔢 Último: N/A`;
+                }
             }
 
             filtrarHistorialMemorandums();
         }
 
         function filtrarHistorialMemorandums() {
-            const query = document.getElementById('filtroBusqueda').value.toLowerCase().trim();
-            const depto = document.getElementById('filtroDeptoHistorial').value;
+            const inputBusq = document.getElementById('filtroBusqueda');
+            const query = inputBusq ? inputBusq.value.toLowerCase().trim() : '';
+            const deptoSel = document.getElementById('filtroDeptoHistorial');
+            const depto = deptoSel ? deptoSel.value : 'TODOS';
 
             const filtrados = memorandumsGlobal.filter(m => {
                 const matchDepto = (depto === 'TODOS' || m.prefijo === depto);
@@ -2030,6 +2294,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         function renderizarTablaHistorial(lista) {
             const tbody = document.getElementById('tbodyHistorialMemos');
+            if (!tbody) return;
             tbody.innerHTML = '';
 
             if (lista.length === 0) {
@@ -2072,14 +2337,13 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             });
         }
 
-        // 10. Acciones del Historial (Cargar, Re-emitir PDF, Eliminar)
+        // 12. Acciones del Historial (Cargar, Re-emitir PDF, Eliminar)
         function cargarMemorandoAlFormulario(id) {
             const m = memorandumsGlobal.find(item => item.id === id);
             if (!m) return;
 
             memorandoEnEdicionId = m.id;
 
-            // Prefijo y departamento
             const selectDepto = document.getElementById('selectDepartamento');
             const existeOption = Array.from(selectDepto.options).some(o => o.value === m.prefijo);
             if (existeOption) {
@@ -2137,9 +2401,10 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     await dbFirestore.collection('memorandums').doc(id).delete();
                 }
 
-                // Borrar de local
                 memorandumsGlobal = memorandumsGlobal.filter(item => item.id !== id);
-                localStorage.setItem('enag_memorandums_local', JSON.stringify(memorandumsGlobal));
+                try {
+                    localStorage.setItem('enag_memorandums_local', JSON.stringify(memorandumsGlobal));
+                } catch (e) {}
 
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Administración', 'Eliminar Memorando', `Se eliminó el memorándum ${cod}`);
@@ -2190,9 +2455,10 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             showToast("Reporte Excel generado correctamente.", "success");
         }
 
-        // 11. Toast Notifications
+        // 13. Toast Notifications
         function showToast(mensaje, tipo = "info") {
             const toast = document.getElementById('toastNotification');
+            if (!toast) return;
             toast.textContent = mensaje;
             toast.className = `toast-notification toast-${tipo} show`;
             setTimeout(() => {
