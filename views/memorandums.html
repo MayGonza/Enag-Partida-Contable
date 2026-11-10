@@ -1426,7 +1426,7 @@
                 }
             });
 
-            let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 51 : 1);
+            let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 53 : 1);
 
             const numInput = document.getElementById('inputNumeroCorrelativo');
             if (numInput) numInput.value = siguiente;
@@ -1707,37 +1707,46 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         // 6. Conversión Robusta de Imágenes a Base64 (Sin cuelgues ni errores de CORS)
         async function getBase64FromUrl(url) {
-            // Método 1: Fetch directo a Blob y FileReader (100% seguro contra canvas taint)
-            try {
-                const controller = new AbortController();
-                const timeoutId = setTimeout(() => controller.abort(), 1800);
-                const res = await fetch(url, { signal: controller.signal });
-                clearTimeout(timeoutId);
-                if (res.ok) {
-                    const blob = await res.blob();
-                    return await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => resolve(reader.result);
-                        reader.onerror = () => resolve(null);
-                        reader.readAsDataURL(blob);
-                    });
-                }
-            } catch (e) {
-                // Continuar al método de Image si fetch es bloqueado
-            }
+            // Codificar URL para manejar espacios y caracteres especiales
+            const urlSegura = url.split('/').map((seg, i) => i === 0 ? seg : encodeURIComponent(seg)).join('/');
 
-            // Método 2: Elemento Image con canvas y timeout garantizado
+            // Método 1: Fetch directo a Blob y FileReader (100% seguro contra canvas taint)
+            const intentarFetch = async (u) => {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+                    const res = await fetch(u, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+                    if (res.ok) {
+                        const blob = await res.blob();
+                        return await new Promise((resolve) => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => resolve(reader.result);
+                            reader.onerror = () => resolve(null);
+                            reader.readAsDataURL(blob);
+                        });
+                    }
+                } catch (e) {
+                    // fetch bloqueado o timeout
+                }
+                return null;
+            };
+
+            // Intentar con URL codificada primero, luego con la original
+            let resultado = await intentarFetch(urlSegura);
+            if (!resultado && urlSegura !== url) resultado = await intentarFetch(url);
+            if (resultado) return resultado;
+
+            // Método 2: Elemento Image con canvas (fallback)
             return new Promise((resolve) => {
                 let terminado = false;
                 const timer = setTimeout(() => {
-                    if (!terminado) {
-                        terminado = true;
-                        resolve(null);
-                    }
-                }, 1800);
+                    if (!terminado) { terminado = true; resolve(null); }
+                }, 4000);
 
                 try {
                     const img = new Image();
+                    img.crossOrigin = 'anonymous';
                     img.onload = () => {
                         if (terminado) return;
                         terminado = true;
@@ -1759,13 +1768,9 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                         clearTimeout(timer);
                         resolve(null);
                     };
-                    img.src = url;
+                    img.src = urlSegura;
                 } catch (err) {
-                    if (!terminado) {
-                        terminado = true;
-                        clearTimeout(timer);
-                        resolve(null);
-                    }
+                    if (!terminado) { terminado = true; clearTimeout(timer); resolve(null); }
                 }
             });
         }
@@ -1783,7 +1788,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             const pageHeight = doc.internal.pageSize.getHeight();
 
             // 1. Cargar fondo membretado oficial (Logo odoo.png o logo.png)
-            const bgPapelUrl = await getBase64FromUrl('../assets/Logo odoo.png');
+            const bgPapelUrl = await getBase64FromUrl('../assets/Logo%20odoo.png');
             if (bgPapelUrl) {
                 try {
                     doc.addImage(bgPapelUrl, 'PNG', 0, 0, pageWidth, pageHeight);
@@ -2022,9 +2027,8 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         // 8. DESCARGA OFICIAL DE PDF
         async function generarPDFMemorandoOficial() {
             const btn = document.getElementById('btnDescargarPDF');
-            const textoOriginal = btn.innerHTML;
-            btn.innerHTML = '<span>⏳</span> Generando PDF...';
-            btn.disabled = true;
+            const textoOriginal = btn ? btn.innerHTML : '';
+            if (btn) { btn.innerHTML = '<span>⏳</span> Generando PDF...'; btn.disabled = true; }
 
             try {
                 const doc = await construirDocumentoPDF();
@@ -2034,59 +2038,62 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 // Descargar el documento PDF directamente
                 doc.save(fileName);
 
-                // Auto-guardar en segundo plano sin bloquear la descarga
-                const asuntoTexto = document.getElementById('inputAsunto').value.trim();
-                const paraNombre = document.getElementById('inputParaNombre').value.trim();
-                registrarEmisionMemorando(codigoCompleto, asuntoTexto, paraNombre).catch(e => console.warn(e));
+                // Auto-guardar en Firestore en segundo plano
+                guardarMemorandoEnFirestore().catch(e => console.warn('Auto-guardado background:', e));
 
-                showToast(`¡Memorándum descargado: ${fileName}!`, "success");
+                showToast(`✅ ¡Memorándum descargado: ${fileName}!`, "success");
             } catch (err) {
                 console.error("Error al generar PDF del memorando:", err);
-                showToast("Error al generar PDF: " + err.message, "error");
-                alert("Error al generar el PDF: " + err.message);
+                showToast("❌ Error al generar PDF: " + err.message, "error");
+                alert("Error al generar el PDF:\n" + err.message + "\n\nRevise la consola del navegador para más detalles.");
             } finally {
-                btn.innerHTML = textoOriginal;
-                btn.disabled = false;
+                if (btn) { btn.innerHTML = textoOriginal; btn.disabled = false; }
             }
         }
 
         // 9. IMPRESIÓN DIRECTA OFICIAL DE ALTA RESOLUCIÓN
         async function imprimirVistaPreviaDirecta() {
-            showToast("Preparando documento para impresión...", "info");
+            showToast("⏳ Preparando documento para impresión...", "info");
             try {
                 const doc = await construirDocumentoPDF();
                 if (doc) {
                     doc.autoPrint();
                     const blobUrl = doc.output('bloburl');
 
-                    // Crear iframe invisible para lanzar el cuadro de impresión nativo del navegador
-                    let printFrame = document.getElementById('memoPrintIframe');
-                    if (!printFrame) {
-                        printFrame = document.createElement('iframe');
-                        printFrame.id = 'memoPrintIframe';
-                        printFrame.style.position = 'fixed';
-                        printFrame.style.right = '0';
-                        printFrame.style.bottom = '0';
-                        printFrame.style.width = '0';
-                        printFrame.style.height = '0';
-                        printFrame.style.border = '0';
-                        document.body.appendChild(printFrame);
-                    }
-                    printFrame.src = blobUrl;
-                    printFrame.onload = function () {
-                        try {
-                            printFrame.contentWindow.focus();
-                            printFrame.contentWindow.print();
-                        } catch (e) {
-                            window.open(blobUrl, '_blank');
+                    // Intentar abrir en nueva ventana para imprimir (más compatible)
+                    const ventana = window.open(blobUrl, '_blank');
+                    if (ventana) {
+                        showToast("✅ PDF abierto en nueva pestaña - use Ctrl+P para imprimir.", "success");
+                    } else {
+                        // Fallback: iframe invisible
+                        let printFrame = document.getElementById('memoPrintIframe');
+                        if (!printFrame) {
+                            printFrame = document.createElement('iframe');
+                            printFrame.id = 'memoPrintIframe';
+                            printFrame.style.position = 'fixed';
+                            printFrame.style.right = '0';
+                            printFrame.style.bottom = '0';
+                            printFrame.style.width = '0';
+                            printFrame.style.height = '0';
+                            printFrame.style.border = '0';
+                            document.body.appendChild(printFrame);
                         }
-                    };
+                        printFrame.src = blobUrl;
+                        printFrame.onload = function () {
+                            try {
+                                printFrame.contentWindow.focus();
+                                printFrame.contentWindow.print();
+                            } catch (e) {
+                                showToast("Active las ventanas emergentes o use el botón de PDF.", "warning");
+                            }
+                        };
+                    }
                     return;
                 }
             } catch (err) {
-                console.warn("Fallo impresión por PDF blob, usando impresión de ventana:", err);
+                console.warn("Fallo impresión por PDF blob:", err);
+                showToast("❌ Error al preparar impresión: " + err.message, "error");
             }
-            window.print();
         }
 
         // 10. PERSISTENCIA EN FIRESTORE Y BITÁCORA DEL SISTEMA
