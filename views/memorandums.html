@@ -1298,7 +1298,8 @@
         // Estado Global del Módulo
         let memorandumsGlobal = [];
         let memorandoEnEdicionId = null;
-        let dbFirestore = null;
+        // Usar la instancia de Firestore del firebase-config.js global (no redeclarar)
+        let _memoDb = null;
 
         // Función para resolver el constructor jsPDF de forma universal
         function obtenerConstructorJsPDF() {
@@ -1426,7 +1427,7 @@
                 }
             });
 
-            let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 53 : 1);
+            let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 59 : 1);
 
             const numInput = document.getElementById('inputNumeroCorrelativo');
             if (numInput) numInput.value = siguiente;
@@ -2097,51 +2098,108 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         }
 
         // 10. PERSISTENCIA EN FIRESTORE Y BITÁCORA DEL SISTEMA
-        function conectarFirebaseYEscuchar() {
-            if (typeof firebase === 'undefined') {
-                console.warn("Firebase SDK no cargado todavía.");
-                cargarHistorialLocalStorage();
-                return;
-            }
-
-            firebase.auth().onAuthStateChanged((user) => {
-                if (user) {
-                    const labelUser = document.getElementById('labelLoggedUser');
-                    if (labelUser) labelUser.textContent = user.displayName || user.email;
-                } else {
-                    let localUser = 'Personal ENAG';
-                    try {
-                        localUser = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || 'Personal ENAG';
-                    } catch (e) {}
-                    const labelUser = document.getElementById('labelLoggedUser');
-                    if (labelUser) labelUser.textContent = localUser;
-                }
-
+        function obtenerDB() {
+            // Reutilizar instancia global de firebase-config.js si está disponible
+            if (_memoDb) return _memoDb;
+            if (typeof firebase !== 'undefined') {
                 try {
-                    dbFirestore = firebase.firestore();
-                    escucharMemorandumsFirestore();
-                } catch (e) {
-                    console.error("Error conectando Firestore:", e);
-                    cargarHistorialLocalStorage();
-                }
-            });
+                    _memoDb = firebase.firestore();
+                    return _memoDb;
+                } catch(e) {}
+            }
+            return null;
         }
 
-        function escucharMemorandumsFirestore() {
-            if (!dbFirestore) return;
+        function conectarFirebaseYEscuchar() {
+            // Intentar cargar inmediatamente desde Firestore (no esperar auth para leer)
+            const db = obtenerDB();
+            if (db) {
+                escucharMemorandumsFirestore(db);
+            } else {
+                // Firebase no está listo aún, esperar 1.5s y reintentar
+                setTimeout(() => {
+                    const db2 = obtenerDB();
+                    if (db2) {
+                        escucharMemorandumsFirestore(db2);
+                    } else {
+                        cargarHistorialLocalStorage();
+                    }
+                }, 1500);
+            }
 
-            dbFirestore.collection('memorandums').orderBy('timestamp', 'desc').limit(200)
-                .onSnapshot((snapshot) => {
-                    const lista = [];
-                    snapshot.forEach((doc) => {
-                        lista.push({ id: doc.id, ...doc.data() });
-                    });
-                    memorandumsGlobal = lista;
-                    actualizarEstadisticasYTabla();
-                }, (err) => {
-                    console.warn("Fallo lectura en tiempo real de Firestore, usando LocalStorage:", err);
-                    cargarHistorialLocalStorage();
+            // Actualizar nombre de usuario en la UI cuando haya sesión
+            if (typeof firebase !== 'undefined') {
+                firebase.auth().onAuthStateChanged((user) => {
+                    const labelUser = document.getElementById('labelLoggedUser');
+                    if (user) {
+                        if (labelUser) labelUser.textContent = user.displayName || user.email;
+                    } else {
+                        let localUser = 'Personal ENAG';
+                        try {
+                            localUser = localStorage.getItem('usuarioNombre') ||
+                                        localStorage.getItem('usuarioLogueado') ||
+                                        localStorage.getItem('enag_username') || 'Personal ENAG';
+                        } catch (e) {}
+                        if (labelUser) labelUser.textContent = localUser;
+                    }
                 });
+            }
+        }
+
+        function escucharMemorandumsFirestore(db) {
+            if (!db) return;
+            try {
+                db.collection('memorandums').orderBy('timestamp', 'desc').limit(200)
+                    .onSnapshot((snapshot) => {
+                        const lista = [];
+                        snapshot.forEach((doc) => {
+                            lista.push({ id: doc.id, ...doc.data() });
+                        });
+                        memorandumsGlobal = lista;
+                        actualizarEstadisticasYTabla();
+                        // Sugerir siguiente correlativo con datos frescos
+                        sugerirSiguienteCorrelativo();
+                    }, (err) => {
+                        console.warn("Fallo lectura en tiempo real de Firestore:", err.code, err.message);
+                        // Si es error de permisos, intentar con get() directo
+                        if (err.code === 'permission-denied') {
+                            cargarHistorialFirestoreGet(db);
+                        } else {
+                            cargarHistorialLocalStorage();
+                        }
+                    });
+            } catch(e) {
+                console.warn("Error al suscribir onSnapshot:", e);
+                cargarHistorialLocalStorage();
+            }
+        }
+
+        // Fallback: cargar con get() en vez de onSnapshot (para entornos con auth requerida)
+        async function cargarHistorialFirestoreGet(db) {
+            try {
+                const snap = await db.collection('memorandums').orderBy('timestamp', 'desc').limit(200).get();
+                const lista = [];
+                snap.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
+                memorandumsGlobal = lista;
+                actualizarEstadisticasYTabla();
+                sugerirSiguienteCorrelativo();
+            } catch(e) {
+                console.warn("Fallo get() Firestore, usando localStorage:", e);
+                cargarHistorialLocalStorage();
+            }
+        }
+
+        // Alias para el botón "Actualizar" del historial
+        function cargarHistorialDesdeFirestore() {
+            const db = obtenerDB();
+            if (db) {
+                cargarHistorialFirestoreGet(db).then(() => {
+                    showToast("✅ Historial actualizado desde Firestore.", "success");
+                });
+            } else {
+                cargarHistorialLocalStorage();
+                showToast("⚠️ Sin conexión a Firestore. Mostrando datos locales.", "warning");
+            }
         }
 
         async function guardarMemorandoEnFirestore() {
@@ -2202,12 +2260,16 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 };
 
                 const docId = memorandoEnEdicionId || `${prefijo}-${num}-${sufijo}`;
+                const db = obtenerDB();
 
-                if (dbFirestore) {
-                    await dbFirestore.collection('memorandums').doc(docId).set({
+                if (db) {
+                    await db.collection('memorandums').doc(docId).set({
                         ...memoData,
                         timestamp: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
+                    showToast(`✅ ¡Memorándum ${codigo} guardado en Firestore!`, "success");
+                } else {
+                    showToast("⚠️ Sin Firestore. Guardado solo localmente.", "warning");
                 }
 
                 guardarRespaldoLocal(docId, memoData);
@@ -2217,11 +2279,10 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 }
 
                 memorandoEnEdicionId = docId;
-                showToast(`¡Memorándum ${codigo} guardado exitosamente!`, "success");
                 actualizarEstadisticasYTabla();
             } catch (error) {
                 console.error("Error guardando memorándum:", error);
-                showToast("Error al guardar: " + error.message, "error");
+                showToast("❌ Error al guardar: " + error.message, "error");
             } finally {
                 if (btn) btn.disabled = false;
             }
@@ -2404,8 +2465,9 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             }
 
             try {
-                if (dbFirestore) {
-                    await dbFirestore.collection('memorandums').doc(id).delete();
+                const db = obtenerDB();
+                if (db) {
+                    await db.collection('memorandums').doc(id).delete();
                 }
 
                 memorandumsGlobal = memorandumsGlobal.filter(item => item.id !== id);

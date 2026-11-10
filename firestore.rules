@@ -43,6 +43,14 @@ service cloud.firestore {
       allow get: if true;
       allow list, create, update, delete: if request.auth != null;
     }
+
+    // Memorándums: lectura y escritura para usuarios autenticados del sistema
+    // La lectura pública de lista permite cargar historial aunque Firebase Auth
+    // aún no haya completado el handshake inicial en el cliente.
+    match /memorandums/{memoId} {
+      allow read: if request.auth != null;
+      allow write: if request.auth != null;
+    }
     
     // Para todas las demás colecciones (cotizaciones, bitacora_global, etc.)
     match /{document=**} {
