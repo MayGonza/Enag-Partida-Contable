@@ -67,6 +67,7 @@
                 opacity: 0;
                 transform: translateY(12px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -687,6 +688,7 @@
                 opacity: 0;
                 transform: translateY(15px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -703,12 +705,14 @@
                 <img src="../assets/logo.jpeg" alt="Logo ENAG" class="header-logo-img">
                 <div class="header-text">
                     <h1>Departamento de Informática — Reportes Técnicos</h1>
-                    <p>Emisión oficial de reportes técnicos para revisión, descargo y soporte de bienes y equipos de cómputo.</p>
+                    <p>Emisión oficial de reportes técnicos para revisión, descargo y soporte de bienes y equipos de
+                        cómputo.</p>
                 </div>
             </div>
             <div class="header-stats-group">
                 <span class="stat-badge" id="badgeTotalReportes">📁 0 Reportes</span>
-                <span class="stat-badge" id="badgeUltimoNumero" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">
+                <span class="stat-badge" id="badgeUltimoNumero"
+                    style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">
                     🔢 Último: N/A
                 </span>
                 <span class="stat-badge" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0;">
@@ -726,27 +730,40 @@
                     <h3 class="card-title">
                         <div><span class="badge-num">1</span> Control y Numeración del Reporte</div>
                         <div style="display:flex; gap:6px;">
-                            <button type="button" class="btn-tool" onclick="cargarEjemploFoto()" title="Cargar ejemplo exacto de la foto (UPS Vertiv Liebert)">
+                            <button type="button" class="btn-tool" onclick="cargarEjemploFoto()"
+                                title="Cargar ejemplo exacto de la foto (UPS Vertiv Liebert)">
                                 ⚡ Cargar Foto (Ejemplo)
                             </button>
-                            <button type="button" class="btn-tool" onclick="sugerirSiguienteNumero()" title="Recalcular siguiente número correlativo">
+                            <button type="button" class="btn-tool" onclick="sugerirSiguienteNumero()"
+                                title="Recalcular siguiente número correlativo">
                                 🔄 Siguiente No.
                             </button>
                         </div>
                     </h3>
 
-                    <div class="form-row" style="grid-template-columns: 140px 1fr 1fr;">
+                    <div class="form-row" style="grid-template-columns: 180px 140px 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="selectFormatoCorrelativo">Formato Correlativo</label>
+                            <select id="selectFormatoCorrelativo" class="form-control" onchange="sugerirSiguienteNumero()">
+                                <option value="con_rt" selected>RT YYYY-NN (RT 2026-11)</option>
+                                <option value="sin_rt">YYYY-NN (2026-11)</option>
+                            </select>
+                        </div>
                         <div class="form-group">
                             <label for="inputNumero">No. Correlativo <span class="req">*</span></label>
-                            <input type="text" id="inputNumero" class="form-control" placeholder="Ej: 2026-10" value="2026-10" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputNumero" class="form-control" placeholder="Ej: RT 2026-11"
+                                value="RT 2026-11" oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputFecha">Fecha del Reporte <span class="req">*</span></label>
-                            <input type="text" id="inputFecha" class="form-control" placeholder="DD/MM/AAAA" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputFecha" class="form-control" placeholder="DD/MM/AAAA"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputElaboradoPor">Elaborado por <span class="req">*</span></label>
-                            <input type="text" id="inputElaboradoPor" class="form-control" placeholder="Nombre del Técnico" value="Wilson Tinoco" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputElaboradoPor" class="form-control"
+                                placeholder="Nombre del Técnico" value="Wilson Tinoco"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
                 </div>
@@ -759,11 +776,14 @@
                     <div class="form-row" style="grid-template-columns: 1.2fr 1fr;">
                         <div class="form-group">
                             <label for="inputResponsable">Responsable del Bien <span class="req">*</span></label>
-                            <input type="text" id="inputResponsable" class="form-control" placeholder="Ej: Rony Oseguera" value="Rony Oseguera" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputResponsable" class="form-control"
+                                placeholder="Ej: Rony Oseguera" value="Rony Oseguera" oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputDepartamento">Departamento <span class="req">*</span></label>
-                            <input type="text" id="inputDepartamento" class="form-control" placeholder="Ej: Bienes Nacionales" value="Bienes Nacionales" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputDepartamento" class="form-control"
+                                placeholder="Ej: Bienes Nacionales" value="Bienes Nacionales"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
                 </div>
@@ -772,30 +792,38 @@
                 <div class="form-card">
                     <h3 class="card-title">
                         <div><span class="badge-num">3</span> Especificaciones y Ficha del Equipo</div>
-                        <button type="button" class="btn-tool btn-tool-primary" onclick="buscarEnBienesNacionales()" title="Autocompletar datos desde el inventario de Bienes Nacionales">
+                        <button type="button" class="btn-tool btn-tool-primary" onclick="buscarEnBienesNacionales()"
+                            title="Autocompletar datos desde el inventario de Bienes Nacionales">
                             🔍 Buscar en Bienes Nacionales
                         </button>
                     </h3>
 
                     <div class="form-group" style="margin-bottom:12px;">
                         <label for="inputDescripcion">Descripción de Equipo <span class="req">*</span></label>
-                        <input type="text" id="inputDescripcion" class="form-control" placeholder="Ej: UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro" value="UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro" oninput="actualizarVistaPrevia()">
+                        <input type="text" id="inputDescripcion" class="form-control"
+                            placeholder="Ej: UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro"
+                            value="UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro"
+                            oninput="actualizarVistaPrevia()">
                     </div>
 
                     <div class="form-row" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
                             <label for="inputSerie">Serie No.</label>
-                            <input type="text" id="inputSerie" class="form-control" placeholder="Ej: 322009500305" value="322009500305" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputSerie" class="form-control" placeholder="Ej: 322009500305"
+                                value="322009500305" oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputInventario">Inventario No.</label>
-                            <input type="text" id="inputInventario" class="form-control" placeholder="Ej: 4004004" value="4004004" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputInventario" class="form-control" placeholder="Ej: 4004004"
+                                value="4004004" oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
                     <div class="form-group" style="margin-top:4px;">
                         <label for="inputProblema">Problema Reportado <span class="req">*</span></label>
-                        <input type="text" id="inputProblema" class="form-control" placeholder="Ej: No funciona / No enciende / Falla en disco" value="No funciona" oninput="actualizarVistaPrevia()">
+                        <input type="text" id="inputProblema" class="form-control"
+                            placeholder="Ej: No funciona / No enciende / Falla en disco" value="No funciona"
+                            oninput="actualizarVistaPrevia()">
                     </div>
                 </div>
 
@@ -815,12 +843,16 @@
 
                     <div class="form-group">
                         <label for="textareaDiagnostico">Diagnóstico Detallado <span class="req">*</span></label>
-                        <textarea id="textareaDiagnostico" class="form-control" placeholder="Escriba el diagnóstico del técnico, componentes evaluados y dictamen..." oninput="actualizarVistaPrevia()">Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará solicitud de descargo al departamento de Bienes Nacionales.</textarea>
+                        <textarea id="textareaDiagnostico" class="form-control"
+                            placeholder="Escriba el diagnóstico del técnico, componentes evaluados y dictamen..."
+                            oninput="actualizarVistaPrevia()">Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará solicitud de descargo al departamento de Bienes Nacionales.</textarea>
                     </div>
 
                     <div class="form-group" style="margin-top:10px;">
                         <label for="inputUltimaLinea">Texto Separador de Cierre</label>
-                        <input type="text" id="inputUltimaLinea" class="form-control" value="-------------------------------- Ultima Linea --------------------------------" oninput="actualizarVistaPrevia()">
+                        <input type="text" id="inputUltimaLinea" class="form-control"
+                            value="-------------------------------- Ultima Linea --------------------------------"
+                            oninput="actualizarVistaPrevia()">
                     </div>
                 </div>
 
@@ -833,47 +865,56 @@
                     <div class="form-row" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
                             <label for="inputFirma1">Firma 1 (Izquierda Superior)</label>
-                            <input type="text" id="inputFirma1" class="form-control" value="Firma Responsable del Bien" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputFirma1" class="form-control" value="Firma Responsable del Bien"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputFirma2">Firma 2 (Derecha Superior)</label>
-                            <input type="text" id="inputFirma2" class="form-control" value="Firma Técnico de Informática" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputFirma2" class="form-control"
+                                value="Firma Técnico de Informática" oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
                     <div class="form-row" style="grid-template-columns: 1fr 1fr;">
                         <div class="form-group">
                             <label for="inputFirma3">Firma 3 (Izquierda Inferior)</label>
-                            <input type="text" id="inputFirma3" class="form-control" value="V.B. Sub-Gerente Administrativo" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputFirma3" class="form-control"
+                                value="V.B. Sub-Gerente Administrativo" oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputFirma4">Firma 4 (Derecha Inferior)</label>
-                            <input type="text" id="inputFirma4" class="form-control" value="Firma Jefe de Informática" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputFirma4" class="form-control" value="Firma Jefe de Informática"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
                     <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr; margin-top:8px;">
                         <div class="form-group">
                             <label for="inputCopia1">Original</label>
-                            <input type="text" id="inputCopia1" class="form-control" value="Original: Bienes Nacionales" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputCopia1" class="form-control" value="Original: Bienes Nacionales"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputCopia2">Copia 1</label>
-                            <input type="text" id="inputCopia2" class="form-control" value="c.c. Archivo" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputCopia2" class="form-control" value="c.c. Archivo"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputCopia3">Copia 2</label>
-                            <input type="text" id="inputCopia3" class="form-control" value="c.c. Responsable del Bien" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputCopia3" class="form-control" value="c.c. Responsable del Bien"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
                 </div>
 
                 <!-- BARRA FIJA DE ACCIONES -->
                 <div class="form-actions-bar">
-                    <button type="button" class="btn-action btn-primary-action" onclick="generarPDFReporteTecnico()" id="btnDescargarPDF">
+                    <button type="button" class="btn-action btn-primary-action" onclick="generarPDFReporteTecnico()"
+                        id="btnDescargarPDF">
                         <span>📄</span> Descargar PDF Oficial
                     </button>
-                    <button type="button" class="btn-action btn-save-action" onclick="guardarReporteEnFirestore()" id="btnGuardarRT">
+                    <button type="button" class="btn-action btn-save-action" onclick="guardarReporteEnFirestore()"
+                        id="btnGuardarRT">
                         <span>💾</span> Guardar en BD
                     </button>
                     <button type="button" class="btn-action btn-outline-action" onclick="imprimirReporteTecnico()">
@@ -901,9 +942,9 @@
                         </div>
 
                         <!-- CAMPOS CON PÍLDORAS -->
-                        <div class="rt-field-row" style="max-width: 200px;">
+                        <div class="rt-field-row" style="max-width: 240px;">
                             <span class="rt-label">No.:</span>
-                            <div class="rt-pill-box centered" id="prevNo">2026-10</div>
+                            <div class="rt-pill-box centered" id="prevNo">RT 2026-11</div>
                         </div>
 
                         <div class="rt-field-row">
@@ -922,7 +963,8 @@
 
                         <div class="rt-field-row">
                             <span class="rt-label">Descripción de Equipo:</span>
-                            <div class="rt-pill-box centered" id="prevDescripcion">UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro</div>
+                            <div class="rt-pill-box centered" id="prevDescripcion">UPS 850VA, Marca: Vertiv, Modelo No.:
+                                Liebert PSL850, Color: Negro</div>
                         </div>
 
                         <div class="rt-field-row">
@@ -941,7 +983,8 @@
                         <div class="rt-diagnostico-container">
                             <div class="rt-diagnostico-title">Diagnóstico:</div>
                             <div class="rt-diagnostico-body" id="prevDiagnostico">
-                                Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará solicitud de descargo al departamento de Bienes Nacionales.
+                                Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará
+                                solicitud de descargo al departamento de Bienes Nacionales.
                             </div>
                             <div class="rt-ultima-linea" id="prevUltimaLinea">
                                 -------------------------------- Ultima Linea --------------------------------
@@ -986,11 +1029,15 @@
                     📋 Historial de Reportes Técnicos Emitidos
                 </h3>
                 <div style="display:flex; gap:10px; align-items:center;">
-                    <input type="text" id="filtroBusqueda" class="history-search-input" placeholder="🔍 Buscar por No., serie, inventario o persona..." oninput="filtrarHistorialReportes()">
-                    <button type="button" class="btn-tool" onclick="exportarHistorialExcel()" title="Descargar en Excel">
+                    <input type="text" id="filtroBusqueda" class="history-search-input"
+                        placeholder="🔍 Buscar por No., serie, inventario o persona..."
+                        oninput="filtrarHistorialReportes()">
+                    <button type="button" class="btn-tool" onclick="exportarHistorialExcel()"
+                        title="Descargar en Excel">
                         📊 Excel
                     </button>
-                    <button type="button" class="btn-tool" onclick="cargarHistorialDesdeFirestore()" title="Refrescar lista">
+                    <button type="button" class="btn-tool" onclick="cargarHistorialDesdeFirestore()"
+                        title="Refrescar lista">
                         🔄 Refrescar
                     </button>
                 </div>
@@ -1075,7 +1122,7 @@
                 try {
                     _rtDb = firebase.firestore();
                     return _rtDb;
-                } catch(e) {}
+                } catch (e) { }
             }
             return null;
         }
@@ -1084,6 +1131,7 @@
         document.addEventListener('DOMContentLoaded', () => {
             inicializarFechaHoy();
             cargarUsuarioSesion();
+            sugerirSiguienteNumero();
             conectarFirebaseYEscuchar();
             actualizarVistaPrevia();
         });
@@ -1106,7 +1154,7 @@
                     const elaborado = document.getElementById('inputElaboradoPor');
                     if (elaborado && !elaborado.value) elaborado.value = userNombre;
                 }
-            } catch(e) {}
+            } catch (e) { }
         }
 
         function cargarEjemploFoto() {
@@ -1176,7 +1224,7 @@
                 } else {
                     showToast("No se encontró ningún bien con ese número o serie.", "warning");
                 }
-            } catch(e) {
+            } catch (e) {
                 console.error("Error buscando bien:", e);
                 showToast("Error al consultar Bienes Nacionales: " + e.message, "error");
             }
@@ -1186,20 +1234,26 @@
             const anioActual = new Date().getFullYear();
             let maxSecuencia = 0;
             reportesGlobal.forEach(r => {
-                const parts = (r.numero || '').split('-');
+                const str = (r.numero || '').trim();
+                const clean = str.replace(/^RT\s*[-]?\s*/i, '');
+                const parts = clean.split('-');
                 if (parts.length === 2 && parts[0] == anioActual) {
                     const sec = parseInt(parts[1], 10);
                     if (!isNaN(sec) && sec > maxSecuencia) maxSecuencia = sec;
                 }
             });
-            const sig = maxSecuencia > 0 ? (maxSecuencia + 1) : 10;
-            document.getElementById('inputNumero').value = `${anioActual}-${sig}`;
+            // Si no hay reportes o la secuencia es menor a 11, arrancamos en 11 (según correlativo actual)
+            const sig = maxSecuencia >= 11 ? (maxSecuencia + 1) : 11;
+            const formato = document.getElementById('selectFormatoCorrelativo') ? document.getElementById('selectFormatoCorrelativo').value : 'con_rt';
+            const numFinal = (formato === 'sin_rt') ? `${anioActual}-${sig}` : `RT ${anioActual}-${sig}`;
+            const inp = document.getElementById('inputNumero');
+            if (inp) inp.value = numFinal;
             actualizarVistaPrevia();
         }
 
         // Actualizar vista previa
         function actualizarVistaPrevia() {
-            const noVal = document.getElementById('inputNumero').value.trim() || '2026-10';
+            const noVal = document.getElementById('inputNumero').value.trim() || 'RT 2026-11';
             const fechaVal = document.getElementById('inputFecha').value.trim() || '30/10/2026';
             const elabVal = document.getElementById('inputElaboradoPor').value.trim() || 'Wilson Tinoco';
             const respVal = document.getElementById('inputResponsable').value.trim() || 'Rony Oseguera';
@@ -1303,8 +1357,9 @@
             };
 
             // Fila 1: No.
-            const noVal = document.getElementById('inputNumero').value.trim();
-            dibujarCampoPildora("No.:", noVal, ml, curY, 48, 12, true);
+            const noVal = document.getElementById('inputNumero').value.trim() || 'RT 2026-11';
+            const anchoPillNo = noVal.length > 8 ? 54 : 46;
+            dibujarCampoPildora("No.:", noVal, ml, curY, anchoPillNo, 11, true);
             curY += 8.2;
 
             // Fila 2: Fecha | Elaborado por:
@@ -1497,7 +1552,7 @@
                         let localUser = 'Personal ENAG';
                         try {
                             localUser = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || 'Personal ENAG';
-                        } catch (e) {}
+                        } catch (e) { }
                         if (labelUser) labelUser.textContent = localUser;
                     }
                 });
@@ -1512,11 +1567,14 @@
                         snapshot.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
                         reportesGlobal = lista;
                         actualizarEstadisticasYTabla();
+                        if (!reporteEnEdicionId) {
+                            sugerirSiguienteNumero();
+                        }
                     }, (err) => {
                         console.warn("Fallo onSnapshot reportes_tecnicos:", err);
                         cargarHistorialFirestoreGet(db);
                     });
-            } catch(e) {
+            } catch (e) {
                 console.warn("Error suscribiendo reportes:", e);
                 cargarHistorialLocalStorage();
             }
@@ -1529,7 +1587,10 @@
                 snap.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
                 reportesGlobal = lista;
                 actualizarEstadisticasYTabla();
-            } catch(e) {
+                if (!reporteEnEdicionId) {
+                    sugerirSiguienteNumero();
+                }
+            } catch (e) {
                 cargarHistorialLocalStorage();
             }
         }
@@ -1628,7 +1689,7 @@
                 if (idx >= 0) local[idx] = { id, ...data };
                 else local.unshift({ id, ...data });
                 localStorage.setItem('enag_reportes_tecnicos_local', JSON.stringify(local));
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function cargarHistorialLocalStorage() {
@@ -1636,7 +1697,7 @@
                 const local = JSON.parse(localStorage.getItem('enag_reportes_tecnicos_local') || '[]');
                 reportesGlobal = local;
                 actualizarEstadisticasYTabla();
-            } catch (e) {}
+            } catch (e) { }
         }
 
         function actualizarEstadisticasYTabla() {
@@ -1766,7 +1827,7 @@
                 reportesGlobal = reportesGlobal.filter(item => item.id !== id);
                 try {
                     localStorage.setItem('enag_reportes_tecnicos_local', JSON.stringify(reportesGlobal));
-                } catch (e) {}
+                } catch (e) { }
 
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Informática', 'Eliminar Reporte Técnico', `Se eliminó el reporte ${num}`);
