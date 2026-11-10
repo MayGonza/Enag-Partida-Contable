@@ -1079,10 +1079,18 @@
                         <textarea id="textareaCuerpo" class="form-control" placeholder="Escriba aquí los párrafos explicativos, requerimientos, solicitudes o viñetas..." oninput="actualizarVistaPrevia()"></textarea>
                     </div>
 
-                    <div class="form-row" style="margin-top:14px; grid-template-columns: 1fr 1fr;">
+                    <div class="form-row" style="margin-top:14px; grid-template-columns: 1fr 1fr 1fr;">
                         <div class="form-group">
                             <label for="inputDespedida">Despedida Formal</label>
                             <input type="text" id="inputDespedida" class="form-control" value="Atentamente," oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="selectTamanoLetra">Tamaño de Letra</label>
+                            <select id="selectTamanoLetra" class="form-control" onchange="actualizarVistaPrevia()">
+                                <option value="pequeno" selected>Pequeña (8.5 pt) - Membrete Completo</option>
+                                <option value="muy_pequeno">Muy Pequeña (7.5 pt) - Textos Extensos</option>
+                                <option value="mediano">Mediana (9.5 pt)</option>
+                            </select>
                         </div>
                         <div class="form-group">
                             <label for="selectEspacioFirma">Espacio para Firma</label>
@@ -1668,6 +1676,21 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 }
             }
 
+            const tamanoSelect = document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'pequeno';
+            const contenedorCuerpo = document.getElementById('prevCuerpoDinamico');
+            if (contenedorCuerpo) {
+                if (tamanoSelect === 'muy_pequeno') {
+                    contenedorCuerpo.style.fontSize = '0.72em';
+                    contenedorCuerpo.style.lineHeight = '1.32';
+                } else if (tamanoSelect === 'mediano') {
+                    contenedorCuerpo.style.fontSize = '0.86em';
+                    contenedorCuerpo.style.lineHeight = '1.45';
+                } else {
+                    contenedorCuerpo.style.fontSize = '0.78em';
+                    contenedorCuerpo.style.lineHeight = '1.38';
+                }
+            }
+
             const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
             const prevDesp = document.getElementById('prevDespedida');
             if (prevDesp) prevDesp.textContent = despedida;
@@ -1739,12 +1762,30 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 doc.addImage(bgPapelUrl, 'PNG', 0, 0, pageWidth, pageHeight);
             }
 
+            // Tamaño de letra seleccionado
+            const tamanoSelect = document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'pequeno';
+            let fontSizeCuerpo = 8.5;
+            let lineHeightCuerpo = 3.8;
+            let fontSizeMeta = 8.5;
+            let metaLineH = 4.0;
+            if (tamanoSelect === 'muy_pequeno') {
+                fontSizeCuerpo = 7.5;
+                lineHeightCuerpo = 3.3;
+                fontSizeMeta = 8.0;
+                metaLineH = 3.6;
+            } else if (tamanoSelect === 'mediano') {
+                fontSizeCuerpo = 9.5;
+                lineHeightCuerpo = 4.4;
+                fontSizeMeta = 9.0;
+                metaLineH = 4.3;
+            }
+
             // 2. Título Central: MEMORANDO {PREFIJO}-{NUMERO}-{SUFIJO}
             const codigoCompleto = construirCodigoCompleto();
             doc.setFont('times', 'bold');
-            doc.setFontSize(15);
+            doc.setFontSize(13.5);
             doc.setTextColor(15, 23, 42);
-            doc.text(codigoCompleto, pageWidth / 2, 45, { align: 'center' });
+            doc.text(codigoCompleto, pageWidth / 2, 43, { align: 'center' });
 
             // 3. Reglas horizontales y Márgenes
             const margenIzq = 22;
@@ -1752,11 +1793,11 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             const anchoUtil = margenDer - margenIzq; // 171.9 mm
 
             doc.setDrawColor(0, 0, 0);
-            doc.setLineWidth(1.1);
-            doc.line(margenIzq, 53, margenDer, 53);
+            doc.setLineWidth(1.0);
+            doc.line(margenIzq, 49, margenDer, 49);
 
             // 4. Bloque de Encabezado: PARA, DE, FECHA, ASUNTO
-            let curY = 59;
+            let curY = 54;
             const colEtiqueta = margenIzq;
             const colValor = margenIzq + 20;
             const valorWidth = anchoUtil - 20;
@@ -1770,79 +1811,79 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             // Fila PARA:
             doc.setFont('times', 'bold');
-            doc.setFontSize(10);
+            doc.setFontSize(fontSizeMeta);
             doc.setTextColor(0, 0, 0);
             doc.text("PARA:", colEtiqueta, curY);
 
             doc.setFont('times', 'normal');
             doc.text(paraNombre, colValor, curY);
-            curY += 4.5;
+            curY += metaLineH;
 
             if (paraCargo) {
                 doc.setFont('times', 'italic');
-                doc.setFontSize(8.8);
+                doc.setFontSize(fontSizeMeta - 1);
                 doc.setTextColor(70, 70, 70);
                 doc.text(paraCargo, colValor, curY);
-                curY += 6;
+                curY += (metaLineH + 1.2);
             } else {
-                curY += 3;
+                curY += 2;
             }
 
             // Fila DE:
             doc.setFont('times', 'bold');
-            doc.setFontSize(10);
+            doc.setFontSize(fontSizeMeta);
             doc.setTextColor(0, 0, 0);
             doc.text("DE:", colEtiqueta, curY);
 
             doc.setFont('times', 'normal');
             doc.text(deNombre, colValor, curY);
-            curY += 4.5;
+            curY += metaLineH;
 
             if (deCargo) {
                 doc.setFont('times', 'italic');
-                doc.setFontSize(8.8);
+                doc.setFontSize(fontSizeMeta - 1);
                 doc.setTextColor(70, 70, 70);
                 doc.text(deCargo, colValor, curY);
-                curY += 6;
+                curY += (metaLineH + 1.2);
             } else {
-                curY += 3;
+                curY += 2;
             }
 
             // Fila FECHA:
             doc.setFont('times', 'bold');
-            doc.setFontSize(10);
+            doc.setFontSize(fontSizeMeta);
             doc.setTextColor(0, 0, 0);
             doc.text("FECHA:", colEtiqueta, curY);
 
             doc.setFont('times', 'normal');
             doc.text(fechaTexto, colValor, curY);
-            curY += 6;
+            curY += metaLineH + 1;
 
             // Fila ASUNTO:
             doc.setFont('times', 'bold');
-            doc.setFontSize(10);
+            doc.setFontSize(fontSizeMeta);
             doc.setTextColor(0, 0, 0);
             doc.text("ASUNTO:", colEtiqueta, curY);
 
             doc.setFont('times', 'bold');
             const asuntoLines = doc.splitTextToSize(asuntoTexto, valorWidth);
             doc.text(asuntoLines, colValor, curY);
-            curY += (asuntoLines.length * 4.5) + 3;
+            curY += (asuntoLines.length * metaLineH) + 2;
 
             // 5. Regla horizontal inferior
             doc.setDrawColor(0, 0, 0);
-            doc.setLineWidth(1.1);
+            doc.setLineWidth(1.0);
             doc.line(margenIzq, curY, margenDer, curY);
-            curY += 9;
+            curY += 7;
 
             // 6. Saludo
             const saludo = document.getElementById('inputSaludo').value.trim();
             if (saludo) {
                 doc.setFont('times', 'normal');
-                doc.setFontSize(10);
+                doc.setFontSize(fontSizeCuerpo);
                 doc.setTextColor(0, 0, 0);
                 doc.text(saludo, margenIzq, curY);
-                curY += 7.5;
+                curY += (lineHeightCuerpo + 2.5);
             }
 
             // 7. Cuerpo del Memorando (Párrafos y Viñetas) — Times New Roman
@@ -1851,7 +1892,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             let parrafoBuffer = [];
 
             doc.setFont('times', 'normal');
-            doc.setFontSize(10);
+            doc.setFontSize(fontSizeCuerpo);
             doc.setTextColor(20, 20, 20);
 
             const imprimirParrafoAcumulado = () => {
@@ -1859,7 +1900,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 const parrafoStr = parrafoBuffer.join(' ');
                 const lines = doc.splitTextToSize(parrafoStr, anchoUtil);
                 doc.text(lines, margenIzq, curY);
-                curY += (lines.length * 4.8) + 4;
+                curY += (lines.length * lineHeightCuerpo) + 3;
                 parrafoBuffer = [];
             };
 
@@ -1868,12 +1909,12 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 if (/^[-*•]\s+/.test(l)) {
                     imprimirParrafoAcumulado();
                     const bulletText = l.replace(/^[-*•]\s+/, '');
-                    const bulletLines = doc.splitTextToSize(bulletText, anchoUtil - 12);
+                    const bulletLines = doc.splitTextToSize(bulletText, anchoUtil - 10);
                     doc.setFont('times', 'bold');
-                    doc.text("-", margenIzq + 4, curY);
+                    doc.text("-", margenIzq + 3, curY);
                     doc.setFont('times', 'normal');
-                    doc.text(bulletLines, margenIzq + 8, curY);
-                    curY += (bulletLines.length * 4.8) + 1.5;
+                    doc.text(bulletLines, margenIzq + 7, curY);
+                    curY += (bulletLines.length * lineHeightCuerpo) + 1.2;
                 } else if (l === '') {
                     imprimirParrafoAcumulado();
                 } else {
@@ -1883,41 +1924,56 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             imprimirParrafoAcumulado();
 
             // 8. Despedida
-            curY += 3;
+            curY += 2;
+            const tamanoSelect = document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'pequeno';
+            const contenedorCuerpo = document.getElementById('prevCuerpoDinamico');
+            if (contenedorCuerpo) {
+                if (tamanoSelect === 'muy_pequeno') {
+                    contenedorCuerpo.style.fontSize = '0.72em';
+                    contenedorCuerpo.style.lineHeight = '1.32';
+                } else if (tamanoSelect === 'mediano') {
+                    contenedorCuerpo.style.fontSize = '0.86em';
+                    contenedorCuerpo.style.lineHeight = '1.45';
+                } else {
+                    contenedorCuerpo.style.fontSize = '0.78em';
+                    contenedorCuerpo.style.lineHeight = '1.38';
+                }
+            }
+
             const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
             doc.setFont('times', 'normal');
-            doc.setFontSize(10);
+            doc.setFontSize(fontSizeCuerpo);
             doc.setTextColor(0, 0, 0);
             doc.text(despedida, margenIzq, curY);
-            curY += 18;
+            curY += 14;
 
-            // 9. Firma del Remitente
+            // 9. Firma del Remitente (Garantizar espacio antes de CC)
             const modoFirma = document.getElementById('selectEspacioFirma').value;
-            if (curY > 230) curY = 225;
+            if (curY > 218) curY = 215;
 
             if (modoFirma !== 'solo_texto') {
                 doc.setDrawColor(80, 80, 80);
                 doc.setLineWidth(0.5);
                 doc.line(margenIzq, curY, margenIzq + 55, curY);
-                curY += 4.5;
+                curY += 4;
             }
 
             doc.setFont('times', 'bold');
-            doc.setFontSize(9.5);
+            doc.setFontSize(fontSizeCuerpo);
             doc.text(deNombre, margenIzq, curY);
-            curY += 4;
+            curY += 3.8;
 
             if (deCargo) {
                 doc.setFont('times', 'italic');
-                doc.setFontSize(8.5);
+                doc.setFontSize(fontSizeCuerpo - 1);
                 doc.setTextColor(70, 70, 70);
                 doc.text(deCargo, margenIzq, curY);
             }
 
-            // 10. Bloque C.C. y Original (Abajo a la izquierda)
-            const yCC = 244;
+            // 10. Bloque C.C. y Original (Posicionado a Y=230mm, sobre el pie de página)
+            const yCC = 230;
             doc.setFont('times', 'normal');
-            doc.setFontSize(7.5);
+            doc.setFontSize(6.8);
             doc.setTextColor(90, 90, 90);
 
             let ccOffset = 0;
@@ -1927,31 +1983,15 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             if (orig) {
                 doc.text(orig, margenIzq, yCC + ccOffset);
-                ccOffset += 3.8;
+                ccOffset += 3.4;
             }
             if (c1) {
                 doc.text(c1, margenIzq, yCC + ccOffset);
-                ccOffset += 3.8;
+                ccOffset += 3.4;
             }
             if (c2) {
                 doc.text(c2, margenIzq, yCC + ccOffset);
             }
-
-            // 11. Firma de Auditoría Obligatoria del Sistema
-            let usuarioAuditoria = '';
-            try {
-                usuarioAuditoria = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
-            } catch (e) {}
-            if (!usuarioAuditoria && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
-                usuarioAuditoria = firebase.auth().currentUser.email;
-            }
-            if (!usuarioAuditoria) usuarioAuditoria = "Usuario del Sistema";
-
-            const fechaHoraAudit = new Date().toLocaleString('es-HN');
-            doc.setFont('times', 'normal');
-            doc.setFontSize(6.5);
-            doc.setTextColor(140, 150, 165);
-            doc.text(`Documento emitido por: ${usuarioAuditoria} • Sistema de Gestión ENAG • ${fechaHoraAudit}`, pageWidth / 2, 273.5, { align: 'center' });
 
             return doc;
         }
