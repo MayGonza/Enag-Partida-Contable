@@ -1008,7 +1008,7 @@
                     </div>
                 </div>
 
-                <input type="file" id="inputSubirDocMemo" accept=".json,.pdf" style="display:none;" onchange="procesarArchivoSubidoMemo(this)">
+                <input type="file" id="inputSubirDocMemo" accept=".json,.pdf" style="position: fixed; top: -1000px; left: -1000px; opacity: 0; width: 1px; height: 1px; pointer-events: none;" onchange="procesarArchivoSubidoMemo(this)">
                 
                 <!-- 1. CORRELATIVO AUTOMÁTICO -->
                 <div class="correlativo-box">
@@ -1782,11 +1782,8 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     p.textContent = parrafoBuffer.join(' ');
                     contenedorCuerpo.appendChild(p);
                 }
-            }
-
-            const tamanoSelect = document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'pequeno';
-            const contenedorCuerpo = document.getElementById('prevCuerpoDinamico');
-            if (contenedorCuerpo) {
+                // Aplicar escala de tipografía según selección
+                const tamanoSelect = document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'pequeno';
                 if (tamanoSelect === 'muy_pequeno') {
                     contenedorCuerpo.style.fontSize = '0.72em';
                     contenedorCuerpo.style.lineHeight = '1.32';
@@ -2033,21 +2030,6 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             // 8. Despedida
             curY += 2;
-            const tamanoSelect = document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'pequeno';
-            const contenedorCuerpo = document.getElementById('prevCuerpoDinamico');
-            if (contenedorCuerpo) {
-                if (tamanoSelect === 'muy_pequeno') {
-                    contenedorCuerpo.style.fontSize = '0.72em';
-                    contenedorCuerpo.style.lineHeight = '1.32';
-                } else if (tamanoSelect === 'mediano') {
-                    contenedorCuerpo.style.fontSize = '0.86em';
-                    contenedorCuerpo.style.lineHeight = '1.45';
-                } else {
-                    contenedorCuerpo.style.fontSize = '0.78em';
-                    contenedorCuerpo.style.lineHeight = '1.38';
-                }
-            }
-
             const despedida = document.getElementById('inputDespedida').value.trim() || 'Atentamente,';
             doc.setFont('times', 'normal');
             doc.setFontSize(fontSizeCuerpo);
@@ -2582,10 +2564,26 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         // 13. CARGA, MODIFICACIÓN Y RESPALDO DE DOCUMENTOS PREVIOS
         // ==============================================================
         function abrirSelectorSubirMemorando() {
-            const input = document.getElementById('inputSubirDocMemo');
-            if (input) {
+            try {
+                let input = document.getElementById('inputSubirDocMemo');
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.id = 'inputSubirDocMemo';
+                    input.accept = '.json,.pdf';
+                    input.style.position = 'fixed';
+                    input.style.top = '-1000px';
+                    input.style.left = '-1000px';
+                    input.style.opacity = '0';
+                    input.style.pointerEvents = 'none';
+                    input.onchange = function() { procesarArchivoSubidoMemo(this); };
+                    document.body.appendChild(input);
+                }
                 input.value = '';
                 input.click();
+            } catch (err) {
+                console.error("Error abriendo selector de memorandos:", err);
+                showToast("Error al abrir explorador de archivos: " + err.message, "error");
             }
         }
 

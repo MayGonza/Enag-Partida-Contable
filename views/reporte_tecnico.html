@@ -824,7 +824,7 @@
                     </div>
                 </div>
 
-                <input type="file" id="inputSubirDocRT" accept=".json,.pdf" style="display:none;" onchange="procesarArchivoSubidoRT(this)">
+                <input type="file" id="inputSubirDocRT" accept=".json,.pdf" style="position: fixed; top: -1000px; left: -1000px; opacity: 0; width: 1px; height: 1px; pointer-events: none;" onchange="procesarArchivoSubidoRT(this)">
 
                 <!-- 1. IDENTIFICACIÓN DEL REPORTE -->
                 <div class="form-card">
@@ -2025,10 +2025,26 @@
         // CARGA, MODIFICACIÓN Y RESPALDO DE REPORTES PREVIOS
         // ==============================================================
         function abrirSelectorSubirReporte() {
-            const input = document.getElementById('inputSubirDocRT');
-            if (input) {
+            try {
+                let input = document.getElementById('inputSubirDocRT');
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.id = 'inputSubirDocRT';
+                    input.accept = '.json,.pdf';
+                    input.style.position = 'fixed';
+                    input.style.top = '-1000px';
+                    input.style.left = '-1000px';
+                    input.style.opacity = '0';
+                    input.style.pointerEvents = 'none';
+                    input.onchange = function() { procesarArchivoSubidoRT(this); };
+                    document.body.appendChild(input);
+                }
                 input.value = '';
                 input.click();
+            } catch (err) {
+                console.error("Error abriendo selector de reportes:", err);
+                showToast("Error al abrir explorador de archivos: " + err.message, "error");
             }
         }
 
