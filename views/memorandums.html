@@ -67,6 +67,7 @@
                 opacity: 0;
                 transform: translateY(12px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -630,7 +631,8 @@
                 margin: 0;
             }
 
-            html, body {
+            html,
+            body {
                 background: #ffffff !important;
                 background-color: #ffffff !important;
                 color: #000000 !important;
@@ -973,12 +975,14 @@
                 <img src="../assets/logo.png" alt="ENAG Logo" class="header-logo-img">
                 <div class="header-text">
                     <h1>Emisión de Memorándums Oficiales</h1>
-                    <p>Formulario con correlativo automático por departamento, vista previa en tiempo real y descarga de PDF oficial.</p>
+                    <p>Formulario con correlativo automático por departamento, vista previa en tiempo real y descarga de
+                        PDF oficial.</p>
                 </div>
             </div>
             <div class="header-quick-stats">
                 <span class="stat-badge" id="badgeTotalMemos">📁 0 Memorándums</span>
-                <span class="stat-badge" id="badgeUltimoCorrelativo" style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">
+                <span class="stat-badge" id="badgeUltimoCorrelativo"
+                    style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">
                     🔢 Último: N/A
                 </span>
             </div>
@@ -990,40 +994,52 @@
             <div class="form-column">
 
                 <!-- BANNER DE CARGA Y MODIFICACIÓN DE DOCUMENTOS PREVIOS -->
-                <div class="import-doc-banner" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px dashed #0284c7; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 6px rgba(0, 33, 71, 0.05);">
+                <div class="import-doc-banner"
+                    style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px dashed #0284c7; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 6px rgba(0, 33, 71, 0.05);">
                     <div style="display: flex; align-items: center; gap: 12px;">
                         <span style="font-size: 1.8em;">📂</span>
                         <div>
-                            <strong style="color: #002147; font-size: 0.98em;">¿Desea modificar un memorándum anterior?</strong>
-                            <div style="font-size: 0.84em; color: #475569; margin-top: 2px;">Suba un archivo de respaldo (<code>.json</code>) o el documento <code>.pdf</code> creado previamente para cargar sus datos y editarlos de inmediato.</div>
+                            <strong style="color: #002147; font-size: 0.98em;">¿Desea modificar un memorándum
+                                anterior?</strong>
+                            <div style="font-size: 0.84em; color: #475569; margin-top: 2px;">Suba un archivo de respaldo
+                                (<code>.json</code>) o el documento <code>.pdf</code> creado previamente para cargar sus
+                                datos y editarlos de inmediato.</div>
                         </div>
                     </div>
                     <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-                        <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirMemorando()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                        <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirMemorando()"
+                            style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
                             <span>⬆️</span> Subir Documento (.json / .pdf)
                         </button>
-                        <button type="button" class="btn-action btn-export-doc" onclick="abrirModalDocumentosGuardadosMemo()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                        <button type="button" class="btn-action btn-export-doc"
+                            onclick="abrirModalDocumentosGuardadosMemo()"
+                            style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
                             <span>📚</span> Elegir de Guardados
                         </button>
                     </div>
                 </div>
 
-                <input type="file" id="inputSubirDocMemo" accept=".json,.pdf" style="position: fixed; top: -1000px; left: -1000px; opacity: 0; width: 1px; height: 1px; pointer-events: none;" onchange="procesarArchivoSubidoMemo(this)">
-                
+                <input type="file" id="inputSubirDocMemo" accept=".json,.pdf"
+                    style="position: fixed; top: -1000px; left: -1000px; opacity: 0; width: 1px; height: 1px; pointer-events: none;"
+                    onchange="procesarArchivoSubidoMemo(this)">
+
                 <!-- 1. CORRELATIVO AUTOMÁTICO -->
                 <div class="correlativo-box">
                     <div class="correlativo-header">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span style="font-size:1.2em;">⚙️</span>
-                            <strong style="color:var(--primary); font-size:0.95em;">Correlativo Automático de Memorándum:</strong>
+                            <strong style="color:var(--primary); font-size:0.95em;">Correlativo Automático de
+                                Memorándum:</strong>
                         </div>
-                        <span id="statusCorrelativo" class="correlativo-status status-ok">🟢 Correlativo Disponible</span>
+                        <span id="statusCorrelativo" class="correlativo-status status-ok">🟢 Correlativo
+                            Disponible</span>
                     </div>
 
                     <div class="form-row" style="grid-template-columns: 1.4fr 1fr 1fr auto;">
                         <div class="form-group">
                             <label for="selectDepartamento">Departamento / Área <span class="req">*</span></label>
-                            <select id="selectDepartamento" class="form-control" onchange="cambiarDepartamentoEmisor(this.value)">
+                            <select id="selectDepartamento" class="form-control"
+                                onchange="cambiarDepartamentoEmisor(this.value)">
                                 <option value="INFO" selected>INFO — Informática / Soporte Técnico</option>
                                 <option value="ADMON">ADMON — Sub-Gerencia Administrativa</option>
                                 <option value="RRHH">RRHH — Recursos Humanos</option>
@@ -1039,28 +1055,34 @@
 
                         <div class="form-group" id="groupPrefijoPersonalizado" style="display:none;">
                             <label for="inputPrefijoPersonalizado">Siglas Prefijo <span class="req">*</span></label>
-                            <input type="text" id="inputPrefijoPersonalizado" class="form-control" placeholder="Ej: LOGIS" maxlength="10" oninput="actualizarCodigoCompleto()">
+                            <input type="text" id="inputPrefijoPersonalizado" class="form-control"
+                                placeholder="Ej: LOGIS" maxlength="10" oninput="actualizarCodigoCompleto()">
                         </div>
 
                         <div class="form-group">
                             <label for="inputNumeroCorrelativo">Número Secuencial <span class="req">*</span></label>
-                            <input type="number" id="inputNumeroCorrelativo" class="form-control" min="1" value="51" oninput="validarNumeroCorrelativoManual()">
+                            <input type="number" id="inputNumeroCorrelativo" class="form-control" min="1" value="51"
+                                oninput="validarNumeroCorrelativoManual()">
                         </div>
 
                         <div class="form-group">
                             <label for="inputSufijoInstitucional">Sufijo Institución</label>
-                            <input type="text" id="inputSufijoInstitucional" class="form-control" value="ENAG" oninput="actualizarCodigoCompleto()">
+                            <input type="text" id="inputSufijoInstitucional" class="form-control" value="ENAG"
+                                oninput="actualizarCodigoCompleto()">
                         </div>
 
                         <div class="form-group" style="justify-content: flex-end;">
-                            <button type="button" class="btn-tool" onclick="sugerirSiguienteCorrelativo()" title="Recalcular automáticamente el siguiente número correlativo">
+                            <button type="button" class="btn-tool" onclick="sugerirSiguienteCorrelativo()"
+                                title="Recalcular automáticamente el siguiente número correlativo">
                                 🔄 Sugerir
                             </button>
                         </div>
                     </div>
 
-                    <div style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-                        <span style="font-size:0.85em; color:#0369a1; font-weight:600;">Código resultante que figurará en el documento:</span>
+                    <div
+                        style="margin-top:12px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
+                        <span style="font-size:0.85em; color:#0369a1; font-weight:600;">Código resultante que figurará
+                            en el documento:</span>
                         <div class="correlativo-display" id="displayCodigoCompleto">
                             MEMORANDO INFO-51-ENAG
                         </div>
@@ -1071,18 +1093,25 @@
                 <div class="form-card">
                     <h3 class="card-title">
                         <div><span class="badge-num">1</span> Destinatario y Remitente</div>
-                        <span style="font-size:0.8em; font-weight:normal; color:var(--text-muted);">Encabezado Formal</span>
+                        <span style="font-size:0.8em; font-weight:normal; color:var(--text-muted);">Encabezado
+                            Formal</span>
                     </h3>
 
                     <div class="form-row">
                         <!-- PARA -->
                         <div class="form-group">
-                            <label for="inputParaNombre">PARA (Nombre del Destinatario) <span class="req">*</span></label>
-                            <input type="text" id="inputParaNombre" class="form-control" placeholder="Ej: Jorge Valladares Sierra" value="Jorge Valladares Sierra" oninput="actualizarVistaPrevia()">
+                            <label for="inputParaNombre">PARA (Nombre del Destinatario) <span
+                                    class="req">*</span></label>
+                            <input type="text" id="inputParaNombre" class="form-control"
+                                placeholder="Ej: Jorge Valladares Sierra" value="Jorge Valladares Sierra"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
-                            <label for="inputParaCargo">Cargo / Puesto del Destinatario <span class="req">*</span></label>
-                            <input type="text" id="inputParaCargo" class="form-control" placeholder="Ej: Sub-Gerente Administrativo" value="Sub-Gerente Administrativo" oninput="actualizarVistaPrevia()">
+                            <label for="inputParaCargo">Cargo / Puesto del Destinatario <span
+                                    class="req">*</span></label>
+                            <input type="text" id="inputParaCargo" class="form-control"
+                                placeholder="Ej: Sub-Gerente Administrativo" value="Sub-Gerente Administrativo"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
@@ -1090,11 +1119,15 @@
                         <!-- DE -->
                         <div class="form-group">
                             <label for="inputDeNombre">DE (Nombre del Remitente) <span class="req">*</span></label>
-                            <input type="text" id="inputDeNombre" class="form-control" placeholder="Ej: Michael Steven Gonzales Castillo" value="Michael Steven Gonzales Castillo" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputDeNombre" class="form-control"
+                                placeholder="Ej: Michael Steven Gonzales Castillo"
+                                value="Michael Steven Gonzales Castillo" oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputDeCargo">Cargo / Puesto del Remitente <span class="req">*</span></label>
-                            <input type="text" id="inputDeCargo" class="form-control" placeholder="Ej: Auxiliar de soporte técnico" value="Auxiliar de soporte técnico" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputDeCargo" class="form-control"
+                                placeholder="Ej: Auxiliar de soporte técnico" value="Auxiliar de soporte técnico"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
                 </div>
@@ -1108,17 +1141,22 @@
                     <div class="form-row" style="grid-template-columns: 1fr 1.6fr;">
                         <div class="form-group">
                             <label for="inputFechaCalendario">Fecha del Documento <span class="req">*</span></label>
-                            <input type="date" id="inputFechaCalendario" class="form-control" onchange="actualizarFechaDesdeInput(this.value)">
+                            <input type="date" id="inputFechaCalendario" class="form-control"
+                                onchange="actualizarFechaDesdeInput(this.value)">
                         </div>
                         <div class="form-group">
                             <label for="inputFechaTextoOficial">Formato Oficial de Fecha (Editable)</label>
-                            <input type="text" id="inputFechaTextoOficial" class="form-control" placeholder="Ej: Miércoles 4 de Noviembre de 2026" oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputFechaTextoOficial" class="form-control"
+                                placeholder="Ej: Miércoles 4 de Noviembre de 2026" oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
 
                     <div class="form-group" style="margin-top:12px;">
                         <label for="inputAsunto">ASUNTO <span class="req">*</span></label>
-                        <input type="text" id="inputAsunto" class="form-control" placeholder="Ej: Compra de Cámaras de Videovigilancia" value="Compra de Cámaras de Videovigilancia" oninput="actualizarVistaPrevia()" style="font-weight:600;">
+                        <input type="text" id="inputAsunto" class="form-control"
+                            placeholder="Ej: Compra de Cámaras de Videovigilancia"
+                            value="Compra de Cámaras de Videovigilancia" oninput="actualizarVistaPrevia()"
+                            style="font-weight:600;">
                     </div>
                 </div>
 
@@ -1127,10 +1165,12 @@
                     <h3 class="card-title">
                         <div><span class="badge-num">3</span> Redacción y Cuerpo del Memorando</div>
                         <div style="display:flex; gap:6px;">
-                            <button type="button" class="btn-tool" onclick="cargarPlantillaCamaras()" title="Cargar ejemplo exacto de la foto (Compra de Cámaras)">
+                            <button type="button" class="btn-tool" onclick="cargarPlantillaCamaras()"
+                                title="Cargar ejemplo exacto de la foto (Compra de Cámaras)">
                                 📹 Plantilla Cámaras
                             </button>
-                            <button type="button" class="btn-tool" onclick="cargarPlantillaMantenimiento()" title="Plantilla de Soporte y Mantenimiento TI">
+                            <button type="button" class="btn-tool" onclick="cargarPlantillaMantenimiento()"
+                                title="Plantilla de Soporte y Mantenimiento TI">
                                 🛠️ Mantenimiento
                             </button>
                         </div>
@@ -1139,8 +1179,11 @@
                     <div class="form-group" style="margin-bottom:12px;">
                         <label for="inputSaludo">Tratamiento / Saludo Inicial</label>
                         <div style="display:flex; gap:8px;">
-                            <input type="text" id="inputSaludo" class="form-control" placeholder="Ej: Estimado Sr. Valladares:" value="Estimado Sr. Valladares:" oninput="actualizarVistaPrevia()">
-                            <button type="button" class="btn-tool" onclick="generarSaludoAutomatico()" title="Sugerir saludo a partir del nombre del destinatario">
+                            <input type="text" id="inputSaludo" class="form-control"
+                                placeholder="Ej: Estimado Sr. Valladares:" value="Estimado Sr. Valladares:"
+                                oninput="actualizarVistaPrevia()">
+                            <button type="button" class="btn-tool" onclick="generarSaludoAutomatico()"
+                                title="Sugerir saludo a partir del nombre del destinatario">
                                 ⚡ Sugerir
                             </button>
                         </div>
@@ -1155,16 +1198,20 @@
                                 ✍️ Frase de Agradecimiento
                             </button>
                             <span style="flex:1;"></span>
-                            <span style="font-size:0.78em; color:var(--text-muted);" id="charCountDisplay">0 caracteres</span>
+                            <span style="font-size:0.78em; color:var(--text-muted);" id="charCountDisplay">0
+                                caracteres</span>
                         </div>
                         <label for="textareaCuerpo">Contenido del Memorando <span class="req">*</span></label>
-                        <textarea id="textareaCuerpo" class="form-control" placeholder="Escriba aquí los párrafos explicativos, requerimientos, solicitudes o viñetas..." oninput="actualizarVistaPrevia()"></textarea>
+                        <textarea id="textareaCuerpo" class="form-control"
+                            placeholder="Escriba aquí los párrafos explicativos, requerimientos, solicitudes o viñetas..."
+                            oninput="actualizarVistaPrevia()"></textarea>
                     </div>
 
                     <div class="form-row" style="margin-top:14px; grid-template-columns: 1fr 1fr 1fr;">
                         <div class="form-group">
                             <label for="inputDespedida">Despedida Formal</label>
-                            <input type="text" id="inputDespedida" class="form-control" value="Atentamente," oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputDespedida" class="form-control" value="Atentamente,"
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="selectTamanoLetra">Tamaño de Letra</label>
@@ -1189,37 +1236,45 @@
                 <div class="form-card">
                     <h3 class="card-title">
                         <div><span class="badge-num">4</span> Distribución y Copias</div>
-                        <span style="font-size:0.8em; font-weight:normal; color:var(--text-muted);">Pie de página oficial</span>
+                        <span style="font-size:0.8em; font-weight:normal; color:var(--text-muted);">Pie de página
+                            oficial</span>
                     </h3>
 
                     <div class="form-row">
                         <div class="form-group">
                             <label for="inputCopiaOriginal">Destino Original</label>
-                            <input type="text" id="inputCopiaOriginal" class="form-control" value="Original Administración." oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputCopiaOriginal" class="form-control"
+                                value="Original Administración." oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputCopia1">Con Copia (C.C.) 1</label>
-                            <input type="text" id="inputCopia1" class="form-control" value="C.C. Archivo." oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputCopia1" class="form-control" value="C.C. Archivo."
+                                oninput="actualizarVistaPrevia()">
                         </div>
                         <div class="form-group">
                             <label for="inputCopia2">Con Copia (C.C.) 2 (Opcional)</label>
-                            <input type="text" id="inputCopia2" class="form-control" placeholder="Ej: C.C. Auditoría Interna." oninput="actualizarVistaPrevia()">
+                            <input type="text" id="inputCopia2" class="form-control"
+                                placeholder="Ej: C.C. Auditoría Interna." oninput="actualizarVistaPrevia()">
                         </div>
                     </div>
                 </div>
 
                 <!-- BARRA DE ACCIONES -->
                 <div class="action-bar">
-                    <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirMemorando()" title="Subir un documento previo (.json o .pdf) para modificarlo">
+                    <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirMemorando()"
+                        title="Subir un documento previo (.json o .pdf) para modificarlo">
                         <span>📂</span> Subir Documento Anterior
                     </button>
-                    <button type="button" class="btn-action btn-export-doc" onclick="exportarMemorandoJSON()" title="Descargar archivo editable de respaldo (.json)">
+                    <button type="button" class="btn-action btn-export-doc" onclick="exportarMemorandoJSON()"
+                        title="Descargar archivo editable de respaldo (.json)">
                         <span>💾</span> Exportar Respaldo JSON
                     </button>
-                    <button type="button" class="btn-action btn-primary-action" onclick="generarPDFMemorandoOficial()" id="btnDescargarPDF">
+                    <button type="button" class="btn-action btn-primary-action" onclick="generarPDFMemorandoOficial()"
+                        id="btnDescargarPDF">
                         <span>📄</span> Descargar PDF Oficial
                     </button>
-                    <button type="button" class="btn-action btn-save-action" onclick="guardarMemorandoEnFirestore()" id="btnGuardarMemo">
+                    <button type="button" class="btn-action btn-save-action" onclick="guardarMemorandoEnFirestore()"
+                        id="btnGuardarMemo">
                         <span>💾</span> Guardar Memorándum
                     </button>
                     <button type="button" class="btn-action btn-outline-action" onclick="imprimirVistaPreviaDirecta()">
@@ -1247,7 +1302,8 @@
                     <div class="paper-content-wrap">
                         <!-- Membrete institucional superior -->
                         <div class="preview-inst-header">
-                            <img src="../assets/logo.png" alt="Gobierno de la República de Honduras • ENAG" class="preview-inst-logo">
+                            <img src="../assets/logo.png" alt="Gobierno de la República de Honduras • ENAG"
+                                class="preview-inst-logo">
                         </div>
 
                         <!-- Título del Memorando con Correlativo -->
@@ -1264,7 +1320,8 @@
                                 <td class="preview-meta-label">PARA:</td>
                                 <td class="preview-meta-val">
                                     <span id="prevParaNombre">Jorge Valladares Sierra</span>
-                                    <span class="preview-meta-cargo" id="prevParaCargo">Sub-Gerente Administrativo</span>
+                                    <span class="preview-meta-cargo" id="prevParaCargo">Sub-Gerente
+                                        Administrativo</span>
                                 </td>
                             </tr>
                             <tr>
@@ -1302,7 +1359,8 @@
                             <!-- Firma Remitente -->
                             <div class="preview-firma-box" id="prevFirmaBox">
                                 <div class="preview-firma-line"></div>
-                                <div class="preview-firma-name" id="prevFirmaNombre">Michael Steven Gonzales Castillo</div>
+                                <div class="preview-firma-name" id="prevFirmaNombre">Michael Steven Gonzales Castillo
+                                </div>
                                 <div class="preview-firma-cargo" id="prevFirmaCargo">Auxiliar de soporte técnico</div>
                             </div>
                         </div>
@@ -1335,7 +1393,9 @@
             <div class="history-header">
                 <h2><span>🗂️</span> Historial de Memorándums Registrados</h2>
                 <div class="history-controls">
-                    <input type="text" id="filtroBusqueda" class="search-input" placeholder="🔍 Buscar por código, asunto, destinatario..." oninput="filtrarHistorialMemorandums()">
+                    <input type="text" id="filtroBusqueda" class="search-input"
+                        placeholder="🔍 Buscar por código, asunto, destinatario..."
+                        oninput="filtrarHistorialMemorandums()">
                     <select id="filtroDeptoHistorial" class="filter-select" onchange="filtrarHistorialMemorandums()">
                         <option value="TODOS">Todos los Departamentos</option>
                         <option value="INFO">INFO — Informática / TI</option>
@@ -1346,10 +1406,12 @@
                         <option value="BN">BN — Bienes Nacionales</option>
                         <option value="CONT">CONT — Contabilidad</option>
                     </select>
-                    <button type="button" class="btn-tool" onclick="exportarHistorialExcel()" title="Descargar reporte en formato Excel">
+                    <button type="button" class="btn-tool" onclick="exportarHistorialExcel()"
+                        title="Descargar reporte en formato Excel">
                         📊 Exportar Excel
                     </button>
-                    <button type="button" class="btn-tool" onclick="cargarHistorialDesdeFirestore()" title="Actualizar lista de memorándums">
+                    <button type="button" class="btn-tool" onclick="cargarHistorialDesdeFirestore()"
+                        title="Actualizar lista de memorándums">
                         🔄 Refrescar
                     </button>
                 </div>
@@ -1386,19 +1448,27 @@
     <!-- MODAL: SELECCIONAR MEMORÁNDUM GUARDADO PARA MODIFICAR -->
     <div id="modalDocumentosGuardadosMemo" class="modal-overlay">
         <div class="modal-box">
-            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
                 <h3 style="margin: 0; color: #002147; font-size: 1.2em; display: flex; align-items: center; gap: 8px;">
                     <span>📚</span> Seleccionar Memorándum para Modificar
                 </h3>
-                <button type="button" onclick="cerrarModalDocumentosGuardadosMemo()" style="background: none; border: none; font-size: 1.6em; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+                <button type="button" onclick="cerrarModalDocumentosGuardadosMemo()"
+                    style="background: none; border: none; font-size: 1.6em; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
             </div>
-            <p style="margin: 0 0 12px 0; font-size: 0.88em; color: #64748b;">Seleccione un memorándum registrado anteriormente para cargar todos sus campos al formulario y realizar las modificaciones deseadas:</p>
-            <input type="text" id="busquedaModalMemo" placeholder="🔍 Filtrar por código, asunto, destinatario o remitente..." oninput="filtrarListaModalMemo()" style="padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.9em; margin-bottom: 14px; width: 100%; box-sizing: border-box; outline: none;">
-            <div id="listaModalMemos" style="overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; gap: 8px;">
+            <p style="margin: 0 0 12px 0; font-size: 0.88em; color: #64748b;">Seleccione un memorándum registrado
+                anteriormente para cargar todos sus campos al formulario y realizar las modificaciones deseadas:</p>
+            <input type="text" id="busquedaModalMemo"
+                placeholder="🔍 Filtrar por código, asunto, destinatario o remitente..."
+                oninput="filtrarListaModalMemo()"
+                style="padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.9em; margin-bottom: 14px; width: 100%; box-sizing: border-box; outline: none;">
+            <div id="listaModalMemos"
+                style="overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; gap: 8px;">
                 <!-- Dinámico -->
             </div>
             <div style="margin-top: 14px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 12px;">
-                <button type="button" onclick="cerrarModalDocumentosGuardadosMemo()" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">Cerrar</button>
+                <button type="button" onclick="cerrarModalDocumentosGuardadosMemo()"
+                    style="background: #e2e8f0; color: #475569; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">Cerrar</button>
             </div>
         </div>
     </div>
@@ -2166,7 +2236,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 try {
                     _memoDb = firebase.firestore();
                     return _memoDb;
-                } catch(e) {}
+                } catch (e) { }
             }
             return null;
         }
@@ -2198,9 +2268,9 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                         let localUser = 'Personal ENAG';
                         try {
                             localUser = localStorage.getItem('usuarioNombre') ||
-                                        localStorage.getItem('usuarioLogueado') ||
-                                        localStorage.getItem('enag_username') || 'Personal ENAG';
-                        } catch (e) {}
+                                localStorage.getItem('usuarioLogueado') ||
+                                localStorage.getItem('enag_username') || 'Personal ENAG';
+                        } catch (e) { }
                         if (labelUser) labelUser.textContent = localUser;
                     }
                 });
@@ -2229,7 +2299,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                             cargarHistorialLocalStorage();
                         }
                     });
-            } catch(e) {
+            } catch (e) {
                 console.warn("Error al suscribir onSnapshot:", e);
                 cargarHistorialLocalStorage();
             }
@@ -2244,7 +2314,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 memorandumsGlobal = lista;
                 actualizarEstadisticasYTabla();
                 sugerirSiguienteCorrelativo();
-            } catch(e) {
+            } catch (e) {
                 console.warn("Fallo get() Firestore, usando localStorage:", e);
                 cargarHistorialLocalStorage();
             }
@@ -2297,7 +2367,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 let usuarioActivo = 'Usuario del Sistema';
                 try {
                     usuarioActivo = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
-                } catch (e) {}
+                } catch (e) { }
                 if (!usuarioActivo && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
                     usuarioActivo = firebase.auth().currentUser.email;
                 }
@@ -2534,7 +2604,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 memorandumsGlobal = memorandumsGlobal.filter(item => item.id !== id);
                 try {
                     localStorage.setItem('enag_memorandums_local', JSON.stringify(memorandumsGlobal));
-                } catch (e) {}
+                } catch (e) { }
 
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Administración', 'Eliminar Memorando', `Se eliminó el memorándum ${cod}`);
@@ -2576,7 +2646,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     input.style.left = '-1000px';
                     input.style.opacity = '0';
                     input.style.pointerEvents = 'none';
-                    input.onchange = function() { procesarArchivoSubidoMemo(this); };
+                    input.onchange = function () { procesarArchivoSubidoMemo(this); };
                     document.body.appendChild(input);
                 }
                 input.value = '';
@@ -2594,7 +2664,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             if (fileName.endsWith('.json')) {
                 const reader = new FileReader();
-                reader.onload = function(e) {
+                reader.onload = function (e) {
                     try {
                         const data = JSON.parse(e.target.result);
                         cargarDatosEnFormularioMemo(data);
