@@ -698,15 +698,40 @@
 </head>
 
 <body>
+    <!-- Barra de Navegación Superior Unificada -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Menú Principal
+            </a>
+            <span class="portal-badge">🛠️ Reportes Técnicos — Informática</span>
+            <a href="memorandums.html" class="btn-nav" style="background-color: #0284c7; color: white;">
+                <span>📑</span> Memorándums
+            </a>
+            <a href="bienes_nacionales.html" class="btn-nav" style="background-color: #002147; color: white; border: 1px solid rgba(255,255,255,0.3);">
+                <span>🏛️</span> Bienes Nacionales
+            </a>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Personal ENAG</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
+        </div>
+    </div>
+
     <div class="main-container">
         <!-- ENCABEZADO DEL MÓDULO -->
         <header class="module-header">
             <div class="header-title-group">
+                <a href="../index.html" class="btn-nav btn-nav-back" title="Regresar al Portal Principal">
+                    <span>←</span> Menú
+                </a>
                 <img src="../assets/logo.jpeg" alt="Logo ENAG" class="header-logo-img">
                 <div class="header-text">
                     <h1>Departamento de Informática — Reportes Técnicos</h1>
-                    <p>Emisión oficial de reportes técnicos para revisión, descargo y soporte de bienes y equipos de
-                        cómputo.</p>
+                    <p>Emisión oficial de reportes técnicos para revisión, descargo y soporte de bienes y equipos de cómputo.</p>
                 </div>
             </div>
             <div class="header-stats-group">
@@ -744,7 +769,8 @@
                     <div class="form-row" style="grid-template-columns: 180px 140px 1fr 1fr;">
                         <div class="form-group">
                             <label for="selectFormatoCorrelativo">Formato Correlativo</label>
-                            <select id="selectFormatoCorrelativo" class="form-control" onchange="sugerirSiguienteNumero()">
+                            <select id="selectFormatoCorrelativo" class="form-control"
+                                onchange="sugerirSiguienteNumero()">
                                 <option value="con_rt" selected>RT YYYY-NN (RT 2026-11)</option>
                                 <option value="sin_rt">YYYY-NN (2026-11)</option>
                             </select>
