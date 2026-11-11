@@ -6,7 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
     <title>Manual de Usuario — Sistema ENAG</title>
-    <meta name="description" content="Manual de usuario completo del Sistema de Gestión de la Empresa Nacional de Artes Gráficas (ENAG).">
+    <meta name="description"
+        content="Manual de usuario completo del Sistema de Gestión de la Empresa Nacional de Artes Gráficas (ENAG).">
 
     <style>
         :root {
@@ -385,9 +386,13 @@
                 <li><a href="#rrhh-incapacidades" class="sidebar-link">6. RRHH — Subsidios IHSS</a></li>
                 <li><a href="#rrhh-personal" class="sidebar-link">7. RRHH — Gestión de Personal</a></li>
                 <li><a href="#produccion" class="sidebar-link">8. Módulo de Producción Gráfica</a></li>
-                <li><a href="#estado-solicitud" class="sidebar-link">9. Estado de Solicitudes</a></li>
-                <li><a href="#bitacora" class="sidebar-link">10. Auditoría y Bitácora</a></li>
-                <li><a href="#parametros" class="sidebar-link">11. Parámetros y Soporte TI</a></li>
+                <li><a href="#bienes-nacionales" class="sidebar-link">9. Bienes Nacionales e Inventario QR</a></li>
+                <li><a href="#memorandums" class="sidebar-link">10. Emisión de Memorándums Oficiales</a></li>
+                <li><a href="#reporte-tecnico" class="sidebar-link">11. Reportes Técnicos — Informática</a></li>
+                <li><a href="#detector-espacio" class="sidebar-link">12. Detector de Espacio (La Gaceta)</a></li>
+                <li><a href="#estado-solicitud" class="sidebar-link">13. Estado de Solicitudes</a></li>
+                <li><a href="#bitacora" class="sidebar-link">14. Auditoría y Bitácora</a></li>
+                <li><a href="#parametros" class="sidebar-link">15. Parámetros y Soporte TI</a></li>
             </ul>
         </div>
 
@@ -401,15 +406,23 @@
             <!-- 1. INTRODUCCION -->
             <div id="introduccion" class="manual-section">
                 <h1>1. Introducción y Control de Acceso</h1>
-                <p>Bienvenido al <strong>Sistema Integral de Gestión de la Empresa Nacional de Artes Gráficas (ENAG)</strong>. Esta plataforma centraliza y optimiza los flujos de trabajo de Contabilidad, Comercialización, Recursos Humanos y Talleres de Producción.</p>
+                <p>Bienvenido al <strong>Sistema Integral de Gestión de la Empresa Nacional de Artes Gráficas
+                        (ENAG)</strong>. Esta plataforma centraliza y optimiza los flujos de trabajo de Contabilidad,
+                    Comercialización, Recursos Humanos y Talleres de Producción.</p>
 
                 <h2>Autenticación Oficial y Seguridad</h2>
-                <p>El sistema cuenta con un control de acceso formal respaldado por <strong>Firebase Authentication</strong>:</p>
+                <p>El sistema cuenta con un control de acceso formal respaldado por <strong>Firebase
+                        Authentication</strong>:</p>
                 <ul>
-                    <li><strong>Inicio de Sesión (login.html):</strong> Se ingresa mediante correo electrónico institucional verificado y contraseña segura.</li>
-                    <li><strong>Verificación Obligatoria de Correo:</strong> Para resguardar los datos públicos, solo los usuarios con correo verificado pueden interactuar con el sistema.</li>
-                    <li><strong>Control de Sesión Única (Anticoncurrencia):</strong> Por motivos de auditoría y seguridad, si una cuenta inicia sesión en un equipo diferente, la sesión previa se cerrará de forma automática.</li>
-                    <li><strong>Recuperación de Contraseña:</strong> Los usuarios pueden restablecer su clave mediante el enlace oficial de recuperación que envía un correo seguro a su bandeja de entrada.</li>
+                    <li><strong>Inicio de Sesión (login.html):</strong> Se ingresa mediante correo electrónico
+                        institucional verificado y contraseña segura.</li>
+                    <li><strong>Verificación Obligatoria de Correo:</strong> Para resguardar los datos públicos, solo
+                        los usuarios con correo verificado pueden interactuar con el sistema.</li>
+                    <li><strong>Control de Sesión Única (Anticoncurrencia):</strong> Por motivos de auditoría y
+                        seguridad, si una cuenta inicia sesión en un equipo diferente, la sesión previa se cerrará de
+                        forma automática.</li>
+                    <li><strong>Recuperación de Contraseña:</strong> Los usuarios pueden restablecer su clave mediante
+                        el enlace oficial de recuperación que envía un correo seguro a su bandeja de entrada.</li>
                 </ul>
 
                 <h2>Accesos Departamentales y PINes Rápidos</h2>
@@ -417,32 +430,41 @@
                 <ul>
                     <li><strong>Módulo de Contabilidad:</strong> Clave departamental <code>CONTA@2026</code>.</li>
                     <li><strong>Módulo de Recursos Humanos:</strong> Clave departamental <code>1212</code>.</li>
-                    <li><strong>Módulo de Comercialización y Producción:</strong> Acceso directo para personal autorizado.</li>
+                    <li><strong>Módulo de Comercialización y Producción:</strong> Acceso directo para personal
+                        autorizado.</li>
                 </ul>
 
                 <div class="manual-image-container">
                     <img src="../assets/captura_portal.png" alt="Pantalla Principal del Portal Administrativo">
-                    <div class="manual-image-caption">Figura 1: Interfaz principal del Portal Administrativo de la ENAG.</div>
+                    <div class="manual-image-caption">Figura 1: Interfaz principal del Portal Administrativo de la ENAG.
+                    </div>
                 </div>
 
                 <div class="manual-warning">
                     <strong>⚠️ Recomendación de Seguridad:</strong>
-                    Nunca revele su contraseña a terceros. Al finalizar su turno laboral, utilice el botón de <em>"Cerrar Sesión"</em> para proteger su usuario en la bitácora institucional.
+                    Nunca revele su contraseña a terceros. Al finalizar su turno laboral, utilice el botón de
+                    <em>"Cerrar Sesión"</em> para proteger su usuario en la bitácora institucional.
                 </div>
             </div>
 
             <!-- 2. CONTABILIDAD -->
             <div id="contabilidad" class="manual-section">
                 <h1>2. Módulo de Contabilidad</h1>
-                <p>Diseñado para la gestión tributaria, emisión de comprobantes de retención conforme al SAR y registro de asientos del libro diario contable.</p>
+                <p>Diseñado para la gestión tributaria, emisión de comprobantes de retención conforme al SAR y registro
+                    de asientos del libro diario contable.</p>
 
                 <h2>2.1. Retenciones de Impuestos</h2>
                 <p>Permite liquidar e imprimir los comprobantes oficiales de retención para compras del Estado:</p>
                 <ol>
-                    <li>Ingrese el <strong>Nombre del Proveedor</strong>, <strong>RTN</strong> y el <strong>Concepto</strong> de la factura.</li>
+                    <li>Ingrese el <strong>Nombre del Proveedor</strong>, <strong>RTN</strong> y el
+                        <strong>Concepto</strong> de la factura.
+                    </li>
                     <li>Digite el <strong>Monto Bruto</strong> de la compra o servicio recibido.</li>
-                    <li>Seleccione el porcentaje aplicable (ej. 1% para compras ordinarias o 12.5% para honorarios profesionales). El sistema calcula de forma instantánea el valor retenido y el neto a pagar.</li>
-                    <li>Presione <strong>"Descargar Comprobante PDF"</strong> para obtener el documento oficial membretado y listo para firmas.</li>
+                    <li>Seleccione el porcentaje aplicable (ej. 1% para compras ordinarias o 12.5% para honorarios
+                        profesionales). El sistema calcula de forma instantánea el valor retenido y el neto a pagar.
+                    </li>
+                    <li>Presione <strong>"Descargar Comprobante PDF"</strong> para obtener el documento oficial
+                        membretado y listo para firmas.</li>
                 </ol>
 
                 <div class="manual-image-container">
@@ -454,39 +476,55 @@
                 <p>Registra las partidas diarias garantizando el principio de <strong>partida doble</strong>:</p>
                 <ul>
                     <li>Indique la fecha y el concepto detallado del asiento contable.</li>
-                    <li>Agregue las cuentas correspondientes asignando valores al <strong>Debe</strong> y al <strong>Haber</strong>.</li>
-                    <li><strong>Regla de Cuadre Estricto:</strong> La suma del Debe debe ser idéntica a la suma del Haber. Si existe un descuadre (por mínimo que sea), el sistema impedirá el guardado para evitar incongruencias contables.</li>
+                    <li>Agregue las cuentas correspondientes asignando valores al <strong>Debe</strong> y al
+                        <strong>Haber</strong>.
+                    </li>
+                    <li><strong>Regla de Cuadre Estricto:</strong> La suma del Debe debe ser idéntica a la suma del
+                        Haber. Si existe un descuadre (por mínimo que sea), el sistema impedirá el guardado para evitar
+                        incongruencias contables.</li>
                 </ul>
 
                 <div class="manual-image-container">
                     <img src="../assets/captura_contabilidad.png" alt="Pantalla de Registro de Partidas Contables">
-                    <div class="manual-image-caption">Figura 3: Registro de Partidas Contables de Diario con validación de cuadre.</div>
+                    <div class="manual-image-caption">Figura 3: Registro de Partidas Contables de Diario con validación
+                        de cuadre.</div>
                 </div>
 
                 <h2>2.3. Partidas Contables al Crédito</h2>
                 <p>Diseñado para la facturación de servicios al crédito, integrando automáticamente:</p>
                 <ul>
-                    <li>Retención automática de impuestos y registro de cuentas del <strong>Banco Central de Honduras (BCH)</strong>.</li>
+                    <li>Retención automática de impuestos y registro de cuentas del <strong>Banco Central de Honduras
+                            (BCH)</strong>.</li>
                     <li>Campos de número de factura, orden de compra y control de vencimiento.</li>
-                    <li>Generación del comprobante de diario en PDF con las firmas del contador general y auditor interno.</li>
+                    <li>Generación del comprobante de diario en PDF con las firmas del contador general y auditor
+                        interno.</li>
                 </ul>
             </div>
 
             <!-- 3. COMERCIALIZACIÓN -->
             <div id="comercializacion" class="manual-section">
                 <h1>3. Módulo de Comercialización — Cotizaciones Oficiales</h1>
-                <p>Permite generar cotizaciones oficiales para publicaciones en el Diario Oficial <strong>La Gaceta</strong> y trabajos de artes gráficas, aplicando las tarifas oficiales del <strong>Acuerdo Ejecutivo N° 249-2010</strong>.</p>
+                <p>Permite generar cotizaciones oficiales para publicaciones en el Diario Oficial <strong>La
+                        Gaceta</strong> y trabajos de artes gráficas, aplicando las tarifas oficiales del
+                    <strong>Acuerdo Ejecutivo N° 249-2010</strong>.
+                </p>
 
                 <h2>3.1. Procedimiento de Cotización:</h2>
                 <ol>
-                    <li><strong>Datos Generales:</strong> El sistema sugiere el número de cotización autoincrementado y asigna el nombre del oficial comercial autenticado en el sistema.</li>
-                    <li><strong>Datos del Cliente:</strong> Ingrese el Nombre o Razón Social, RTN (con máscara automática), Persona de Contacto, Teléfono y Correo Electrónico.</li>
+                    <li><strong>Datos Generales:</strong> El sistema sugiere el número de cotización autoincrementado y
+                        asigna el nombre del oficial comercial autenticado en el sistema.</li>
+                    <li><strong>Datos del Cliente:</strong> Ingrese el Nombre o Razón Social, RTN (con máscara
+                        automática), Persona de Contacto, Teléfono y Correo Electrónico.</li>
                     <li><strong>Detalle de Conceptos:</strong>
                         <ul>
                             <li>Presione <strong>"+ Agregar Fila"</strong> para insertar conceptos adicionales.</li>
-                            <li>Seleccione del catálogo productos preestablecidos (ej. <em>1 Página, 1/2 Página, Marcas y Patentes, Juntas de Agua</em>) o seleccione <em>"Otro / Personalizado"</em> para digitar un servicio especial.</li>
-                            <li>Ingrese la <strong>Cantidad</strong> y el <strong>Precio Unitario</strong>. El total de la fila se calcula de manera inmediata.</li>
-                            <li>Seleccione el régimen de impuesto: <strong>ISV 15%</strong> o <strong>Exento</strong>.</li>
+                            <li>Seleccione del catálogo productos preestablecidos (ej. <em>1 Página, 1/2 Página, Marcas
+                                    y Patentes, Juntas de Agua</em>) o seleccione <em>"Otro / Personalizado"</em> para
+                                digitar un servicio especial.</li>
+                            <li>Ingrese la <strong>Cantidad</strong> y el <strong>Precio Unitario</strong>. El total de
+                                la fila se calcula de manera inmediata.</li>
+                            <li>Seleccione el régimen de impuesto: <strong>ISV 15%</strong> o <strong>Exento</strong>.
+                            </li>
                             <li>Utilice el botón rojo <strong>"x"</strong> para eliminar filas innecesarias.</li>
                         </ul>
                     </li>
@@ -499,36 +537,51 @@
                             <li><strong>Personalizado:</strong> Permite ingresar un porcentaje libre autorizado.</li>
                         </ul>
                     </li>
-                    <li><strong>Descarga y Guardado:</strong> Haga clic en <strong>"Generar y Descargar Cotización (PDF)"</strong> para emitir el documento oficial con membrete, tabla de desglose horizontal, notas de ley y línea de autorización.</li>
+                    <li><strong>Descarga y Guardado:</strong> Haga clic en <strong>"Generar y Descargar Cotización
+                            (PDF)"</strong> para emitir el documento oficial con membrete, tabla de desglose horizontal,
+                        notas de ley y línea de autorización.</li>
                 </ol>
 
                 <h2>3.2. Historial de Cotizaciones y Control de Estados</h2>
-                <p>El historial inferior permite buscar cotizaciones emitidas, filtrar por fechas o clientes y actualizar su estado en tiempo real:</p>
+                <p>El historial inferior permite buscar cotizaciones emitidas, filtrar por fechas o clientes y
+                    actualizar su estado en tiempo real:</p>
                 <ul>
-                    <li><span class="manual-badge badge-pending">⏳ Pendiente:</span> Cotización emitida a la espera de confirmación del cliente.</li>
-                    <li><span class="manual-badge badge-approved">✅ Aprobada:</span> El cliente autorizó el presupuesto para pasar a taller de producción.</li>
-                    <li><span class="manual-badge badge-rejected">❌ Rechazada:</span> Cotización no aceptada o cancelada.</li>
+                    <li><span class="manual-badge badge-pending">⏳ Pendiente:</span> Cotización emitida a la espera de
+                        confirmación del cliente.</li>
+                    <li><span class="manual-badge badge-approved">✅ Aprobada:</span> El cliente autorizó el presupuesto
+                        para pasar a taller de producción.</li>
+                    <li><span class="manual-badge badge-rejected">❌ Rechazada:</span> Cotización no aceptada o
+                        cancelada.</li>
                 </ul>
-                <p>Cualquier cambio de estado se registra automáticamente en la <strong>Bitácora Institucional</strong> para auditoría de Comercialización.</p>
+                <p>Cualquier cambio de estado se registra automáticamente en la <strong>Bitácora Institucional</strong>
+                    para auditoría de Comercialización.</p>
             </div>
 
             <!-- 4. RRHH - VOUCHERS -->
             <div id="rrhh-vouchers" class="manual-section">
                 <h1>4. Recursos Humanos — Vouchers de Pago</h1>
-                <p>Automatiza el procesamiento de planillas salariales mensuales para el personal bajo régimen de <strong>Acuerdo</strong> (permanente) y <strong>Contrato</strong> (temporal).</p>
+                <p>Automatiza el procesamiento de planillas salariales mensuales para el personal bajo régimen de
+                    <strong>Acuerdo</strong> (permanente) y <strong>Contrato</strong> (temporal).
+                </p>
 
                 <h2>Procedimiento de Procesamiento de Planillas:</h2>
                 <ol>
                     <li>Seleccione el mes y año de pago correspondiente.</li>
-                    <li>Arrastre o cargue el archivo Excel de la planilla salarial (<code>.xls</code> o <code>.xlsx</code>).</li>
-                    <li>El sistema extraerá automáticamente a todos los empleados, calculando el sueldo nominal, deducciones de ley (IHSS, aportes jubilatorios), deducciones de cooperativa y el salario neto final.</li>
+                    <li>Arrastre o cargue el archivo Excel de la planilla salarial (<code>.xls</code> o
+                        <code>.xlsx</code>).
+                    </li>
+                    <li>El sistema extraerá automáticamente a todos los empleados, calculando el sueldo nominal,
+                        deducciones de ley (IHSS, aportes jubilatorios), deducciones de cooperativa y el salario neto
+                        final.</li>
                     <li>Utilice el buscador para verificar los valores individuales de un empleado.</li>
-                    <li>Presione <strong>"Generar Vouchers"</strong> para compilar y descargar en bloque los recibos individuales membretados y listos para distribución.</li>
+                    <li>Presione <strong>"Generar Vouchers"</strong> para compilar y descargar en bloque los recibos
+                        individuales membretados y listos para distribución.</li>
                 </ol>
 
                 <div class="manual-image-container">
                     <img src="../assets/captura_vouchers_acuerdo.png" alt="Pantalla de Vouchers Acuerdo">
-                    <div class="manual-image-caption">Figura 4: Interfaz de carga masiva de planillas para personal de Acuerdo.</div>
+                    <div class="manual-image-caption">Figura 4: Interfaz de carga masiva de planillas para personal de
+                        Acuerdo.</div>
                 </div>
             </div>
 
@@ -537,49 +590,67 @@
                 <h1>5. Recursos Humanos — Constancias Laborales</h1>
                 <p>Genera certificaciones oficiales de empleo en cuatro variantes institucionales:</p>
                 <ul>
-                    <li><strong>Con Deducciones (Acuerdo / Contrato):</strong> Detalla el sueldo nominal junto al desglose de deducciones mensuales. Formato requerido por bancos y cooperativas para préstamos.</li>
-                    <li><strong>Sin Deducciones (Acuerdo / Contrato):</strong> Certifica el puesto, fecha de ingreso y salario nominal bruto.</li>
+                    <li><strong>Con Deducciones (Acuerdo / Contrato):</strong> Detalla el sueldo nominal junto al
+                        desglose de deducciones mensuales. Formato requerido por bancos y cooperativas para préstamos.
+                    </li>
+                    <li><strong>Sin Deducciones (Acuerdo / Contrato):</strong> Certifica el puesto, fecha de ingreso y
+                        salario nominal bruto.</li>
                 </ul>
 
                 <h2>Pasos para Emisión:</h2>
                 <ol>
-                    <li>Cargue la lista de empleados desde la planilla Excel o digite manualmente los datos generales (Nombre, Identidad, Sueldo, Fecha de Inicio).</li>
+                    <li>Cargue la lista de empleados desde la planilla Excel o digite manualmente los datos generales
+                        (Nombre, Identidad, Sueldo, Fecha de Inicio).</li>
                     <li>Seleccione el firmante autorizado de Recursos Humanos.</li>
-                    <li>Haga clic en <strong>"Generar Constancia"</strong>. El documento se generará con formato de correspondencia formal, sello, firma y <strong>Código QR de Validación Institucional</strong>.</li>
+                    <li>Haga clic en <strong>"Generar Constancia"</strong>. El documento se generará con formato de
+                        correspondencia formal, sello, firma y <strong>Código QR de Validación Institucional</strong>.
+                    </li>
                 </ol>
 
                 <div class="manual-image-container">
                     <img src="../assets/captura_constancias.png" alt="Pantalla de Constancias Laborales">
-                    <div class="manual-image-caption">Figura 5: Interfaz para emisión de constancias de trabajo oficiales.</div>
+                    <div class="manual-image-caption">Figura 5: Interfaz para emisión de constancias de trabajo
+                        oficiales.</div>
                 </div>
             </div>
 
             <!-- 6. RRHH - INCAPACIDADES -->
             <div id="rrhh-incapacidades" class="manual-section">
                 <h1>6. Recursos Humanos — Subsidios por Incapacidad IHSS</h1>
-                <p>Determina la distribución de subsidios por incapacidad temporal del Instituto Hondureño de Seguridad Social (IHSS) y el flujo de reintegro a favor de la ENAG.</p>
+                <p>Determina la distribución de subsidios por incapacidad temporal del Instituto Hondureño de Seguridad
+                    Social (IHSS) y el flujo de reintegro a favor de la ENAG.</p>
 
                 <div class="manual-note">
                     <strong>📌 Principio de Reintegro en el Sector Público:</strong>
-                    Debido a que el colaborador percibe el 100% de su sueldo nominal normal a través de la planilla de la ENAG mientras dura la licencia médica, la legislación estipula que el subsidio en efectivo otorgado por el IHSS (66% de la base) debe ser <strong>reintegrado</strong> formalmente a la institución.
+                    Debido a que el colaborador percibe el 100% de su sueldo nominal normal a través de la planilla de
+                    la ENAG mientras dura la licencia médica, la legislación estipula que el subsidio en efectivo
+                    otorgado por el IHSS (66% de la base) debe ser <strong>reintegrado</strong> formalmente a la
+                    institución.
                 </div>
 
                 <h2>Metodología de Cálculo:</h2>
                 <ul>
-                    <li><strong>Suma de Días de 3 Meses Anteriores:</strong> Obtiene la suma de los días calendario reales de los 3 meses previos al inicio de la incapacidad.</li>
-                    <li><strong>Sueldo Diario de Referencia:</strong> Se toma el Techo de Cotización vigente (<strong>L. 11,903.13</strong>), se multiplica por 3 y se divide entre los días calendario totales de dicho período.</li>
+                    <li><strong>Suma de Días de 3 Meses Anteriores:</strong> Obtiene la suma de los días calendario
+                        reales de los 3 meses previos al inicio de la incapacidad.</li>
+                    <li><strong>Sueldo Diario de Referencia:</strong> Se toma el Techo de Cotización vigente (<strong>L.
+                            11,903.13</strong>), se multiplica por 3 y se divide entre los días calendario totales de
+                        dicho período.</li>
                     <li><strong>Distribución del Subsidio:</strong>
                         <ul>
                             <li><strong>Subsidio IHSS (66%):</strong> Monto a reintegrar a favor de la ENAG.</li>
                             <li><strong>Aporte Patrono (34%):</strong> Aporte complementario institucional.</li>
                         </ul>
                     </li>
-                    <li><strong>Carencia:</strong> En enfermedad o accidente común, el patrono cubre los primeros 3 días; el IHSS opera a partir del 4.º día. En maternidad o riesgos profesionales no aplica carencia.</li>
+                    <li><strong>Carencia:</strong> En enfermedad o accidente común, el patrono cubre los primeros 3
+                        días; el IHSS opera a partir del 4.º día. En maternidad o riesgos profesionales no aplica
+                        carencia.</li>
                 </ul>
 
                 <div class="manual-image-container">
-                    <img src="../assets/diagrama_reintegro.png" alt="Diagrama de Reintegro IHSS" style="max-width: 65%;">
-                    <div class="manual-image-caption">Figura 6: Diagrama de flujo de fondos y proceso de reintegro de subsidios en la ENAG.</div>
+                    <img src="../assets/diagrama_reintegro.png" alt="Diagrama de Reintegro IHSS"
+                        style="max-width: 65%;">
+                    <div class="manual-image-caption">Figura 6: Diagrama de flujo de fondos y proceso de reintegro de
+                        subsidios en la ENAG.</div>
                 </div>
             </div>
 
@@ -589,24 +660,32 @@
                 <p>Módulos de apoyo para la administración del recurso humano de la institución:</p>
 
                 <h2>7.1. Permisos Laborales (rrhh_permisos.html)</h2>
-                <p>Permite tramitar licencias y permisos justificados de colaboradores por motivos de salud, duelo, estudio o asuntos personales, registrando horas o días y emitiendo el comprobante de visto bueno de la jefatura.</p>
+                <p>Permite tramitar licencias y permisos justificados de colaboradores por motivos de salud, duelo,
+                    estudio o asuntos personales, registrando horas o días y emitiendo el comprobante de visto bueno de
+                    la jefatura.</p>
 
                 <h2>7.2. Solicitud y Requisición de Personal (solicitud_personal.html)</h2>
-                <p>Formulario oficial para que las diferentes jefaturas de departamento soliciten la contratación de plazas temporales o permanentes, especificando funciones, perfil requerido y justificación técnica.</p>
+                <p>Formulario oficial para que las diferentes jefaturas de departamento soliciten la contratación de
+                    plazas temporales o permanentes, especificando funciones, perfil requerido y justificación técnica.
+                </p>
 
                 <h2>7.3. Control de Vacaciones (vacaciones.html)</h2>
-                <p>Lleva el cómputo de días acumulados según la antigüedad laboral en base al Código de Trabajo y la Ley de Servicio Civil, registrando días gozados y saldos pendientes.</p>
+                <p>Lleva el cómputo de días acumulados según la antigüedad laboral en base al Código de Trabajo y la Ley
+                    de Servicio Civil, registrando días gozados y saldos pendientes.</p>
             </div>
 
             <!-- 8. PRODUCCIÓN GRÁFICA -->
             <div id="produccion" class="manual-section">
                 <h1>8. Módulo de Producción Gráfica</h1>
-                <p>Coordina la ejecución de trabajos industriales de imprenta, encuadernación y diseño en los talleres de la ENAG.</p>
+                <p>Coordina la ejecución de trabajos industriales de imprenta, encuadernación y diseño en los talleres
+                    de la ENAG.</p>
 
                 <h2>8.1. Registro de Órdenes de Producción:</h2>
                 <ol>
-                    <li>Ingrese el número de orden, cliente y la descripción del trabajo (libros, afiches, diarios oficiales).</li>
-                    <li>Especifique la cantidad de tiraje, formato de papel, tipo de tinta y acabados (plegado, grapado, barniz).</li>
+                    <li>Ingrese el número de orden, cliente y la descripción del trabajo (libros, afiches, diarios
+                        oficiales).</li>
+                    <li>Especifique la cantidad de tiraje, formato de papel, tipo de tinta y acabados (plegado, grapado,
+                        barniz).</li>
                     <li>Asigne el operador o maquinista a cargo y la fecha comprometida de entrega.</li>
                 </ol>
 
@@ -616,39 +695,256 @@
                     <li><strong>Pre-prensa / Diseño:</strong> Elaboración de artes, fotolitos o placas CTP.</li>
                     <li><strong>Prensa / Impresión:</strong> Montaje en máquinas rotativas o planas y tiraje.</li>
                     <li><strong>Post-prensa / Acabados:</strong> Corte, encuadernación y empaque.</li>
-                    <li><strong>Listo para Entrega / Entregado:</strong> Notificación al cliente y salida de taller.</li>
+                    <li><strong>Listo para Entrega / Entregado:</strong> Notificación al cliente y salida de taller.
+                    </li>
                 </ul>
 
                 <div class="manual-image-container">
                     <img src="../assets/captura_produccion.png" alt="Pantalla de Órdenes de Producción">
-                    <div class="manual-image-caption">Figura 7: Formulario y control de Órdenes de Producción en Talleres Gráficos.</div>
+                    <div class="manual-image-caption">Figura 7: Formulario y control de Órdenes de Producción en
+                        Talleres Gráficos.</div>
                 </div>
             </div>
 
-            <!-- 9. ESTADO DE SOLICITUDES -->
-            <div id="estado-solicitud" class="manual-section">
-                <h1>9. Atención al Ciudadano — Estado de Solicitudes</h1>
-                <p>El módulo <strong>estado_solicitud.html</strong> permite a usuarios internos y ciudadanos consultar en tiempo real el progreso de trámites, cotizaciones o requisiciones ingresando el número de expediente o ticket correspondiente.</p>
+            <!-- 9. BIENES NACIONALES -->
+            <div id="bienes-nacionales" class="manual-section">
+                <h1>9. Módulo de Bienes Nacionales e Inventario QR</h1>
+                <p>El módulo <strong>bienes_nacionales.html</strong> administra y fiscaliza el patrimonio mueble y los
+                    activos fijos de la ENAG conforme a las normativas de la Dirección General de Bienes Nacionales de
+                    la República de Honduras. Permite el control individualizado por custodio, generación de fichas de
+                    resguardo y emisión de etiquetas con códigos QR y barras para escaneo físico in situ.</p>
+
+                <h2>9.1. Registro y Ficha Técnica del Activo</h2>
+                <p>Para incorporar un nuevo bien al inventario estatal:</p>
+                <ol>
+                    <li><strong>Código de Inventario:</strong> Número único asignado al activo (ej.
+                        <code>4004004</code>).
+                    </li>
+                    <li><strong>Clasificación y Categoría:</strong> Selección de la categoría presupuestaria (Equipo de
+                        Computación, Mobiliario y Equipo de Oficina, Maquinaria Gráfica Industrial, Vehículos, etc.).
+                    </li>
+                    <li><strong>Especificaciones Físicas:</strong> Denominación detallada, Marca, Modelo, Número de
+                        Serie y Color.</li>
+                    <li><strong>Datos Financieros:</strong> Valor de adquisición en Lempiras (L.), Proveedor y Fecha de
+                        ingreso.</li>
+                    <li><strong>Asignación y Custodio:</strong> Nombre completo del empleado responsable (Custodio),
+                        cargo, departamento institucional y ubicación física exacta dentro de la planta o edificio.</li>
+                    <li><strong>Estado Operativo del Bien:</strong> Clasificación técnica obligatoria: <em>Excelente,
+                            Bueno, Regular, Malo</em> o <em>Para Descargo</em>.</li>
+                </ol>
+
+                <h2>9.2. Emisión de Etiquetas con Códigos QR y Códigos de Barra</h2>
+                <p>El sistema genera etiquetas oficiales listas para impresión adhesiva:</p>
+                <ul>
+                    <li><strong>Código QR Institucional:</strong> Al ser escaneado con la cámara de cualquier teléfono
+                        móvil o tableta, redirige al portal público de consulta (<code>consulta_bien.html</code>)
+                        mostrando de forma instantánea la ficha del bien, custodio y estado sin requerir inicio de
+                        sesión.</li>
+                    <li><strong>Código de Barras Code 128:</strong> Generado mediante <code>JsBarcode</code> para
+                        pistolas lectoras láser estándar de almacén.</li>
+                </ul>
+
+                <h2>9.3. Actas Oficiales y Fichas de Resguardo en PDF</h2>
+                <ul>
+                    <li><strong>Ficha de Resguardo / Asignación:</strong> Acta formal que firma el empleado al recibir
+                        un activo, comprometiéndose a su custodia y buen uso.</li>
+                    <li><strong>Acta de Descargo:</strong> Documento legal para activos dañados, obsoletos o
+                        inservibles, respaldado por el dictamen del Departamento de Informática.</li>
+                </ul>
+
+                <h2>9.4. Búsqueda y Exportación a Excel</h2>
+                <p>Incluye filtros rápidos por departamento, estado y buscador dinámico. El botón <strong>"Exportar a
+                        Excel"</strong> genera un informe tabular consolidado con todos los campos del inventario
+                    patrimonial para fines de auditoría del Tribunal Superior de Cuentas (TSC).</p>
             </div>
 
-            <!-- 10. AUDITORÍA Y BITÁCORA -->
-            <div id="bitacora" class="manual-section">
-                <h1>10. Auditoría y Bitácora Institucional</h1>
-                <p>El módulo <strong>bitacora.html</strong> registra de forma cronológica e inmutable todas las operaciones sensibles ejecutadas en el sistema:</p>
+            <!-- 10. EMISIÓN DE MEMORÁNDUMS OFICIALES -->
+            <div id="memorandums" class="manual-section">
+                <h1>10. Módulo de Emisión de Memorándums Oficiales</h1>
+                <p>El módulo <strong>memorandums.html</strong> es la herramienta corporativa para la redacción,
+                    numeración correlativa automatizada y emisión de memorándums formales en formato oficial
+                    estandarizado de la ENAG.</p>
+
+                <h2>10.1. Correlativo Automático por Departamento</h2>
+                <p>El sistema mantiene la secuencia numérica de memorandos por área emisora:</p>
                 <ul>
-                    <li><strong>Eventos Registrados:</strong> Creación, modificación o eliminación de cotizaciones, cuadre de partidas contables, descargas de vouchers y cambios de estado.</li>
-                    <li><strong>Trazabilidad:</strong> Cada registro guarda el módulo de origen, la acción realizada, el nombre de usuario autenticado y la fecha/hora exacta.</li>
-                    <li><strong>Filtros:</strong> Los auditores pueden filtrar registros por departamento (Contabilidad, Comercialización, RRHH, TI) o buscar por palabras clave.</li>
+                    <li><strong>Prefijo Departamental:</strong> <code>INFO</code> (Informática), <code>ADMON</code>
+                        (Administración), <code>PROD</code> (Producción), <code>CONT</code> (Contabilidad), o
+                        <code>OTRO</code> para departamentos con prefijo personalizado.
+                    </li>
+                    <li><strong>Numeración Consecutiva:</strong> El sistema consulta en Cloud Firestore el último número
+                        emitido y sugiere automáticamente el siguiente (ej. <code>INFO-59-ENAG</code>). Si se detecta un
+                        correlativo ya utilizado, el indicador alerta inmediatamente para prevenir duplicidades.</li>
+                    <li><strong>Sufijo Institucional:</strong> Termina reglamentariamente en <code>ENAG</code>.</li>
+                </ul>
+
+                <h2>10.2. Estructura y Redacción Normada</h2>
+                <ol>
+                    <li><strong>Destinatario (PARA):</strong> Nombre completo y cargo oficial del funcionario o empleado
+                        que recibe la comunicación.</li>
+                    <li><strong>Remitente (DE):</strong> Nombre y cargo del emisor. El sistema precarga automáticamente
+                        estos datos a partir de la sesión activa del usuario.</li>
+                    <li><strong>Fecha Oficial en Español:</strong> Generada automáticamente en formato extendido formal
+                        de Honduras (ej. <em>"Miércoles 11 de Noviembre de 2026"</em>).</li>
+                    <li><strong>Asunto:</strong> Resumen conciso del motivo de la comunicación.</li>
+                    <li><strong>Tratamiento y Saludo Inicial:</strong> Texto formal con botón <em>"⚡ Sugerir"</em> para
+                        generar el saludo apropiado según el destinatario.</li>
+                    <li><strong>Cuerpo del Memorando:</strong> Área de texto con botones para añadir viñetas
+                        estructuradas (<code>-</code>) y frases de cierre protocolario.</li>
+                    <li><strong>Despedida y Firmas:</strong> Opciones configurables entre Normal (línea de firma y
+                        sello), Compacto (para textos largos) o Solo Texto.</li>
+                    <li><strong>Copias y Archivo (c.c.):</strong> Registro de destinatarios de copias (Original y hasta
+                        dos copias adicionales).</li>
+                </ol>
+
+                <h2>10.3. Control de Tipografía y Membrete Completo</h2>
+                <p>Para garantizar que el documento se imprima en una sola página sin recortar ni sobreescribir el
+                    membrete institucional superior ni la barra azul inferior con la dirección y sitio web
+                    (<code>www.enag.gob.hn</code>), el sistema dispone de un <strong>Selector de Tamaño de
+                        Letra</strong>:</p>
+                <ul>
+                    <li><strong>Pequeña (8.5 pt) [Predeterminada]:</strong> Configuración óptima que balancea
+                        legibilidad y espacio vertical, asegurando el membrete 100% visible.</li>
+                    <li><strong>Muy Pequeña (7.5 pt):</strong> Para memorándums extensos con listas o tablas
+                        descriptivas.</li>
+                    <li><strong>Mediana (9.5 pt):</strong> Para notas breves de uno o dos párrafos.</li>
+                </ul>
+
+                <h2>10.4. Vista Previa en Vivo y Descarga de PDF Oficial</h2>
+                <p>A la derecha del formulario, el panel de <strong>Vista Previa</strong> reproduce en tiempo real el
+                    aspecto exacto de la hoja carta membretada. Al presionar <strong>"📄 Descargar PDF
+                        Oficial"</strong>, se genera un archivo PDF vectorial de alta resolución en tipografía Times New
+                    Roman con el membrete institucional de fondo y se guarda automáticamente el registro en la base de
+                    datos.</p>
+            </div>
+
+            <!-- 11. REPORTES TÉCNICOS -->
+            <div id="reporte-tecnico" class="manual-section">
+                <h1>11. Módulo de Reportes Técnicos — Departamento de Informática</h1>
+                <p>El módulo <strong>reporte_tecnico.html</strong> estandariza los dictámenes periciales y de soporte
+                    emitidos por el personal de Tecnologías de la Información. Es el instrumento oficial requerido para
+                    justificar reparaciones, mantenimientos correctivos y solicitudes de descargo de activos
+                    tecnológicos ante Bienes Nacionales.</p>
+
+                <h2>11.1. Numeración Correlativa Anual</h2>
+                <p>Los reportes se numeran cronológicamente por año fiscal bajo el formato oficial <strong>`RT
+                        YYYY-NN`</strong> (ej. <code>RT 2026-11</code>). El sistema calcula dinámicamente el siguiente
+                    número en secuencia y permite alternar entre el formato con prefijo (<code>RT 2026-11</code>) o
+                    numérico puro (<code>2026-11</code>).</p>
+
+                <h2>11.2. Enlace Inteligente con Bienes Nacionales</h2>
+                <p>El módulo cuenta con el botón <strong>"🔍 Buscar en Bienes Nacionales"</strong>. Al ingresar el
+                    Código de Inventario o Serie de un equipo, el sistema consulta en tiempo real la base de datos de
+                    Bienes Nacionales y autocompleta al instante:</p>
+                <ul>
+                    <li>Nombre del Responsable del Bien (Custodio asignado).</li>
+                    <li>Departamento al que pertenece el equipo.</li>
+                    <li>Descripción completa (Denominación, Marca, Modelo y Color).</li>
+                    <li>Número de Serie y Número de Inventario.</li>
+                </ul>
+
+                <h2>11.3. Diagnóstico y Dictamen Técnico</h2>
+                <p>El técnico detalla la evaluación realizada, fallas detectadas y solución recomendada. Incluye botones
+                    rápidos para insertar plantillas comunes:</p>
+                <ul>
+                    <li><strong>⚠️ Descargo:</strong> Inserta el texto formal que dictamina daño irreparable y no
+                        costeable, recomendando el trámite de baja ante Bienes Nacionales.</li>
+                    <li><strong>✅ Reparado:</strong> Registra la conclusión de mantenimiento correctivo, cambio de
+                        repuestos y operatividad restablecida.</li>
+                    <li><strong>Texto de Cierre Obligatorio:</strong> Inserta automáticamente la línea centrada de
+                        seguridad
+                        <code>-------------------------------- Ultima Linea --------------------------------</code> que
+                        previene alteraciones posteriores al documento.
+                    </li>
+                </ul>
+
+                <h2>11.4. Cuadrante de Cuatro Firmas y Copias Oficiales</h2>
+                <p>El documento oficial exige y delimita los espacios para cuatro firmas de responsabilidad en
+                    cuadrícula 2x2:</p>
+                <ol>
+                    <li><strong>Firma Responsable del Bien:</strong> Aceptación del custodio del equipo.</li>
+                    <li><strong>Firma Técnico de Informática:</strong> Perito que realizó la revisión física.</li>
+                    <li><strong>V.B. Sub-Gerente Administrativo:</strong> Autoridad administrativa que avala el
+                        dictamen.</li>
+                    <li><strong>Firma Jefe de Informática:</strong> Aprobación técnica de la jefatura de departamento.
+                    </li>
+                </ol>
+                <p>Al pie del reporte se especifica la distribución de copias: <em>Original: Bienes Nacionales</em>,
+                    <em>c.c. Archivo</em> y <em>c.c. Responsable del Bien</em>.
+                </p>
+
+                <h2>11.5. Emisión de PDF, Impresión Directa e Historial</h2>
+                <ul>
+                    <li><strong>Descarga PDF:</strong> Genera el formato carta con las cajas y píldoras estilizadas
+                        idénticas a la plantilla oficial sobre el papel membretado.</li>
+                    <li><strong>Imprimir:</strong> Abre directamente el visor de impresión nativo del navegador.</li>
+                    <li><strong>Historial en la Nube:</strong> Todos los reportes se almacenan en la colección
+                        <code>reportes_tecnicos</code> de Cloud Firestore, permitiendo reemitir el PDF o consultar
+                        antecedentes por número de serie o custodio en cualquier momento.
+                    </li>
                 </ul>
             </div>
 
-            <!-- 11. PARÁMETROS Y SOPORTE TI -->
+            <!-- 12. DETECTOR DE ESPACIO -->
+            <div id="detector-espacio" class="manual-section">
+                <h1>12. Módulo de Detector de Espacio y Tarifas (La Gaceta)</h1>
+                <p>El módulo <strong>detector_espacio.html</strong> resuelve de forma automatizada uno de los procesos
+                    más críticos de Comercialización: determinar con precisión milimétrica la fracción de página que
+                    ocupará un texto legal en el formato tabloide del Diario Oficial <em>La Gaceta</em> y calcular su
+                    cotización oficial.</p>
+
+                <h2>12.1. Metodología de Detección Tipográfica</h2>
+                <ol>
+                    <li>Pegue el texto íntegro del aviso, acuerdo, decreto o edicto en el área de trabajo.</li>
+                    <li>El algoritmo procesa el número de caracteres, palabras y párrafos, proyectando su diagramación a
+                        <strong>3 columnas reglamentarias</strong> con interlineado editorial estándar.
+                    </li>
+                    <li>Determina automáticamente la fracción de página requerida: <strong>1/8, 1/4, 1/3, 1/2,
+                            3/4</strong> o <strong>Página Completa Tabloide</strong>.</li>
+                    <li>Permite ajustar el tamaño de fuente (en escala tipográfica Times New Roman reglamentaria) para
+                        evaluar si un aviso puede optimizarse dentro de una fracción inferior.</li>
+                </ol>
+
+                <h2>12.2. Liquidación y Enlace a Cotizaciones</h2>
+                <p>Una vez determinado el espacio, el sistema aplica la tarifa vigente según el Acuerdo Ejecutivo N°
+                    249-2010 y permite trasladar los datos directamente al módulo de <strong>Cotizaciones</strong> para
+                    emitir la factura proforma al cliente de manera inmediata.</p>
+            </div>
+
+            <!-- 13. ESTADO DE SOLICITUDES -->
+            <div id="estado-solicitud" class="manual-section">
+                <h1>13. Atención al Ciudadano — Estado de Solicitudes</h1>
+                <p>El módulo <strong>estado_solicitud.html</strong> permite a usuarios internos y ciudadanos consultar
+                    en tiempo real el progreso de trámites, cotizaciones o requisiciones ingresando el número de
+                    expediente o ticket correspondiente.</p>
+            </div>
+
+            <!-- 14. AUDITORÍA Y BITÁCORA -->
+            <div id="bitacora" class="manual-section">
+                <h1>14. Auditoría y Bitácora Institucional</h1>
+                <p>El módulo <strong>bitacora.html</strong> registra de forma cronológica e inmutable todas las
+                    operaciones sensibles ejecutadas en el sistema:</p>
+                <ul>
+                    <li><strong>Eventos Registrados:</strong> Creación, modificación o eliminación de cotizaciones,
+                        cuadre de partidas contables, emisión de memorándums, reportes técnicos, descargas de vouchers y
+                        cambios de estado.</li>
+                    <li><strong>Trazabilidad:</strong> Cada registro guarda el módulo de origen, la acción realizada, el
+                        nombre de usuario autenticado y la fecha/hora exacta.</li>
+                    <li><strong>Filtros:</strong> Los auditores pueden filtrar registros por departamento (Contabilidad,
+                        Comercialización, RRHH, TI, Bienes Nacionales) o buscar por palabras clave.</li>
+                </ul>
+            </div>
+
+            <!-- 15. PARÁMETROS Y SOPORTE TI -->
             <div id="parametros" class="manual-section">
-                <h1>11. Parámetros del Sistema y Soporte TI</h1>
+                <h1>15. Parámetros del Sistema y Soporte TI</h1>
                 <p>Herramientas administrativas destinadas al departamento de Tecnologías de la Información:</p>
                 <ul>
-                    <li><strong>Parámetros Globales (parametros.html):</strong> Configuración del porcentaje de ISV, tiempo de expiración de sesión por inactividad y activación de bloqueo de sesiones múltiples.</li>
-                    <li><strong>Soporte Técnico (soporte.js):</strong> Botón flotante de asistencia que permite a los operadores reportar incidencias técnicas y generar tickets directamente a TI.</li>
+                    <li><strong>Parámetros Globales (parametros.html):</strong> Configuración del porcentaje de ISV,
+                        tiempo de expiración de sesión por inactividad y activación de bloqueo de sesiones múltiples.
+                    </li>
+                    <li><strong>Soporte Técnico (soporte.js):</strong> Botón flotante de asistencia que permite a los
+                        operadores reportar incidencias técnicas y generar tickets directamente a TI.</li>
                 </ul>
             </div>
 
@@ -722,7 +1018,7 @@
             const capturaProduccionBgUrl = await getBase64FromUrl('../assets/captura_produccion.png');
 
             let pageNum = 1;
-            const totalPaginasTotal = 10;
+            const totalPaginasTotal = 14;
 
             function drawHeaderFooter(doc, logoBgUrl, numPagina) {
                 if (logoBgUrl) {
@@ -916,10 +1212,122 @@
                 doc.text("Figura 9: Registro y seguimiento de Órdenes de Producción en Talleres.", 105, y, { align: 'center' });
             }
 
-            // PÁGINA 10: AUDITORÍA Y BITÁCORA
+            // PÁGINA 10: BIENES NACIONALES E INVENTARIO QR
             doc.addPage(); pageNum++; drawHeaderFooter(doc, logoBgUrl, pageNum);
             doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
-            doc.text("8. AUDITORÍA, BITÁCORA Y PARÁMETROS", marginX, 45);
+            doc.text("8. MÓDULO DE BIENES NACIONALES E INVENTARIO QR", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            let pBienes = "Administra y fiscaliza el patrimonio mueble y los activos fijos de la institución conforme a los lineamientos de la Dirección General de Bienes Nacionales de Honduras. Permite registrar código de inventario, marca, modelo, número de serie, custodio asignado, ubicación y estado físico (Excelente, Bueno, Regular, Malo o Para Descargo). Asimismo, genera etiquetas oficiales con códigos QR y barras para escaneo físico in situ y habilita la consulta pública ciudadana mediante enlace seguro.";
+            let splitBienes = doc.splitTextToSize(pBienes, maxW);
+            doc.text(splitBienes, marginX, y);
+            y += (splitBienes.length * 5) + 8;
+
+            doc.setFillColor(245, 247, 250);
+            doc.setDrawColor(200, 210, 225);
+            doc.roundedRect(marginX, y, maxW, 55, 3, 3, 'FD');
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+            doc.text("Capacidades Principales de Bienes Nacionales:", marginX + 5, y + 8);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(51, 51, 51);
+            let bPoints = [
+                "• Ficha Técnica Integral: Detalle de adquisición, costo en Lempiras, factura y proveedor.",
+                "• Trazabilidad de Custodios: Asignación por empleado, cargo institucional y departamento.",
+                "• Generación de Etiquetas QR / Barcode: Identificadores individuales para pegado adhesivo.",
+                "• Descargo y Mantenimiento: Control estricto de bajas y solicitud de sustitución de bienes.",
+                "• Consulta Pública (consulta_bien.html): Verificación instantánea por lectura con smartphone."
+            ];
+            let by = y + 16;
+            bPoints.forEach(pt => { doc.text(pt, marginX + 6, by); by += 7; });
+
+            // PÁGINA 11: MEMORÁNDUMS OFICIALES
+            doc.addPage(); pageNum++; drawHeaderFooter(doc, logoBgUrl, pageNum);
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+            doc.text("9. EMISIÓN DE MEMORÁNDUMS OFICIALES", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            let pMemo = "Automatiza la redacción y despacho de comunicaciones oficiales internas y externas. Incluye encabezado gubernamental, pie de página institucional, selección de tipografía Times New Roman y escalado automático (Pequeña 8.5pt, Muy Pequeña 7.5pt, Mediana 9.5pt) para garantizar que todo el texto y firmas se ajusten exactamente en una sola página reglamentaria. Incorpora correlativo editable con prefijo institucional y sincronización en la nube con Firestore.";
+            let splitMemo = doc.splitTextToSize(pMemo, maxW);
+            doc.text(splitMemo, marginX, y);
+            y += (splitMemo.length * 5) + 8;
+
+            doc.setFillColor(245, 247, 250);
+            doc.setDrawColor(200, 210, 225);
+            doc.roundedRect(marginX, y, maxW, 55, 3, 3, 'FD');
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+            doc.text("Flujo Operativo de Memorándums:", marginX + 5, y + 8);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(51, 51, 51);
+            let mPoints = [
+                "• Correlativo Institucional: Conteo dinámico editable (ej. MEMO-ENAG-SG-059-2026).",
+                "• Destinatarios y Remitentes: Selección rápida con cargos y departamentos de la ENAG.",
+                "• Redacción Formal: Asunto, cuerpo del mensaje, líneas de cortesía y firmas autorizadas.",
+                "• Control de Ajuste de Página: Selectores para evitar desbordes al pie o cortes de firmas.",
+                "• Impresión y PDF: Exportación directa en PDF vectorial e impresión nativa sin desconfiguración."
+            ];
+            let my = y + 16;
+            mPoints.forEach(pt => { doc.text(pt, marginX + 6, my); my += 7; });
+
+            // PÁGINA 12: REPORTES TÉCNICOS DE INFORMÁTICA
+            doc.addPage(); pageNum++; drawHeaderFooter(doc, logoBgUrl, pageNum);
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+            doc.text("10. REPORTES TÉCNICOS DEL DEPARTAMENTO DE INFORMÁTICA", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            let pRT = "Herramienta especializada para el Departamento de Informática (reporte_tecnico.html) diseñada para documentar revisiones, diagnósticos y solicitudes de descargo de equipos de cómputo y periféricos. Posee formato idéntico a la plantilla institucional física con campos redondeados en píldora, correlativo oficial (RT 2026-11), bloque de diagnóstico con marca de agua y cuadrante de 4 firmas de ley.";
+            let splitRT = doc.splitTextToSize(pRT, maxW);
+            doc.text(splitRT, marginX, y);
+            y += (splitRT.length * 5) + 8;
+
+            doc.setFillColor(245, 247, 250);
+            doc.setDrawColor(200, 210, 225);
+            doc.roundedRect(marginX, y, maxW, 55, 3, 3, 'FD');
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+            doc.text("Características Técnicas del Módulo de Reportes:", marginX + 5, y + 8);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(51, 51, 51);
+            let rtPoints = [
+                "• Enlace con Bienes Nacionales: Botón 'Buscar en Bienes' para auto-completar datos al instante.",
+                "• Correlativo Oficial: Formato configurable RT YYYY-NN o YYYY-NN con persistencia en Firestore.",
+                "• Diagnóstico Estructurado: Espacio amplio con línea de cierre reglamentaria '--- Ultima Linea ---'.",
+                "• Cuadrante de 4 Firmas: Responsable, Técnico, V.B. Sub-Gerencia y Jefe de Informática.",
+                "• Destino de Copias: Original Bienes Nacionales, c.c. Archivo y c.c. Responsable del Bien."
+            ];
+            let rty = y + 16;
+            rtPoints.forEach(pt => { doc.text(pt, marginX + 6, rty); rty += 7; });
+
+            // PÁGINA 13: DETECTOR DE ESPACIO Y TARIFAS DE LA GACETA
+            doc.addPage(); pageNum++; drawHeaderFooter(doc, logoBgUrl, pageNum);
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+            doc.text("11. DETECTOR DE ESPACIO Y TARIFAS DE LA GACETA", marginX, 45);
+            doc.line(marginX, 47, pw - marginX, 47);
+            y = 54;
+
+            let pDet = "Módulo de visión por computadora y análisis espacial (detector_espacio.html) que procesa avisos y documentos destinados a publicarse en el Diario Oficial La Gaceta. Utiliza PDF.js para rasterizar a alta fidelidad y algoritmos de escaneo de densidad de píxeles para calcular la ocupación real en página, determinando fracciones exactas (1/8, 1/4, 1/2, 3/4 o página completa) y cotizando según el Acuerdo Ejecutivo N° 249-2010.";
+            let splitDet = doc.splitTextToSize(pDet, maxW);
+            doc.text(splitDet, marginX, y);
+            y += (splitDet.length * 5) + 8;
+
+            doc.setFillColor(245, 247, 250);
+            doc.setDrawColor(200, 210, 225);
+            doc.roundedRect(marginX, y, maxW, 55, 3, 3, 'FD');
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(10);
+            doc.text("Aspectos Clave de la Detección Automática:", marginX + 5, y + 8);
+            doc.setFont('helvetica', 'normal'); doc.setFontSize(8.8); doc.setTextColor(51, 51, 51);
+            let detPoints = [
+                "• Carga y Renderizado Rápido: Soporta PDFs vectoriales o documentos escaneados a 2.0x DPI.",
+                "• Umbralización Adaptativa: Ignora márgenes en blanco e impurezas de escaneo.",
+                "• Mapeo Tarifario: Aplica de forma inmediata la tarifa oficial por fracción calculada.",
+                "• Enlace con Cotizaciones: Exporta la fracción directamente al generador de cotizaciones.",
+                "• Auditoría de Medición: Elimina discrepancias en el cobro de avisos legales del Estado."
+            ];
+            let dety = y + 16;
+            detPoints.forEach(pt => { doc.text(pt, marginX + 6, dety); dety += 7; });
+
+            // PÁGINA 14: AUDITORÍA Y BITÁCORA
+            doc.addPage(); pageNum++; drawHeaderFooter(doc, logoBgUrl, pageNum);
+            doc.setTextColor(0, 33, 71); doc.setFont('helvetica', 'bold'); doc.setFontSize(13);
+            doc.text("12. AUDITORÍA, BITÁCORA Y PARÁMETROS", marginX, 45);
             doc.line(marginX, 47, pw - marginX, 47);
             y = 54;
 
