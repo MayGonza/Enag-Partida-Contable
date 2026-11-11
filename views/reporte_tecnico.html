@@ -782,6 +782,9 @@
                 <a href="../index.html" class="btn-nav btn-nav-back" title="Regresar al Portal Principal">
                     <span>←</span> Menú
                 </a>
+                <a href="mesa_ayuda.html" class="btn-nav" style="background:#ecfdf5; color:#065f46; border:1px solid #10b981; font-weight:700; text-decoration:none; padding:7px 12px; border-radius:6px; font-size:0.85em; display:inline-flex; align-items:center; gap:5px;" title="Ir a la Mesa de Ayuda (Tickets)">
+                    <span>🎧</span> Mesa de Ayuda
+                </a>
                 <img src="../assets/logo.jpeg" alt="Logo ENAG" class="header-logo-img">
                 <div class="header-text">
                     <h1>Departamento de Informática — Reportes Técnicos</h1>
@@ -1270,8 +1273,45 @@
             cargarUsuarioSesion();
             sugerirSiguienteNumero();
             conectarFirebaseYEscuchar();
+            cargarDatosDesdeMesaAyudaSiExisten();
             actualizarVistaPrevia();
         });
+
+        function cargarDatosDesdeMesaAyudaSiExisten() {
+            try {
+                const raw = sessionStorage.getItem('enag_ticket_a_reporte_tecnico');
+                if (!raw) return;
+                const d = JSON.parse(raw);
+                sessionStorage.removeItem('enag_ticket_a_reporte_tecnico');
+
+                if (d.responsableBien && document.getElementById('inputResponsableBien')) {
+                    document.getElementById('inputResponsableBien').value = d.responsableBien;
+                }
+                if (d.departamento && document.getElementById('inputDepartamento')) {
+                    document.getElementById('inputDepartamento').value = d.departamento;
+                }
+                if (d.descripcionEquipo && document.getElementById('inputDescripcionEquipo')) {
+                    document.getElementById('inputDescripcionEquipo').value = d.descripcionEquipo;
+                }
+                if (d.problemaReportado && document.getElementById('inputProblemaReportado')) {
+                    document.getElementById('inputProblemaReportado').value = d.problemaReportado;
+                }
+                if (d.diagnostico && document.getElementById('textareaDiagnostico')) {
+                    document.getElementById('textareaDiagnostico').value = d.diagnostico;
+                }
+                if (d.elaboradoPor && document.getElementById('inputElaboradoPor')) {
+                    document.getElementById('inputElaboradoPor').value = d.elaboradoPor;
+                }
+                setTimeout(() => {
+                    actualizarVistaPrevia();
+                    if (typeof showToast === 'function') {
+                        showToast(`✅ Datos transferidos desde Ticket ${d.codigoTicket || ''} de Mesa de Ayuda.`, "success");
+                    }
+                }, 200);
+            } catch(e) {
+                console.warn("No se pudieron cargar datos desde Mesa de Ayuda:", e);
+            }
+        }
 
         function inicializarFechaHoy() {
             const hoy = new Date();

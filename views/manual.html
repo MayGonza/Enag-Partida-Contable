@@ -580,6 +580,7 @@
                 <li><a href="#estado-solicitud" class="sidebar-link"><span>17. Estado de Solicitudes</span> <span class="sidebar-badge">Portal</span></a></li>
                 <li><a href="#bitacora" class="sidebar-link"><span>18. Auditoría y Bitácora</span> <span class="sidebar-badge">Auditoría</span></a></li>
                 <li><a href="#parametros" class="sidebar-link"><span>19. Parámetros y TI</span> <span class="sidebar-badge">Admin</span></a></li>
+                <li><a href="#mesa-ayuda" class="sidebar-link"><span>20. Mesa de Ayuda TI</span> <span class="sidebar-badge">Helpdesk</span></a></li>
             </ul>
         </div>
 
@@ -1206,6 +1207,48 @@
                     <li><strong>Tiempos de Sesión:</strong> Ajuste de la expiración automática por inactividad para resguardo de terminales desatendidas.</li>
                     <li><strong>Bloqueo de Concurrencia:</strong> Activa o desactiva la política de sesión única para todo el personal.</li>
                     <li><strong>Botón Flotante de Soporte (soporte.js):</strong> Herramienta en pantalla que permite a los operadores notificar fallas al departamento de TI con captura de pantalla y descripción del error.</li>
+                </ul>
+            </div>
+
+            <!-- 20. MESA DE AYUDA TI (HELPDESK GLPI ENAG) -->
+            <div id="mesa-ayuda" class="manual-section">
+                <h1>20. Mesa de Ayuda TI (Helpdesk GLPI ENAG)</h1>
+                <p>El módulo <strong>mesa_ayuda.html</strong> implementa una plataforma de Service Desk basada en los estándares ITIL y adaptada de las mejores prácticas de GLPI, diseñada para centralizar, gestionar y documentar todas las incidencias y requerimientos de soporte técnico de la ENAG.</p>
+
+                <h2>20.1. Portal del Solicitante</h2>
+                <p>Cualquier empleado de la institución puede reportar una incidencia o requerimiento técnico sin complicaciones:</p>
+                <ul>
+                    <li><strong>Correlativo Automático:</strong> El sistema genera de forma transparente un código único bajo el estándar <code>TICK-YYYY-NNN</code> (ej. <code>TICK-2026-001</code>).</li>
+                    <li><strong>Categorización del Requerimiento:</strong> Selección entre Hardware, Conectividad/Red, Impresoras/Tóner, Software/Sistemas, Equipos de Talleres Gráficos, Cuentas/Accesos o Asistencia General.</li>
+                    <li><strong>Nivel de Prioridad:</strong> Clasificación entre Baja, Media, Alta o Urgente según la criticidad operativa del puesto.</li>
+                    <li><strong>Seguimiento en Vivo:</strong> Sección interactiva para consultar el estado del ticket y las respuestas del equipo de informática en tiempo real.</li>
+                </ul>
+
+                <h2>20.2. Ciclo de Vida ITIL del Ticket</h2>
+                <div class="manual-callout callout-info">
+                    <strong>Estados Oficiales de Atención:</strong>
+                    <ol style="margin-top: 6px; padding-left: 20px;">
+                        <li><strong>Nuevo:</strong> Ticket registrado recientemente en la cola de atención, pendiente de revisión o asignación.</li>
+                        <li><strong>Asignado:</strong> Asignado formalmente a un técnico de informática (ej. Wilson Tinoco).</li>
+                        <li><strong>En Proceso:</strong> El técnico se encuentra realizando el diagnóstico o intervención física/lógica.</li>
+                        <li><strong>En Espera:</strong> Detenido temporalmente a la espera de repuestos, cotización de suministros o respuesta del usuario.</li>
+                        <li><strong>Resuelto:</strong> Problema solventado y validado técnicamente.</li>
+                        <li><strong>Cerrado:</strong> Incidencia completada y archivada formalmente.</li>
+                    </ol>
+                </div>
+
+                <h2>20.3. Tablero Kanban y Bandeja de Control TI</h2>
+                <p>Para los técnicos y administradores de Informática, el sistema ofrece una doble vista de supervisión:</p>
+                <ul>
+                    <li><strong>Bandeja en Tabla:</strong> Búsqueda instantánea con filtros combinados por estado, prioridad, técnico y departamento solicitante, con exportación directa a Excel/CSV.</li>
+                    <li><strong>Tablero Kanban:</strong> Columnas dinámicas que permiten visualizar el flujo de trabajo y avanzar el estado de las solicitudes con un solo clic.</li>
+                    <li><strong>Gestión y Bitácora:</strong> Registro de notas técnicas internas y comentarios públicos, junto con el diagnóstico y procedimiento realizado.</li>
+                </ul>
+
+                <h2>20.4. Emisión de Boleta de Soporte y Derivación a Reporte Técnico</h2>
+                <ul>
+                    <li><strong>Boleta de Soporte en PDF:</strong> Generación instantánea de una constancia oficial con membrete ENAG, descripción de la falla, trabajo realizado y casillas de firma del técnico y solicitante conforme.</li>
+                    <li><strong>Pasar a Reporte Técnico (RT):</strong> Si durante la intervención se determina que un equipo sufrió un daño severo o irreparable, el técnico puede presionar un solo botón para transferir todos los datos del ticket a <code>reporte_tecnico.html</code> y emitir el dictamen oficial.</li>
                 </ul>
             </div>
 

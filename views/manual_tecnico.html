@@ -460,6 +460,7 @@ Enag-Partida-Contable/
 │   ├── manual.html         # Manual de Usuario interactivo
 │   ├── manual_tecnico.html # Este Manual Técnico de Arquitectura
 │   ├── memorandums.html    # Emisión de memorándums con correlativo institucional
+│   ├── mesa_ayuda.html     # Mesa de Ayuda TI (Helpdesk GLPI), tickets y tablero Kanban
 │   ├── orden_produccion.html # Órdenes y fases de producción en talleres
 │   ├── parametros.html     # Parámetros dinámicos y timeouts
 │   ├── partidas*.html      # Partidas contables de diario y crédito
@@ -555,6 +556,26 @@ Enag-Partida-Contable/
                     <li><code>detalles</code> (string): Detalle textual legible.</li>
                     <li><code>usuario</code> (string): Operador responsable.</li>
                     <li><code>timestamp</code> (timestamp): Fecha y hora exacta registrada en servidor.</li>
+                </ul>
+
+                <h2>4.7. Colección <code>tickets_soporte</code> (Mesa de Ayuda / GLPI)</h2>
+                <p>Gestión integral de tickets de soporte técnico e incidencias de usuarios (<code>/tickets_soporte/{docId}</code>):</p>
+                <ul>
+                    <li><code>codigo</code> (string): Correlativo institucional único (ej. <code>"TICK-2026-001"</code>).</li>
+                    <li><code>solicitante</code> (string): Nombre completo del empleado que levanta la solicitud.</li>
+                    <li><code>departamento</code> (string): Departamento o área de trabajo (ej. <code>"Contabilidad"</code>).</li>
+                    <li><code>ubicacion</code> (string): Oficina física o extensión telefónica.</li>
+                    <li><code>categoria</code> (string): <code>'Hardware / Computadoras'</code>, <code>'Conectividad y Redes'</code>, <code>'Impresoras y Escáneres'</code>, <code>'Software y Sistemas'</code>, <code>'Talleres de Producción'</code>, <code>'Cuentas y Accesos'</code>, <code>'Asistencia General'</code>.</li>
+                    <li><code>prioridad</code> (string): <code>'Baja'</code>, <code>'Media'</code>, <code>'Alta'</code>, <code>'Urgente'</code>.</li>
+                    <li><code>equipoReferencia</code> (string): Descripción libre del equipo o periférico (completamente independiente del inventario de Bienes Nacionales).</li>
+                    <li><code>asunto</code> (string): Título o descripción sintética del problema.</li>
+                    <li><code>descripcion</code> (string): Detalle amplio de la falla o solicitud.</li>
+                    <li><code>estado</code> (string): Ciclo ITIL (<code>'Nuevo'</code>, <code>'Asignado'</code>, <code>'En Proceso'</code>, <code>'En Espera'</code>, <code>'Resuelto'</code>, <code>'Cerrado'</code>).</li>
+                    <li><code>tecnicoAsignado</code> (string): Nombre del técnico de informática responsable (ej. <code>"Wilson Tinoco"</code>).</li>
+                    <li><code>diagnostico</code> (string): Diagnóstico técnico elaborado durante o tras la intervención.</li>
+                    <li><code>solucion</code> (string): Procedimiento técnico aplicado para resolver el requerimiento.</li>
+                    <li><code>bitacora</code> (array de objetos): Historial cronológico con <code>fecha</code>, <code>autor</code>, <code>accion</code> y <code>nota</code>.</li>
+                    <li><code>fechaCreacion</code> (string ISO): Marca de tiempo del registro.</li>
                 </ul>
             </div>
 
