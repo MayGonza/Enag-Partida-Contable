@@ -874,6 +874,60 @@
         .toast-warning {
             background: #d97706;
         }
+
+        /* Modal de selección de documentos previos */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 33, 71, 0.68);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            width: 90%;
+            max-width: 720px;
+            max-height: 85vh;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+            border-top: 5px solid var(--primary);
+        }
+
+        .btn-upload-doc {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-upload-doc:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-export-doc {
+            background: #f8fafc !important;
+            color: #002147 !important;
+            border: 1.5px solid #cbd5e1 !important;
+        }
+
+        .btn-export-doc:hover {
+            background: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+        }
     </style>
 
     <!-- Librerías de PDF y Exportación con Fallback CDN -->
@@ -885,6 +939,13 @@
     </script>
     <script src="../js/jspdf-autotable.min.js"></script>
     <script src="../js/xlsx.full.min.js"></script>
+    <!-- PDF.js para importar y leer documentos previos en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
 </head>
 
 <body>
@@ -927,6 +988,27 @@
         <div class="workspace-grid">
             <!-- COLUMNA IZQUIERDA: FORMULARIO -->
             <div class="form-column">
+
+                <!-- BANNER DE CARGA Y MODIFICACIÓN DE DOCUMENTOS PREVIOS -->
+                <div class="import-doc-banner" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px dashed #0284c7; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 6px rgba(0, 33, 71, 0.05);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.8em;">📂</span>
+                        <div>
+                            <strong style="color: #002147; font-size: 0.98em;">¿Desea modificar un memorándum anterior?</strong>
+                            <div style="font-size: 0.84em; color: #475569; margin-top: 2px;">Suba un archivo de respaldo (<code>.json</code>) o el documento <code>.pdf</code> creado previamente para cargar sus datos y editarlos de inmediato.</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirMemorando()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                            <span>⬆️</span> Subir Documento (.json / .pdf)
+                        </button>
+                        <button type="button" class="btn-action btn-export-doc" onclick="abrirModalDocumentosGuardadosMemo()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                            <span>📚</span> Elegir de Guardados
+                        </button>
+                    </div>
+                </div>
+
+                <input type="file" id="inputSubirDocMemo" accept=".json,.pdf" style="display:none;" onchange="procesarArchivoSubidoMemo(this)">
                 
                 <!-- 1. CORRELATIVO AUTOMÁTICO -->
                 <div class="correlativo-box">
@@ -1128,6 +1210,12 @@
 
                 <!-- BARRA DE ACCIONES -->
                 <div class="action-bar">
+                    <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirMemorando()" title="Subir un documento previo (.json o .pdf) para modificarlo">
+                        <span>📂</span> Subir Documento Anterior
+                    </button>
+                    <button type="button" class="btn-action btn-export-doc" onclick="exportarMemorandoJSON()" title="Descargar archivo editable de respaldo (.json)">
+                        <span>💾</span> Exportar Respaldo JSON
+                    </button>
                     <button type="button" class="btn-action btn-primary-action" onclick="generarPDFMemorandoOficial()" id="btnDescargarPDF">
                         <span>📄</span> Descargar PDF Oficial
                     </button>
@@ -1294,6 +1382,26 @@
 
     <!-- NOTIFICACIONES TOAST -->
     <div id="toastNotification" class="toast-notification"></div>
+
+    <!-- MODAL: SELECCIONAR MEMORÁNDUM GUARDADO PARA MODIFICAR -->
+    <div id="modalDocumentosGuardadosMemo" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                <h3 style="margin: 0; color: #002147; font-size: 1.2em; display: flex; align-items: center; gap: 8px;">
+                    <span>📚</span> Seleccionar Memorándum para Modificar
+                </h3>
+                <button type="button" onclick="cerrarModalDocumentosGuardadosMemo()" style="background: none; border: none; font-size: 1.6em; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <p style="margin: 0 0 12px 0; font-size: 0.88em; color: #64748b;">Seleccione un memorándum registrado anteriormente para cargar todos sus campos al formulario y realizar las modificaciones deseadas:</p>
+            <input type="text" id="busquedaModalMemo" placeholder="🔍 Filtrar por código, asunto, destinatario o remitente..." oninput="filtrarListaModalMemo()" style="padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.9em; margin-bottom: 14px; width: 100%; box-sizing: border-box; outline: none;">
+            <div id="listaModalMemos" style="overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Dinámico -->
+            </div>
+            <div style="margin-top: 14px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                <button type="button" onclick="cerrarModalDocumentosGuardadosMemo()" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">Cerrar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Firebase SDK Compat v10 -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
@@ -2470,32 +2578,268 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             showToast("Formulario listo para redactar un nuevo memorándum.", "info");
         }
 
-        function exportarHistorialExcel() {
-            if (memorandumsGlobal.length === 0) {
-                showToast("No hay registros para exportar a Excel.", "warning");
+        // ==============================================================
+        // 13. CARGA, MODIFICACIÓN Y RESPALDO DE DOCUMENTOS PREVIOS
+        // ==============================================================
+        function abrirSelectorSubirMemorando() {
+            const input = document.getElementById('inputSubirDocMemo');
+            if (input) {
+                input.value = '';
+                input.click();
+            }
+        }
+
+        async function procesarArchivoSubidoMemo(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const fileName = file.name.toLowerCase();
+
+            if (fileName.endsWith('.json')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        cargarDatosEnFormularioMemo(data);
+                        showToast("✅ Memorándum cargado desde archivo JSON para modificación.", "success");
+                    } catch (err) {
+                        console.error(err);
+                        showToast("❌ Error al leer archivo JSON: " + err.message, "error");
+                    }
+                };
+                reader.readAsText(file);
+            } else if (fileName.endsWith('.pdf')) {
+                showToast("⏳ Extrayendo texto y campos del documento PDF...", "info");
+                try {
+                    await extraerCamposDesdePdfMemo(file);
+                } catch (err) {
+                    console.error(err);
+                    showToast("❌ No se pudo extraer la información del PDF: " + err.message, "error");
+                }
+            } else {
+                showToast("⚠️ Formato no compatible. Por favor suba un archivo .json o .pdf", "warning");
+            }
+        }
+
+        function cargarDatosEnFormularioMemo(data) {
+            if (data.prefijo) {
+                const selectDepto = document.getElementById('selectDepartamento');
+                const existe = Array.from(selectDepto.options).some(o => o.value === data.prefijo);
+                if (existe) {
+                    selectDepto.value = data.prefijo;
+                    document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
+                } else {
+                    selectDepto.value = 'OTRO';
+                    document.getElementById('groupPrefijoPersonalizado').style.display = 'flex';
+                    document.getElementById('inputPrefijoPersonalizado').value = data.prefijo;
+                }
+            }
+            if (data.numero) document.getElementById('inputNumeroCorrelativo').value = data.numero;
+            if (data.sufijo) document.getElementById('inputSufijoInstitucional').value = data.sufijo;
+
+            if (data.para) {
+                document.getElementById('inputParaNombre').value = data.para.nombre || '';
+                document.getElementById('inputParaCargo').value = data.para.cargo || '';
+            }
+            if (data.de) {
+                document.getElementById('inputDeNombre').value = data.de.nombre || '';
+                document.getElementById('inputDeCargo').value = data.de.cargo || '';
+            }
+            if (data.fecha) document.getElementById('inputFechaTextoOficial').value = data.fecha;
+            if (data.asunto) document.getElementById('inputAsunto').value = data.asunto;
+            if (data.saludo) document.getElementById('inputSaludo').value = data.saludo;
+            if (data.cuerpo) document.getElementById('textareaCuerpo').value = data.cuerpo;
+            if (data.despedida) document.getElementById('inputDespedida').value = data.despedida;
+
+            if (data.copias) {
+                document.getElementById('inputCopiaOriginal').value = data.copias.original || '';
+                document.getElementById('inputCopia1').value = data.copias.copia1 || '';
+                document.getElementById('inputCopia2').value = data.copias.copia2 || '';
+            }
+            if (data.tamanoLetra && document.getElementById('selectTamanoLetra')) {
+                document.getElementById('selectTamanoLetra').value = data.tamanoLetra;
+                aplicarTamanoLetra(data.tamanoLetra);
+            }
+            if (data.id) {
+                memorandoEnEdicionId = data.id;
+            }
+            actualizarCodigoCompleto();
+            actualizarVistaPrevia();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function extraerCamposDesdePdfMemo(file) {
+            if (typeof pdfjsLib === 'undefined') {
+                throw new Error("Biblioteca PDF.js no disponible.");
+            }
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(" ");
+                fullText += pageText + "\n";
+            }
+
+            const dataExtraida = {};
+
+            // Correlativo e.g. MEMORANDO INFO-51-ENAG o MEMO-ENAG-SG-059-2026
+            const memoMatch = fullText.match(/MEMOR[AÁ]ND[OU]M?\s*(?:No\.?)?\s*([A-Z0-9\-_]+)/i);
+            if (memoMatch) {
+                const rawCode = memoMatch[1];
+                const parts = rawCode.split('-');
+                if (parts.length >= 3) {
+                    dataExtraida.prefijo = parts[0];
+                    dataExtraida.numero = parseInt(parts[1], 10) || 1;
+                    dataExtraida.sufijo = parts.slice(2).join('-');
+                } else if (parts.length === 2) {
+                    dataExtraida.prefijo = parts[0];
+                    dataExtraida.numero = parseInt(parts[1], 10) || 1;
+                }
+            }
+
+            // PARA
+            const paraMatch = fullText.match(/PARA\s*:\s*([^\n\r]+?)(?:DE\s*:|$)/i);
+            if (paraMatch) {
+                dataExtraida.para = { nombre: paraMatch[1].trim(), cargo: '' };
+            }
+
+            // DE
+            const deMatch = fullText.match(/DE\s*:\s*([^\n\r]+?)(?:FECHA\s*:|$)/i);
+            if (deMatch) {
+                dataExtraida.de = { nombre: deMatch[1].trim(), cargo: '' };
+            }
+
+            // FECHA
+            const fechaMatch = fullText.match(/FECHA\s*:\s*([^\n\r]+?)(?:ASUNTO\s*:|$)/i);
+            if (fechaMatch) {
+                dataExtraida.fecha = fechaMatch[1].trim();
+            }
+
+            // ASUNTO
+            const asuntoMatch = fullText.match(/ASUNTO\s*:\s*([^\n\r]+?)(?:Estimad|Por medio|Agradezc|Atentamente|$)/i);
+            if (asuntoMatch) {
+                dataExtraida.asunto = asuntoMatch[1].trim();
+            }
+
+            // CUERPO
+            let cuerpoTexto = fullText;
+            if (asuntoMatch) {
+                const idx = fullText.indexOf(asuntoMatch[0]);
+                if (idx >= 0) {
+                    cuerpoTexto = fullText.substring(idx + asuntoMatch[0].length);
+                }
+            }
+            const stopIdx = cuerpoTexto.search(/Atentamente|Original|www\.enag\.gob\.hn/i);
+            if (stopIdx >= 0) {
+                cuerpoTexto = cuerpoTexto.substring(0, stopIdx).trim();
+            }
+            dataExtraida.cuerpo = cuerpoTexto.trim();
+
+            cargarDatosEnFormularioMemo(dataExtraida);
+            showToast("✅ Información extraída del PDF y cargada en el formulario para modificar.", "success");
+        }
+
+        function exportarMemorandoJSON() {
+            const data = {
+                tipo: 'memorandum_enag',
+                version: '1.0',
+                id: memorandoEnEdicionId || null,
+                prefijo: obtenerPrefijoActual(),
+                numero: parseInt(document.getElementById('inputNumeroCorrelativo').value, 10) || 1,
+                sufijo: document.getElementById('inputSufijoInstitucional').value.trim() || 'ENAG',
+                codigo: construirCodigoCompleto(),
+                para: {
+                    nombre: document.getElementById('inputParaNombre').value.trim(),
+                    cargo: document.getElementById('inputParaCargo').value.trim()
+                },
+                de: {
+                    nombre: document.getElementById('inputDeNombre').value.trim(),
+                    cargo: document.getElementById('inputDeCargo').value.trim()
+                },
+                fecha: document.getElementById('inputFechaTextoOficial').value.trim(),
+                asunto: document.getElementById('inputAsunto').value.trim(),
+                saludo: document.getElementById('inputSaludo').value.trim(),
+                cuerpo: document.getElementById('textareaCuerpo').value,
+                despedida: document.getElementById('inputDespedida').value.trim(),
+                copias: {
+                    original: document.getElementById('inputCopiaOriginal').value.trim(),
+                    copia1: document.getElementById('inputCopia1').value.trim(),
+                    copia2: document.getElementById('inputCopia2').value.trim()
+                },
+                tamanoLetra: document.getElementById('selectTamanoLetra') ? document.getElementById('selectTamanoLetra').value : 'small'
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Memorando_${data.codigo.replace(/[\s\/\\:]+/g, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("💾 Respaldo JSON descargado correctamente.", "success");
+        }
+
+        // Modal de Documentos Guardados
+        function abrirModalDocumentosGuardadosMemo() {
+            const modal = document.getElementById('modalDocumentosGuardadosMemo');
+            if (!modal) return;
+            modal.classList.add('active');
+            filtrarListaModalMemo();
+        }
+
+        function cerrarModalDocumentosGuardadosMemo() {
+            const modal = document.getElementById('modalDocumentosGuardadosMemo');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function filtrarListaModalMemo() {
+            const cont = document.getElementById('listaModalMemos');
+            if (!cont) return;
+            const query = (document.getElementById('busquedaModalMemo').value || '').toLowerCase().trim();
+
+            const filtrados = memorandumsGlobal.filter(m => {
+                if (!query) return true;
+                const txt = `${m.codigo || ''} ${m.asunto || ''} ${m.para ? m.para.nombre : ''} ${m.de ? m.de.nombre : ''}`.toLowerCase();
+                return txt.includes(query);
+            });
+
+            cont.innerHTML = '';
+            if (filtrados.length === 0) {
+                cont.innerHTML = `<div style="text-align:center; padding: 25px; color:#64748b;">No hay memorándums que coincidan con la búsqueda.</div>`;
                 return;
             }
 
-            const dataExport = memorandumsGlobal.map(m => ({
-                "Correlativo": m.codigo || `${m.prefijo}-${m.numero}`,
-                "Fecha": m.fecha || '',
-                "Destinatario (PARA)": m.para ? m.para.nombre : '',
-                "Cargo Destinatario": m.para ? m.para.cargo : '',
-                "Remitente (DE)": m.de ? m.de.nombre : '',
-                "Cargo Remitente": m.de ? m.de.cargo : '',
-                "Asunto": m.asunto || '',
-                "Elaborado Por": m.elaboradoPor || '',
-                "Fecha Registro": m.fechaActualizacion || ''
-            }));
-
-            const ws = XLSX.utils.json_to_sheet(dataExport);
-            const wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, "Memorandums_ENAG");
-            XLSX.writeFile(wb, `Reporte_Memorandums_ENAG_${new Date().toISOString().slice(0, 10)}.xlsx`);
-            showToast("Reporte Excel generado correctamente.", "success");
+            filtrados.forEach(m => {
+                const card = document.createElement('div');
+                card.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
+                const cod = m.codigo || `${m.prefijo}-${m.numero}`;
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-memo">${cod}</span>
+                            <span style="font-size: 0.82em; color: #64748b;">${m.fecha || ''}</span>
+                        </div>
+                        <div style="font-size: 0.94em; font-weight: bold; color: #002147; margin: 4px 0;">${m.asunto || 'Sin asunto'}</div>
+                        <div style="font-size: 0.82em; color: #475569;">
+                            Para: <strong>${m.para ? m.para.nombre : 'N/A'}</strong> | De: <strong>${m.de ? m.de.nombre : 'N/A'}</strong>
+                        </div>
+                    </div>
+                    <button type="button" onclick="cargarMemorandoDesdeModal('${m.id}')" style="background: #0284c7; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.84em; cursor: pointer; white-space: nowrap;">
+                        ✏️ Modificar
+                    </button>
+                `;
+                cont.appendChild(card);
+            });
         }
 
-        // 13. Toast Notifications
+        function cargarMemorandoDesdeModal(id) {
+            cerrarModalDocumentosGuardadosMemo();
+            cargarMemorandoAlFormulario(id);
+            showToast("✅ Memorándum cargado para modificación. Realice sus cambios y guarde o descargue el PDF.", "success");
+        }
+
+        // 14. Toast Notifications
         function showToast(mensaje, tipo = "info") {
             const toast = document.getElementById('toastNotification');
             if (!toast) return;

@@ -1098,6 +1098,15 @@
                     <li>Indique las dependencias que recibirán copias de cortesía (<code>c.c.</code>).</li>
                     <li>Presione <strong>"📄 Descargar PDF Oficial"</strong> para emitir el archivo en alta definición o <strong>"🖨️ Imprimir"</strong> para enviarlo directo a su impresora.</li>
                 </ol>
+
+                <h2>15.4. Carga y Modificación de Memorándums Previos</h2>
+                <p>Para corregir, actualizar o reutilizar un memorándum elaborado anteriormente sin tener que redactarlo desde cero, el módulo ofrece tres vías directas:</p>
+                <ul>
+                    <li><strong>Subir Archivo de Respaldo (<code>.json</code>):</strong> Al presionar <em>"📂 Subir Documento Anterior"</em> y seleccionar un archivo <code>.json</code> previamente exportado, el sistema reconstruye instantáneamente todos los campos del memorando (correlativo, destinatario, asunto, cuerpo, copias y tamaño de fuente).</li>
+                    <li><strong>Subir Documento en PDF (<code>.pdf</code>):</strong> Permite cargar un memorando emitido con anterioridad en formato PDF. El motor inteligente con <code>PDF.js</code> analiza y extrae automáticamente los textos y campos oficiales volcándolos al formulario para su modificación inmediata.</li>
+                    <li><strong>Cargar desde Guardados (Cloud Firestore):</strong> El botón <em>"📚 Elegir de Guardados"</em> abre un catálogo modal interactivo de memorándums registrados en la nube con buscador en vivo para cargar y editar cualquier registro con un solo clic.</li>
+                    <li><strong>Exportar Respaldo Editable:</strong> El botón <em>"💾 Exportar Respaldo JSON"</em> descarga un archivo ligero con la estructura íntegra del memorando para su resguardo local.</li>
+                </ul>
             </div>
 
             <!-- 16. REPORTES TÉCNICOS DE INFORMÁTICA -->
@@ -1139,6 +1148,15 @@
 
                 <h2>16.5. Navegación Unificada</h2>
                 <p>El módulo cuenta con el botón superior <strong>"← Volver al Menú Principal"</strong> para un retorno expedito a la consola de inicio.</p>
+
+                <h2>16.6. Carga y Modificación de Reportes Técnicos Previos</h2>
+                <p>El personal de Informática puede modificar reportes técnicos generados anteriormente mediante múltiples mecanismos de importación:</p>
+                <ul>
+                    <li><strong>Subida de Respaldo (<code>.json</code>):</strong> Carga al instante el diagnóstico, serie, inventario, problema y firmas de un archivo JSON descargado previamente.</li>
+                    <li><strong>Subida de Documento PDF (<code>.pdf</code>):</strong> Procesa el documento PDF oficial con <code>PDF.js</code>, detectando automáticamente el número correlativo, fecha, técnico responsable, custodio, serie, inventario y texto de diagnóstico para realizar ampliaciones o correcciones.</li>
+                    <li><strong>Selector de Guardados en BD:</strong> El botón <em>"📚 Elegir de Guardados"</em> despliega el catálogo de reportes técnicos en Firestore con filtro dinámico por custodio, serie o inventario.</li>
+                    <li><strong>Exportación de Archivo Editable:</strong> El botón <em>"💾 Exportar Respaldo JSON"</em> permite guardar en disco local una copia editable del dictamen pericial.</li>
+                </ul>
             </div>
 
             <!-- 17. ESTADO DE SOLICITUDES -->

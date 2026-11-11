@@ -683,6 +683,60 @@
             background: #0284c7;
         }
 
+        /* Modal de selección de documentos previos */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 33, 71, 0.68);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            width: 90%;
+            max-width: 720px;
+            max-height: 85vh;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+            border-top: 5px solid var(--primary);
+        }
+
+        .btn-upload-doc {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-upload-doc:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-export-doc {
+            background: #f8fafc !important;
+            color: #002147 !important;
+            border: 1.5px solid #cbd5e1 !important;
+        }
+
+        .btn-export-doc:hover {
+            background: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+        }
+
         @keyframes slideUp {
             from {
                 opacity: 0;
@@ -750,6 +804,28 @@
         <div class="workspace-grid">
             <!-- COLUMNA IZQUIERDA: FORMULARIO -->
             <div class="form-pane">
+
+                <!-- BANNER DE CARGA Y MODIFICACIÓN DE REPORTES PREVIOS -->
+                <div class="import-doc-banner" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px dashed #002147; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 6px rgba(0, 33, 71, 0.05);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.8em;">📂</span>
+                        <div>
+                            <strong style="color: #002147; font-size: 0.98em;">¿Desea modificar un reporte técnico anterior?</strong>
+                            <div style="font-size: 0.84em; color: #475569; margin-top: 2px;">Suba un archivo de respaldo (<code>.json</code>) o el documento <code>.pdf</code> generado antes para cargar los datos y editarlos al instante.</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirReporte()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                            <span>⬆️</span> Subir Documento (.json / .pdf)
+                        </button>
+                        <button type="button" class="btn-action btn-export-doc" onclick="abrirModalDocumentosGuardadosRT()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                            <span>📚</span> Elegir de Guardados
+                        </button>
+                    </div>
+                </div>
+
+                <input type="file" id="inputSubirDocRT" accept=".json,.pdf" style="display:none;" onchange="procesarArchivoSubidoRT(this)">
+
                 <!-- 1. IDENTIFICACIÓN DEL REPORTE -->
                 <div class="form-card">
                     <h3 class="card-title">
@@ -935,6 +1011,14 @@
 
                 <!-- BARRA FIJA DE ACCIONES -->
                 <div class="form-actions-bar">
+                    <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirReporte()"
+                        title="Subir un documento previo (.json o .pdf) para modificarlo">
+                        <span>📂</span> Subir Documento Anterior
+                    </button>
+                    <button type="button" class="btn-action btn-export-doc" onclick="exportarReporteJSON()"
+                        title="Descargar archivo editable de respaldo (.json)">
+                        <span>💾</span> Exportar Respaldo JSON
+                    </button>
                     <button type="button" class="btn-action btn-primary-action" onclick="generarPDFReporteTecnico()"
                         id="btnDescargarPDF">
                         <span>📄</span> Descargar PDF Oficial
@@ -1097,6 +1181,26 @@
     <!-- NOTIFICACIONES TOAST -->
     <div id="toastNotification" class="toast-notification"></div>
 
+    <!-- MODAL: SELECCIONAR REPORTE TÉCNICO GUARDADO PARA MODIFICAR -->
+    <div id="modalDocumentosGuardadosRT" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                <h3 style="margin: 0; color: #002147; font-size: 1.2em; display: flex; align-items: center; gap: 8px;">
+                    <span>📚</span> Seleccionar Reporte Técnico para Modificar
+                </h3>
+                <button type="button" onclick="cerrarModalDocumentosGuardadosRT()" style="background: none; border: none; font-size: 1.6em; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <p style="margin: 0 0 12px 0; font-size: 0.88em; color: #64748b;">Seleccione un reporte técnico registrado anteriormente para cargar todos sus campos al formulario y realizar las modificaciones deseadas:</p>
+            <input type="text" id="busquedaModalRT" placeholder="🔍 Filtrar por No., serie, inventario, equipo o custodio..." oninput="filtrarListaModalRT()" style="padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.9em; margin-bottom: 14px; width: 100%; box-sizing: border-box; outline: none;">
+            <div id="listaModalRT" style="overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Dinámico -->
+            </div>
+            <div style="margin-top: 14px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                <button type="button" onclick="cerrarModalDocumentosGuardadosRT()" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
     <iframe id="rtPrintIframe" style="display:none;"></iframe>
 
     <!-- Firebase SDK Compat v10 -->
@@ -1113,6 +1217,13 @@
         }
     </script>
     <script src="../js/xlsx.full.min.js"></script>
+    <!-- PDF.js para importar y leer documentos previos en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
 
     <!-- SCRIPT DEL MÓDULO DE REPORTE TÉCNICO -->
     <script>
@@ -1908,6 +2019,238 @@
             XLSX.utils.book_append_sheet(wb, ws, "Reportes_Tecnicos_ENAG");
             XLSX.writeFile(wb, `Reportes_Tecnicos_ENAG_${new Date().toISOString().slice(0, 10)}.xlsx`);
             showToast("Reporte Excel generado correctamente.", "success");
+        }
+
+        // ==============================================================
+        // CARGA, MODIFICACIÓN Y RESPALDO DE REPORTES PREVIOS
+        // ==============================================================
+        function abrirSelectorSubirReporte() {
+            const input = document.getElementById('inputSubirDocRT');
+            if (input) {
+                input.value = '';
+                input.click();
+            }
+        }
+
+        async function procesarArchivoSubidoRT(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const fileName = file.name.toLowerCase();
+
+            if (fileName.endsWith('.json')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        cargarDatosEnFormularioRT(data);
+                        showToast("✅ Reporte Técnico cargado desde archivo JSON para modificación.", "success");
+                    } catch (err) {
+                        console.error(err);
+                        showToast("❌ Error al leer archivo JSON: " + err.message, "error");
+                    }
+                };
+                reader.readAsText(file);
+            } else if (fileName.endsWith('.pdf')) {
+                showToast("⏳ Extrayendo texto y campos del reporte PDF...", "info");
+                try {
+                    await extraerCamposDesdePdfRT(file);
+                } catch (err) {
+                    console.error(err);
+                    showToast("❌ No se pudo extraer la información del PDF: " + err.message, "error");
+                }
+            } else {
+                showToast("⚠️ Formato no compatible. Por favor suba un archivo .json o .pdf", "warning");
+            }
+        }
+
+        function cargarDatosEnFormularioRT(data) {
+            if (data.id) reporteEnEdicionId = data.id;
+            if (data.numero) document.getElementById('inputNumero').value = data.numero;
+            if (data.fecha) document.getElementById('inputFecha').value = data.fecha;
+            if (data.elaboradoPor) document.getElementById('inputElaboradoPor').value = data.elaboradoPor;
+            if (data.responsable) document.getElementById('inputResponsable').value = data.responsable;
+            if (data.departamento) document.getElementById('inputDepartamento').value = data.departamento;
+            if (data.descripcion) document.getElementById('inputDescripcion').value = data.descripcion;
+            if (data.serie) document.getElementById('inputSerie').value = data.serie;
+            if (data.inventario) document.getElementById('inputInventario').value = data.inventario;
+            if (data.problema) document.getElementById('inputProblema').value = data.problema;
+            if (data.diagnostico) document.getElementById('textareaDiagnostico').value = data.diagnostico;
+            if (data.ultimaLinea) document.getElementById('inputUltimaLinea').value = data.ultimaLinea;
+
+            if (data.firmas) {
+                if (data.firmas.f1) document.getElementById('inputFirma1').value = data.firmas.f1;
+                if (data.firmas.f2) document.getElementById('inputFirma2').value = data.firmas.f2;
+                if (data.firmas.f3) document.getElementById('inputFirma3').value = data.firmas.f3;
+                if (data.firmas.f4) document.getElementById('inputFirma4').value = data.firmas.f4;
+            }
+
+            if (data.copias) {
+                if (data.copias.c1) document.getElementById('inputCopia1').value = data.copias.c1;
+                if (data.copias.c2) document.getElementById('inputCopia2').value = data.copias.c2;
+                if (data.copias.c3) document.getElementById('inputCopia3').value = data.copias.c3;
+            }
+
+            actualizarVistaPrevia();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function extraerCamposDesdePdfRT(file) {
+            if (typeof pdfjsLib === 'undefined') {
+                throw new Error("Biblioteca PDF.js no disponible.");
+            }
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(" ");
+                fullText += pageText + "\n";
+            }
+
+            const dataExtraida = {};
+
+            // No. / Correlativo e.g. RT 2026-11 o 2026-10
+            const numMatch = fullText.match(/No\.?\s*:\s*([A-Z0-9\-_ ]+?)(?:Fecha|$)/i);
+            if (numMatch) dataExtraida.numero = numMatch[1].trim();
+
+            // Fecha
+            const fechaMatch = fullText.match(/Fecha\s*:\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+            if (fechaMatch) dataExtraida.fecha = fechaMatch[1].trim();
+
+            // Elaborado por
+            const elabMatch = fullText.match(/Elaborado\s+por\s*:\s*([^\n\r]+?)(?:Responsable|$)/i);
+            if (elabMatch) dataExtraida.elaboradoPor = elabMatch[1].trim();
+
+            // Responsable del Bien
+            const respMatch = fullText.match(/Responsable\s+del\s+Bien\s*:\s*([^\n\r]+?)(?:Departamento|$)/i);
+            if (respMatch) dataExtraida.responsable = respMatch[1].trim();
+
+            // Departamento
+            const deptoMatch = fullText.match(/Departamento\s*:\s*([^\n\r]+?)(?:Descripci[oó]n|$)/i);
+            if (deptoMatch) dataExtraida.departamento = deptoMatch[1].trim();
+
+            // Descripción de Equipo
+            const descMatch = fullText.match(/Descripci[oó]n\s+de\s+Equipo\s*:\s*([^\n\r]+?)(?:Serie|$)/i);
+            if (descMatch) dataExtraida.descripcion = descMatch[1].trim();
+
+            // Serie No.
+            const serieMatch = fullText.match(/Serie\s+No\.?\s*:\s*([^\n\r]+?)(?:Inventario|$)/i);
+            if (serieMatch) dataExtraida.serie = serieMatch[1].trim();
+
+            // Inventario No.
+            const invMatch = fullText.match(/Inventario\s+No\.?\s*:\s*([^\n\r]+?)(?:Problema|$)/i);
+            if (invMatch) dataExtraida.inventario = invMatch[1].trim();
+
+            // Problema Reportado
+            const probMatch = fullText.match(/Problema\s+Reportado\s*:\s*([^\n\r]+?)(?:Diagn[oó]stico|$)/i);
+            if (probMatch) dataExtraida.problema = probMatch[1].trim();
+
+            // Diagnóstico
+            const diagMatch = fullText.match(/Diagn[oó]stico\s*:\s*([\s\S]+?)(?:-{4,}|Firma|$)/i);
+            if (diagMatch) {
+                dataExtraida.diagnostico = diagMatch[1].replace(/-{4,}.*?-{4,}/g, '').trim();
+            }
+
+            cargarDatosEnFormularioRT(dataExtraida);
+            showToast("✅ Información extraída del Reporte PDF y cargada para modificar.", "success");
+        }
+
+        function exportarReporteJSON() {
+            const data = {
+                tipo: 'reporte_tecnico_enag',
+                version: '1.0',
+                id: reporteEnEdicionId || null,
+                numero: document.getElementById('inputNumero').value.trim(),
+                fecha: document.getElementById('inputFecha').value.trim(),
+                elaboradoPor: document.getElementById('inputElaboradoPor').value.trim(),
+                responsable: document.getElementById('inputResponsable').value.trim(),
+                departamento: document.getElementById('inputDepartamento').value.trim(),
+                descripcion: document.getElementById('inputDescripcion').value.trim(),
+                serie: document.getElementById('inputSerie').value.trim(),
+                inventario: document.getElementById('inputInventario').value.trim(),
+                problema: document.getElementById('inputProblema').value.trim(),
+                diagnostico: document.getElementById('textareaDiagnostico').value.trim(),
+                ultimaLinea: document.getElementById('inputUltimaLinea').value.trim(),
+                firmas: {
+                    f1: document.getElementById('inputFirma1').value.trim(),
+                    f2: document.getElementById('inputFirma2').value.trim(),
+                    f3: document.getElementById('inputFirma3').value.trim(),
+                    f4: document.getElementById('inputFirma4').value.trim()
+                },
+                copias: {
+                    c1: document.getElementById('inputCopia1').value.trim(),
+                    c2: document.getElementById('inputCopia2').value.trim(),
+                    c3: document.getElementById('inputCopia3').value.trim()
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Reporte_Tecnico_${data.numero.replace(/[\s\/\\:]+/g, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("💾 Respaldo JSON descargado correctamente.", "success");
+        }
+
+        // Modal de Documentos Guardados RT
+        function abrirModalDocumentosGuardadosRT() {
+            const modal = document.getElementById('modalDocumentosGuardadosRT');
+            if (!modal) return;
+            modal.classList.add('active');
+            filtrarListaModalRT();
+        }
+
+        function cerrarModalDocumentosGuardadosRT() {
+            const modal = document.getElementById('modalDocumentosGuardadosRT');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function filtrarListaModalRT() {
+            const cont = document.getElementById('listaModalRT');
+            if (!cont) return;
+            const query = (document.getElementById('busquedaModalRT').value || '').toLowerCase().trim();
+
+            const filtrados = reportesGlobal.filter(r => {
+                if (!query) return true;
+                const txt = `${r.numero || ''} ${r.descripcion || ''} ${r.serie || ''} ${r.inventario || ''} ${r.responsable || ''} ${r.elaboradoPor || ''}`.toLowerCase();
+                return txt.includes(query);
+            });
+
+            cont.innerHTML = '';
+            if (filtrados.length === 0) {
+                cont.innerHTML = `<div style="text-align:center; padding: 25px; color:#64748b;">No hay reportes técnicos que coincidan con la búsqueda.</div>`;
+                return;
+            }
+
+            filtrados.forEach(r => {
+                const card = document.createElement('div');
+                card.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-rt">${r.numero || 'N/A'}</span>
+                            <span style="font-size: 0.82em; color: #64748b;">${r.fecha || ''}</span>
+                        </div>
+                        <div style="font-size: 0.94em; font-weight: bold; color: #002147; margin: 4px 0;">${r.descripcion || 'Sin descripción'}</div>
+                        <div style="font-size: 0.82em; color: #475569;">
+                            Responsable: <strong>${r.responsable || 'N/A'}</strong> (${r.departamento || ''}) | S/N: <code>${r.serie || 'N/A'}</code>
+                        </div>
+                    </div>
+                    <button type="button" onclick="cargarReporteDesdeModal('${r.id}')" style="background: #0284c7; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.84em; cursor: pointer; white-space: nowrap;">
+                        ✏️ Modificar
+                    </button>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        function cargarReporteDesdeModal(id) {
+            cerrarModalDocumentosGuardadosRT();
+            cargarReporteAlFormulario(id);
+            showToast("✅ Reporte cargado para modificación. Realice sus cambios y guarde o descargue el PDF.", "success");
         }
 
         function showToast(mensaje, tipo = "info") {
