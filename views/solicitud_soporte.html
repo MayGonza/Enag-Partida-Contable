@@ -330,6 +330,12 @@
             border: 1px solid #fde68a;
         }
 
+        .status-por_validar {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+        }
+
         .status-resuelto {
             background: #dcfce7;
             color: #166534;
@@ -854,6 +860,40 @@
 
                 const bitacora = t.bitacora || [];
                 const ultimaNota = bitacora.length > 0 ? bitacora[bitacora.length - 1] : null;
+                const ticketKey = t.id || t.codigo;
+
+                // Bloque de Validación del Solicitante tras la Visita Técnica
+                let bloqueValidacionHTML = '';
+                if (t.estado === 'Por Validar' || ((t.estado === 'En Proceso' || t.estado === 'Asignado') && (t.solucion || t.diagnostico))) {
+                    bloqueValidacionHTML = `
+                        <div style="margin-top: 14px; background: #fff7ed; border: 2px solid #fb923c; border-radius: 10px; padding: 14px 16px;">
+                            <div style="font-weight: 800; color: #9a3412; font-size: 0.96em; margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
+                                <span>⏳</span> Validación de Visita Técnica — ¿Se resolvió su problema?
+                            </div>
+                            <p style="margin: 0 0 10px; font-size: 0.85em; color: #7c2d12; line-height: 1.4;">
+                                El técnico <strong>${t.tecnicoAsignado || 'de Informática'}</strong> ha registrado la atención de su solicitud. Por favor verifique que su equipo o sistema funcione correctamente y confirme para pasar el ticket a <strong>Resuelto</strong>:
+                            </p>
+                            <div style="margin-bottom: 10px;">
+                                <input type="text" id="comentarioVal_${ticketKey}" class="form-control" style="font-size: 0.85em; padding: 8px 12px; background: white;" placeholder="Comentario opcional (ej. Todo funciona correctamente tras la visita)...">
+                            </div>
+                            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+                                <button type="button" onclick="confirmarValidacionSolicitante('${ticketKey}', true)" style="background: #10b981; color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 0.86em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);">
+                                    <span>✅</span> Sí, Confirmar que se Resolvió
+                                </button>
+                                <button type="button" onclick="confirmarValidacionSolicitante('${ticketKey}', false)" style="background: #ef4444; color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 0.86em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                    <span>❌</span> No, el Problema Persiste
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (t.validadoPorUsuario || t.estado === 'Resuelto' || t.estado === 'Cerrado') {
+                    bloqueValidacionHTML = `
+                        <div style="margin-top: 12px; background: #dcfce7; border: 1.5px solid #86efac; border-radius: 8px; padding: 10px 14px; font-size: 0.85em; color: #166534;">
+                            <strong>✅ Validado Conforme por el Solicitante:</strong> ${t.validadoPorNombre || t.solicitante} ${t.fechaValidacion ? '(' + t.fechaValidacion + ')' : ''}
+                            ${t.comentarioValidacion ? `<div style="margin-top:3px; font-style:italic;">"${t.comentarioValidacion}"</div>` : ''}
+                        </div>
+                    `;
+                }
 
                 card.innerHTML = `
                     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
@@ -868,12 +908,78 @@
 
                     <div style="background:#f8fafc; border-left:3px solid var(--primary); padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.86em; margin-top:8px;">
                         <div><strong>👨‍💻 Técnico Asignado:</strong> ${t.tecnicoAsignado || 'En espera de asignación'}</div>
-                        ${t.solucion ? `<div style="margin-top:4px; color:#166534;"><strong>✅ Solución:</strong> ${t.solucion}</div>` : ''}
+                        ${t.diagnostico ? `<div style="margin-top:4px; color:#334155;"><strong>🔍 Diagnóstico:</strong> ${t.diagnostico}</div>` : ''}
+                        ${t.solucion ? `<div style="margin-top:4px; color:#166534;"><strong>🛠️ Solución Aplicada:</strong> ${t.solucion}</div>` : ''}
                         ${ultimaNota ? `<div style="margin-top:4px; color:var(--text-muted); font-size:0.92em;"><em>Última actualización: "${ultimaNota.nota || ultimaNota.accion}"</em></div>` : ''}
                     </div>
+                    ${bloqueValidacionHTML}
                 `;
                 container.appendChild(card);
             });
+        }
+
+        // FUNCIÓN PARA QUE EL USUARIO SOLICITANTE VALIDE O REABRA EL TICKET TRAS LA VISITA
+        async function confirmarValidacionSolicitante(idOrCodigo, fueResuelto) {
+            const ticket = listaTicketsCache.find(t => (t.id && t.id === idOrCodigo) || t.codigo === idOrCodigo);
+            if (!ticket) return;
+
+            const inpComentario = document.getElementById('comentarioVal_' + idOrCodigo);
+            const comentario = inpComentario ? inpComentario.value.trim() : '';
+            const ahoraStr = new Date().toLocaleString('es-HN');
+
+            if (!fueResuelto && !comentario) {
+                alert('⚠️ Por favor escriba en el cuadro de comentario qué problema continúa presentándose para que el técnico pueda atenderlo.');
+                if (inpComentario) inpComentario.focus();
+                return;
+            }
+
+            if (!ticket.bitacora) ticket.bitacora = [];
+
+            if (fueResuelto) {
+                ticket.estado = 'Resuelto';
+                ticket.validadoPorUsuario = true;
+                ticket.validadoPorNombre = ticket.solicitante;
+                ticket.fechaValidacion = ahoraStr;
+                ticket.comentarioValidacion = comentario || 'El usuario comprobó después de la visita técnica que el problema quedó resuelto.';
+                ticket.rechazadoValidacion = false;
+
+                ticket.bitacora.push({
+                    fecha: ahoraStr,
+                    autor: `${ticket.solicitante} (Solicitante)`,
+                    accion: 'Validación y Cierre por Usuario',
+                    nota: `✅ VALIDADO POR EL SOLICITANTE: "${ticket.comentarioValidacion}" — Ticket pasado a estado Resuelto.`
+                });
+            } else {
+                ticket.estado = 'En Proceso';
+                ticket.validadoPorUsuario = false;
+                ticket.rechazadoValidacion = true;
+                ticket.fechaRechazoValidacion = ahoraStr;
+                ticket.motivoRechazoValidacion = comentario;
+
+                ticket.bitacora.push({
+                    fecha: ahoraStr,
+                    autor: `${ticket.solicitante} (Solicitante)`,
+                    accion: 'Reapertura por Solicitante',
+                    nota: `⚠️ EL PROBLEMA PERSISTE: El solicitante indicó tras la visita: "${comentario}". Ticket devuelto a En Proceso.`
+                });
+            }
+
+            if (typeof dbFirestore !== 'undefined' && dbFirestore && ticket.id && !ticket.id.startsWith('local_')) {
+                try {
+                    await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
+                } catch (err) {
+                    console.warn("Error guardando validación en Firestore:", err);
+                }
+            }
+
+            localStorage.setItem('enag_tickets_public_cache', JSON.stringify(listaTicketsCache));
+            buscarTicketUsuario();
+
+            if (fueResuelto) {
+                showToast(`✅ ¡Gracias! El ticket ${ticket.codigo} ha sido validado y marcado como Resuelto.`, 'success');
+            } else {
+                showToast(`🔄 Se notificó a Informática que el problema en ${ticket.codigo} aún persiste.`, 'info');
+            }
         }
 
         // TOAST

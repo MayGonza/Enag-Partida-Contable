@@ -431,6 +431,13 @@
             border: 1px solid #fde68a;
         }
 
+        .status-por_validar {
+            background: #ffedd5;
+            color: #c2410c;
+            border: 1px solid #fdba74;
+            box-shadow: 0 0 0 2px rgba(249, 115, 22, 0.12);
+        }
+
         .status-resuelto {
             background: #dcfce7;
             color: #166534;
@@ -1105,7 +1112,8 @@
                         <option value="Asignado">Asignados</option>
                         <option value="En Proceso">En Proceso</option>
                         <option value="En Espera">En Espera</option>
-                        <option value="Resuelto">Resueltos</option>
+                        <option value="Por Validar">⏳ Por Validar (Usuario)</option>
+                        <option value="Resuelto">✅ Resueltos (Validados)</option>
                         <option value="Cerrado">Cerrados</option>
                     </select>
                 </div>
@@ -1219,10 +1227,21 @@
                     </div>
                 </div>
 
+                <!-- COLUMNA: POR VALIDAR (VISITA REALIZADA) -->
+                <div class="kanban-column" id="kanbanColPorValidar" style="border-top: 3px solid #f97316;">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">⏳ POR VALIDAR</span>
+                        <span class="badge-status status-por_validar" id="countKanbanPorValidar">0</span>
+                    </div>
+                    <div class="kanban-cards-container" id="cardsPorValidar">
+                        <!-- Tarjetas -->
+                    </div>
+                </div>
+
                 <!-- COLUMNA: RESUELTO / CERRADO -->
                 <div class="kanban-column" id="kanbanColResuelto">
                     <div class="kanban-column-header">
-                        <span class="kanban-column-title">✅ RESUELTOS</span>
+                        <span class="kanban-column-title">✅ RESUELTOS (VALIDADOS)</span>
                         <span class="badge-status status-resuelto" id="countKanbanResuelto">0</span>
                     </div>
                     <div class="kanban-cards-container" id="cardsResuelto">
@@ -1360,8 +1379,9 @@
                                         <option value="Asignado">Asignado</option>
                                         <option value="En Proceso">En Proceso</option>
                                         <option value="En Espera">En Espera</option>
-                                        <option value="Resuelto">Resuelto</option>
-                                        <option value="Cerrado">Cerrado</option>
+                                        <option value="Por Validar" id="optModalEstadoPorValidar">⏳ Por Validar (Visita Realizada)</option>
+                                        <option value="Resuelto" id="optModalEstadoResuelto">✅ Resuelto (Validado)</option>
+                                        <option value="Cerrado" id="optModalEstadoCerrado">Cerrado</option>
                                     </select>
                                 </div>
                                 <div class="form-group">
@@ -1374,6 +1394,14 @@
                                     </select>
                                 </div>
                             </div>
+
+                            <div id="msgNotaValidacionTecnico" style="margin-top: 10px; font-size: 0.78em; color: #9a3412; background: #fff7ed; border: 1px solid #fed7aa; padding: 8px 10px; border-radius: 6px; line-height: 1.4;">
+                                💡 <strong>Flujo de Cierre:</strong> Al finalizar la visita técnica, seleccione <strong>"⏳ Por Validar (Visita Realizada)"</strong>. El ticket pasará a <strong>"✅ Resuelto"</strong> únicamente cuando el usuario solicitante confirme que el problema quedó solucionado.
+                            </div>
+                        </div>
+
+                        <!-- TARJETA DE ESTADO DE VALIDACIÓN DEL SOLICITANTE -->
+                        <div id="boxEstadoValidacionUsuario" style="display:none; margin-bottom: 14px; padding: 14px 16px; border-radius: 10px; font-size: 0.86em;">
                         </div>
 
                         <!-- BITÁCORA / SEGUIMIENTO CRONOLÓGICO -->
@@ -1900,7 +1928,7 @@
             const total = visibles.length;
             const nuevos = visibles.filter(t => t.estado === 'Nuevo' || !t.tecnicoAsignado || t.tecnicoAsignado === 'Sin asignar').length;
             const asignados = visibles.filter(t => t.estado === 'Asignado').length;
-            const enProceso = visibles.filter(t => t.estado === 'En Proceso' || t.estado === 'En Espera').length;
+            const enProceso = visibles.filter(t => t.estado === 'En Proceso' || t.estado === 'En Espera' || t.estado === 'Por Validar').length;
             const resueltos = visibles.filter(t => t.estado === 'Resuelto' || t.estado === 'Cerrado').length;
 
             document.getElementById('kpiTotal').textContent = total;
@@ -2058,6 +2086,7 @@
                 'Asignado': document.getElementById('cardsAsignado'),
                 'En Proceso': document.getElementById('cardsProceso'),
                 'En Espera': document.getElementById('cardsEspera'),
+                'Por Validar': document.getElementById('cardsPorValidar'),
                 'Resuelto': document.getElementById('cardsResuelto')
             };
 
@@ -2066,6 +2095,7 @@
                 'Asignado': 0,
                 'En Proceso': 0,
                 'En Espera': 0,
+                'Por Validar': 0,
                 'Resuelto': 0
             };
 
@@ -2090,6 +2120,10 @@
                     else if (t.prioridad === 'Media') borderColor = '#eab308';
                     card.style.borderLeftColor = borderColor;
 
+                    const badgeValidado = t.validadoPorUsuario
+                        ? `<div style="margin-top:5px; font-size:0.74em; color:#15803d; font-weight:700; background:#dcfce7; padding:3px 7px; border-radius:4px; display:inline-block;">✅ Validado por ${t.validadoPorNombre || t.solicitante}</div>`
+                        : (t.estado === 'Por Validar' ? `<div style="margin-top:5px; font-size:0.74em; color:#c2410c; font-weight:700; background:#ffedd5; padding:3px 7px; border-radius:4px; display:inline-block;">⏳ Esperando validación del solicitante</div>` : '');
+
                     card.innerHTML = `
                         <div class="kanban-card-header">
                             <span class="ticket-code" style="font-size:0.9em;">${t.codigo}</span>
@@ -2097,6 +2131,7 @@
                         </div>
                         <div class="kanban-card-title">${t.asunto}</div>
                         <div style="font-size:0.8em; color:var(--text-muted);">${t.solicitante} — ${t.departamento}</div>
+                        ${badgeValidado}
                         <div class="kanban-card-meta">
                             <span>👨‍💻 ${t.tecnicoAsignado || 'Sin asignar'}</span>
                             <span style="font-size:0.95em;">➡️</span>
@@ -2110,6 +2145,7 @@
             if (document.getElementById('countKanbanAsignado')) document.getElementById('countKanbanAsignado').textContent = counts['Asignado'];
             if (document.getElementById('countKanbanProceso')) document.getElementById('countKanbanProceso').textContent = counts['En Proceso'];
             if (document.getElementById('countKanbanEspera')) document.getElementById('countKanbanEspera').textContent = counts['En Espera'];
+            if (document.getElementById('countKanbanPorValidar')) document.getElementById('countKanbanPorValidar').textContent = counts['Por Validar'];
             if (document.getElementById('countKanbanResuelto')) document.getElementById('countKanbanResuelto').textContent = counts['Resuelto'];
         }
 
@@ -2300,9 +2336,87 @@
                 selectPrioModal.disabled = !esAdminTI;
             }
 
-            document.getElementById('modalSelectEstado').value = ticket.estado || 'Asignado';
+            const selectEstadoModal = document.getElementById('modalSelectEstado');
+            const optResuelto = document.getElementById('optModalEstadoResuelto');
+            const optCerrado = document.getElementById('optModalEstadoCerrado');
+
+            // Los técnicos regulares NO pueden marcar directamente "Resuelto" ni "Cerrado"; deben marcar "Por Validar" para que el solicitante valide tras la visita
+            if (!esAdminTI) {
+                if (ticket.estado === 'Resuelto' || ticket.estado === 'Cerrado') {
+                    if (optResuelto) optResuelto.disabled = false;
+                    if (optCerrado) optCerrado.disabled = false;
+                    if (selectEstadoModal) selectEstadoModal.disabled = true;
+                } else {
+                    if (optResuelto) {
+                        optResuelto.disabled = true;
+                        optResuelto.textContent = '🔒 Resuelto (Requiere Validación del Solicitante)';
+                    }
+                    if (optCerrado) {
+                        optCerrado.disabled = true;
+                        optCerrado.textContent = '🔒 Cerrado (Solo tras Validación)';
+                    }
+                    if (selectEstadoModal) selectEstadoModal.disabled = false;
+                }
+            } else {
+                if (optResuelto) {
+                    optResuelto.disabled = false;
+                    optResuelto.textContent = '✅ Resuelto (Validado)';
+                }
+                if (optCerrado) {
+                    optCerrado.disabled = false;
+                    optCerrado.textContent = 'Cerrado';
+                }
+                if (selectEstadoModal) selectEstadoModal.disabled = false;
+            }
+
+            if (selectEstadoModal) {
+                selectEstadoModal.value = ticket.estado || 'Asignado';
+            }
             document.getElementById('modalDiagnostico').value = ticket.diagnostico || '';
             document.getElementById('modalSolucion').value = ticket.solucion || '';
+
+            // Renderizar tarjeta de estado de validación del usuario solicitante
+            const boxValidacion = document.getElementById('boxEstadoValidacionUsuario');
+            if (boxValidacion) {
+                if (ticket.validadoPorUsuario || ticket.estado === 'Resuelto' || ticket.estado === 'Cerrado') {
+                    boxValidacion.style.display = 'block';
+                    boxValidacion.style.background = '#dcfce7';
+                    boxValidacion.style.border = '1.5px solid #86efac';
+                    boxValidacion.style.color = '#166534';
+                    boxValidacion.innerHTML = `
+                        <div style="font-weight: 800; font-size: 0.96em; margin-bottom: 4px; display:flex; align-items:center; gap:6px;">
+                            <span>✅</span> VALIDADO CONFORME POR EL SOLICITANTE
+                        </div>
+                        <div><strong>Confirmado por:</strong> ${ticket.validadoPorNombre || ticket.solicitante}</div>
+                        <div><strong>Fecha de Validación:</strong> ${ticket.fechaValidacion || 'Confirmado en sistema'}</div>
+                        ${ticket.comentarioValidacion ? `<div style="margin-top:4px; background:rgba(255,255,255,0.7); padding:6px 10px; border-radius:6px;"><strong>Observación del Usuario:</strong> "${ticket.comentarioValidacion}"</div>` : ''}
+                    `;
+                } else if (ticket.estado === 'Por Validar') {
+                    boxValidacion.style.display = 'block';
+                    boxValidacion.style.background = '#ffedd5';
+                    boxValidacion.style.border = '1.5px solid #fdba74';
+                    boxValidacion.style.color = '#9a3412';
+                    boxValidacion.innerHTML = `
+                        <div style="font-weight: 800; font-size: 0.96em; margin-bottom: 4px; display:flex; align-items:center; gap:6px;">
+                            <span>⏳</span> EN ESPERA DE VALIDACIÓN DEL SOLICITANTE
+                        </div>
+                        <div>La visita técnica fue registrada. El usuario <strong>${ticket.solicitante}</strong> debe confirmar desde el botón <strong>"Soporte Técnico → Mis Tickets"</strong> o en el portal de consulta que el problema quedó resuelto para que pase a <strong>Resuelto</strong>.</div>
+                    `;
+                } else if (ticket.rechazadoValidacion) {
+                    boxValidacion.style.display = 'block';
+                    boxValidacion.style.background = '#fee2e2';
+                    boxValidacion.style.border = '1.5px solid #fca5a5';
+                    boxValidacion.style.color = '#991b1b';
+                    boxValidacion.innerHTML = `
+                        <div style="font-weight: 800; font-size: 0.96em; margin-bottom: 4px; display:flex; align-items:center; gap:6px;">
+                            <span>⚠️</span> VALIDACIÓN RECHAZADA — EL PROBLEMA PERSISTE
+                        </div>
+                        <div><strong>Reportado por ${ticket.solicitante} (${ticket.fechaRechazoValidacion || ''}):</strong> "${ticket.motivoRechazoValidacion || 'El usuario indicó que la falla continúa.'}"</div>
+                    `;
+                } else {
+                    boxValidacion.style.display = 'none';
+                }
+            }
 
             renderizarTimelineModal();
 
@@ -2381,6 +2495,21 @@
             let nuevaPrioridad = ticketSeleccionado.prioridad || 'Media';
             let nuevoEstado = document.getElementById('modalSelectEstado').value;
 
+            const diagnostico = document.getElementById('modalDiagnostico').value.trim();
+            const solucion = document.getElementById('modalSolucion').value.trim();
+
+            // Si un técnico regular intenta pasar a Resuelto o Cerrado sin que haya sido validado antes por el usuario, forzar "Por Validar"
+            if (!esAdminTI && (nuevoEstado === 'Resuelto' || nuevoEstado === 'Cerrado') && !ticketSeleccionado.validadoPorUsuario) {
+                nuevoEstado = 'Por Validar';
+            }
+
+            // Validar que al pasar a "Por Validar" o "Resuelto" exista diagnóstico o solución documentada
+            if ((nuevoEstado === 'Por Validar' || nuevoEstado === 'Resuelto') && !diagnostico && !solucion) {
+                showToast("⚠️ Debe describir el Diagnóstico Técnico o la Solución realizada durante la visita antes de enviar a validación del usuario.", "warning");
+                document.getElementById('modalSolucion').focus();
+                return;
+            }
+
             // Solo el Super Admin TI (steven.gonzales) puede asignar o cambiar técnico y prioridad
             if (esAdminTI) {
                 nuevoTecnico = document.getElementById('modalSelectTecnico').value;
@@ -2397,12 +2526,14 @@
                 }
             }
 
-            const diagnostico = document.getElementById('modalDiagnostico').value.trim();
-            const solucion = document.getElementById('modalSolucion').value.trim();
-
             ticketSeleccionado.estado = nuevoEstado;
             ticketSeleccionado.diagnostico = diagnostico;
             ticketSeleccionado.solucion = solucion;
+
+            if (nuevoEstado === 'Por Validar') {
+                ticketSeleccionado.fechaVisitaTecnica = new Date().toLocaleString('es-HN');
+                ticketSeleccionado.rechazadoValidacion = false;
+            }
 
             if (!ticketSeleccionado.bitacora) ticketSeleccionado.bitacora = [];
 
@@ -2416,11 +2547,15 @@
             }
 
             if (estadoAnterior !== nuevoEstado) {
+                const notaEstado = nuevoEstado === 'Por Validar'
+                    ? `Visita técnica concluida por ${usuarioActual.nombre || nuevoTecnico}. Solución registrada y enviada para validación del solicitante (${ticketSeleccionado.solicitante}).`
+                    : `Estado actualizado de "${estadoAnterior}" a "${nuevoEstado}".`;
+
                 ticketSeleccionado.bitacora.push({
                     fecha: new Date().toLocaleString('es-HN'),
                     autor: usuarioActual.nombre || (nuevoTecnico !== 'Sin asignar' ? nuevoTecnico : 'Sistema'),
-                    accion: 'Cambio de Estado',
-                    nota: `Estado actualizado de "${estadoAnterior}" a "${nuevoEstado}".`
+                    accion: nuevoEstado === 'Por Validar' ? 'Enviado a Validación del Usuario' : 'Cambio de Estado',
+                    nota: notaEstado
                 });
             }
 
@@ -2441,7 +2576,12 @@
             guardarEnLocalStorage(ticketsData);
             renderizarTodo();
             cerrarModalGestion();
-            showToast(`✅ Cambios del ticket ${codigoGuardado} guardados.`, "success");
+
+            if (nuevoEstado === 'Por Validar') {
+                showToast(`⏳ Ticket ${codigoGuardado} enviado a validación. Pasará a "Resuelto" cuando el usuario solicitante confirme la solución.`, "info");
+            } else {
+                showToast(`✅ Cambios del ticket ${codigoGuardado} guardados.`, "success");
+            }
         }
 
         // 14. TRANSFERIR A REPORTE TÉCNICO (RT)
@@ -2564,7 +2704,23 @@
 
             const solLines = doc.splitTextToSize(`Solución / Trabajo Realizado: ${t.solucion || 'Pendiente de cierre o en pruebas.'}`, 184);
             doc.text(solLines, 16, y);
-            y += (solLines.length * 5) + 20;
+            y += (solLines.length * 5) + 8;
+
+            if (t.validadoPorUsuario) {
+                doc.setFillColor(220, 252, 231);
+                doc.setDrawColor(134, 239, 172);
+                doc.rect(16, y, 184, 16, 'FD');
+                doc.setFont('helvetica', 'bold');
+                doc.setTextColor(22, 101, 52);
+                doc.setFontSize(9.5);
+                doc.text(`VALIDADO DIGITALMENTE POR EL SOLICITANTE: ${t.validadoPorNombre || t.solicitante} (${t.fechaValidacion || ''})`, 20, y + 6);
+                doc.setFont('helvetica', 'normal');
+                doc.setFontSize(8.5);
+                doc.text(`Conformidad: ${t.comentarioValidacion || 'El usuario comprobó tras la visita que el problema fue resuelto.'}`, 20, y + 12);
+                y += 28;
+            } else {
+                y += 12;
+            }
 
             // Firmas de Conformidad
             doc.setDrawColor(0, 0, 0);
@@ -2575,6 +2731,7 @@
 
             doc.setFontSize(9);
             doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
             doc.text("Firma del Técnico de Informática", 58, y + 5, { align: "center" });
             doc.text("Firma del Solicitante Conforme", 158, y + 5, { align: "center" });
 
