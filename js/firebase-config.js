@@ -23,6 +23,14 @@ if (typeof firebase !== 'undefined') {
       firebaseApp = firebase.app();
     }
     dbFirestore = firebase.firestore();
+    try {
+      dbFirestore.settings({
+        experimentalAutoDetectLongPolling: true,
+        merge: true
+      });
+    } catch (errSettings) {
+      console.warn("Aviso aplicando settings de compatibilidad de red Firestore:", errSettings);
+    }
     console.log("🔥 Firebase Firestore conectado a:", firebaseConfig.projectId);
   } catch (e) {
     console.warn("⚠️ No se pudo inicializar Firebase:", e);
