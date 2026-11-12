@@ -55,6 +55,28 @@ service cloud.firestore {
       allow read: if true;
       allow write: if request.auth != null || true;
     }
+
+    // Mesa de Ayuda TI (Helpdesk): Gestión de tickets de soporte técnico e incidencias
+    match /tickets_soporte/{ticketId} {
+      allow read: if true;
+      allow create: if request.resource.data.codigo is string
+                    && request.resource.data.codigo.size() > 0
+                    && request.resource.data.codigo.size() <= 50
+                    && request.resource.data.solicitante is string
+                    && request.resource.data.solicitante.size() > 0
+                    && request.resource.data.solicitante.size() <= 150
+                    && request.resource.data.departamento is string
+                    && request.resource.data.departamento.size() > 0
+                    && request.resource.data.departamento.size() <= 150
+                    && request.resource.data.asunto is string
+                    && request.resource.data.asunto.size() > 0
+                    && request.resource.data.asunto.size() <= 250
+                    && request.resource.data.descripcion is string
+                    && request.resource.data.descripcion.size() > 0
+                    && request.resource.data.descripcion.size() <= 5000
+                    && request.resource.data.estado == 'Nuevo';
+      allow update, delete: if request.auth != null;
+    }
     
     // Para todas las demás colecciones (cotizaciones, bitacora_global, etc.)
     match /{document=**} {
