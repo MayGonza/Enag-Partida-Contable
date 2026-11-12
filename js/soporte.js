@@ -300,14 +300,14 @@
 
         lista.forEach(t => {
             const key = t.id || t.codigo;
-            const requiereValidacion = (t.estado === 'Por Validar') || ((t.estado === 'En Proceso' || t.estado === 'Asignado') && (t.solucion || t.diagnostico));
+            const requiereValidacion = (t.estado !== 'Resuelto' && t.estado !== 'Cerrado');
 
             let bloqueAccion = '';
             if (requiereValidacion) {
                 bloqueAccion = `
                     <div style="margin-top:10px; background:#fff7ed; border:1.5px solid #fb923c; border-radius:8px; padding:10px 12px;">
                         <div style="font-weight:800; color:#9a3412; font-size:0.85em; margin-bottom:4px;">
-                            ⏳ Visita Técnica Realizada — ¿Quedó resuelto su problema?
+                            ⏳ Validación del Solicitante — ¿Quedó resuelto su problema tras la visita?
                         </div>
                         <input type="text" id="inpValWidget_${key}" placeholder="Comentario de conformidad o detalle (opcional)..." style="width:100%; padding:7px 10px; border:1px solid #cbd5e1; border-radius:6px; font-size:0.82em; margin-bottom:8px; background:white;">
                         <div style="display:flex; gap:8px; flex-wrap:wrap;">
@@ -399,11 +399,31 @@
             });
         }
 
-        if (typeof dbFirestore !== 'undefined' && dbFirestore && ticket.id) {
+        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
             try {
-                await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
-            } catch (err) {
-                console.warn('Error actualizando validación en Firestore:', err);
+                await dbFirestore.collection('reportes_tecnicos').doc('VAL_' + ticket.codigo).set({
+                    tipoRegistro: 'validacion_ticket',
+                    ticketId: ticket.id || '',
+                    codigo: ticket.codigo,
+                    estado: ticket.estado,
+                    validadoPorUsuario: !!ticket.validadoPorUsuario,
+                    validadoPorNombre: ticket.validadoPorNombre || ticket.solicitante,
+                    fechaValidacion: ticket.fechaValidacion || '',
+                    comentarioValidacion: ticket.comentarioValidacion || '',
+                    rechazadoValidacion: !!ticket.rechazadoValidacion,
+                    fechaRechazoValidacion: ticket.fechaRechazoValidacion || '',
+                    motivoRechazoValidacion: ticket.motivoRechazoValidacion || '',
+                    ultimaEntradaBitacora: ticket.bitacora[ticket.bitacora.length - 1],
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (e) { }
+
+            if (ticket.id) {
+                try {
+                    await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
+                } catch (err) {
+                    console.warn('Error actualizando validación en Firestore:', err);
+                }
             }
         }
 

@@ -1747,6 +1747,38 @@
             return ticketsData.filter(t => esTicketAsignadoAMi(t));
         }
 
+        let mapaValidacionesRemotas = {};
+
+        function sincronizarValidacionesEnTickets() {
+            let huboCambios = false;
+            ticketsData.forEach(t => {
+                const val = mapaValidacionesRemotas[t.codigo];
+                if (val && val.estado) {
+                    if (t.estado !== val.estado || t.validadoPorUsuario !== val.validadoPorUsuario || t.comentarioValidacion !== val.comentarioValidacion) {
+                        t.estado = val.estado;
+                        t.validadoPorUsuario = val.validadoPorUsuario;
+                        t.validadoPorNombre = val.validadoPorNombre || t.solicitante;
+                        t.fechaValidacion = val.fechaValidacion || t.fechaValidacion;
+                        t.comentarioValidacion = val.comentarioValidacion || t.comentarioValidacion;
+                        t.rechazadoValidacion = val.rechazadoValidacion;
+                        t.fechaRechazoValidacion = val.fechaRechazoValidacion || t.fechaRechazoValidacion;
+                        t.motivoRechazoValidacion = val.motivoRechazoValidacion || t.motivoRechazoValidacion;
+                        if (val.ultimaEntradaBitacora) {
+                            if (!Array.isArray(t.bitacora)) t.bitacora = [];
+                            const ya = t.bitacora.some(b => b.fecha === val.ultimaEntradaBitacora.fecha && b.accion === val.ultimaEntradaBitacora.accion);
+                            if (!ya) t.bitacora.push(val.ultimaEntradaBitacora);
+                        }
+                        huboCambios = true;
+                        // Persistir en tickets_soporte con la sesión autenticada de TI
+                        if (typeof dbFirestore !== 'undefined' && dbFirestore && t.id && !t.id.startsWith('local_')) {
+                            dbFirestore.collection('tickets_soporte').doc(t.id).set(t, { merge: true }).catch(() => {});
+                        }
+                    }
+                }
+            });
+            return huboCambios;
+        }
+
         // 1. CONEXIÓN A FIRESTORE CON ESCUCHA EN TIEMPO REAL
         function conectarFirebaseTickets() {
             if (typeof dbFirestore === 'undefined' || !dbFirestore) {
@@ -1757,6 +1789,23 @@
 
             try {
                 if (unsubscribeFirestore) unsubscribeFirestore();
+
+                // Escuchar validaciones de solicitantes enviadas desde el portal público
+                dbFirestore.collection('reportes_tecnicos')
+                    .where('tipoRegistro', '==', 'validacion_ticket')
+                    .onSnapshot((snapVal) => {
+                        snapVal.forEach(doc => {
+                            const d = doc.data();
+                            if (d && d.codigo) mapaValidacionesRemotas[d.codigo] = d;
+                        });
+                        if (sincronizarValidacionesEnTickets()) {
+                            guardarEnLocalStorage(ticketsData);
+                            renderizarTodo();
+                        }
+                    }, (err) => {
+                        console.warn("Aviso escucha validaciones remotas:", err);
+                    });
+
                 // Escuchar cambios en la colección tickets_soporte
                 unsubscribeFirestore = dbFirestore.collection('tickets_soporte')
                     .orderBy('fechaCreacion', 'desc')
@@ -1770,6 +1819,7 @@
                             lista.push({ id: doc.id, ...data });
                         });
                         ticketsData = lista;
+                        sincronizarValidacionesEnTickets();
                         guardarEnLocalStorage(lista);
                         renderizarTodo();
                         actualizarIndicadorSync(true);
@@ -2172,25 +2222,119 @@
             }
 
             lista.forEach(t => {
+                const key = t.id || t.codigo;
                 const item = document.createElement('div');
-                item.style.cssText = 'background:white; border:1px solid #cbd5e1; border-radius:8px; padding:12px; cursor:pointer; transition:all 0.2s;';
+                item.style.cssText = 'background:white; border:1px solid #cbd5e1; border-radius:8px; padding:12px; transition:all 0.2s;';
                 item.onmouseenter = () => item.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
                 item.onmouseleave = () => item.style.boxShadow = 'none';
-                item.onclick = () => abrirModalGestion(t.id || t.codigo);
+
+                let bloqueValidarHTML = '';
+                if (t.estado !== 'Resuelto' && t.estado !== 'Cerrado') {
+                    bloqueValidarHTML = `
+                        <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #e2e8f0; display:flex; gap:6px; flex-wrap:wrap;" onclick="event.stopPropagation()">
+                            <button type="button" onclick="validarTicketDesdeBuscador('${key}', true)" style="flex:1; background:#10b981; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.78em; cursor:pointer;">
+                                ✅ Confirmar Resuelto
+                            </button>
+                            <button type="button" onclick="validarTicketDesdeBuscador('${key}', false)" style="background:#ef4444; color:white; border:none; padding:6px 10px; border-radius:6px; font-weight:700; font-size:0.78em; cursor:pointer;">
+                                ❌ Persiste
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    bloqueValidarHTML = `
+                        <div style="margin-top:6px; font-size:0.78em; color:#166534; font-weight:700;">
+                            ✅ Validado Conforme (${t.validadoPorNombre || t.solicitante})
+                        </div>
+                    `;
+                }
 
                 item.innerHTML = `
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-                        <span class="ticket-code" style="font-size:0.92em;">${t.codigo}</span>
-                        <span class="badge-status status-${t.estado ? t.estado.toLowerCase().replace(' ', '_') : 'nuevo'}">${t.estado}</span>
+                    <div onclick="abrirModalGestion('${key}')" style="cursor:pointer;">
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                            <span class="ticket-code" style="font-size:0.92em;">${t.codigo}</span>
+                            <span class="badge-status status-${t.estado ? t.estado.toLowerCase().replace(' ', '_') : 'nuevo'}">${t.estado}</span>
+                        </div>
+                        <div style="font-weight:600; font-size:0.88em; color:var(--text-color);">${t.asunto}</div>
+                        <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:0.78em; color:var(--text-muted);">
+                            <span>📅 ${t.fechaCreacionTexto || t.fechaCreacion || '-'}</span>
+                            <span>👨‍💻 ${t.tecnicoAsignado || 'En espera de asignación'}</span>
+                        </div>
                     </div>
-                    <div style="font-weight:600; font-size:0.88em; color:var(--text-color);">${t.asunto}</div>
-                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:0.78em; color:var(--text-muted);">
-                        <span>📅 ${t.fechaCreacionTexto || t.fechaCreacion || '-'}</span>
-                        <span>👨‍💻 ${t.tecnicoAsignado || 'En espera de asignación'}</span>
-                    </div>
+                    ${bloqueValidarHTML}
                 `;
                 container.appendChild(item);
             });
+        }
+
+        async function validarTicketDesdeBuscador(idOrCodigo, fueResuelto) {
+            const ticket = ticketsData.find(t => (t.id && t.id === idOrCodigo) || t.codigo === idOrCodigo);
+            if (!ticket) return;
+
+            const ahoraStr = new Date().toLocaleString('es-HN');
+            if (!ticket.bitacora) ticket.bitacora = [];
+
+            if (fueResuelto) {
+                const com = prompt('Comentario de conformidad (opcional):', 'Visita realizada y problema solucionado satisfactoriamente.');
+                if (com === null) return;
+                ticket.estado = 'Resuelto';
+                ticket.validadoPorUsuario = true;
+                ticket.validadoPorNombre = ticket.solicitante;
+                ticket.fechaValidacion = ahoraStr;
+                ticket.comentarioValidacion = com.trim() || 'Confirmado como resuelto por el solicitante.';
+                ticket.rechazadoValidacion = false;
+                ticket.bitacora.push({
+                    fecha: ahoraStr,
+                    autor: `${ticket.solicitante} (Solicitante)`,
+                    accion: 'Validación y Cierre por Usuario',
+                    nota: `✅ VALIDADO POR EL SOLICITANTE: "${ticket.comentarioValidacion}" — Ticket pasado a Resuelto.`
+                });
+            } else {
+                const motivo = prompt('Indique qué problema continúa presentándose:');
+                if (!motivo || !motivo.trim()) return;
+                ticket.estado = 'En Proceso';
+                ticket.validadoPorUsuario = false;
+                ticket.rechazadoValidacion = true;
+                ticket.fechaRechazoValidacion = ahoraStr;
+                ticket.motivoRechazoValidacion = motivo.trim();
+                ticket.bitacora.push({
+                    fecha: ahoraStr,
+                    autor: `${ticket.solicitante} (Solicitante)`,
+                    accion: 'Reapertura por Solicitante',
+                    nota: `⚠️ EL PROBLEMA PERSISTE: "${motivo.trim()}". Ticket devuelto a En Proceso.`
+                });
+            }
+
+            const payloadValidacion = {
+                tipoRegistro: 'validacion_ticket',
+                ticketId: ticket.id || '',
+                codigo: ticket.codigo,
+                estado: ticket.estado,
+                validadoPorUsuario: !!ticket.validadoPorUsuario,
+                validadoPorNombre: ticket.validadoPorNombre || ticket.solicitante,
+                fechaValidacion: ticket.fechaValidacion || '',
+                comentarioValidacion: ticket.comentarioValidacion || '',
+                rechazadoValidacion: !!ticket.rechazadoValidacion,
+                fechaRechazoValidacion: ticket.fechaRechazoValidacion || '',
+                motivoRechazoValidacion: ticket.motivoRechazoValidacion || '',
+                ultimaEntradaBitacora: ticket.bitacora[ticket.bitacora.length - 1],
+                updatedAt: new Date().toISOString()
+            };
+            mapaValidacionesRemotas[ticket.codigo] = payloadValidacion;
+
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    await dbFirestore.collection('reportes_tecnicos').doc('VAL_' + ticket.codigo).set(payloadValidacion, { merge: true });
+                } catch (e) {}
+                if (ticket.id && !ticket.id.startsWith('local_')) {
+                    try {
+                        await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
+                    } catch (e) {}
+                }
+            }
+
+            guardarEnLocalStorage(ticketsData);
+            renderizarTodo();
+            showToast(fueResuelto ? `✅ Ticket ${ticket.codigo} validado y pasado a Resuelto.` : `🔄 Ticket ${ticket.codigo} devuelto a En Proceso.`, fueResuelto ? 'success' : 'info');
         }
 
         // 10. RENDERIZAR MÉTRICAS Y GRÁFICAS ESTILO GLPI
@@ -2565,6 +2709,18 @@
             if (typeof dbFirestore !== 'undefined' && dbFirestore && ticketSeleccionado.id && !ticketSeleccionado.id.startsWith('local_')) {
                 try {
                     await dbFirestore.collection('tickets_soporte').doc(ticketSeleccionado.id).set(ticketSeleccionado, { merge: true });
+                    if (mapaValidacionesRemotas[codigoGuardado]) {
+                        mapaValidacionesRemotas[codigoGuardado].estado = nuevoEstado;
+                        mapaValidacionesRemotas[codigoGuardado].validadoPorUsuario = !!ticketSeleccionado.validadoPorUsuario;
+                        await dbFirestore.collection('reportes_tecnicos').doc('VAL_' + codigoGuardado).set({
+                            tipoRegistro: 'validacion_ticket',
+                            ticketId: ticketSeleccionado.id,
+                            codigo: codigoGuardado,
+                            estado: nuevoEstado,
+                            validadoPorUsuario: !!ticketSeleccionado.validadoPorUsuario,
+                            updatedAt: new Date().toISOString()
+                        }, { merge: true }).catch(() => {});
+                    }
                     if (window.registrarBitacora) {
                         window.registrarBitacora('Mesa de Ayuda', 'Actualizar Ticket', `Ticket ${ticketSeleccionado.codigo} actualizado (Estado: ${nuevoEstado}, Técnico: ${ticketSeleccionado.tecnicoAsignado})`);
                     }

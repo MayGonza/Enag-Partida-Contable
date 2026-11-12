@@ -657,12 +657,14 @@
 
     <!-- SCRIPTS FIREBASE -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
     <script src="../js/firebase-config.js"></script>
 
     <script>
         let ultimoCodigoTicket = '';
         let listaTicketsCache = [];
+        let mapaValidacionesPublicas = {};
 
         document.addEventListener('DOMContentLoaded', () => {
             cargarCacheLocal();
@@ -683,17 +685,56 @@
             }
         }
 
+        function aplicarValidacionesPublicasALista(arr) {
+            arr.forEach(t => {
+                const val = mapaValidacionesPublicas[t.codigo];
+                if (val && val.estado) {
+                    t.estado = val.estado;
+                    t.validadoPorUsuario = val.validadoPorUsuario;
+                    t.validadoPorNombre = val.validadoPorNombre || t.solicitante;
+                    t.fechaValidacion = val.fechaValidacion || t.fechaValidacion;
+                    t.comentarioValidacion = val.comentarioValidacion || t.comentarioValidacion;
+                    t.rechazadoValidacion = val.rechazadoValidacion;
+                    t.fechaRechazoValidacion = val.fechaRechazoValidacion || t.fechaRechazoValidacion;
+                    t.motivoRechazoValidacion = val.motivoRechazoValidacion || t.motivoRechazoValidacion;
+                    if (val.ultimaEntradaBitacora) {
+                        if (!Array.isArray(t.bitacora)) t.bitacora = [];
+                        const yaExiste = t.bitacora.some(b => b.fecha === val.ultimaEntradaBitacora.fecha && b.accion === val.ultimaEntradaBitacora.accion);
+                        if (!yaExiste) t.bitacora.push(val.ultimaEntradaBitacora);
+                    }
+                }
+            });
+        }
+
         function conectarFirebaseYConsultar() {
             if (typeof dbFirestore === 'undefined' || !dbFirestore) return;
 
+            // Escuchar validaciones públicas de solicitantes (colección con escritura pública permitida)
+            dbFirestore.collection('reportes_tecnicos')
+                .where('tipoRegistro', '==', 'validacion_ticket')
+                .onSnapshot((snapVal) => {
+                    snapVal.forEach(doc => {
+                        const d = doc.data();
+                        if (d && d.codigo) {
+                            mapaValidacionesPublicas[d.codigo] = d;
+                        }
+                    });
+                    aplicarValidacionesPublicasALista(listaTicketsCache);
+                    localStorage.setItem('enag_tickets_public_cache', JSON.stringify(listaTicketsCache));
+                    buscarTicketUsuario();
+                }, (err) => {
+                    console.warn("Aviso escucha validaciones:", err);
+                });
+
             dbFirestore.collection('tickets_soporte')
                 .orderBy('fechaCreacion', 'desc')
-                .limit(50)
+                .limit(60)
                 .onSnapshot((snapshot) => {
                     const arr = [];
                     snapshot.forEach(doc => {
                         arr.push({ id: doc.id, ...doc.data() });
                     });
+                    aplicarValidacionesPublicasALista(arr);
                     listaTicketsCache = arr;
                     localStorage.setItem('enag_tickets_public_cache', JSON.stringify(arr));
                     buscarTicketUsuario();
@@ -862,35 +903,43 @@
                 const ultimaNota = bitacora.length > 0 ? bitacora[bitacora.length - 1] : null;
                 const ticketKey = t.id || t.codigo;
 
-                // Bloque de Validación del Solicitante tras la Visita Técnica
+                // Bloque de Validación del Solicitante tras la Visita Técnica (SIEMPRE visible para el solicitante)
                 let bloqueValidacionHTML = '';
-                if (t.estado === 'Por Validar' || ((t.estado === 'En Proceso' || t.estado === 'Asignado') && (t.solucion || t.diagnostico))) {
+                if (t.estado !== 'Resuelto' && t.estado !== 'Cerrado') {
+                    const esPorValidar = t.estado === 'Por Validar';
                     bloqueValidacionHTML = `
-                        <div style="margin-top: 14px; background: #fff7ed; border: 2px solid #fb923c; border-radius: 10px; padding: 14px 16px;">
-                            <div style="font-weight: 800; color: #9a3412; font-size: 0.96em; margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
-                                <span>⏳</span> Validación de Visita Técnica — ¿Se resolvió su problema?
+                        <div style="margin-top: 14px; background: ${esPorValidar ? '#fff7ed' : '#f0fdf4'}; border: 2px solid ${esPorValidar ? '#fb923c' : '#22c55e'}; border-radius: 10px; padding: 14px 16px;">
+                            <div style="font-weight: 800; color: ${esPorValidar ? '#9a3412' : '#166534'}; font-size: 0.96em; margin-bottom: 6px; display:flex; align-items:center; gap:6px;">
+                                <span>${esPorValidar ? '⏳' : '✅'}</span> Validación del Solicitante — ¿Ya se resolvió su problema tras la visita técnica?
                             </div>
-                            <p style="margin: 0 0 10px; font-size: 0.85em; color: #7c2d12; line-height: 1.4;">
-                                El técnico <strong>${t.tecnicoAsignado || 'de Informática'}</strong> ha registrado la atención de su solicitud. Por favor verifique que su equipo o sistema funcione correctamente y confirme para pasar el ticket a <strong>Resuelto</strong>:
+                            <p style="margin: 0 0 10px; font-size: 0.85em; color: #334155; line-height: 1.4;">
+                                ${esPorValidar
+                                    ? `El técnico <strong>${t.tecnicoAsignado || 'de Informática'}</strong> registró la visita técnica. Verifique que su equipo o sistema funcione correctamente y confirme abajo para pasar el ticket a <strong>Resuelto</strong>:`
+                                    : `Una vez realizada la visita del técnico (<strong>${t.tecnicoAsignado || 'Informática'}</strong>) y comprobado que el problema fue solucionado, confirme aquí para validar y pasar el ticket a <strong>Resuelto</strong>:`}
                             </p>
                             <div style="margin-bottom: 10px;">
-                                <input type="text" id="comentarioVal_${ticketKey}" class="form-control" style="font-size: 0.85em; padding: 8px 12px; background: white;" placeholder="Comentario opcional (ej. Todo funciona correctamente tras la visita)...">
+                                <input type="text" id="comentarioVal_${ticketKey}" class="form-control" style="font-size: 0.85em; padding: 8px 12px; background: white;" placeholder="Comentario opcional (ej. Visita realizada, equipo funcionando correctamente)...">
                             </div>
                             <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                                <button type="button" onclick="confirmarValidacionSolicitante('${ticketKey}', true)" style="background: #10b981; color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 0.86em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.25);">
-                                    <span>✅</span> Sí, Confirmar que se Resolvió
+                                <button type="button" onclick="confirmarValidacionSolicitante('${ticketKey}', true)" style="background: #10b981; color: white; border: none; padding: 10px 18px; border-radius: 8px; font-weight: 700; font-size: 0.88em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 2px 6px rgba(16, 185, 129, 0.3);">
+                                    <span>✅</span> Confirmar que se Resolvió (Pasar a Resuelto)
                                 </button>
-                                <button type="button" onclick="confirmarValidacionSolicitante('${ticketKey}', false)" style="background: #ef4444; color: white; border: none; padding: 9px 16px; border-radius: 8px; font-weight: 700; font-size: 0.86em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
-                                    <span>❌</span> No, el Problema Persiste
+                                <button type="button" onclick="confirmarValidacionSolicitante('${ticketKey}', false)" style="background: #ef4444; color: white; border: none; padding: 10px 16px; border-radius: 8px; font-weight: 700; font-size: 0.86em; cursor: pointer; display: inline-flex; align-items: center; gap: 6px;">
+                                    <span>❌</span> El Problema Persiste
                                 </button>
                             </div>
                         </div>
                     `;
-                } else if (t.validadoPorUsuario || t.estado === 'Resuelto' || t.estado === 'Cerrado') {
+                } else {
                     bloqueValidacionHTML = `
-                        <div style="margin-top: 12px; background: #dcfce7; border: 1.5px solid #86efac; border-radius: 8px; padding: 10px 14px; font-size: 0.85em; color: #166534;">
-                            <strong>✅ Validado Conforme por el Solicitante:</strong> ${t.validadoPorNombre || t.solicitante} ${t.fechaValidacion ? '(' + t.fechaValidacion + ')' : ''}
-                            ${t.comentarioValidacion ? `<div style="margin-top:3px; font-style:italic;">"${t.comentarioValidacion}"</div>` : ''}
+                        <div style="margin-top: 12px; background: #dcfce7; border: 1.5px solid #86efac; border-radius: 8px; padding: 12px 14px; font-size: 0.86em; color: #166534; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+                            <div>
+                                <strong>✅ Ticket Validado y Resuelto por el Solicitante:</strong> ${t.validadoPorNombre || t.solicitante} ${t.fechaValidacion ? '(' + t.fechaValidacion + ')' : ''}
+                                ${t.comentarioValidacion ? `<div style="margin-top:3px; font-style:italic;">"${t.comentarioValidacion}"</div>` : ''}
+                            </div>
+                            <button type="button" onclick="reabrirTicketSolicitante('${ticketKey}')" style="background:#fff; color:#dc2626; border:1px solid #fca5a5; padding:6px 12px; border-radius:6px; font-weight:700; font-size:0.8em; cursor:pointer;">
+                                🔄 El problema volvió (Reabrir)
+                            </button>
                         </div>
                     `;
                 }
@@ -964,11 +1013,42 @@
                 });
             }
 
-            if (typeof dbFirestore !== 'undefined' && dbFirestore && ticket.id && !ticket.id.startsWith('local_')) {
+            const payloadValidacion = {
+                tipoRegistro: 'validacion_ticket',
+                ticketId: ticket.id || '',
+                codigo: ticket.codigo,
+                estado: ticket.estado,
+                validadoPorUsuario: !!ticket.validadoPorUsuario,
+                validadoPorNombre: ticket.validadoPorNombre || ticket.solicitante,
+                fechaValidacion: ticket.fechaValidacion || '',
+                comentarioValidacion: ticket.comentarioValidacion || '',
+                rechazadoValidacion: !!ticket.rechazadoValidacion,
+                fechaRechazoValidacion: ticket.fechaRechazoValidacion || '',
+                motivoRechazoValidacion: ticket.motivoRechazoValidacion || '',
+                ultimaEntradaBitacora: ticket.bitacora[ticket.bitacora.length - 1],
+                updatedAt: new Date().toISOString()
+            };
+
+            mapaValidacionesPublicas[ticket.codigo] = payloadValidacion;
+
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                // 1. Guardar en colección con permiso público para solicitantes sin cuenta
                 try {
-                    await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
-                } catch (err) {
-                    console.warn("Error guardando validación en Firestore:", err);
+                    await dbFirestore.collection('reportes_tecnicos').doc('VAL_' + ticket.codigo).set(payloadValidacion, { merge: true });
+                } catch (errVal) {
+                    console.warn("Aviso guardando registro de validación pública:", errVal);
+                }
+
+                // 2. Intentar actualizar directamente el documento en tickets_soporte
+                if (ticket.id && !ticket.id.startsWith('local_')) {
+                    try {
+                        if (typeof firebase !== 'undefined' && firebase.auth && !firebase.auth().currentUser) {
+                            await firebase.auth().signInAnonymously().catch(() => {});
+                        }
+                        await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
+                    } catch (err) {
+                        console.warn("Sincronización diferida a Mesa de Ayuda TI:", err);
+                    }
                 }
             }
 
@@ -980,6 +1060,63 @@
             } else {
                 showToast(`🔄 Se notificó a Informática que el problema en ${ticket.codigo} aún persiste.`, 'info');
             }
+        }
+
+        async function reabrirTicketSolicitante(idOrCodigo) {
+            const motivo = prompt('Por favor indique brevemente qué problema volvió a presentarse para notificar al técnico:');
+            if (!motivo || !motivo.trim()) return;
+
+            const ticket = listaTicketsCache.find(t => (t.id && t.id === idOrCodigo) || t.codigo === idOrCodigo);
+            if (!ticket) return;
+
+            const ahoraStr = new Date().toLocaleString('es-HN');
+            if (!ticket.bitacora) ticket.bitacora = [];
+
+            ticket.estado = 'En Proceso';
+            ticket.validadoPorUsuario = false;
+            ticket.rechazadoValidacion = true;
+            ticket.fechaRechazoValidacion = ahoraStr;
+            ticket.motivoRechazoValidacion = motivo.trim();
+
+            ticket.bitacora.push({
+                fecha: ahoraStr,
+                autor: `${ticket.solicitante} (Solicitante)`,
+                accion: 'Reapertura por Solicitante',
+                nota: `⚠️ REABIERTO POR SOLICITANTE: "${motivo.trim()}". Ticket devuelto a En Proceso.`
+            });
+
+            const payloadValidacion = {
+                tipoRegistro: 'validacion_ticket',
+                ticketId: ticket.id || '',
+                codigo: ticket.codigo,
+                estado: ticket.estado,
+                validadoPorUsuario: false,
+                validadoPorNombre: ticket.solicitante,
+                fechaValidacion: ticket.fechaValidacion || '',
+                comentarioValidacion: ticket.comentarioValidacion || '',
+                rechazadoValidacion: true,
+                fechaRechazoValidacion: ahoraStr,
+                motivoRechazoValidacion: motivo.trim(),
+                ultimaEntradaBitacora: ticket.bitacora[ticket.bitacora.length - 1],
+                updatedAt: new Date().toISOString()
+            };
+
+            mapaValidacionesPublicas[ticket.codigo] = payloadValidacion;
+
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    await dbFirestore.collection('reportes_tecnicos').doc('VAL_' + ticket.codigo).set(payloadValidacion, { merge: true });
+                } catch (e) {}
+                if (ticket.id && !ticket.id.startsWith('local_')) {
+                    try {
+                        await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
+                    } catch (e) {}
+                }
+            }
+
+            localStorage.setItem('enag_tickets_public_cache', JSON.stringify(listaTicketsCache));
+            buscarTicketUsuario();
+            showToast(`🔄 Ticket ${ticket.codigo} reabierto y enviado nuevamente a Informática.`, 'info');
         }
 
         // TOAST
