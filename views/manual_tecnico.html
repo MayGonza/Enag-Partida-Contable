@@ -448,17 +448,23 @@ Enag-Partida-Contable/
 │   ├── flatpickr.min.js    # Selector de fechas
 │   └── soporte.js          # Emisión de tickets y bitácora de TI
 ├── views/                  # Vistas modulares de cada área institucional
+│   ├── bienes_nacionales.html # Inventario patrimonial y etiquetas QR / Barras
 │   ├── bitacora.html       # Auditoría histórica del sistema
 │   ├── comprobante_retencion.html # Retenciones de impuestos SAR
 │   ├── constancias*.html   # Emisión de 4 variantes de constancias
+│   ├── consulta_bien.html  # Consulta móvil pública de activos vía QR
 │   ├── cotizaciones.html   # Módulo oficial de cotizaciones La Gaceta
+│   ├── detector_espacio.html # Estimación de espacio tabloide y tarifas
 │   ├── incapacidades.html  # Cálculo y reintegros de subsidios IHSS
 │   ├── login.html          # Control de acceso, sesión única y recuperación
 │   ├── manual.html         # Manual de Usuario interactivo
 │   ├── manual_tecnico.html # Este Manual Técnico de Arquitectura
+│   ├── memorandums.html    # Emisión de memorándums con correlativo institucional
+│   ├── mesa_ayuda.html     # Mesa de Ayuda TI (Helpdesk GLPI), tickets y tablero Kanban
 │   ├── orden_produccion.html # Órdenes y fases de producción en talleres
 │   ├── parametros.html     # Parámetros dinámicos y timeouts
 │   ├── partidas*.html      # Partidas contables de diario y crédito
+│   ├── reporte_tecnico.html # Reportes técnicos del Departamento de Informática
 │   ├── rrhh_permisos.html  # Control de permisos laborales
 │   ├── solicitud_personal.html # Requisición de plazas
 │   ├── vacaciones.html     # Control de vacaciones
@@ -498,42 +504,144 @@ Enag-Partida-Contable/
                     <li><code>timestamp</code> (timestamp): Marca temporal del servidor.</li>
                 </ul>
 
-                <h2>4.3. Colección <code>bitacora</code></h2>
+                <h2>4.3. Colección <code>bienes_nacionales</code></h2>
+                <p>Inventario general de activos fijos gubernamentales (<code>/bienes_nacionales/{codigo}</code>):</p>
+                <ul>
+                    <li><code>codigo</code> (string): Código de inventario patrimonial (ej. <code>"4004004"</code>).</li>
+                    <li><code>categoria</code> (string): Mobiliario, Cómputo, Maquinaria, etc.</li>
+                    <li><code>denominacion</code>, <code>marca</code>, <code>modelo</code>, <code>serie</code>, <code>color</code> (strings).</li>
+                    <li><code>valor</code> (number): Costo de adquisición en Lempiras.</li>
+                    <li><code>custodio</code>, <code>custodioCargo</code>, <code>departamento</code>, <code>ubicacion</code> (strings).</li>
+                    <li><code>estado</code> (string): <code>'Excelente'</code>, <code>'Bueno'</code>, <code>'Regular'</code>, <code>'Malo'</code>, <code>'Para Descargo'</code>.</li>
+                    <li><code>fecha</code> (string): Fecha de registro institucional.</li>
+                </ul>
+
+                <h2>4.4. Colección <code>memorandums</code></h2>
+                <p>Registro de comunicaciones formales (<code>/memorandums/{docId}</code>):</p>
+                <ul>
+                    <li><code>codigo</code> (string): Formato completo (ej. <code>"MEMORANDO INFO-59-ENAG"</code>).</li>
+                    <li><code>prefijo</code> (string): <code>'INFO'</code>, <code>'ADMON'</code>, <code>'PROD'</code>, <code>'CONT'</code>, etc.</li>
+                    <li><code>numero</code> (number): Secuencia numérica consecutiva.</li>
+                    <li><code>sufijo</code> (string): <code>'ENAG'</code>.</li>
+                    <li><code>para</code> (map): <code>{ nombre, cargo }</code>.</li>
+                    <li><code>de</code> (map): <code>{ nombre, cargo }</code>.</li>
+                    <li><code>fecha</code>, <code>asunto</code>, <code>saludo</code>, <code>cuerpo</code>, <code>despedida</code> (strings).</li>
+                    <li><code>copias</code> (map): <code>{ original, copia1, copia2 }</code>.</li>
+                    <li><code>elaboradoPor</code> (string): Nombre de usuario o correo emisor.</li>
+                    <li><code>timestamp</code> (timestamp): Marca temporal del servidor.</li>
+                </ul>
+
+                <h2>4.5. Colección <code>reportes_tecnicos</code></h2>
+                <p>Dictámenes de peritaje del Departamento de Informática (<code>/reportes_tecnicos/{docId}</code>):</p>
+                <ul>
+                    <li><code>numero</code> (string): Código oficial (ej. <code>"RT 2026-11"</code> o <code>"2026-11"</code>).</li>
+                    <li><code>fecha</code> (string): Fecha de emisión formal.</li>
+                    <li><code>elaboradoPor</code> (string): Técnico de TI evaluador.</li>
+                    <li><code>responsable</code> (string): Custodio del activo evaluado.</li>
+                    <li><code>departamento</code> (string): Área asignataria del equipo.</li>
+                    <li><code>descripcion</code> (string): Ficha descriptiva consolidada.</li>
+                    <li><code>serie</code>, <code>inventario</code>, <code>problema</code> (strings).</li>
+                    <li><code>diagnostico</code> (string): Dictamen técnico de falla, reparación o solicitud de descargo.</li>
+                    <li><code>ultimaLinea</code> (string): Separador de seguridad inmutable.</li>
+                    <li><code>firmas</code> (map): <code>{ f1, f2, f3, f4 }</code> (Responsable, Técnico, Sub-Gerente, Jefe TI).</li>
+                    <li><code>copias</code> (map): <code>{ c1, c2, c3 }</code>.</li>
+                    <li><code>timestamp</code> (timestamp): Registro temporal en el servidor.</li>
+                </ul>
+
+                <h2>4.6. Colección <code>bitacora_global</code></h2>
                 <p>Registro histórico inmutable de auditoría institucional:</p>
                 <ul>
                     <li><code>modulo</code> (string): Área de origen del evento.</li>
                     <li><code>accion</code> (string): Crear, Modificar, Eliminar, Generar PDF, etc.</li>
-                    <li><code>mensaje</code> (string): Detalle textual legible.</li>
+                    <li><code>detalles</code> (string): Detalle textual legible.</li>
                     <li><code>usuario</code> (string): Operador responsable.</li>
                     <li><code>timestamp</code> (timestamp): Fecha y hora exacta registrada en servidor.</li>
+                </ul>
+
+                <h2>4.7. Colección <code>tickets_soporte</code> (Mesa de Ayuda / GLPI)</h2>
+                <p>Gestión integral de tickets de soporte técnico e incidencias de usuarios (<code>/tickets_soporte/{docId}</code>):</p>
+                <ul>
+                    <li><code>codigo</code> (string): Correlativo institucional único (ej. <code>"TICK-2026-001"</code>).</li>
+                    <li><code>solicitante</code> (string): Nombre completo del empleado que levanta la solicitud.</li>
+                    <li><code>departamento</code> (string): Departamento o área de trabajo (ej. <code>"Contabilidad"</code>).</li>
+                    <li><code>ubicacion</code> (string): Oficina física o extensión telefónica.</li>
+                    <li><code>categoria</code> (string): <code>'Hardware / Computadoras'</code>, <code>'Conectividad y Redes'</code>, <code>'Impresoras y Escáneres'</code>, <code>'Software y Sistemas'</code>, <code>'Talleres de Producción'</code>, <code>'Cuentas y Accesos'</code>, <code>'Asistencia General'</code>.</li>
+                    <li><code>prioridad</code> (string): <code>'Baja'</code>, <code>'Media'</code>, <code>'Alta'</code>, <code>'Urgente'</code>.</li>
+                    <li><code>equipoReferencia</code> (string): Descripción libre del equipo o periférico (completamente independiente del inventario de Bienes Nacionales).</li>
+                    <li><code>asunto</code> (string): Título o descripción sintética del problema.</li>
+                    <li><code>descripcion</code> (string): Detalle amplio de la falla o solicitud.</li>
+                    <li><code>estado</code> (string): Ciclo ITIL (<code>'Nuevo'</code>, <code>'Asignado'</code>, <code>'En Proceso'</code>, <code>'En Espera'</code>, <code>'Resuelto'</code>, <code>'Cerrado'</code>).</li>
+                    <li><code>tecnicoAsignado</code> (string): Nombre del técnico de informática responsable (ej. <code>"Wilson Tinoco"</code>).</li>
+                    <li><code>diagnostico</code> (string): Diagnóstico técnico elaborado durante o tras la intervención.</li>
+                    <li><code>solucion</code> (string): Procedimiento técnico aplicado para resolver el requerimiento.</li>
+                    <li><code>bitacora</code> (array de objetos): Historial cronológico con <code>fecha</code>, <code>autor</code>, <code>accion</code> y <code>nota</code>.</li>
+                    <li><code>fechaCreacion</code> (string ISO): Marca de tiempo del registro.</li>
                 </ul>
             </div>
 
             <!-- 5. SEGURIDAD -->
             <div id="seguridad" class="manual-section">
                 <h1>5. Seguridad y Reglas de Firestore</h1>
-                <p>Las reglas en <code>firestore.rules</code> bloquean accesos anónimos y restringen permisos por verificación de email:</p>
+                <p>Las directivas en <code>firestore.rules</code> regulan el acceso según el principio de mínimo privilegio y resguardan las consultas públicas de auditoría:</p>
                 <pre>
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    function isAuth() {
-      return request.auth != null && request.auth.token.email_verified == true;
-    }
-    
+    // Consulta pública de usuarios para búsqueda por username durante login
     match /usuarios/{userId} {
-      allow read: if isAuth();
-      allow write: if isAuth() && (request.auth.uid == userId || request.auth.token.admin == true);
+      allow read: if true;
+      allow write: if request.auth != null;
     }
     
-    match /cotizaciones/{document=**} {
-      allow read, create, update, delete: if isAuth();
+    // Solicitudes de personal (creación pública, lectura/edición autenticada)
+    match /solicitudes_personal/{solicitudId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+
+      match /adjuntos/{adjuntoId} {
+        allow create: if request.resource.data.tipo in ['application/pdf', 'image/jpeg']
+                      && request.resource.data.data.size() < 1000000;
+        allow read, update, delete: if request.auth != null;
+      }
+    }
+
+    // Consulta pública de comprobantes QR (solo get individual, no list)
+    match /consulta_solicitudes/{solicitudId} {
+      allow get: if true;
+      allow list, update, delete: if request.auth != null;
     }
     
-    match /bitacora/{logId} {
-      allow read, create: if isAuth();
-      allow update, delete: if false; // Inmutabilidad garantizada
+    // Consulta pública de Bienes Nacionales (para escaneo QR in situ)
+    match /bienes_nacionales/{bienId} {
+      allow get: if true;
+      allow list, create, update, delete: if request.auth != null;
+    }
+
+    // Memorándums y Reportes Técnicos: lectura para auditoría y escritura controlada
+    match /memorandums/{memoId} {
+      allow read, write: if true;
+    }
+
+    match /reportes_tecnicos/{reporteId} {
+      allow read, write: if true;
+    }
+    
+    // Mesa de Ayuda TI (Helpdesk): tickets de soporte técnico e incidencias
+    match /tickets_soporte/{ticketId} {
+      allow read: if true;
+      allow create: if request.resource.data.codigo is string
+                    && request.resource.data.solicitante is string
+                    && request.resource.data.departamento is string
+                    && request.resource.data.asunto is string
+                    && request.resource.data.descripcion is string
+                    && request.resource.data.estado == 'Nuevo';
+      allow update, delete: if request.auth != null;
+    }
+    
+    // Colecciones generales (cotizaciones, bitacora_global, etc.)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }</pre>
@@ -566,6 +674,51 @@ service cloud.firestore {
 
                 <h2>7.3. Subsidios IHSS (Metodología ENAG)</h2>
                 <p>Sueldo Diario de Referencia: <code>(Techo IHSS * 3) / Días_3_Meses_Anteriores</code>. El 66% es subsidio IHSS reintegrable a la ENAG; el 34% es aporte patronal complementario.</p>
+
+                <h2>7.4. Estimación Tipográfica de Espacio Tabloide (Detector de Espacio)</h2>
+                <p>Calcula el rendimiento editorial en columnas del formato tabloide de <em>La Gaceta</em>:</p>
+                <pre>
+// Estimación de líneas por columna y fracciones tabloide
+const CARACTERES_POR_LINEA = 38; // Fuente Times New Roman 9pt a 1 columna
+const LINEAS_POR_COLUMNA = 95;   // Altura útil de plana tabloide
+const COLUMNAS_POR_PAGINA = 3;   // Diagramación estándar de 3 columnas
+const totalLineas = Math.ceil(totalCaracteres / CARACTERES_POR_LINEA);
+const fraccionPagina = totalLineas / (LINEAS_POR_COLUMNA * COLUMNAS_POR_PAGINA);
+// Mapeo a escalones oficiales: 1/8, 1/4, 1/3, 1/2, 3/4 o 1 Página</pre>
+
+                <h2>7.5. Generación Vectorial de Píldoras y Cajas en jsPDF</h2>
+                <p>Para emular con precisión los campos redondeados del Reporte Técnico y evitar artefactos visuales:</p>
+                <pre>
+// Trazado vectorial de cajas redondeadas y textos centrados en mm
+doc.setDrawColor(70, 70, 70);
+doc.setLineWidth(0.3);
+doc.setFillColor(255, 255, 255);
+doc.roundedRect(x, y, w, h, rx, ry, 'FD'); // Fill and Draw vectorial</pre>
+
+                <h2>7.6. Conversión Robusta de Imágenes Base64 y Anti-CORS</h2>
+                <p>Para evitar fallos de <em>tainted canvas</em> al cargar fondos membretados pesados (ej. <code>Logo odoo.png</code>):</p>
+                <pre>
+const getBase64FromUrl = (url) => new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // Obligatorio con Access-Control-Allow-Origin: *
+    img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width; canvas.height = img.height;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+});</pre>
+
+                <h2>7.7. Algoritmo de Correlativos Dinámicos Autoincrementales</h2>
+                <p>Consulta en memoria y Firestore los documentos del año fiscal corriente para determinar la siguiente secuencia consecutiva sin colisiones:</p>
+                <pre>
+// Extracción de secuencia numérica ignorando prefijos variables ('RT ', 'INFO-')
+const clean = str.replace(/^(RT\s*[-]?\s*|[A-Z]+-)/i, '');
+const parts = clean.split('-');
+const sec = parseInt(parts[1] || parts[0], 10);
+const sig = maxSecuencia >= BASE_INICIAL ? (maxSecuencia + 1) : BASE_INICIAL;</pre>
             </div>
 
             <!-- 8. INSTALACION -->

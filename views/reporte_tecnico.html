@@ -1,0 +1,2325 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Reporte Técnico — Departamento de Informática | ENAG</title>
+    <meta name="description"
+        content="Generación y emisión de Reportes Técnicos Oficiales del Departamento de Informática para la Empresa Nacional de Artes Gráficas (ENAG).">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --primary-accent: #0f172a;
+            --bg-body: #002147;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 30px 15px;
+            background-color: var(--bg-body);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        /* Fondo institucional difuminado */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 38%;
+            filter: blur(10px) opacity(0.14);
+            z-index: -1;
+        }
+
+        .main-container {
+            max-width: 1440px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+            padding: 28px;
+            animation: fadeIn 0.3s ease-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Encabezado del Módulo */
+        .module-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 15px;
+            border-bottom: 2px solid #e2e8f0;
+            padding-bottom: 18px;
+            margin-bottom: 22px;
+        }
+
+        .header-title-group {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .header-logo-img {
+            max-height: 48px;
+            width: auto;
+        }
+
+        .header-text h1 {
+            margin: 0;
+            font-size: 1.55em;
+            color: var(--primary);
+            font-weight: 800;
+            letter-spacing: -0.3px;
+        }
+
+        .header-text p {
+            margin: 4px 0 0 0;
+            color: var(--text-muted);
+            font-size: 0.9em;
+        }
+
+        .header-stats-group {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .stat-badge {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85em;
+            font-weight: 600;
+            color: #334155;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        /* Disposición Principal (2 Columnas: Formulario vs Vista Previa) */
+        .workspace-grid {
+            display: grid;
+            grid-template-columns: 1.05fr 0.95fr;
+            gap: 24px;
+            align-items: start;
+        }
+
+        @media (max-width: 1100px) {
+            .workspace-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Tarjetas de Sección del Formulario */
+        .form-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 18px 20px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.03);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-card:hover {
+            border-color: #cbd5e1;
+        }
+
+        .card-title {
+            margin: 0 0 14px 0;
+            font-size: 1.02em;
+            color: var(--primary);
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            border-bottom: 1px dashed #e2e8f0;
+            padding-bottom: 8px;
+        }
+
+        .card-title .badge-num {
+            background: var(--primary);
+            color: white;
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75em;
+            font-weight: 700;
+        }
+
+        /* Campos de Entrada */
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .form-group label {
+            font-size: 0.82em;
+            font-weight: 700;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
+
+        .form-group label .req {
+            color: var(--danger);
+        }
+
+        .form-control {
+            padding: 9px 12px;
+            border: 1.5px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9em;
+            color: #1e293b;
+            background-color: #ffffff;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.12);
+            background-color: #ffffff;
+        }
+
+        textarea.form-control {
+            min-height: 100px;
+            resize: vertical;
+            line-height: 1.45;
+        }
+
+        /* Botones de herramientas del formulario */
+        .btn-tool {
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: #475569;
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .btn-tool:hover {
+            background: #e2e8f0;
+            color: var(--primary);
+            border-color: #94a3b8;
+        }
+
+        .btn-tool-primary {
+            background: #e0f2fe;
+            border-color: #7dd3fc;
+            color: #0369a1;
+        }
+
+        .btn-tool-primary:hover {
+            background: #bae6fd;
+            color: #0284c7;
+        }
+
+        /* Barra de Acciones del Formulario */
+        .form-actions-bar {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-top: 18px;
+            position: sticky;
+            bottom: 12px;
+            background: rgba(255, 255, 255, 0.96);
+            padding: 12px;
+            border-radius: 10px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15);
+            border: 1px solid #cbd5e1;
+            z-index: 10;
+        }
+
+        .btn-action {
+            flex: 1;
+            min-width: 140px;
+            padding: 11px 18px;
+            border-radius: 7px;
+            font-size: 0.9em;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s ease;
+            font-family: inherit;
+        }
+
+        .btn-primary-action {
+            background: linear-gradient(135deg, #002147 0%, #003470 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(0, 33, 71, 0.25);
+        }
+
+        .btn-primary-action:hover {
+            background: linear-gradient(135deg, #001833 0%, #002147 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-save-action {
+            background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-save-action:hover {
+            background: linear-gradient(135deg, #059669 0%, #047857 100%);
+            transform: translateY(-1px);
+        }
+
+        .btn-outline-action {
+            background: white;
+            color: #475569;
+            border: 1.5px solid #cbd5e1;
+        }
+
+        .btn-outline-action:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        /* ==============================================================
+           VISTA PREVIA EN VIVO (HOJA CARTA OFICIAL ENAG - REPORTE TÉCNICO)
+           ============================================================== */
+        .preview-pane-container {
+            position: sticky;
+            top: 20px;
+        }
+
+        .preview-header-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 0 4px;
+        }
+
+        .preview-header-bar h3 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1.05em;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .paper-preview {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.18), 0 2px 6px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            aspect-ratio: 8.5 / 11;
+            padding: 30px 34px 28px 34px;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            font-family: 'Times New Roman', Times, serif;
+            color: #000000;
+            background-repeat: no-repeat;
+            background-size: cover;
+        }
+
+        /* Simulación de fondo membretado */
+        .paper-preview::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/Logo odoo.png') no-repeat center center;
+            background-size: 100% 100%;
+            opacity: 0.98;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .paper-content-wrap {
+            position: relative;
+            z-index: 2;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        /* Encabezado del documento */
+        .rt-header-block {
+            text-align: center;
+            margin-top: 50px;
+            margin-bottom: 10px;
+        }
+
+        .rt-dept-title {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #000;
+            margin: 0;
+            letter-spacing: 0.2px;
+        }
+
+        .rt-main-title {
+            font-size: 1.35em;
+            font-weight: bold;
+            color: #000;
+            margin: 2px 0 10px 0;
+            letter-spacing: 0.5px;
+        }
+
+        /* Formulario de Campos con Píldoras / Cajas Redondeadas */
+        .rt-field-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 6px;
+            font-size: 0.78em;
+            gap: 6px;
+        }
+
+        .rt-label {
+            font-weight: normal;
+            color: #000;
+            white-space: nowrap;
+        }
+
+        .rt-pill-box {
+            border: 1px solid #475569;
+            border-radius: 12px;
+            padding: 2px 10px;
+            background: rgba(255, 255, 255, 0.75);
+            font-weight: bold;
+            color: #000;
+            min-height: 20px;
+            display: inline-flex;
+            align-items: center;
+            flex: 1;
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 0.92em;
+        }
+
+        .rt-pill-box.centered {
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Caja Grande de Diagnóstico */
+        .rt-diagnostico-container {
+            border: 1.2px solid #334155;
+            border-radius: 12px;
+            padding: 10px 12px;
+            margin-top: 8px;
+            margin-bottom: 8px;
+            background: rgba(255, 255, 255, 0.65);
+            min-height: 140px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .rt-diagnostico-title {
+            font-weight: bold;
+            font-size: 0.82em;
+            margin-bottom: 4px;
+        }
+
+        .rt-diagnostico-body {
+            font-size: 0.78em;
+            line-height: 1.35;
+            color: #111;
+            flex: 1;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .rt-ultima-linea {
+            text-align: center;
+            font-size: 0.72em;
+            color: #475569;
+            margin-top: 8px;
+            font-weight: bold;
+            letter-spacing: 0.5px;
+        }
+
+        /* Bloque de 4 Firmas (2x2) */
+        .rt-firmas-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px 24px;
+            margin-top: 10px;
+            margin-bottom: 8px;
+        }
+
+        .rt-firma-item {
+            text-align: center;
+        }
+
+        .rt-firma-linea {
+            border-top: 1px solid #000;
+            width: 85%;
+            margin: 0 auto 3px auto;
+        }
+
+        .rt-firma-texto {
+            font-size: 0.74em;
+            color: #000;
+            font-weight: bold;
+        }
+
+        /* Copias / Archivo en la esquina inferior izquierda */
+        .rt-copias-block {
+            font-size: 0.62em;
+            line-height: 1.25;
+            color: #334155;
+            margin-top: 2px;
+            margin-bottom: 12px;
+        }
+
+        /* ==============================================================
+           HISTORIAL DE REPORTES TÉCNICOS (TABLA DE REGISTROS)
+           ============================================================== */
+        .history-card {
+            margin-top: 28px;
+            background: #ffffff;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+            padding: 24px;
+        }
+
+        .history-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .history-search-input {
+            padding: 8px 12px;
+            border: 1px solid #cbd5e1;
+            border-radius: 6px;
+            font-size: 0.9em;
+            min-width: 280px;
+            font-family: inherit;
+        }
+
+        .table-responsive {
+            overflow-x: auto;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88em;
+            text-align: left;
+        }
+
+        .data-table th {
+            background-color: #f8fafc;
+            color: #475569;
+            padding: 10px 14px;
+            font-weight: 700;
+            border-bottom: 2px solid #e2e8f0;
+            white-space: nowrap;
+        }
+
+        .data-table td {
+            padding: 10px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover {
+            background-color: #f8fafc;
+        }
+
+        .badge-rt {
+            background: #e0f2fe;
+            color: #0369a1;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-weight: 700;
+            font-size: 0.88em;
+            display: inline-block;
+        }
+
+        .btn-hist-action {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.82em;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            margin-right: 4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .btn-hist-load {
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .btn-hist-load:hover {
+            background: #cbd5e1;
+        }
+
+        .btn-hist-pdf {
+            background: #0284c7;
+            color: white;
+        }
+
+        .btn-hist-pdf:hover {
+            background: #0369a1;
+        }
+
+        .btn-hist-delete {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .btn-hist-delete:hover {
+            background: #fecaca;
+        }
+
+        /* Notificación Toast */
+        .toast-notification {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            background: #1e293b;
+            color: white;
+            padding: 12px 20px;
+            border-radius: 8px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.25);
+            font-size: 0.9em;
+            font-weight: 600;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            z-index: 9999;
+            animation: slideUp 0.25s ease-out;
+        }
+
+        .toast-notification.show {
+            display: flex;
+        }
+
+        .toast-success {
+            background: #059669;
+        }
+
+        .toast-error {
+            background: #dc2626;
+        }
+
+        .toast-warning {
+            background: #d97706;
+        }
+
+        .toast-info {
+            background: #0284c7;
+        }
+
+        /* Modal de selección de documentos previos */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 33, 71, 0.68);
+            backdrop-filter: blur(5px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal-box {
+            background: white;
+            width: 90%;
+            max-width: 720px;
+            max-height: 85vh;
+            border-radius: 12px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 15px 40px rgba(0, 0, 0, 0.35);
+            border-top: 5px solid var(--primary);
+        }
+
+        .btn-upload-doc {
+            background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%) !important;
+            color: white !important;
+            border: none !important;
+        }
+
+        .btn-upload-doc:hover {
+            background: linear-gradient(135deg, #0369a1 0%, #075985 100%) !important;
+            transform: translateY(-1px);
+        }
+
+        .btn-export-doc {
+            background: #f8fafc !important;
+            color: #002147 !important;
+            border: 1.5px solid #cbd5e1 !important;
+        }
+
+        .btn-export-doc:hover {
+            background: #e2e8f0 !important;
+            border-color: #94a3b8 !important;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(15px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de Navegación Superior Unificada -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Menú Principal
+            </a>
+            <span class="portal-badge">🛠️ Reportes Técnicos — Informática</span>
+            <a href="memorandums.html" class="btn-nav" style="background-color: #0284c7; color: white;">
+                <span>📑</span> Memorándums
+            </a>
+            <a href="bienes_nacionales.html" class="btn-nav" style="background-color: #002147; color: white; border: 1px solid rgba(255,255,255,0.3);">
+                <span>🏛️</span> Bienes Nacionales
+            </a>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Personal ENAG</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
+        </div>
+    </div>
+
+    <div class="main-container">
+        <!-- ENCABEZADO DEL MÓDULO -->
+        <header class="module-header">
+            <div class="header-title-group">
+                <a href="../index.html" class="btn-nav btn-nav-back" title="Regresar al Portal Principal">
+                    <span>←</span> Menú
+                </a>
+                <a href="mesa_ayuda.html" class="btn-nav" style="background:#ecfdf5; color:#065f46; border:1px solid #10b981; font-weight:700; text-decoration:none; padding:7px 12px; border-radius:6px; font-size:0.85em; display:inline-flex; align-items:center; gap:5px;" title="Ir a la Mesa de Ayuda (Tickets)">
+                    <span>🎧</span> Mesa de Ayuda
+                </a>
+                <img src="../assets/logo.jpeg" alt="Logo ENAG" class="header-logo-img">
+                <div class="header-text">
+                    <h1>Departamento de Informática — Reportes Técnicos</h1>
+                    <p>Emisión oficial de reportes técnicos para revisión, descargo y soporte de bienes y equipos de cómputo.</p>
+                </div>
+            </div>
+            <div class="header-stats-group">
+                <span class="stat-badge" id="badgeTotalReportes">📁 0 Reportes</span>
+                <span class="stat-badge" id="badgeUltimoNumero"
+                    style="background:#e0f2fe; color:#0369a1; border-color:#7dd3fc;">
+                    🔢 Último: N/A
+                </span>
+                <span class="stat-badge" style="background:#ecfdf5; color:#047857; border-color:#a7f3d0;">
+                    🟢 Sesión: <span id="labelLoggedUser" style="margin-left:4px; font-weight:700;">Personal ENAG</span>
+                </span>
+            </div>
+        </header>
+
+        <!-- ÁREA DE TRABAJO (FORMULARIO + VISTA PREVIA) -->
+        <div class="workspace-grid">
+            <!-- COLUMNA IZQUIERDA: FORMULARIO -->
+            <div class="form-pane">
+
+                <!-- BANNER DE CARGA Y MODIFICACIÓN DE REPORTES PREVIOS -->
+                <div class="import-doc-banner" style="background: linear-gradient(135deg, #f0fdf4 0%, #e0f2fe 100%); border: 1.5px dashed #002147; border-radius: 10px; padding: 14px 18px; margin-bottom: 18px; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; box-shadow: 0 2px 6px rgba(0, 33, 71, 0.05);">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+                        <span style="font-size: 1.8em;">📂</span>
+                        <div>
+                            <strong style="color: #002147; font-size: 0.98em;">¿Desea modificar un reporte técnico anterior?</strong>
+                            <div style="font-size: 0.84em; color: #475569; margin-top: 2px;">Suba un archivo de respaldo (<code>.json</code>) o el documento <code>.pdf</code> generado antes para cargar los datos y editarlos al instante.</div>
+                        </div>
+                    </div>
+                    <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                        <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirReporte()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                            <span>⬆️</span> Subir Documento (.json / .pdf)
+                        </button>
+                        <button type="button" class="btn-action btn-export-doc" onclick="abrirModalDocumentosGuardadosRT()" style="padding: 8px 14px; font-size: 0.86em; cursor: pointer;">
+                            <span>📚</span> Elegir de Guardados
+                        </button>
+                    </div>
+                </div>
+
+                <input type="file" id="inputSubirDocRT" accept=".json,.pdf" style="position: fixed; top: -1000px; left: -1000px; opacity: 0; width: 1px; height: 1px; pointer-events: none;" onchange="procesarArchivoSubidoRT(this)">
+
+                <!-- 1. IDENTIFICACIÓN DEL REPORTE -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">1</span> Control y Numeración del Reporte</div>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn-tool" onclick="cargarEjemploFoto()"
+                                title="Cargar ejemplo exacto de la foto (UPS Vertiv Liebert)">
+                                ⚡ Cargar Foto (Ejemplo)
+                            </button>
+                            <button type="button" class="btn-tool" onclick="sugerirSiguienteNumero()"
+                                title="Recalcular siguiente número correlativo">
+                                🔄 Siguiente No.
+                            </button>
+                        </div>
+                    </h3>
+
+                    <div class="form-row" style="grid-template-columns: 180px 140px 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="selectFormatoCorrelativo">Formato Correlativo</label>
+                            <select id="selectFormatoCorrelativo" class="form-control"
+                                onchange="sugerirSiguienteNumero()">
+                                <option value="con_rt" selected>RT YYYY-NN (RT 2026-11)</option>
+                                <option value="sin_rt">YYYY-NN (2026-11)</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="inputNumero">No. Correlativo <span class="req">*</span></label>
+                            <input type="text" id="inputNumero" class="form-control" placeholder="Ej: RT 2026-11"
+                                value="RT 2026-11" oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFecha">Fecha del Reporte <span class="req">*</span></label>
+                            <input type="text" id="inputFecha" class="form-control" placeholder="DD/MM/AAAA"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputElaboradoPor">Elaborado por <span class="req">*</span></label>
+                            <input type="text" id="inputElaboradoPor" class="form-control"
+                                placeholder="Nombre del Técnico" value="Wilson Tinoco"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 2. DATOS DEL RESPONSABLE Y DEPARTAMENTO -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">2</span> Responsable y Departamento Asignado</div>
+                    </h3>
+                    <div class="form-row" style="grid-template-columns: 1.2fr 1fr;">
+                        <div class="form-group">
+                            <label for="inputResponsable">Responsable del Bien <span class="req">*</span></label>
+                            <input type="text" id="inputResponsable" class="form-control"
+                                placeholder="Ej: Rony Oseguera" value="Rony Oseguera" oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputDepartamento">Departamento <span class="req">*</span></label>
+                            <input type="text" id="inputDepartamento" class="form-control"
+                                placeholder="Ej: Bienes Nacionales" value="Bienes Nacionales"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3. DATOS DEL EQUIPO (INTEGRACIÓN BIENES NACIONALES) -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">3</span> Especificaciones y Ficha del Equipo</div>
+                        <button type="button" class="btn-tool btn-tool-primary" onclick="buscarEnBienesNacionales()"
+                            title="Autocompletar datos desde el inventario de Bienes Nacionales">
+                            🔍 Buscar en Bienes Nacionales
+                        </button>
+                    </h3>
+
+                    <div class="form-group" style="margin-bottom:12px;">
+                        <label for="inputDescripcion">Descripción de Equipo <span class="req">*</span></label>
+                        <input type="text" id="inputDescripcion" class="form-control"
+                            placeholder="Ej: UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro"
+                            value="UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro"
+                            oninput="actualizarVistaPrevia()">
+                    </div>
+
+                    <div class="form-row" style="grid-template-columns: 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="inputSerie">Serie No.</label>
+                            <input type="text" id="inputSerie" class="form-control" placeholder="Ej: 322009500305"
+                                value="322009500305" oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputInventario">Inventario No.</label>
+                            <input type="text" id="inputInventario" class="form-control" placeholder="Ej: 4004004"
+                                value="4004004" oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="margin-top:4px;">
+                        <label for="inputProblema">Problema Reportado <span class="req">*</span></label>
+                        <input type="text" id="inputProblema" class="form-control"
+                            placeholder="Ej: No funciona / No enciende / Falla en disco" value="No funciona"
+                            oninput="actualizarVistaPrevia()">
+                    </div>
+                </div>
+
+                <!-- 4. DIAGNÓSTICO TÉCNICO -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">4</span> Diagnóstico Técnico y Dictamen</div>
+                        <div style="display:flex; gap:6px;">
+                            <button type="button" class="btn-tool" onclick="insertarPlantillaDescargo()">
+                                ⚠️ Descargo
+                            </button>
+                            <button type="button" class="btn-tool" onclick="insertarPlantillaReparado()">
+                                ✅ Reparado
+                            </button>
+                        </div>
+                    </h3>
+
+                    <div class="form-group">
+                        <label for="textareaDiagnostico">Diagnóstico Detallado <span class="req">*</span></label>
+                        <textarea id="textareaDiagnostico" class="form-control"
+                            placeholder="Escriba el diagnóstico del técnico, componentes evaluados y dictamen..."
+                            oninput="actualizarVistaPrevia()">Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará solicitud de descargo al departamento de Bienes Nacionales.</textarea>
+                    </div>
+
+                    <div class="form-group" style="margin-top:10px;">
+                        <label for="inputUltimaLinea">Texto Separador de Cierre</label>
+                        <input type="text" id="inputUltimaLinea" class="form-control"
+                            value="-------------------------------- Ultima Linea --------------------------------"
+                            oninput="actualizarVistaPrevia()">
+                    </div>
+                </div>
+
+                <!-- 5. FIRMAS Y COPIAS -->
+                <div class="form-card">
+                    <h3 class="card-title">
+                        <div><span class="badge-num">5</span> Firmas Autorizadas y Copias de Distribución</div>
+                    </h3>
+
+                    <div class="form-row" style="grid-template-columns: 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="inputFirma1">Firma 1 (Izquierda Superior)</label>
+                            <input type="text" id="inputFirma1" class="form-control" value="Firma Responsable del Bien"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFirma2">Firma 2 (Derecha Superior)</label>
+                            <input type="text" id="inputFirma2" class="form-control"
+                                value="Firma Técnico de Informática" oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="grid-template-columns: 1fr 1fr;">
+                        <div class="form-group">
+                            <label for="inputFirma3">Firma 3 (Izquierda Inferior)</label>
+                            <input type="text" id="inputFirma3" class="form-control"
+                                value="V.B. Sub-Gerente Administrativo" oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputFirma4">Firma 4 (Derecha Inferior)</label>
+                            <input type="text" id="inputFirma4" class="form-control" value="Firma Jefe de Informática"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+
+                    <div class="form-row" style="grid-template-columns: 1fr 1fr 1fr; margin-top:8px;">
+                        <div class="form-group">
+                            <label for="inputCopia1">Original</label>
+                            <input type="text" id="inputCopia1" class="form-control" value="Original: Bienes Nacionales"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputCopia2">Copia 1</label>
+                            <input type="text" id="inputCopia2" class="form-control" value="c.c. Archivo"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                        <div class="form-group">
+                            <label for="inputCopia3">Copia 2</label>
+                            <input type="text" id="inputCopia3" class="form-control" value="c.c. Responsable del Bien"
+                                oninput="actualizarVistaPrevia()">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- BARRA FIJA DE ACCIONES -->
+                <div class="form-actions-bar">
+                    <button type="button" class="btn-action btn-upload-doc" onclick="abrirSelectorSubirReporte()"
+                        title="Subir un documento previo (.json o .pdf) para modificarlo">
+                        <span>📂</span> Subir Documento Anterior
+                    </button>
+                    <button type="button" class="btn-action btn-export-doc" onclick="exportarReporteJSON()"
+                        title="Descargar archivo editable de respaldo (.json)">
+                        <span>💾</span> Exportar Respaldo JSON
+                    </button>
+                    <button type="button" class="btn-action btn-primary-action" onclick="generarPDFReporteTecnico()"
+                        id="btnDescargarPDF">
+                        <span>📄</span> Descargar PDF Oficial
+                    </button>
+                    <button type="button" class="btn-action btn-save-action" onclick="guardarReporteEnFirestore()"
+                        id="btnGuardarRT">
+                        <span>💾</span> Guardar en BD
+                    </button>
+                    <button type="button" class="btn-action btn-outline-action" onclick="imprimirReporteTecnico()">
+                        <span>🖨️</span> Imprimir
+                    </button>
+                    <button type="button" class="btn-action btn-outline-action" onclick="limpiarFormularioNuevo()">
+                        <span>📝</span> Nuevo
+                    </button>
+                </div>
+            </div>
+
+            <!-- COLUMNA DERECHA: VISTA PREVIA EXACTA EN PAPEL -->
+            <div class="preview-pane-container">
+                <div class="preview-header-bar">
+                    <h3><span>👁️</span> Vista Previa Oficial (Papel Membretado ENAG)</h3>
+                    <span style="font-size:0.8em; color:var(--text-muted);">Formato Carta Oficial</span>
+                </div>
+
+                <div class="paper-preview" id="paperPreviewReporte">
+                    <div class="paper-content-wrap">
+                        <!-- ENCABEZADO -->
+                        <div class="rt-header-block">
+                            <div class="rt-dept-title">Departamento de Informática</div>
+                            <div class="rt-main-title">REPORTE TÉCNICO</div>
+                        </div>
+
+                        <!-- CAMPOS CON PÍLDORAS -->
+                        <div class="rt-field-row" style="max-width: 240px;">
+                            <span class="rt-label">No.:</span>
+                            <div class="rt-pill-box centered" id="prevNo">RT 2026-11</div>
+                        </div>
+
+                        <div class="rt-field-row">
+                            <span class="rt-label">Fecha:</span>
+                            <div class="rt-pill-box centered" style="max-width: 140px;" id="prevFecha">30/10/2026</div>
+                            <span class="rt-label" style="margin-left: 8px;">Elaborado por:</span>
+                            <div class="rt-pill-box centered" id="prevElaborado">Wilson Tinoco</div>
+                        </div>
+
+                        <div class="rt-field-row">
+                            <span class="rt-label">Responsable del Bien:</span>
+                            <div class="rt-pill-box centered" id="prevResponsable">Rony Oseguera</div>
+                            <span class="rt-label" style="margin-left: 8px;">Departamento:</span>
+                            <div class="rt-pill-box centered" id="prevDepartamento">Bienes Nacionales</div>
+                        </div>
+
+                        <div class="rt-field-row">
+                            <span class="rt-label">Descripción de Equipo:</span>
+                            <div class="rt-pill-box centered" id="prevDescripcion">UPS 850VA, Marca: Vertiv, Modelo No.:
+                                Liebert PSL850, Color: Negro</div>
+                        </div>
+
+                        <div class="rt-field-row">
+                            <span class="rt-label">Serie No.:</span>
+                            <div class="rt-pill-box centered" id="prevSerie">322009500305</div>
+                            <span class="rt-label" style="margin-left: 8px;">Inventario No.:</span>
+                            <div class="rt-pill-box centered" id="prevInventario">4004004</div>
+                        </div>
+
+                        <div class="rt-field-row">
+                            <span class="rt-label">Problema Reportado:</span>
+                            <div class="rt-pill-box centered" id="prevProblema">No funciona</div>
+                        </div>
+
+                        <!-- CAJA GRANDE DE DIAGNÓSTICO -->
+                        <div class="rt-diagnostico-container">
+                            <div class="rt-diagnostico-title">Diagnóstico:</div>
+                            <div class="rt-diagnostico-body" id="prevDiagnostico">
+                                Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará
+                                solicitud de descargo al departamento de Bienes Nacionales.
+                            </div>
+                            <div class="rt-ultima-linea" id="prevUltimaLinea">
+                                -------------------------------- Ultima Linea --------------------------------
+                            </div>
+                        </div>
+
+                        <!-- BLOQUE DE 4 FIRMAS (2x2) -->
+                        <div class="rt-firmas-grid">
+                            <div class="rt-firma-item">
+                                <div class="rt-firma-linea"></div>
+                                <div class="rt-firma-texto" id="prevFirma1">Firma Responsable del Bien</div>
+                            </div>
+                            <div class="rt-firma-item">
+                                <div class="rt-firma-linea"></div>
+                                <div class="rt-firma-texto" id="prevFirma2">Firma Técnico de Informática</div>
+                            </div>
+                            <div class="rt-firma-item">
+                                <div class="rt-firma-linea"></div>
+                                <div class="rt-firma-texto" id="prevFirma3">V.B. Sub-Gerente Administrativo</div>
+                            </div>
+                            <div class="rt-firma-item">
+                                <div class="rt-firma-linea"></div>
+                                <div class="rt-firma-texto" id="prevFirma4">Firma Jefe de Informática</div>
+                            </div>
+                        </div>
+
+                        <!-- COPIAS / ARCHIVO -->
+                        <div class="rt-copias-block" id="prevCopiasBlock">
+                            <div id="prevCopia1">Original: Bienes Nacionales</div>
+                            <div id="prevCopia2">c.c. Archivo</div>
+                            <div id="prevCopia3">c.c. Responsable del Bien</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECCIÓN DE HISTORIAL Y BÚSQUEDA -->
+        <div class="history-card">
+            <div class="history-toolbar">
+                <h3 style="margin:0; color:var(--primary); font-size:1.15em;">
+                    📋 Historial de Reportes Técnicos Emitidos
+                </h3>
+                <div style="display:flex; gap:10px; align-items:center;">
+                    <input type="text" id="filtroBusqueda" class="history-search-input"
+                        placeholder="🔍 Buscar por No., serie, inventario o persona..."
+                        oninput="filtrarHistorialReportes()">
+                    <button type="button" class="btn-tool" onclick="exportarHistorialExcel()"
+                        title="Descargar en Excel">
+                        📊 Excel
+                    </button>
+                    <button type="button" class="btn-tool" onclick="cargarHistorialDesdeFirestore()"
+                        title="Refrescar lista">
+                        🔄 Refrescar
+                    </button>
+                </div>
+            </div>
+
+            <div class="table-responsive">
+                <table class="data-table">
+                    <thead>
+                        <tr>
+                            <th>No. Reporte</th>
+                            <th>Fecha</th>
+                            <th>Equipo / Descripción</th>
+                            <th>Serie / Inventario</th>
+                            <th>Responsable</th>
+                            <th>Elaborado Por</th>
+                            <th style="text-align:center;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyHistorialRT">
+                        <tr>
+                            <td colspan="7" style="text-align:center; padding: 25px; color:var(--text-muted);">
+                                ⏳ Cargando historial de reportes técnicos...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICACIONES TOAST -->
+    <div id="toastNotification" class="toast-notification"></div>
+
+    <!-- MODAL: SELECCIONAR REPORTE TÉCNICO GUARDADO PARA MODIFICAR -->
+    <div id="modalDocumentosGuardadosRT" class="modal-overlay">
+        <div class="modal-box">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                <h3 style="margin: 0; color: #002147; font-size: 1.2em; display: flex; align-items: center; gap: 8px;">
+                    <span>📚</span> Seleccionar Reporte Técnico para Modificar
+                </h3>
+                <button type="button" onclick="cerrarModalDocumentosGuardadosRT()" style="background: none; border: none; font-size: 1.6em; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+            <p style="margin: 0 0 12px 0; font-size: 0.88em; color: #64748b;">Seleccione un reporte técnico registrado anteriormente para cargar todos sus campos al formulario y realizar las modificaciones deseadas:</p>
+            <input type="text" id="busquedaModalRT" placeholder="🔍 Filtrar por No., serie, inventario, equipo o custodio..." oninput="filtrarListaModalRT()" style="padding: 9px 12px; border: 1.5px solid #cbd5e1; border-radius: 6px; font-size: 0.9em; margin-bottom: 14px; width: 100%; box-sizing: border-box; outline: none;">
+            <div id="listaModalRT" style="overflow-y: auto; max-height: 400px; display: flex; flex-direction: column; gap: 8px;">
+                <!-- Dinámico -->
+            </div>
+            <div style="margin-top: 14px; text-align: right; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                <button type="button" onclick="cerrarModalDocumentosGuardadosRT()" style="background: #e2e8f0; color: #475569; border: none; padding: 8px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <iframe id="rtPrintIframe" style="display:none;"></iframe>
+
+    <!-- Firebase SDK Compat v10 -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <!-- jsPDF & XLSX -->
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script>
+        if (!window.jspdf && !window.jsPDF) {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
+        }
+    </script>
+    <script src="../js/xlsx.full.min.js"></script>
+    <!-- PDF.js para importar y leer documentos previos en PDF -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <script>
+        if (typeof pdfjsLib !== 'undefined') {
+            pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+        }
+    </script>
+
+    <!-- SCRIPT DEL MÓDULO DE REPORTE TÉCNICO -->
+    <script>
+        let reportesGlobal = [];
+        let reporteEnEdicionId = null;
+        let _rtDb = null;
+
+        function obtenerConstructorJsPDF() {
+            if (typeof window !== 'undefined') {
+                if (window.jspdf && window.jspdf.jsPDF) return window.jspdf.jsPDF;
+                if (window.jsPDF) return window.jsPDF;
+            }
+            return null;
+        }
+
+        const getBase64FromUrl = (url) => new Promise((resolve) => {
+            const img = new Image();
+            img.crossOrigin = "Anonymous";
+            img.onload = () => {
+                const canvas = document.createElement("canvas");
+                canvas.width = img.width;
+                canvas.height = img.height;
+                canvas.getContext("2d").drawImage(img, 0, 0);
+                resolve(canvas.toDataURL("image/png"));
+            };
+            img.onerror = () => resolve(null);
+            img.src = url;
+        });
+
+        function obtenerDB() {
+            if (_rtDb) return _rtDb;
+            if (typeof firebase !== 'undefined') {
+                try {
+                    _rtDb = firebase.firestore();
+                    return _rtDb;
+                } catch (e) { }
+            }
+            return null;
+        }
+
+        // Inicialización
+        document.addEventListener('DOMContentLoaded', () => {
+            inicializarFechaHoy();
+            cargarUsuarioSesion();
+            sugerirSiguienteNumero();
+            conectarFirebaseYEscuchar();
+            cargarDatosDesdeMesaAyudaSiExisten();
+            actualizarVistaPrevia();
+        });
+
+        function cargarDatosDesdeMesaAyudaSiExisten() {
+            try {
+                const raw = sessionStorage.getItem('enag_ticket_a_reporte_tecnico');
+                if (!raw) return;
+                const d = JSON.parse(raw);
+                sessionStorage.removeItem('enag_ticket_a_reporte_tecnico');
+
+                if (d.responsableBien && document.getElementById('inputResponsableBien')) {
+                    document.getElementById('inputResponsableBien').value = d.responsableBien;
+                }
+                if (d.departamento && document.getElementById('inputDepartamento')) {
+                    document.getElementById('inputDepartamento').value = d.departamento;
+                }
+                if (d.descripcionEquipo && document.getElementById('inputDescripcionEquipo')) {
+                    document.getElementById('inputDescripcionEquipo').value = d.descripcionEquipo;
+                }
+                if (d.problemaReportado && document.getElementById('inputProblemaReportado')) {
+                    document.getElementById('inputProblemaReportado').value = d.problemaReportado;
+                }
+                if (d.diagnostico && document.getElementById('textareaDiagnostico')) {
+                    document.getElementById('textareaDiagnostico').value = d.diagnostico;
+                }
+                if (d.elaboradoPor && document.getElementById('inputElaboradoPor')) {
+                    document.getElementById('inputElaboradoPor').value = d.elaboradoPor;
+                }
+                setTimeout(() => {
+                    actualizarVistaPrevia();
+                    if (typeof showToast === 'function') {
+                        showToast(`✅ Datos transferidos desde Ticket ${d.codigoTicket || ''} de Mesa de Ayuda.`, "success");
+                    }
+                }, 200);
+            } catch(e) {
+                console.warn("No se pudieron cargar datos desde Mesa de Ayuda:", e);
+            }
+        }
+
+        function inicializarFechaHoy() {
+            const hoy = new Date();
+            const dd = String(hoy.getDate()).padStart(2, '0');
+            const mm = String(hoy.getMonth() + 1).padStart(2, '0');
+            const yyyy = hoy.getFullYear();
+            const dateInput = document.getElementById('inputFecha');
+            if (dateInput && !dateInput.value) {
+                dateInput.value = `${dd}/${mm}/${yyyy}`;
+            }
+        }
+
+        function cargarUsuarioSesion() {
+            try {
+                let userNombre = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
+                if (userNombre) {
+                    const elaborado = document.getElementById('inputElaboradoPor');
+                    if (elaborado && !elaborado.value) elaborado.value = userNombre;
+                }
+            } catch (e) { }
+        }
+
+        function cargarEjemploFoto() {
+            document.getElementById('inputNumero').value = '2026-10';
+            document.getElementById('inputFecha').value = '30/10/2026';
+            document.getElementById('inputElaboradoPor').value = 'Wilson Tinoco';
+            document.getElementById('inputResponsable').value = 'Rony Oseguera';
+            document.getElementById('inputDepartamento').value = 'Bienes Nacionales';
+            document.getElementById('inputDescripcion').value = 'UPS 850VA, Marca: Vertiv, Modelo No.: Liebert PSL850, Color: Negro';
+            document.getElementById('inputSerie').value = '322009500305';
+            document.getElementById('inputInventario').value = '4004004';
+            document.getElementById('inputProblema').value = 'No funciona';
+            document.getElementById('textareaDiagnostico').value = 'Placa electrónica principal quemada por alto voltaje. No tiene reparación. Se hará solicitud de descargo al departamento de Bienes Nacionales.';
+            document.getElementById('inputUltimaLinea').value = '-------------------------------- Ultima Linea --------------------------------';
+            actualizarVistaPrevia();
+            showToast("Ejemplo exacto de la foto cargado en el formulario.", "info");
+        }
+
+        function insertarPlantillaDescargo() {
+            document.getElementById('textareaDiagnostico').value = 'Equipo presenta falla irreparable en componentes principales. No es costeable su reparación. Se recomienda trámite de descargo ante Bienes Nacionales.';
+            actualizarVistaPrevia();
+        }
+
+        function insertarPlantillaReparado() {
+            document.getElementById('textareaDiagnostico').value = 'Se realizó mantenimiento correctivo, limpieza profunda, reemplazo de partes dañadas y pruebas de operatividad. Equipo queda funcionando en óptimas condiciones.';
+            actualizarVistaPrevia();
+        }
+
+        async function buscarEnBienesNacionales() {
+            const query = prompt("Ingrese el Código de Inventario o Serie del bien:");
+            if (!query || !query.trim()) return;
+            const term = query.trim();
+
+            const db = obtenerDB();
+            if (!db) {
+                showToast("Conectando con base de datos...", "warning");
+                return;
+            }
+
+            try {
+                showToast("Buscando en Bienes Nacionales...", "info");
+                // Buscar por código exacto
+                let docSnap = await db.collection('bienes_nacionales').doc(term).get();
+                let bien = null;
+                if (docSnap.exists) {
+                    bien = docSnap.data();
+                } else {
+                    // Buscar por campo codigo o serie
+                    const qSnap = await db.collection('bienes_nacionales').where('serie', '==', term).limit(1).get();
+                    if (!qSnap.empty) {
+                        bien = qSnap.docs[0].data();
+                    }
+                }
+
+                if (bien) {
+                    if (bien.custodio) document.getElementById('inputResponsable').value = bien.custodio;
+                    if (bien.departamento) document.getElementById('inputDepartamento').value = bien.departamento;
+                    let desc = `${bien.denominacion || ''}`;
+                    if (bien.marca) desc += `, Marca: ${bien.marca}`;
+                    if (bien.modelo) desc += `, Modelo No.: ${bien.modelo}`;
+                    if (bien.color) desc += `, Color: ${bien.color}`;
+                    document.getElementById('inputDescripcion').value = desc.trim().replace(/^,\s*/, '');
+                    if (bien.serie) document.getElementById('inputSerie').value = bien.serie;
+                    if (bien.codigo) document.getElementById('inputInventario').value = bien.codigo;
+                    actualizarVistaPrevia();
+                    showToast(`✅ Bien encontrado: ${bien.codigo} - ${bien.denominacion || ''}`, "success");
+                } else {
+                    showToast("No se encontró ningún bien con ese número o serie.", "warning");
+                }
+            } catch (e) {
+                console.error("Error buscando bien:", e);
+                showToast("Error al consultar Bienes Nacionales: " + e.message, "error");
+            }
+        }
+
+        function sugerirSiguienteNumero() {
+            const anioActual = new Date().getFullYear();
+            let maxSecuencia = 0;
+            reportesGlobal.forEach(r => {
+                const str = (r.numero || '').trim();
+                const clean = str.replace(/^RT\s*[-]?\s*/i, '');
+                const parts = clean.split('-');
+                if (parts.length === 2 && parts[0] == anioActual) {
+                    const sec = parseInt(parts[1], 10);
+                    if (!isNaN(sec) && sec > maxSecuencia) maxSecuencia = sec;
+                }
+            });
+            // Si no hay reportes o la secuencia es menor a 11, arrancamos en 11 (según correlativo actual)
+            const sig = maxSecuencia >= 11 ? (maxSecuencia + 1) : 11;
+            const formato = document.getElementById('selectFormatoCorrelativo') ? document.getElementById('selectFormatoCorrelativo').value : 'con_rt';
+            const numFinal = (formato === 'sin_rt') ? `${anioActual}-${sig}` : `RT ${anioActual}-${sig}`;
+            const inp = document.getElementById('inputNumero');
+            if (inp) inp.value = numFinal;
+            actualizarVistaPrevia();
+        }
+
+        // Actualizar vista previa
+        function actualizarVistaPrevia() {
+            const noVal = document.getElementById('inputNumero').value.trim() || 'RT 2026-11';
+            const fechaVal = document.getElementById('inputFecha').value.trim() || '30/10/2026';
+            const elabVal = document.getElementById('inputElaboradoPor').value.trim() || 'Wilson Tinoco';
+            const respVal = document.getElementById('inputResponsable').value.trim() || 'Rony Oseguera';
+            const deptoVal = document.getElementById('inputDepartamento').value.trim() || 'Bienes Nacionales';
+            const descVal = document.getElementById('inputDescripcion').value.trim() || '';
+            const serieVal = document.getElementById('inputSerie').value.trim() || '';
+            const invVal = document.getElementById('inputInventario').value.trim() || '';
+            const probVal = document.getElementById('inputProblema').value.trim() || '';
+            const diagVal = document.getElementById('textareaDiagnostico').value || '';
+            const ultVal = document.getElementById('inputUltimaLinea').value || '-------------------------------- Ultima Linea --------------------------------';
+
+            document.getElementById('prevNo').textContent = noVal;
+            document.getElementById('prevFecha').textContent = fechaVal;
+            document.getElementById('prevElaborado').textContent = elabVal;
+            document.getElementById('prevResponsable').textContent = respVal;
+            document.getElementById('prevDepartamento').textContent = deptoVal;
+            document.getElementById('prevDescripcion').textContent = descVal;
+            document.getElementById('prevSerie').textContent = serieVal;
+            document.getElementById('prevInventario').textContent = invVal;
+            document.getElementById('prevProblema').textContent = probVal;
+            document.getElementById('prevDiagnostico').textContent = diagVal;
+            document.getElementById('prevUltimaLinea').textContent = ultVal;
+
+            document.getElementById('prevFirma1').textContent = document.getElementById('inputFirma1').value.trim() || 'Firma Responsable del Bien';
+            document.getElementById('prevFirma2').textContent = document.getElementById('inputFirma2').value.trim() || 'Firma Técnico de Informática';
+            document.getElementById('prevFirma3').textContent = document.getElementById('inputFirma3').value.trim() || 'V.B. Sub-Gerente Administrativo';
+            document.getElementById('prevFirma4').textContent = document.getElementById('inputFirma4').value.trim() || 'Firma Jefe de Informática';
+
+            document.getElementById('prevCopia1').textContent = document.getElementById('inputCopia1').value.trim() || 'Original: Bienes Nacionales';
+            document.getElementById('prevCopia2').textContent = document.getElementById('inputCopia2').value.trim() || 'c.c. Archivo';
+            document.getElementById('prevCopia3').textContent = document.getElementById('inputCopia3').value.trim() || 'c.c. Responsable del Bien';
+        }
+
+        // Constructor del PDF Oficial de Reporte Técnico
+        async function construirDocumentoPDF() {
+            const jsPDFClass = obtenerConstructorJsPDF();
+            if (!jsPDFClass) {
+                throw new Error("Librería jsPDF no disponible. Recargue la página.");
+            }
+
+            // Hoja Carta Oficial (215.9 x 279.4 mm)
+            const doc = new jsPDFClass('p', 'mm', 'letter');
+            const pw = doc.internal.pageSize.getWidth();
+            const ph = doc.internal.pageSize.getHeight();
+
+            // 1. Fondo membretado oficial completo (Logo odoo.png)
+            const bgPapel = await getBase64FromUrl('../assets/Logo odoo.png');
+            if (bgPapel) {
+                doc.addImage(bgPapel, 'PNG', 0, 0, pw, ph);
+            }
+
+            // Configuración de márgenes
+            const ml = 20;
+            const mr = pw - 20;
+            const contentW = mr - ml; // ~175.9 mm
+
+            // 2. Encabezado Oficial
+            doc.setFont('times', 'bold');
+            doc.setFontSize(14);
+            doc.setTextColor(0, 0, 0);
+            doc.text("Departamento de Informática", pw / 2, 45, { align: 'center' });
+
+            doc.setFontSize(16);
+            doc.text("REPORTE TÉCNICO", pw / 2, 52, { align: 'center' });
+
+            let curY = 60;
+
+            // Función auxiliar para dibujar campo con píldora / caja redondeada
+            const dibujarCampoPildora = (etiqueta, valor, x, y, anchoTotal, anchoEtiqueta = null, centrado = true) => {
+                doc.setFont('times', 'normal');
+                doc.setFontSize(9.5);
+                doc.setTextColor(0, 0, 0);
+
+                if (!anchoEtiqueta) {
+                    anchoEtiqueta = doc.getTextWidth(etiqueta) + 2.5;
+                }
+
+                doc.text(etiqueta, x, y + 4.2);
+
+                const pillX = x + anchoEtiqueta;
+                const pillW = anchoTotal - anchoEtiqueta;
+                const pillH = 6.2;
+
+                // Dibujar caja redondeada
+                doc.setDrawColor(70, 70, 70);
+                doc.setLineWidth(0.3);
+                doc.setFillColor(255, 255, 255);
+                doc.roundedRect(pillX, y, pillW, pillH, 2.5, 2.5, 'FD');
+
+                // Texto del valor
+                doc.setFont('helvetica', 'bold');
+                doc.setFontSize(9);
+                doc.setTextColor(0, 0, 0);
+
+                const lines = doc.splitTextToSize(valor || '', pillW - 4);
+                if (centrado) {
+                    doc.text(lines[0] || '', pillX + (pillW / 2), y + 4.2, { align: 'center' });
+                } else {
+                    doc.text(lines[0] || '', pillX + 3, y + 4.2);
+                }
+            };
+
+            // Fila 1: No.
+            const noVal = document.getElementById('inputNumero').value.trim() || 'RT 2026-11';
+            const anchoPillNo = noVal.length > 8 ? 54 : 46;
+            dibujarCampoPildora("No.:", noVal, ml, curY, anchoPillNo, 11, true);
+            curY += 8.2;
+
+            // Fila 2: Fecha | Elaborado por:
+            const fechaVal = document.getElementById('inputFecha').value.trim();
+            const elabVal = document.getElementById('inputElaboradoPor').value.trim();
+            const col1W = 68;
+            dibujarCampoPildora("Fecha:", fechaVal, ml, curY, col1W, 14, true);
+            dibujarCampoPildora("Elaborado por:", elabVal, ml + col1W + 4, curY, contentW - col1W - 4, 25, true);
+            curY += 8.2;
+
+            // Fila 3: Responsable del Bien: | Departamento:
+            const respVal = document.getElementById('inputResponsable').value.trim();
+            const deptoVal = document.getElementById('inputDepartamento').value.trim();
+            const colRespW = 95;
+            dibujarCampoPildora("Responsable del Bien:", respVal, ml, curY, colRespW, 35, true);
+            dibujarCampoPildora("Departamento:", deptoVal, ml + colRespW + 4, curY, contentW - colRespW - 4, 24, true);
+            curY += 8.2;
+
+            // Fila 4: Descripción de Equipo: (Línea completa)
+            const descVal = document.getElementById('inputDescripcion').value.trim();
+            dibujarCampoPildora("Descripción de Equipo:", descVal, ml, curY, contentW, 37, true);
+            curY += 8.2;
+
+            // Fila 5: Serie No.: | Inventario No.:
+            const serieVal = document.getElementById('inputSerie').value.trim();
+            const invVal = document.getElementById('inputInventario').value.trim();
+            const colSerieW = 90;
+            dibujarCampoPildora("Serie No.:", serieVal, ml, curY, colSerieW, 19, true);
+            dibujarCampoPildora("Inventario No.:", invVal, ml + colSerieW + 4, curY, contentW - colSerieW - 4, 26, true);
+            curY += 8.2;
+
+            // Fila 6: Problema Reportado:
+            const probVal = document.getElementById('inputProblema').value.trim();
+            dibujarCampoPildora("Problema Reportado:", probVal, ml, curY, contentW, 35, true);
+            curY += 10.5;
+
+            // 3. Caja Grande de Diagnóstico
+            const diagBoxY = curY;
+            const diagBoxH = 56;
+
+            doc.setDrawColor(40, 40, 40);
+            doc.setLineWidth(0.4);
+            doc.setFillColor(255, 255, 255);
+            doc.roundedRect(ml, diagBoxY, contentW, diagBoxH, 3, 3, 'FD');
+
+            // Encabezado "Diagnóstico:"
+            doc.setFont('times', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 0, 0);
+            doc.text("Diagnóstico:", ml + 4, diagBoxY + 6);
+
+            // Contenido del diagnóstico
+            const diagVal = document.getElementById('textareaDiagnostico').value.trim();
+            doc.setFont('helvetica', 'normal');
+            doc.setFontSize(9);
+            doc.setTextColor(20, 20, 20);
+
+            const diagLines = doc.splitTextToSize(diagVal, contentW - 8);
+            doc.text(diagLines, ml + 4, diagBoxY + 12);
+
+            // Texto de cierre ("---------------- Ultima Linea ----------------")
+            const ultVal = document.getElementById('inputUltimaLinea').value.trim() || '-------------------------------- Ultima Linea --------------------------------';
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(8.5);
+            doc.setTextColor(60, 60, 60);
+            doc.text(ultVal, pw / 2, diagBoxY + diagBoxH - 5, { align: 'center' });
+
+            curY = diagBoxY + diagBoxH + 18;
+
+            // 4. Bloque de 4 Firmas (2x2)
+            const f1 = document.getElementById('inputFirma1').value.trim() || 'Firma Responsable del Bien';
+            const f2 = document.getElementById('inputFirma2').value.trim() || 'Firma Técnico de Informática';
+            const f3 = document.getElementById('inputFirma3').value.trim() || 'V.B. Sub-Gerente Administrativo';
+            const f4 = document.getElementById('inputFirma4').value.trim() || 'Firma Jefe de Informática';
+
+            const mitadX = pw / 2;
+            const anchoFirma = 65;
+            const leftColX = ml + 6;
+            const rightColX = mitadX + 12;
+
+            // Fila 1 de firmas
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.5);
+            doc.line(leftColX, curY, leftColX + anchoFirma, curY);
+            doc.line(rightColX, curY, rightColX + anchoFirma, curY);
+
+            doc.setFont('times', 'bold');
+            doc.setFontSize(9);
+            doc.setTextColor(0, 0, 0);
+            doc.text(f1, leftColX + (anchoFirma / 2), curY + 4.5, { align: 'center' });
+            doc.text(f2, rightColX + (anchoFirma / 2), curY + 4.5, { align: 'center' });
+
+            curY += 20;
+
+            // Fila 2 de firmas
+            doc.line(leftColX, curY, leftColX + anchoFirma, curY);
+            doc.line(rightColX, curY, rightColX + anchoFirma, curY);
+
+            doc.text(f3, leftColX + (anchoFirma / 2), curY + 4.5, { align: 'center' });
+            doc.text(f4, rightColX + (anchoFirma / 2), curY + 4.5, { align: 'center' });
+
+            // 5. Bloque de Copias en la esquina inferior izquierda
+            const yCopias = 246;
+            doc.setFont('times', 'normal');
+            doc.setFontSize(7);
+            doc.setTextColor(60, 60, 60);
+
+            const c1 = document.getElementById('inputCopia1').value.trim();
+            const c2 = document.getElementById('inputCopia2').value.trim();
+            const c3 = document.getElementById('inputCopia3').value.trim();
+
+            let cOffset = 0;
+            if (c1) { doc.text(c1, ml, yCopias + cOffset); cOffset += 3.2; }
+            if (c2) { doc.text(c2, ml, yCopias + cOffset); cOffset += 3.2; }
+            if (c3) { doc.text(c3, ml, yCopias + cOffset); }
+
+            return doc;
+        }
+
+        async function generarPDFReporteTecnico() {
+            const btn = document.getElementById('btnDescargarPDF');
+            const textoOrig = btn.innerHTML;
+            btn.innerHTML = '<span>⏳</span> Generando PDF...';
+            btn.disabled = true;
+
+            try {
+                const doc = await construirDocumentoPDF();
+                const num = document.getElementById('inputNumero').value.trim() || 'RT';
+                const fileName = `Reporte_Tecnico_${num.replace(/\s+/g, '_')}.pdf`;
+                doc.save(fileName);
+
+                // Auto-guardar en base de datos en segundo plano
+                guardarReporteEnFirestore().catch(e => console.warn(e));
+
+                showToast(`✅ ¡Reporte Técnico descargado: ${fileName}!`, "success");
+            } catch (err) {
+                console.error("Error al generar PDF:", err);
+                showToast("❌ Error al generar PDF: " + err.message, "error");
+                alert("Error al generar PDF: " + err.message);
+            } finally {
+                btn.innerHTML = textoOrig;
+                btn.disabled = false;
+            }
+        }
+
+        async function imprimirReporteTecnico() {
+            showToast("⏳ Preparando reporte para impresión...", "info");
+            try {
+                const doc = await construirDocumentoPDF();
+                if (doc) {
+                    doc.autoPrint();
+                    const blobUrl = doc.output('bloburl');
+                    const ventana = window.open(blobUrl, '_blank');
+                    if (ventana) {
+                        showToast("✅ PDF abierto en nueva pestaña. Use Ctrl+P para imprimir.", "success");
+                    } else {
+                        const iframe = document.getElementById('rtPrintIframe');
+                        iframe.src = blobUrl;
+                        iframe.onload = () => {
+                            iframe.contentWindow.focus();
+                            iframe.contentWindow.print();
+                        };
+                    }
+                }
+            } catch (err) {
+                console.error("Fallo impresión por PDF blob:", err);
+                window.print();
+            }
+        }
+
+        // Firestore y Persistencia
+        function conectarFirebaseYEscuchar() {
+            const db = obtenerDB();
+            if (db) {
+                escucharReportesFirestore(db);
+            } else {
+                setTimeout(() => {
+                    const db2 = obtenerDB();
+                    if (db2) escucharReportesFirestore(db2);
+                    else cargarHistorialLocalStorage();
+                }, 1500);
+            }
+
+            if (typeof firebase !== 'undefined') {
+                firebase.auth().onAuthStateChanged((user) => {
+                    const labelUser = document.getElementById('labelLoggedUser');
+                    if (user) {
+                        if (labelUser) labelUser.textContent = user.displayName || user.email;
+                    } else {
+                        let localUser = 'Personal ENAG';
+                        try {
+                            localUser = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || 'Personal ENAG';
+                        } catch (e) { }
+                        if (labelUser) labelUser.textContent = localUser;
+                    }
+                });
+            }
+        }
+
+        function escucharReportesFirestore(db) {
+            try {
+                db.collection('reportes_tecnicos').orderBy('timestamp', 'desc').limit(200)
+                    .onSnapshot((snapshot) => {
+                        const lista = [];
+                        snapshot.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
+                        reportesGlobal = lista;
+                        actualizarEstadisticasYTabla();
+                        if (!reporteEnEdicionId) {
+                            sugerirSiguienteNumero();
+                        }
+                    }, (err) => {
+                        console.warn("Fallo onSnapshot reportes_tecnicos:", err);
+                        cargarHistorialFirestoreGet(db);
+                    });
+            } catch (e) {
+                console.warn("Error suscribiendo reportes:", e);
+                cargarHistorialLocalStorage();
+            }
+        }
+
+        async function cargarHistorialFirestoreGet(db) {
+            try {
+                const snap = await db.collection('reportes_tecnicos').orderBy('timestamp', 'desc').limit(200).get();
+                const lista = [];
+                snap.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
+                reportesGlobal = lista;
+                actualizarEstadisticasYTabla();
+                if (!reporteEnEdicionId) {
+                    sugerirSiguienteNumero();
+                }
+            } catch (e) {
+                cargarHistorialLocalStorage();
+            }
+        }
+
+        function cargarHistorialDesdeFirestore() {
+            const db = obtenerDB();
+            if (db) {
+                cargarHistorialFirestoreGet(db).then(() => {
+                    showToast("✅ Historial de Reportes actualizado.", "success");
+                });
+            } else {
+                cargarHistorialLocalStorage();
+                showToast("Mostrando respaldo local.", "info");
+            }
+        }
+
+        async function guardarReporteEnFirestore() {
+            const btn = document.getElementById('btnGuardarRT');
+            if (btn) btn.disabled = true;
+
+            try {
+                const numero = document.getElementById('inputNumero').value.trim();
+                const fecha = document.getElementById('inputFecha').value.trim();
+                const elaboradoPor = document.getElementById('inputElaboradoPor').value.trim();
+                const responsable = document.getElementById('inputResponsable').value.trim();
+                const departamento = document.getElementById('inputDepartamento').value.trim();
+                const descripcion = document.getElementById('inputDescripcion').value.trim();
+                const serie = document.getElementById('inputSerie').value.trim();
+                const inventario = document.getElementById('inputInventario').value.trim();
+                const problema = document.getElementById('inputProblema').value.trim();
+                const diagnostico = document.getElementById('textareaDiagnostico').value.trim();
+
+                if (!numero || !fecha || !elaboradoPor || !descripcion || !diagnostico) {
+                    showToast("Complete los campos obligatorios antes de guardar.", "warning");
+                    if (btn) btn.disabled = false;
+                    return;
+                }
+
+                const docData = {
+                    numero,
+                    fecha,
+                    elaboradoPor,
+                    responsable,
+                    departamento,
+                    descripcion,
+                    serie,
+                    inventario,
+                    problema,
+                    diagnostico,
+                    ultimaLinea: document.getElementById('inputUltimaLinea').value.trim(),
+                    firmas: {
+                        f1: document.getElementById('inputFirma1').value.trim(),
+                        f2: document.getElementById('inputFirma2').value.trim(),
+                        f3: document.getElementById('inputFirma3').value.trim(),
+                        f4: document.getElementById('inputFirma4').value.trim(),
+                    },
+                    copias: {
+                        c1: document.getElementById('inputCopia1').value.trim(),
+                        c2: document.getElementById('inputCopia2').value.trim(),
+                        c3: document.getElementById('inputCopia3').value.trim(),
+                    },
+                    fechaRegistro: new Date().toISOString()
+                };
+
+                const docId = reporteEnEdicionId || `RT-${numero.replace(/\s+/g, '_')}`;
+                const db = obtenerDB();
+
+                if (db) {
+                    await db.collection('reportes_tecnicos').doc(docId).set({
+                        ...docData,
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
+                    }, { merge: true });
+                    showToast(`✅ ¡Reporte Técnico ${numero} guardado en BD!`, "success");
+                }
+
+                guardarRespaldoLocal(docId, docData);
+
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Informática', 'Guardar Reporte Técnico', `Se registró el Reporte Técnico ${numero} para ${responsable} (Equipo: ${descripcion})`);
+                }
+
+                reporteEnEdicionId = docId;
+                actualizarEstadisticasYTabla();
+            } catch (err) {
+                console.error("Error guardando reporte:", err);
+                showToast("❌ Error al guardar: " + err.message, "error");
+            } finally {
+                if (btn) btn.disabled = false;
+            }
+        }
+
+        function guardarRespaldoLocal(id, data) {
+            try {
+                let local = JSON.parse(localStorage.getItem('enag_reportes_tecnicos_local') || '[]');
+                const idx = local.findIndex(r => r.id === id);
+                if (idx >= 0) local[idx] = { id, ...data };
+                else local.unshift({ id, ...data });
+                localStorage.setItem('enag_reportes_tecnicos_local', JSON.stringify(local));
+            } catch (e) { }
+        }
+
+        function cargarHistorialLocalStorage() {
+            try {
+                const local = JSON.parse(localStorage.getItem('enag_reportes_tecnicos_local') || '[]');
+                reportesGlobal = local;
+                actualizarEstadisticasYTabla();
+            } catch (e) { }
+        }
+
+        function actualizarEstadisticasYTabla() {
+            const badgeTotal = document.getElementById('badgeTotalReportes');
+            if (badgeTotal) badgeTotal.textContent = `📁 ${reportesGlobal.length} Reportes`;
+
+            const badgeUltimo = document.getElementById('badgeUltimoNumero');
+            if (badgeUltimo) {
+                if (reportesGlobal.length > 0) {
+                    badgeUltimo.textContent = `🔢 Último: ${reportesGlobal[0].numero || 'N/A'}`;
+                } else {
+                    badgeUltimo.textContent = `🔢 Último: N/A`;
+                }
+            }
+            filtrarHistorialReportes();
+        }
+
+        function filtrarHistorialReportes() {
+            const query = (document.getElementById('filtroBusqueda').value || '').toLowerCase().trim();
+            const filtrados = reportesGlobal.filter(r => {
+                if (!query) return true;
+                const txt = `${r.numero || ''} ${r.descripcion || ''} ${r.serie || ''} ${r.inventario || ''} ${r.responsable || ''} ${r.elaboradoPor || ''} ${r.diagnostico || ''}`.toLowerCase();
+                return txt.includes(query);
+            });
+            renderizarTablaHistorial(filtrados);
+        }
+
+        function renderizarTablaHistorial(lista) {
+            const tbody = document.getElementById('tbodyHistorialRT');
+            if (!tbody) return;
+            tbody.innerHTML = '';
+
+            if (lista.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align:center; padding: 24px; color:var(--text-muted);">
+                            No se encontraron reportes técnicos registrados.
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            lista.forEach(r => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td><span class="badge-rt">${r.numero || 'N/A'}</span></td>
+                    <td style="white-space:nowrap;">${r.fecha || ''}</td>
+                    <td style="max-width:240px;"><strong>${r.descripcion || ''}</strong></td>
+                    <td style="font-size:0.85em; color:#475569;">
+                        S/N: ${r.serie || 'N/A'}<br>Inv: ${r.inventario || 'N/A'}
+                    </td>
+                    <td><strong>${r.responsable || 'N/A'}</strong><br><small style="color:#64748b;">${r.departamento || ''}</small></td>
+                    <td style="white-space:nowrap; font-size:0.88em; color:#475569;">${r.elaboradoPor || ''}</td>
+                    <td style="text-align:center; white-space:nowrap;">
+                        <button type="button" class="btn-hist-action btn-hist-load" onclick="cargarReporteAlFormulario('${r.id}')" title="Cargar y editar">
+                            👁️ Cargar
+                        </button>
+                        <button type="button" class="btn-hist-action btn-hist-pdf" onclick="descargarPDFDesdeHistorial('${r.id}')" title="Descargar PDF">
+                            📄 PDF
+                        </button>
+                        <button type="button" class="btn-hist-action btn-hist-delete" onclick="eliminarReporte('${r.id}')" title="Eliminar">
+                            🗑️
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        function cargarReporteAlFormulario(id) {
+            const r = reportesGlobal.find(item => item.id === id);
+            if (!r) return;
+
+            reporteEnEdicionId = r.id;
+            document.getElementById('inputNumero').value = r.numero || '';
+            document.getElementById('inputFecha').value = r.fecha || '';
+            document.getElementById('inputElaboradoPor').value = r.elaboradoPor || '';
+            document.getElementById('inputResponsable').value = r.responsable || '';
+            document.getElementById('inputDepartamento').value = r.departamento || '';
+            document.getElementById('inputDescripcion').value = r.descripcion || '';
+            document.getElementById('inputSerie').value = r.serie || '';
+            document.getElementById('inputInventario').value = r.inventario || '';
+            document.getElementById('inputProblema').value = r.problema || '';
+            document.getElementById('textareaDiagnostico').value = r.diagnostico || '';
+            if (r.ultimaLinea) document.getElementById('inputUltimaLinea').value = r.ultimaLinea;
+
+            if (r.firmas) {
+                if (r.firmas.f1) document.getElementById('inputFirma1').value = r.firmas.f1;
+                if (r.firmas.f2) document.getElementById('inputFirma2').value = r.firmas.f2;
+                if (r.firmas.f3) document.getElementById('inputFirma3').value = r.firmas.f3;
+                if (r.firmas.f4) document.getElementById('inputFirma4').value = r.firmas.f4;
+            }
+
+            if (r.copias) {
+                if (r.copias.c1) document.getElementById('inputCopia1').value = r.copias.c1;
+                if (r.copias.c2) document.getElementById('inputCopia2').value = r.copias.c2;
+                if (r.copias.c3) document.getElementById('inputCopia3').value = r.copias.c3;
+            }
+
+            actualizarVistaPrevia();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            showToast(`Reporte ${r.numero} cargado al formulario.`, "info");
+        }
+
+        async function descargarPDFDesdeHistorial(id) {
+            cargarReporteAlFormulario(id);
+            setTimeout(() => {
+                generarPDFReporteTecnico();
+            }, 300);
+        }
+
+        async function eliminarReporte(id) {
+            const r = reportesGlobal.find(item => item.id === id);
+            const num = r ? r.numero : id;
+
+            if (!confirm(`¿Está seguro de eliminar el Reporte Técnico ${num}? Esta acción no se puede deshacer.`)) {
+                return;
+            }
+
+            try {
+                const db = obtenerDB();
+                if (db) {
+                    await db.collection('reportes_tecnicos').doc(id).delete();
+                }
+
+                reportesGlobal = reportesGlobal.filter(item => item.id !== id);
+                try {
+                    localStorage.setItem('enag_reportes_tecnicos_local', JSON.stringify(reportesGlobal));
+                } catch (e) { }
+
+                if (window.registrarBitacora) {
+                    window.registrarBitacora('Informática', 'Eliminar Reporte Técnico', `Se eliminó el reporte ${num}`);
+                }
+
+                showToast(`Reporte ${num} eliminado con éxito.`, "success");
+                actualizarEstadisticasYTabla();
+            } catch (err) {
+                console.error("Error al eliminar reporte:", err);
+                showToast("Error al eliminar: " + err.message, "error");
+            }
+        }
+
+        function limpiarFormularioNuevo() {
+            reporteEnEdicionId = null;
+            sugerirSiguienteNumero();
+            inicializarFechaHoy();
+            cargarUsuarioSesion();
+            document.getElementById('inputResponsable').value = '';
+            document.getElementById('inputDepartamento').value = '';
+            document.getElementById('inputDescripcion').value = '';
+            document.getElementById('inputSerie').value = '';
+            document.getElementById('inputInventario').value = '';
+            document.getElementById('inputProblema').value = '';
+            document.getElementById('textareaDiagnostico').value = '';
+            actualizarVistaPrevia();
+            showToast("Formulario listo para nuevo reporte técnico.", "info");
+        }
+
+        function exportarHistorialExcel() {
+            if (reportesGlobal.length === 0) {
+                showToast("No hay registros para exportar a Excel.", "warning");
+                return;
+            }
+
+            const dataExport = reportesGlobal.map(r => ({
+                "No. Reporte": r.numero || '',
+                "Fecha": r.fecha || '',
+                "Elaborado Por": r.elaboradoPor || '',
+                "Responsable del Bien": r.responsable || '',
+                "Departamento": r.departamento || '',
+                "Descripción Equipo": r.descripcion || '',
+                "Serie No.": r.serie || '',
+                "Inventario No.": r.inventario || '',
+                "Problema Reportado": r.problema || '',
+                "Diagnóstico": r.diagnostico || '',
+                "Fecha Registro": r.fechaRegistro || ''
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dataExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Reportes_Tecnicos_ENAG");
+            XLSX.writeFile(wb, `Reportes_Tecnicos_ENAG_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            showToast("Reporte Excel generado correctamente.", "success");
+        }
+
+        // ==============================================================
+        // CARGA, MODIFICACIÓN Y RESPALDO DE REPORTES PREVIOS
+        // ==============================================================
+        function abrirSelectorSubirReporte() {
+            try {
+                let input = document.getElementById('inputSubirDocRT');
+                if (!input) {
+                    input = document.createElement('input');
+                    input.type = 'file';
+                    input.id = 'inputSubirDocRT';
+                    input.accept = '.json,.pdf';
+                    input.style.position = 'fixed';
+                    input.style.top = '-1000px';
+                    input.style.left = '-1000px';
+                    input.style.opacity = '0';
+                    input.style.pointerEvents = 'none';
+                    input.onchange = function() { procesarArchivoSubidoRT(this); };
+                    document.body.appendChild(input);
+                }
+                input.value = '';
+                input.click();
+            } catch (err) {
+                console.error("Error abriendo selector de reportes:", err);
+                showToast("Error al abrir explorador de archivos: " + err.message, "error");
+            }
+        }
+
+        async function procesarArchivoSubidoRT(input) {
+            if (!input.files || input.files.length === 0) return;
+            const file = input.files[0];
+            const fileName = file.name.toLowerCase();
+
+            if (fileName.endsWith('.json')) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const data = JSON.parse(e.target.result);
+                        cargarDatosEnFormularioRT(data);
+                        showToast("✅ Reporte Técnico cargado desde archivo JSON para modificación.", "success");
+                    } catch (err) {
+                        console.error(err);
+                        showToast("❌ Error al leer archivo JSON: " + err.message, "error");
+                    }
+                };
+                reader.readAsText(file);
+            } else if (fileName.endsWith('.pdf')) {
+                showToast("⏳ Extrayendo texto y campos del reporte PDF...", "info");
+                try {
+                    await extraerCamposDesdePdfRT(file);
+                } catch (err) {
+                    console.error(err);
+                    showToast("❌ No se pudo extraer la información del PDF: " + err.message, "error");
+                }
+            } else {
+                showToast("⚠️ Formato no compatible. Por favor suba un archivo .json o .pdf", "warning");
+            }
+        }
+
+        function cargarDatosEnFormularioRT(data) {
+            if (data.id) reporteEnEdicionId = data.id;
+            if (data.numero) document.getElementById('inputNumero').value = data.numero;
+            if (data.fecha) document.getElementById('inputFecha').value = data.fecha;
+            if (data.elaboradoPor) document.getElementById('inputElaboradoPor').value = data.elaboradoPor;
+            if (data.responsable) document.getElementById('inputResponsable').value = data.responsable;
+            if (data.departamento) document.getElementById('inputDepartamento').value = data.departamento;
+            if (data.descripcion) document.getElementById('inputDescripcion').value = data.descripcion;
+            if (data.serie) document.getElementById('inputSerie').value = data.serie;
+            if (data.inventario) document.getElementById('inputInventario').value = data.inventario;
+            if (data.problema) document.getElementById('inputProblema').value = data.problema;
+            if (data.diagnostico) document.getElementById('textareaDiagnostico').value = data.diagnostico;
+            if (data.ultimaLinea) document.getElementById('inputUltimaLinea').value = data.ultimaLinea;
+
+            if (data.firmas) {
+                if (data.firmas.f1) document.getElementById('inputFirma1').value = data.firmas.f1;
+                if (data.firmas.f2) document.getElementById('inputFirma2').value = data.firmas.f2;
+                if (data.firmas.f3) document.getElementById('inputFirma3').value = data.firmas.f3;
+                if (data.firmas.f4) document.getElementById('inputFirma4').value = data.firmas.f4;
+            }
+
+            if (data.copias) {
+                if (data.copias.c1) document.getElementById('inputCopia1').value = data.copias.c1;
+                if (data.copias.c2) document.getElementById('inputCopia2').value = data.copias.c2;
+                if (data.copias.c3) document.getElementById('inputCopia3').value = data.copias.c3;
+            }
+
+            actualizarVistaPrevia();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        async function extraerCamposDesdePdfRT(file) {
+            if (typeof pdfjsLib === 'undefined') {
+                throw new Error("Biblioteca PDF.js no disponible.");
+            }
+            const arrayBuffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+            let fullText = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map(item => item.str).join(" ");
+                fullText += pageText + "\n";
+            }
+
+            const dataExtraida = {};
+
+            // No. / Correlativo e.g. RT 2026-11 o 2026-10
+            const numMatch = fullText.match(/No\.?\s*:\s*([A-Z0-9\-_ ]+?)(?:Fecha|$)/i);
+            if (numMatch) dataExtraida.numero = numMatch[1].trim();
+
+            // Fecha
+            const fechaMatch = fullText.match(/Fecha\s*:\s*(\d{1,2}\/\d{1,2}\/\d{2,4})/i);
+            if (fechaMatch) dataExtraida.fecha = fechaMatch[1].trim();
+
+            // Elaborado por
+            const elabMatch = fullText.match(/Elaborado\s+por\s*:\s*([^\n\r]+?)(?:Responsable|$)/i);
+            if (elabMatch) dataExtraida.elaboradoPor = elabMatch[1].trim();
+
+            // Responsable del Bien
+            const respMatch = fullText.match(/Responsable\s+del\s+Bien\s*:\s*([^\n\r]+?)(?:Departamento|$)/i);
+            if (respMatch) dataExtraida.responsable = respMatch[1].trim();
+
+            // Departamento
+            const deptoMatch = fullText.match(/Departamento\s*:\s*([^\n\r]+?)(?:Descripci[oó]n|$)/i);
+            if (deptoMatch) dataExtraida.departamento = deptoMatch[1].trim();
+
+            // Descripción de Equipo
+            const descMatch = fullText.match(/Descripci[oó]n\s+de\s+Equipo\s*:\s*([^\n\r]+?)(?:Serie|$)/i);
+            if (descMatch) dataExtraida.descripcion = descMatch[1].trim();
+
+            // Serie No.
+            const serieMatch = fullText.match(/Serie\s+No\.?\s*:\s*([^\n\r]+?)(?:Inventario|$)/i);
+            if (serieMatch) dataExtraida.serie = serieMatch[1].trim();
+
+            // Inventario No.
+            const invMatch = fullText.match(/Inventario\s+No\.?\s*:\s*([^\n\r]+?)(?:Problema|$)/i);
+            if (invMatch) dataExtraida.inventario = invMatch[1].trim();
+
+            // Problema Reportado
+            const probMatch = fullText.match(/Problema\s+Reportado\s*:\s*([^\n\r]+?)(?:Diagn[oó]stico|$)/i);
+            if (probMatch) dataExtraida.problema = probMatch[1].trim();
+
+            // Diagnóstico
+            const diagMatch = fullText.match(/Diagn[oó]stico\s*:\s*([\s\S]+?)(?:-{4,}|Firma|$)/i);
+            if (diagMatch) {
+                dataExtraida.diagnostico = diagMatch[1].replace(/-{4,}.*?-{4,}/g, '').trim();
+            }
+
+            cargarDatosEnFormularioRT(dataExtraida);
+            showToast("✅ Información extraída del Reporte PDF y cargada para modificar.", "success");
+        }
+
+        function exportarReporteJSON() {
+            const data = {
+                tipo: 'reporte_tecnico_enag',
+                version: '1.0',
+                id: reporteEnEdicionId || null,
+                numero: document.getElementById('inputNumero').value.trim(),
+                fecha: document.getElementById('inputFecha').value.trim(),
+                elaboradoPor: document.getElementById('inputElaboradoPor').value.trim(),
+                responsable: document.getElementById('inputResponsable').value.trim(),
+                departamento: document.getElementById('inputDepartamento').value.trim(),
+                descripcion: document.getElementById('inputDescripcion').value.trim(),
+                serie: document.getElementById('inputSerie').value.trim(),
+                inventario: document.getElementById('inputInventario').value.trim(),
+                problema: document.getElementById('inputProblema').value.trim(),
+                diagnostico: document.getElementById('textareaDiagnostico').value.trim(),
+                ultimaLinea: document.getElementById('inputUltimaLinea').value.trim(),
+                firmas: {
+                    f1: document.getElementById('inputFirma1').value.trim(),
+                    f2: document.getElementById('inputFirma2').value.trim(),
+                    f3: document.getElementById('inputFirma3').value.trim(),
+                    f4: document.getElementById('inputFirma4').value.trim()
+                },
+                copias: {
+                    c1: document.getElementById('inputCopia1').value.trim(),
+                    c2: document.getElementById('inputCopia2').value.trim(),
+                    c3: document.getElementById('inputCopia3').value.trim()
+                }
+            };
+            const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Reporte_Tecnico_${data.numero.replace(/[\s\/\\:]+/g, '_')}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+            showToast("💾 Respaldo JSON descargado correctamente.", "success");
+        }
+
+        // Modal de Documentos Guardados RT
+        function abrirModalDocumentosGuardadosRT() {
+            const modal = document.getElementById('modalDocumentosGuardadosRT');
+            if (!modal) return;
+            modal.classList.add('active');
+            filtrarListaModalRT();
+        }
+
+        function cerrarModalDocumentosGuardadosRT() {
+            const modal = document.getElementById('modalDocumentosGuardadosRT');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function filtrarListaModalRT() {
+            const cont = document.getElementById('listaModalRT');
+            if (!cont) return;
+            const query = (document.getElementById('busquedaModalRT').value || '').toLowerCase().trim();
+
+            const filtrados = reportesGlobal.filter(r => {
+                if (!query) return true;
+                const txt = `${r.numero || ''} ${r.descripcion || ''} ${r.serie || ''} ${r.inventario || ''} ${r.responsable || ''} ${r.elaboradoPor || ''}`.toLowerCase();
+                return txt.includes(query);
+            });
+
+            cont.innerHTML = '';
+            if (filtrados.length === 0) {
+                cont.innerHTML = `<div style="text-align:center; padding: 25px; color:#64748b;">No hay reportes técnicos que coincidan con la búsqueda.</div>`;
+                return;
+            }
+
+            filtrados.forEach(r => {
+                const card = document.createElement('div');
+                card.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
+                card.innerHTML = `
+                    <div style="flex-grow: 1;">
+                        <div style="display: flex; align-items: center; gap: 8px;">
+                            <span class="badge-rt">${r.numero || 'N/A'}</span>
+                            <span style="font-size: 0.82em; color: #64748b;">${r.fecha || ''}</span>
+                        </div>
+                        <div style="font-size: 0.94em; font-weight: bold; color: #002147; margin: 4px 0;">${r.descripcion || 'Sin descripción'}</div>
+                        <div style="font-size: 0.82em; color: #475569;">
+                            Responsable: <strong>${r.responsable || 'N/A'}</strong> (${r.departamento || ''}) | S/N: <code>${r.serie || 'N/A'}</code>
+                        </div>
+                    </div>
+                    <button type="button" onclick="cargarReporteDesdeModal('${r.id}')" style="background: #0284c7; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.84em; cursor: pointer; white-space: nowrap;">
+                        ✏️ Modificar
+                    </button>
+                `;
+                cont.appendChild(card);
+            });
+        }
+
+        function cargarReporteDesdeModal(id) {
+            cerrarModalDocumentosGuardadosRT();
+            cargarReporteAlFormulario(id);
+            showToast("✅ Reporte cargado para modificación. Realice sus cambios y guarde o descargue el PDF.", "success");
+        }
+
+        function showToast(mensaje, tipo = "info") {
+            const toast = document.getElementById('toastNotification');
+            if (!toast) return;
+            toast.textContent = mensaje;
+            toast.className = `toast-notification toast-${tipo} show`;
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3500);
+        }
+    </script>
+    <script src="../js/portal-header.js"></script>
+</body>
+
+</html>

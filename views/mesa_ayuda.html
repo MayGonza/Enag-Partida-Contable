@@ -1,0 +1,2636 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Mesa de Ayuda (Helpdesk) — Departamento de Informática | ENAG</title>
+    <meta name="description"
+        content="Sistema de Mesa de Ayuda y Gestión de Tickets de Soporte Técnico para la Empresa Nacional de Artes Gráficas (ENAG).">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --primary-accent: #0f172a;
+            --accent: #d4af37;
+            --accent-hover: #b89628;
+            --bg-body: #002147;
+            --card-bg: rgba(255, 255, 255, 0.98);
+            --text-color: #1e293b;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --info: #0284c7;
+            --purple: #8b5cf6;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 24px 16px;
+            background-color: var(--bg-body);
+            min-height: 100vh;
+            color: var(--text-color);
+        }
+
+        /* Fondo institucional difuminado */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 36%;
+            filter: blur(12px) opacity(0.12);
+            z-index: -1;
+        }
+
+        .main-container {
+            max-width: 1480px;
+            margin: 0 auto;
+            background: var(--card-bg);
+            border-radius: 14px;
+            box-shadow: 0 12px 35px rgba(0, 0, 0, 0.38);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* HEADER INSTITUCIONAL */
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 20px 28px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 16px;
+            border-bottom: 4px solid var(--accent);
+        }
+
+        .header-title-box {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .header-logo {
+            width: 65px;
+            height: 65px;
+            object-fit: contain;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .header h1 {
+            margin: 0;
+            font-size: 1.5em;
+            letter-spacing: 0.5px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .header p {
+            margin: 4px 0 0;
+            font-size: 0.9em;
+            opacity: 0.9;
+            color: #e2e8f0;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .btn-nav-header {
+            background: rgba(255, 255, 255, 0.12);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 9px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.88em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            text-decoration: none;
+            transition: all 0.2s ease;
+        }
+
+        .btn-nav-header:hover {
+            background: rgba(255, 255, 255, 0.24);
+            transform: translateY(-1px);
+        }
+
+        .btn-accent-header {
+            background: var(--accent);
+            color: var(--primary);
+            border: none;
+            padding: 9px 16px;
+            border-radius: 8px;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 0.88em;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-accent-header:hover {
+            background: var(--accent-hover);
+            transform: translateY(-1px);
+        }
+
+        /* BARRA DE NAVEGACIÓN DE VISTAS (TABS) */
+        .tabs-bar {
+            background: #f1f5f9;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 10px 24px;
+            border-bottom: 1px solid var(--border-color);
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            background: transparent;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-size: 0.92em;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .tab-btn:hover {
+            color: var(--primary);
+            background: rgba(0, 33, 71, 0.05);
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            background: white;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+            border: 1px solid var(--border-color);
+            position: relative;
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 15%;
+            width: 70%;
+            height: 3px;
+            background: var(--primary);
+            border-radius: 3px 3px 0 0;
+        }
+
+        /* METRICAS KPI BAR */
+        .kpi-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 14px;
+            padding: 20px 24px 10px;
+            background: #f8fafc;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .kpi-card {
+            background: white;
+            padding: 14px 18px;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.04);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            transition: transform 0.2s;
+        }
+
+        .kpi-card:hover {
+            transform: translateY(-2px);
+        }
+
+        .kpi-info h4 {
+            margin: 0;
+            font-size: 0.78em;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: var(--text-muted);
+        }
+
+        .kpi-info .kpi-num {
+            font-size: 1.6em;
+            font-weight: 700;
+            color: var(--primary);
+            margin: 4px 0 0;
+        }
+
+        .kpi-icon {
+            font-size: 2em;
+            opacity: 0.85;
+        }
+
+        /* CONTENIDO PRINCIPAL */
+        .tab-content {
+            padding: 24px;
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(4px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* ESTILOS COMUNES DE FORMULARIO */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.86em;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-control {
+            padding: 10px 13px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.92em;
+            transition: all 0.2s;
+            outline: none;
+            background: white;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.12);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 90px;
+        }
+
+        .form-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 22px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.04);
+            margin-bottom: 20px;
+        }
+
+        .form-card-title {
+            font-size: 1.1em;
+            font-weight: 700;
+            color: var(--primary);
+            margin-top: 0;
+            margin-bottom: 16px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        /* BOTONES DE ACCIÓN */
+        .btn-action {
+            padding: 10px 18px;
+            border-radius: 8px;
+            border: none;
+            font-weight: 600;
+            font-size: 0.9em;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.2s;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: var(--primary-light);
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-success:hover {
+            background: #059669;
+        }
+
+        .btn-secondary {
+            background: #e2e8f0;
+            color: var(--text-color);
+        }
+
+        .btn-secondary:hover {
+            background: #cbd5e1;
+        }
+
+        /* BADGES DE ESTADO (ITIL GLPI) */
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.76em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-nuevo {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .status-asignado {
+            background: #ede9fe;
+            color: #6b21a8;
+            border: 1px solid #ddd6fe;
+        }
+
+        .status-en_proceso {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .status-en_espera {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .status-resuelto {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-cerrado {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* BADGES DE PRIORIDAD */
+        .badge-priority {
+            padding: 3px 8px;
+            border-radius: 6px;
+            font-size: 0.74em;
+            font-weight: 700;
+            display: inline-block;
+        }
+
+        .priority-baja {
+            background: #e2e8f0;
+            color: #475569;
+        }
+
+        .priority-media {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .priority-alta {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .priority-urgente {
+            background: #fee2e2;
+            color: #991b1b;
+            font-weight: 800;
+            animation: pulse-danger 2s infinite;
+        }
+
+        @keyframes pulse-danger {
+            0% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(239, 68, 68, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(239, 68, 68, 0);
+            }
+        }
+
+        /* TABLA DE TICKETS */
+        .table-responsive {
+            overflow-x: auto;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+            background: white;
+        }
+
+        .tickets-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88em;
+            text-align: left;
+        }
+
+        .tickets-table th {
+            background: #f8fafc;
+            color: var(--primary);
+            font-weight: 700;
+            padding: 12px 14px;
+            border-bottom: 2px solid var(--border-color);
+            white-space: nowrap;
+        }
+
+        .tickets-table td {
+            padding: 12px 14px;
+            border-bottom: 1px solid #f1f5f9;
+            vertical-align: middle;
+        }
+
+        .tickets-table tbody tr:hover {
+            background: #f8fafc;
+        }
+
+        .ticket-code {
+            font-weight: 700;
+            color: var(--primary);
+            font-family: monospace;
+            font-size: 1.05em;
+        }
+
+        /* BARRA DE FILTROS */
+        .filters-bar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+            margin-bottom: 16px;
+            padding: 14px 18px;
+            background: white;
+            border-radius: 10px;
+            border: 1px solid var(--border-color);
+        }
+
+        .search-box {
+            position: relative;
+            flex: 1;
+            min-width: 240px;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 9px 12px 9px 34px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.9em;
+            outline: none;
+        }
+
+        .search-box::before {
+            content: "🔍";
+            position: absolute;
+            left: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 0.9em;
+            opacity: 0.6;
+        }
+
+        /* TABLERO KANBAN */
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 16px;
+            align-items: start;
+        }
+
+        .kanban-column {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 10px;
+            padding: 12px;
+            min-height: 480px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .kanban-column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 6px 8px 10px;
+            border-bottom: 2px solid var(--border-color);
+        }
+
+        .kanban-column-title {
+            font-weight: 700;
+            font-size: 0.92em;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .kanban-cards-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            flex: 1;
+            overflow-y: auto;
+            max-height: 650px;
+            padding: 2px;
+        }
+
+        .kanban-card {
+            background: white;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+            cursor: pointer;
+            transition: all 0.2s;
+            position: relative;
+            border-left: 4px solid var(--primary);
+        }
+
+        .kanban-card:hover {
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.09);
+            transform: translateY(-2px);
+        }
+
+        .kanban-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .kanban-card-title {
+            font-weight: 600;
+            font-size: 0.88em;
+            color: var(--text-color);
+            margin: 0 0 6px;
+            line-height: 1.35;
+        }
+
+        .kanban-card-meta {
+            font-size: 0.78em;
+            color: var(--text-muted);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 8px;
+            padding-top: 6px;
+            border-top: 1px dashed #e2e8f0;
+        }
+
+        /* MODAL DE GESTIÓN DE TICKET */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.65);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            padding: 16px;
+            backdrop-filter: blur(4px);
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 14px;
+            width: 100%;
+            max-width: 900px;
+            max-height: 92vh;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.35);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid var(--accent);
+        }
+
+        .modal-body {
+            padding: 20px 24px;
+            overflow-y: auto;
+            flex: 1;
+        }
+
+        .modal-footer {
+            padding: 14px 24px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .btn-close-modal {
+            background: transparent;
+            border: none;
+            color: white;
+            font-size: 1.4em;
+            cursor: pointer;
+            line-height: 1;
+            opacity: 0.8;
+        }
+
+        .btn-close-modal:hover {
+            opacity: 1;
+        }
+
+        /* BITÁCORA / SEGUIMIENTO EN MODAL */
+        .timeline-box {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-top: 10px;
+        }
+
+        .timeline-item {
+            display: flex;
+            gap: 12px;
+            background: #f8fafc;
+            border-left: 3px solid var(--primary);
+            padding: 10px 14px;
+            border-radius: 0 8px 8px 0;
+            font-size: 0.86em;
+        }
+
+        .timeline-item.internal {
+            background: #fffbeb;
+            border-left-color: #f59e0b;
+        }
+
+        /* TOAST NOTIFICACIONES */
+        #toastContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast-msg {
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            animation: slideInToast 0.3s ease;
+        }
+
+        .toast-success {
+            background: #10b981;
+        }
+
+        .toast-error {
+            background: #ef4444;
+        }
+
+        .toast-info {
+            background: #0284c7;
+        }
+
+        .toast-warning {
+            background: #f59e0b;
+        }
+
+        @keyframes slideInToast {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 16px;
+            }
+
+            .kpi-container {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .tabs-bar {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Barra de Navegación Superior Unificada -->
+    <div class="top-navbar">
+        <div class="nav-left-group">
+            <a href="../index.html" class="btn-nav btn-nav-back">
+                <span>←</span> Volver al Menú Principal
+            </a>
+            <span class="portal-badge">🎧 Mesa de Ayuda — Informática TI</span>
+            <a href="reporte_tecnico.html" class="btn-nav" style="background-color: #002147; color: white; border: 1px solid rgba(255,255,255,0.3);">
+                <span>🛠️</span> Reportes Técnicos
+            </a>
+            <a href="memorandums.html" class="btn-nav" style="background-color: #0284c7; color: white;">
+                <span>📑</span> Memorándums
+            </a>
+        </div>
+        <div class="nav-right-group">
+            <span id="badgeCurrentUser" class="portal-user-badge">
+                <span class="user-status-dot"></span>
+                <span id="navUserName">👤 Personal TI</span>
+            </span>
+            <span id="badgeCurrentDate" class="portal-date-badge"></span>
+        </div>
+    </div>
+
+    <div class="main-container" id="mesaAyudaMainContainer">
+
+        <!-- HEADER INSTITUCIONAL -->
+        <header class="header">
+            <div class="header-title-box">
+                <img src="../assets/logo.png" alt="Logo ENAG" class="header-logo"
+                    onerror="this.src='../assets/logo.jpeg'">
+                <div>
+                    <h1>🎧 Mesa de Ayuda TI (Helpdesk ENAG)</h1>
+                    <p id="subtituloMesaAyuda">Empresa Nacional de Artes Gráficas | Departamento de Informática — Soporte y Gestión de
+                        Incidencias</p>
+                    <div id="badgeRolMesaAyuda" style="display:inline-flex; align-items:center; gap:6px; margin-top:6px; padding:4px 12px; border-radius:20px; font-size:0.78em; font-weight:700; background:rgba(255,255,255,0.16); color:#f8fafc; border:1px solid rgba(255,255,255,0.3);">
+                        🔒 Verificando credenciales de TI...
+                    </div>
+                </div>
+            </div>
+            <div class="header-actions">
+                <a href="../index.html" class="btn-nav-header" title="Volver al Panel Principal">
+                    <span>⬅️</span> Menú Principal
+                </a>
+                <a href="reporte_tecnico.html" class="btn-nav-header" title="Ir al generador de Reportes Técnicos">
+                    <span>🛠️</span> Reportes Técnicos
+                </a>
+                <a href="memorandums.html" class="btn-nav-header" title="Ir al generador de Memorándums">
+                    <span>📑</span> Memorándums
+                </a>
+                <button type="button" id="btnHeaderNuevoTicket" class="btn-accent-header" onclick="abrirNuevoTicketModal()">
+                    <span>➕</span> Nuevo Ticket
+                </button>
+            </div>
+        </header>
+
+        <!-- BARRA DE PESTAÑAS (VISTAS PRINCIPALES) -->
+        <nav class="tabs-bar">
+            <div class="nav-tabs">
+                <button type="button" class="tab-btn active" id="tabBtnSolicitante" onclick="cambiarVistaTab('portal')">
+                    <span>👤</span> Portal del Solicitante
+                </button>
+                <button type="button" class="tab-btn" id="tabBtnBandeja" onclick="cambiarVistaTab('bandeja')">
+                    <span>📋</span> Bandeja TI (Tabla)
+                </button>
+                <button type="button" class="tab-btn" id="tabBtnKanban" onclick="cambiarVistaTab('kanban')">
+                    <span>📊</span> Tablero Kanban (GLPI)
+                </button>
+                <button type="button" class="tab-btn" id="tabBtnMetricas" onclick="cambiarVistaTab('metricas')">
+                    <span>📈</span> Indicadores y Métricas
+                </button>
+            </div>
+
+            <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="syncIndicator" style="font-size: 0.82em; color: var(--text-muted); font-weight: 600;">🟢 En
+                    línea (Sincronizado)</span>
+                <button type="button" class="btn-action btn-secondary" onclick="recargarTickets()"
+                    style="padding: 6px 12px; font-size: 0.82em;">
+                    <span>🔄</span> Refrescar
+                </button>
+            </div>
+        </nav>
+
+        <!-- KPI / METRICAS RÁPIDAS -->
+        <div class="kpi-container" id="kpiContainerGrid">
+            <div class="kpi-card" id="kpiCardTotal" style="border-left: 4px solid var(--primary);">
+                <div class="kpi-info">
+                    <h4 id="lblKpiTotal">Total Registrados</h4>
+                    <div class="kpi-num" id="kpiTotal">0</div>
+                </div>
+                <div class="kpi-icon">🎫</div>
+            </div>
+            <div class="kpi-card" id="kpiCardNuevos" style="border-left: 4px solid var(--info);">
+                <div class="kpi-info">
+                    <h4>Nuevos / Sin Asignar</h4>
+                    <div class="kpi-num" id="kpiNuevos" style="color: var(--info);">0</div>
+                </div>
+                <div class="kpi-icon">🆕</div>
+            </div>
+            <div class="kpi-card" id="kpiCardAsignados" style="border-left: 4px solid var(--purple);">
+                <div class="kpi-info">
+                    <h4>Asignados</h4>
+                    <div class="kpi-num" id="kpiAsignados" style="color: var(--purple);">0</div>
+                </div>
+                <div class="kpi-icon">👤</div>
+            </div>
+            <div class="kpi-card" id="kpiCardEnProceso" style="border-left: 4px solid var(--warning);">
+                <div class="kpi-info">
+                    <h4>En Proceso / Espera</h4>
+                    <div class="kpi-num" id="kpiEnProceso" style="color: var(--warning);">0</div>
+                </div>
+                <div class="kpi-icon">⚙️</div>
+            </div>
+            <div class="kpi-card" id="kpiCardResueltos" style="border-left: 4px solid var(--success);">
+                <div class="kpi-info">
+                    <h4>Resueltos / Cerrados</h4>
+                    <div class="kpi-num" id="kpiResueltos" style="color: var(--success);">0</div>
+                </div>
+                <div class="kpi-icon">✅</div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- 1. VISTA: PORTAL DEL SOLICITANTE / CREACIÓN DE TICKET           -->
+        <!-- ============================================================== -->
+        <div id="tabContentPortal" class="tab-content active">
+            <div class="form-grid" style="grid-template-columns: 1.15fr 0.85fr; align-items: start;">
+
+                <!-- FORMULARIO DE REPORTE DE INCIDENCIA -->
+                <div class="form-card">
+                    <h3 class="form-card-title">
+                        <span>📝 Reportar Falla o Requerimiento Técnico</span>
+                        <span id="lblCorrelativoSiguiente"
+                            style="font-size: 0.82em; color: var(--primary); font-family: monospace; background: #e0f2fe; padding: 4px 8px; border-radius: 6px;">TICK-2026-001</span>
+                    </h3>
+
+                    <form id="formNuevoTicket" onsubmit="guardarNuevoTicket(event)">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="inputSolicitanteNombre">👤 Nombre del Solicitante *</label>
+                                <input type="text" id="inputSolicitanteNombre" class="form-control"
+                                    placeholder="Nombre completo del empleado" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="selectSolicitanteDepto">🏢 Departamento / Área *</label>
+                                <select id="selectSolicitanteDepto" class="form-control" required>
+                                    <option value="" disabled selected>Seleccione un departamento...</option>
+                                    <option value="Dirección General">Dirección General</option>
+                                    <option value="Sub-Gerencia Administrativa">Sub-Gerencia Administrativa</option>
+                                    <option value="Recursos Humanos">Recursos Humanos</option>
+                                    <option value="Contabilidad">Contabilidad</option>
+                                    <option value="Presupuesto">Presupuesto</option>
+                                    <option value="Tesorería">Tesorería</option>
+                                    <option value="Compras y Suministros">Compras y Suministros</option>
+                                    <option value="Comercialización y Ventas">Comercialización y Ventas</option>
+                                    <option value="Bienes Nacionales">Bienes Nacionales</option>
+                                    <option value="Informática / TI">Informática / TI</option>
+                                    <option value="Producción / Talleres">Producción / Talleres Gráficos</option>
+                                    <option value="Pre-Prensa y Diseño">Pre-Prensa y Diseño</option>
+                                    <option value="Prensa Plana / Rotativas">Prensa Plana / Rotativas</option>
+                                    <option value="Encuadernación">Encuadernación</option>
+                                    <option value="Almacén General">Almacén General</option>
+                                    <option value="Archivo y Gaceta">Archivo y Gaceta</option>
+                                    <option value="Auditoría Interna">Auditoría Interna</option>
+                                    <option value="Asesoría Legal">Asesoría Legal</option>
+                                    <option value="Secretaría General">Secretaría General</option>
+                                    <option value="Transporte y Mantenimiento">Transporte y Mantenimiento</option>
+                                    <option value="Otro">Otro Departamento / Área</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="margin-top: 14px;">
+                            <div class="form-group">
+                                <label for="inputUbicacion">📍 Ubicación / Oficina / Extensión</label>
+                                <input type="text" id="inputUbicacion" class="form-control"
+                                    placeholder="Ej. Edificio Principal, 2do piso, Ext. 104">
+                            </div>
+                            <div class="form-group">
+                                <label for="selectCategoria">🏷️ Tipo de Requerimiento / Categoría *</label>
+                                <select id="selectCategoria" class="form-control" required>
+                                    <option value="Hardware / Computadoras">💻 Hardware / Computadoras (PC, monitor,
+                                        teclado)</option>
+                                    <option value="Conectividad y Redes">🌐 Red e Internet (Sin conexión, cable, Wi-Fi)
+                                    </option>
+                                    <option value="Impresoras y Escáneres">🖨️ Impresoras y Periféricos (Tóner, atascos,
+                                        red)</option>
+                                    <option value="Software y Sistemas">⚙️ Software / Sistemas (Partida contable,
+                                        correo,
+                                        Office)</option>
+                                    <option value="Talleres de Producción">🏭 Equipos de Artes Gráficas (RIP, CTP,
+                                        diseño)</option>
+                                    <option value="Cuentas y Accesos">🔐 Usuarios, Contraseñas y Accesos</option>
+                                    <option value="Asistencia General">💡 Asistencia Técnica General</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="form-grid" style="margin-top: 14px;">
+                            <div class="form-group">
+                                <label for="selectPrioridad">⚡ Prioridad Solicitada *</label>
+                                <select id="selectPrioridad" class="form-control" required>
+                                    <option value="Baja">🟢 Baja (No detiene el trabajo diario)</option>
+                                    <option value="Media" selected>🟡 Media (Afecta parcialmente una tarea)</option>
+                                    <option value="Alta">🟠 Alta (Puesto de trabajo completamente detenido)</option>
+                                    <option value="Urgente">🔴 Urgente (Servicio crítico o área paralizada)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inputEquipoReferencia">🖥️ Equipo / Dispositivo Afectado (Opcional)</label>
+                                <input type="text" id="inputEquipoReferencia" class="form-control"
+                                    placeholder="Ej. PC de escritorio Dell, Impresora HP LaserJet, Laptop Lenovo">
+                            </div>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 14px;">
+                            <label for="inputAsunto">📌 Asunto Breve de la Falla *</label>
+                            <input type="text" id="inputAsunto" class="form-control"
+                                placeholder="Ej. Computadora no enciende tras tormenta eléctrica" required>
+                        </div>
+
+                        <div class="form-group" style="margin-top: 14px;">
+                            <label for="textareaDescripcion">📝 Descripción Detallada del Problema *</label>
+                            <textarea id="textareaDescripcion" class="form-control" rows="3"
+                                placeholder="Describa qué ocurrió, mensajes de error observados o desde cuándo se presenta la falla..."
+                                required></textarea>
+                        </div>
+
+                        <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px;">
+                            <button type="reset" class="btn-action btn-secondary">
+                                <span>🧹</span> Limpiar
+                            </button>
+                            <button type="submit" class="btn-action btn-primary">
+                                <span>🚀</span> Registrar Ticket de Soporte
+                            </button>
+                        </div>
+                    </form>
+                </div>
+
+                <!-- CONSULTA Y SEGUIMIENTO PARA EL USUARIO -->
+                <div>
+                    <div class="form-card" style="border-top: 4px solid var(--accent);">
+                        <h3 class="form-card-title">
+                            <span>🔍 Consultar Mis Solicitudes</span>
+                        </h3>
+                        <p style="font-size: 0.86em; color: var(--text-muted); margin-top: 0;">Ingrese su nombre o el
+                            código de su ticket para verificar el estado de atención en tiempo real.</p>
+                        <div class="search-box" style="margin-bottom: 14px;">
+                            <input type="text" id="inputBuscarMiTicket"
+                                placeholder="Buscar por código (TICK-...) o su nombre..."
+                                oninput="filtrarTicketsSolicitante()">
+                        </div>
+
+                        <div id="listaMisTickets"
+                            style="display: flex; flex-direction: column; gap: 10px; max-height: 480px; overflow-y: auto;">
+                            <!-- Se llena dinámicamente -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- 2. VISTA: BANDEJA DE INFORMÁTICA (TABLA DE CONTROL TI)          -->
+        <!-- ============================================================== -->
+        <div id="tabContentBandeja" class="tab-content">
+
+            <!-- BARRA DE FILTROS -->
+            <div class="filters-bar">
+                <div class="search-box">
+                    <input type="text" id="inputFiltroTexto"
+                        placeholder="Buscar por código, solicitante, departamento o asunto..."
+                        oninput="aplicarFiltrosTabla()">
+                </div>
+
+                <div class="form-group" style="min-width: 150px;" id="groupFiltroEstado">
+                    <select id="filtroEstado" class="form-control" onchange="aplicarFiltrosTabla()"
+                        style="padding: 8px 10px;">
+                        <option value="TODOS">Todos los Estados</option>
+                        <option value="Nuevo" id="optFiltroEstadoNuevo">Nuevos</option>
+                        <option value="Asignado">Asignados</option>
+                        <option value="En Proceso">En Proceso</option>
+                        <option value="En Espera">En Espera</option>
+                        <option value="Resuelto">Resueltos</option>
+                        <option value="Cerrado">Cerrados</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="min-width: 150px;" id="groupFiltroPrioridad">
+                    <select id="filtroPrioridad" class="form-control" onchange="aplicarFiltrosTabla()"
+                        style="padding: 8px 10px;">
+                        <option value="TODAS">Todas las Prioridades</option>
+                        <option value="Urgente">Urgente</option>
+                        <option value="Alta">Alta</option>
+                        <option value="Media">Media</option>
+                        <option value="Baja">Baja</option>
+                    </select>
+                </div>
+
+                <div class="form-group" style="min-width: 190px;" id="groupFiltroTecnico">
+                    <select id="filtroTecnico" class="form-control" onchange="aplicarFiltrosTabla()"
+                        style="padding: 8px 10px;">
+                        <option value="TODOS">Todos los Técnicos TI</option>
+                        <option value="Sin asignar">Sin Asignar</option>
+                    </select>
+                </div>
+
+                <div style="display: flex; gap: 8px; margin-left: auto;">
+                    <button type="button" class="btn-action btn-secondary" onclick="exportarTicketsCSV()"
+                        title="Exportar a archivo Excel / CSV">
+                        <span>📊</span> Exportar
+                    </button>
+                    <button type="button" id="btnTablaNuevoTicket" class="btn-action btn-primary" onclick="abrirNuevoTicketModal()">
+                        <span>➕</span> Nuevo
+                    </button>
+                </div>
+            </div>
+
+            <!-- TABLA DE TICKETS -->
+            <div class="table-responsive">
+                <table class="tickets-table">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Fecha</th>
+                            <th>Solicitante & Depto</th>
+                            <th>Asunto & Categoría</th>
+                            <th>Prioridad</th>
+                            <th>Técnico</th>
+                            <th>Estado</th>
+                            <th style="text-align: right;">Acciones</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tbodyTickets">
+                        <!-- Llenado dinámico -->
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="sinTicketsMsg"
+                style="display:none; text-align: center; padding: 40px 20px; color: var(--text-muted);">
+                <div style="font-size: 3em; margin-bottom: 8px;">📂</div>
+                <div style="font-weight: 600; font-size: 1.1em;">No se encontraron tickets registrados con los filtros
+                    seleccionados.</div>
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- 3. VISTA: TABLERO KANBAN ESTILO GLPI / SERVICE DESK             -->
+        <!-- ============================================================== -->
+        <div id="tabContentKanban" class="tab-content">
+            <div class="kanban-board">
+
+                <!-- COLUMNA: NUEVO -->
+                <div class="kanban-column" id="kanbanColNuevo">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">📥 NUEVOS</span>
+                        <span class="badge-status status-nuevo" id="countKanbanNuevo">0</span>
+                    </div>
+                    <div class="kanban-cards-container" id="cardsNuevo">
+                        <!-- Tarjetas -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA: ASIGNADO -->
+                <div class="kanban-column" id="kanbanColAsignado">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">👤 ASIGNADOS</span>
+                        <span class="badge-status status-asignado" id="countKanbanAsignado">0</span>
+                    </div>
+                    <div class="kanban-cards-container" id="cardsAsignado">
+                        <!-- Tarjetas -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA: EN PROCESO -->
+                <div class="kanban-column" id="kanbanColProceso">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">⚙️ EN PROCESO</span>
+                        <span class="badge-status status-en_proceso" id="countKanbanProceso">0</span>
+                    </div>
+                    <div class="kanban-cards-container" id="cardsProceso">
+                        <!-- Tarjetas -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA: EN ESPERA -->
+                <div class="kanban-column" id="kanbanColEspera">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">⏸️ EN ESPERA</span>
+                        <span class="badge-status status-en_espera" id="countKanbanEspera">0</span>
+                    </div>
+                    <div class="kanban-cards-container" id="cardsEspera">
+                        <!-- Tarjetas -->
+                    </div>
+                </div>
+
+                <!-- COLUMNA: RESUELTO / CERRADO -->
+                <div class="kanban-column" id="kanbanColResuelto">
+                    <div class="kanban-column-header">
+                        <span class="kanban-column-title">✅ RESUELTOS</span>
+                        <span class="badge-status status-resuelto" id="countKanbanResuelto">0</span>
+                    </div>
+                    <div class="kanban-cards-container" id="cardsResuelto">
+                        <!-- Tarjetas -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- ============================================================== -->
+        <!-- 4. VISTA: INDICADORES Y MÉTRICAS DE SOPORTE                     -->
+        <!-- ============================================================== -->
+        <div id="tabContentMetricas" class="tab-content">
+            <div class="form-grid" style="grid-template-columns: 1fr 1fr;">
+
+                <div class="form-card">
+                    <h3 class="form-card-title">📊 Incidencias por Departamento</h3>
+                    <div id="metricasPorDepto" style="display:flex; flex-direction:column; gap:8px;">
+                        <!-- Llenado dinámico -->
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3 class="form-card-title">🏷️ Requerimientos por Categoría</h3>
+                    <div id="metricasPorCategoria" style="display:flex; flex-direction:column; gap:8px;">
+                        <!-- Llenado dinámico -->
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3 class="form-card-title">👨‍💻 Carga por Técnico de Informática</h3>
+                    <div id="metricasPorTecnico" style="display:flex; flex-direction:column; gap:8px;">
+                        <!-- Llenado dinámico -->
+                    </div>
+                </div>
+
+                <div class="form-card">
+                    <h3 class="form-card-title">⚡ Desglose por Nivel de Prioridad</h3>
+                    <div id="metricasPorPrioridad" style="display:flex; flex-direction:column; gap:8px;">
+                        <!-- Llenado dinámico -->
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- ============================================================== -->
+    <!-- MODAL DE GESTIÓN INTEGRAL DEL TICKET (DETALLES & SEGUIMIENTO)   -->
+    <!-- ============================================================== -->
+    <div id="modalGestionTicket" class="modal-overlay">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div>
+                    <h3 id="modalTicketCodigo"
+                        style="margin:0; font-size: 1.25em; display:flex; align-items:center; gap:8px;">
+                        <span>🎫</span> TICK-2026-000
+                    </h3>
+                    <div id="modalTicketMeta" style="font-size:0.82em; opacity:0.9; margin-top:2px;">Apertura: -</div>
+                </div>
+                <button type="button" class="btn-close-modal" onclick="cerrarModalGestion()">&times;</button>
+            </div>
+
+            <div class="modal-body">
+                <div class="form-grid" style="grid-template-columns: 1.1fr 0.9fr; gap: 20px;">
+
+                    <!-- COLUMNA IZQUIERDA: DETALLES DE LA SOLICITUD -->
+                    <div>
+                        <div class="form-card" style="margin-bottom: 14px; padding: 16px;">
+                            <h4 style="margin: 0 0 10px; color: var(--primary); font-size: 0.95em;">📋 Información del
+                                Solicitante</h4>
+                            <div style="font-size: 0.88em; display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+                                <div><strong>Solicitante:</strong> <span id="dtlSolicitante">-</span></div>
+                                <div><strong>Departamento:</strong> <span id="dtlDepto">-</span></div>
+                                <div><strong>Ubicación:</strong> <span id="dtlUbicacion">-</span></div>
+                                <div><strong>Categoría:</strong> <span id="dtlCategoria">-</span></div>
+                            </div>
+                            <div style="margin-top: 8px; font-size: 0.88em;">
+                                <strong>Equipo de Referencia:</strong> <span id="dtlEquipo">-</span>
+                            </div>
+                        </div>
+
+                        <div class="form-card" style="margin-bottom: 14px; padding: 16px;">
+                            <h4 style="margin: 0 0 8px; color: var(--primary); font-size: 0.95em;">📌 Asunto</h4>
+                            <div id="dtlAsunto"
+                                style="font-size: 0.92em; font-weight: 600; color: #1e293b; margin-bottom: 10px;"></div>
+
+                            <h4 style="margin: 0 0 8px; color: var(--primary); font-size: 0.95em;">📝 Descripción del
+                                Problema</h4>
+                            <div id="dtlDescripcion"
+                                style="font-size: 0.88em; background: #f8fafc; padding: 10px; border-radius: 6px; border: 1px solid #e2e8f0; white-space: pre-wrap; line-height: 1.45;">
+                            </div>
+                        </div>
+
+                        <!-- SOLUCIÓN TÉCNICA -->
+                        <div class="form-card" style="padding: 16px;">
+                            <h4 style="margin: 0 0 10px; color: var(--success); font-size: 0.95em;">🛠️ Diagnóstico y
+                                Solución Aplicada</h4>
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label for="modalDiagnostico">Diagnóstico Técnico:</label>
+                                <textarea id="modalDiagnostico" class="form-control" rows="2"
+                                    placeholder="Causa raíz identificada por el técnico..."></textarea>
+                            </div>
+                            <div class="form-group">
+                                <label for="modalSolucion">Solución / Procedimiento Realizado:</label>
+                                <textarea id="modalSolucion" class="form-control" rows="2"
+                                    placeholder="Acciones realizadas para resolver la incidencia..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COLUMNA DERECHA: CONTROL TI & BITÁCORA -->
+                    <div>
+                        <div class="form-card" style="margin-bottom: 14px; padding: 16px; background: #f8fafc;">
+                            <h4 style="margin: 0 0 12px; color: var(--primary); font-size: 0.95em;">⚙️ Control y
+                                Asignación TI</h4>
+
+                            <div class="form-group" style="margin-bottom: 10px;">
+                                <label for="modalSelectTecnico">👨‍💻 Técnico Responsable:</label>
+                                <select id="modalSelectTecnico" class="form-control">
+                                    <option value="Sin asignar">Sin asignar</option>
+                                </select>
+                                <div id="msgBloqueoAsignacion" style="display:none; font-size:0.76em; color:#64748b; margin-top:4px; font-weight:600;">
+                                    🔒 Solo el Administrador General de TI puede asignar o reasignar técnicos.
+                                </div>
+                            </div>
+
+                            <div class="form-grid" style="grid-template-columns: 1fr 1fr; gap: 10px;">
+                                <div class="form-group">
+                                    <label for="modalSelectEstado">Estado:</label>
+                                    <select id="modalSelectEstado" class="form-control">
+                                        <option value="Nuevo" id="optModalEstadoNuevo">Nuevo</option>
+                                        <option value="Asignado">Asignado</option>
+                                        <option value="En Proceso">En Proceso</option>
+                                        <option value="En Espera">En Espera</option>
+                                        <option value="Resuelto">Resuelto</option>
+                                        <option value="Cerrado">Cerrado</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="modalSelectPrioridad">Prioridad TI:</label>
+                                    <select id="modalSelectPrioridad" class="form-control">
+                                        <option value="Baja">Baja</option>
+                                        <option value="Media">Media</option>
+                                        <option value="Alta">Alta</option>
+                                        <option value="Urgente">Urgente</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- BITÁCORA / SEGUIMIENTO CRONOLÓGICO -->
+                        <div class="form-card" style="padding: 16px;">
+                            <h4 style="margin: 0 0 10px; color: var(--primary); font-size: 0.95em;">🔄 Seguimiento y
+                                Notas Técnicas</h4>
+
+                            <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+                                <input type="text" id="modalInputNuevaNota" class="form-control"
+                                    placeholder="Agregar nota de avance o respuesta...">
+                                <button type="button" class="btn-action btn-primary" onclick="agregarNotaSeguimiento()"
+                                    style="padding: 8px 12px; font-size: 0.85em;">
+                                    <span>➕</span>
+                                </button>
+                            </div>
+
+                            <div id="modalTimelineNotas" class="timeline-box"
+                                style="max-height: 220px; overflow-y: auto;">
+                                <!-- Eventos -->
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                    <button type="button" class="btn-action btn-secondary" onclick="imprimirBoletaSoporte()"
+                        title="Imprimir constancia o boleta de servicio en PDF">
+                        <span>🖨️</span> Boleta de Soporte
+                    </button>
+                    <button type="button" class="btn-action" style="background:#0284c7; color:white;"
+                        onclick="derivarAReporteTecnico()"
+                        title="Transferir datos para crear un Reporte Técnico Oficial (RT)">
+                        <span>🛠️</span> Pasar a Reporte Técnico (RT)
+                    </button>
+                </div>
+
+                <div style="display:flex; gap:8px;">
+                    <button type="button" class="btn-action btn-secondary" onclick="cerrarModalGestion()">
+                        Cancelar
+                    </button>
+                    <button type="button" class="btn-action btn-success" onclick="guardarCambiosGestionTicket()">
+                        <span>💾</span> Guardar Cambios
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- CONTENEDOR DE TOASTS -->
+    <div id="toastContainer"></div>
+
+    <!-- SCRIPTS: FIREBASE COMPAT & HERRAMIENTAS -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <!-- jsPDF para impresión de Boletas de Soporte -->
+    <script src="../js/jspdf.umd.min.js"></script>
+    <script>
+        if (typeof window.jspdf === 'undefined') {
+            document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
+        }
+    </script>
+
+    <!-- LÓGICA PRINCIPAL DEL HELPDESK (GLPI ENAG) -->
+    <script>
+        // ESTADO GLOBAL DE TICKETS Y PERMISOS TI
+        let ticketsData = [];
+        let ticketSeleccionado = null;
+        let unsubscribeFirestore = null;
+        let unsubscribeTecnicos = null;
+        let tecnicosDisponibles = [];
+
+        // CONTROL DE ROL Y USUARIO ACTUAL
+        let esAdminTI = false; // Solo Steven Gonzales (steven.gonzales / maygonza.cs@gmail.com)
+        let usuarioActual = {
+            uid: '',
+            nombre: '',
+            usuario: '',
+            correo: '',
+            departamento: ''
+        };
+
+        // INICIALIZACIÓN CON VERIFICACIÓN ESTRICTA DE ACCESO TI
+        document.addEventListener('DOMContentLoaded', () => {
+            verificarAccesoYPapelTI();
+        });
+
+        function verificarAccesoYPapelTI() {
+            if (typeof firebase === 'undefined' || !firebase.auth) {
+                cargarTicketsLocalStorage();
+                sugerirSiguienteCodigoTicket();
+                conectarFirebaseTickets();
+                return;
+            }
+
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+
+                try {
+                    const doc = await dbFirestore.collection('usuarios').doc(user.uid).get();
+                    if (!doc.exists) {
+                        denegarAccesoMesaAyuda('Su cuenta no cuenta con un perfil registrado en el sistema.');
+                        return;
+                    }
+
+                    const data = doc.data();
+                    const dep = (data.departamento || '').toLowerCase().trim();
+                    const email = (user.email || data.correo || '').toLowerCase().trim();
+                    const uname = (data.usuario || '').toLowerCase().trim();
+
+                    // Super Administrador de TI: únicamente Steven Gonzales Castillo
+                    esAdminTI = (
+                        email === 'maygonza.cs@gmail.com' ||
+                        uname === 'steven.gonzales' ||
+                        user.uid === 'GQKNVr7eh2R2AdoyKwgp8q7Mkhx2'
+                    );
+
+                    // Personal de TI: departamento 'ti' o Super Admin TI
+                    const esPersonalTI = esAdminTI || dep === 'ti' || dep === 'informática / ti' || dep === 'informatica / ti';
+
+                    if (!esPersonalTI) {
+                        denegarAccesoMesaAyuda('La Mesa de Ayuda es de acceso exclusivo para el personal del Departamento de Informática (TI).');
+                        return;
+                    }
+
+                    usuarioActual = {
+                        uid: user.uid,
+                        nombre: (data.nombre || data.usuario || user.email || 'Técnico TI').trim(),
+                        usuario: (data.usuario || '').trim(),
+                        correo: email,
+                        departamento: dep
+                    };
+
+                    // Configurar interfaz según rol (Admin TI vs Técnico TI)
+                    configurarInterfazPorRol();
+
+                    // Cargar técnicos registrados en el departamento de TI dinámicamente
+                    cargarTecnicosRegistradosTI();
+
+                    // Cargar tickets y conectar con Firestore
+                    cargarTicketsLocalStorage();
+                    sugerirSiguienteCodigoTicket();
+                    conectarFirebaseTickets();
+                    filtrarTicketsSolicitante();
+
+                } catch (err) {
+                    console.error('Error verificando permisos en Mesa de Ayuda:', err);
+                }
+            });
+        }
+
+        function denegarAccesoMesaAyuda(mensaje) {
+            alert('⛔ ACCESO RESTRINGIDO\n\n' + mensaje);
+            window.location.href = '../index.html';
+        }
+
+        function configurarInterfazPorRol() {
+            const badgeRol = document.getElementById('badgeRolMesaAyuda');
+            const selectTecModal = document.getElementById('modalSelectTecnico');
+            const selectPrioModal = document.getElementById('modalSelectPrioridad');
+            const msgBloqueo = document.getElementById('msgBloqueoAsignacion');
+
+            if (esAdminTI) {
+                // SUPER ADMIN TI (steven.gonzales): Acceso a todas las funciones y asignación de técnicos
+                if (badgeRol) {
+                    badgeRol.innerHTML = `👑 Administrador General TI (${usuarioActual.nombre}) — Control Total y Asignación de Técnicos`;
+                    badgeRol.style.background = 'rgba(212, 175, 55, 0.25)';
+                    badgeRol.style.borderColor = '#d4af37';
+                    badgeRol.style.color = '#fef08a';
+                }
+                if (selectTecModal) selectTecModal.disabled = false;
+                if (selectPrioModal) selectPrioModal.disabled = false;
+                if (msgBloqueo) msgBloqueo.style.display = 'none';
+            } else {
+                // TÉCNICO TI REGULAR: Solo ve sus tickets asignados y NO puede asignar técnicos
+                if (badgeRol) {
+                    badgeRol.innerHTML = `👨‍💻 Técnico TI (${usuarioActual.nombre}) — Vista Exclusiva: Mis Tickets Asignados`;
+                    badgeRol.style.background = 'rgba(16, 185, 129, 0.22)';
+                    badgeRol.style.borderColor = '#10b981';
+                    badgeRol.style.color = '#d1fae5';
+                }
+
+                // Ocultar pestañas de Portal General y Métricas Globales
+                const tabPortal = document.getElementById('tabBtnSolicitante');
+                const tabMetricas = document.getElementById('tabBtnMetricas');
+                const tabBandeja = document.getElementById('tabBtnBandeja');
+                const tabKanban = document.getElementById('tabBtnKanban');
+
+                if (tabPortal) tabPortal.style.display = 'none';
+                if (tabMetricas) tabMetricas.style.display = 'none';
+                if (tabBandeja) tabBandeja.innerHTML = '<span>📋</span> Mis Tickets Asignados';
+                if (tabKanban) tabKanban.innerHTML = '<span>📊</span> Mi Tablero Kanban';
+
+                // Ocultar botones de crear nuevo ticket y filtro de otros técnicos
+                const btnHeaderNuevo = document.getElementById('btnHeaderNuevoTicket');
+                const btnTablaNuevo = document.getElementById('btnTablaNuevoTicket');
+                const groupFiltroTec = document.getElementById('groupFiltroTecnico');
+                const kpiCardNuevos = document.getElementById('kpiCardNuevos');
+                const kanbanColNuevo = document.getElementById('kanbanColNuevo');
+                const lblKpiTotal = document.getElementById('lblKpiTotal');
+                const optFiltroNuevo = document.getElementById('optFiltroEstadoNuevo');
+                const optModalNuevo = document.getElementById('optModalEstadoNuevo');
+
+                if (btnHeaderNuevo) btnHeaderNuevo.style.display = 'none';
+                if (btnTablaNuevo) btnTablaNuevo.style.display = 'none';
+                if (groupFiltroTec) groupFiltroTec.style.display = 'none';
+                if (kpiCardNuevos) kpiCardNuevos.style.display = 'none';
+                if (kanbanColNuevo) kanbanColNuevo.style.display = 'none';
+                if (lblKpiTotal) lblKpiTotal.textContent = 'Total Asignados a Mí';
+                if (optFiltroNuevo) optFiltroNuevo.style.display = 'none';
+                if (optModalNuevo) optModalNuevo.style.display = 'none';
+
+                // Bloquear selector de asignación de técnico y prioridad en el modal
+                if (selectTecModal) selectTecModal.disabled = true;
+                if (selectPrioModal) selectPrioModal.disabled = true;
+                if (msgBloqueo) msgBloqueo.style.display = 'block';
+
+                // Ir directamente a la bandeja de sus tickets asignados
+                cambiarVistaTab('bandeja');
+            }
+        }
+
+        // CARGAR TÉCNICOS DISPONIBLES DINÁMICAMENTE DESDE USUARIOS REGISTRADOS EN TI
+        function cargarTecnicosRegistradosTI() {
+            if (typeof dbFirestore === 'undefined' || !dbFirestore) return;
+
+            if (unsubscribeTecnicos) unsubscribeTecnicos();
+
+            unsubscribeTecnicos = dbFirestore.collection('usuarios')
+                .where('departamento', '==', 'ti')
+                .onSnapshot((snapshot) => {
+                    const lista = [];
+                    snapshot.forEach((doc) => {
+                        const d = doc.data();
+                        const nombre = (d.nombre || d.usuario || '').trim();
+                        // Excluir explícitamente a Rony Oseguera (pertenece a Bienes Nacionales, no a TI)
+                        if (nombre && !nombre.toLowerCase().includes('rony')) {
+                            lista.push({
+                                uid: doc.id,
+                                nombre: nombre,
+                                usuario: (d.usuario || '').trim(),
+                                correo: (d.correo || '').toLowerCase().trim()
+                            });
+                        }
+                    });
+
+                    // Ordenar alfabéticamente por nombre
+                    lista.sort((a, b) => a.nombre.localeCompare(b.nombre, 'es'));
+                    tecnicosDisponibles = lista;
+
+                    actualizarSelectoresTecnicos();
+                    renderizarTodo();
+                }, (err) => {
+                    console.warn('Error cargando técnicos de TI:', err);
+                });
+        }
+
+        function actualizarSelectoresTecnicos() {
+            const filtroSelect = document.getElementById('filtroTecnico');
+            const modalSelect = document.getElementById('modalSelectTecnico');
+
+            if (filtroSelect) {
+                const valorPrevio = filtroSelect.value || 'TODOS';
+                filtroSelect.innerHTML = `
+                    <option value="TODOS">Todos los Técnicos TI</option>
+                    <option value="Sin asignar">Sin Asignar</option>
+                `;
+                tecnicosDisponibles.forEach(tec => {
+                    const opt = document.createElement('option');
+                    opt.value = tec.nombre;
+                    opt.textContent = tec.nombre + (tec.usuario ? ` (${tec.usuario})` : '');
+                    filtroSelect.appendChild(opt);
+                });
+                if ([...filtroSelect.options].some(o => o.value === valorPrevio)) {
+                    filtroSelect.value = valorPrevio;
+                }
+            }
+
+            if (modalSelect) {
+                const valorModalPrevio = ticketSeleccionado ? (ticketSeleccionado.tecnicoAsignado || 'Sin asignar') : (modalSelect.value || 'Sin asignar');
+                modalSelect.innerHTML = `<option value="Sin asignar">Sin asignar</option>`;
+                tecnicosDisponibles.forEach(tec => {
+                    const opt = document.createElement('option');
+                    opt.value = tec.nombre;
+                    opt.dataset.uid = tec.uid;
+                    opt.dataset.usuario = tec.usuario;
+                    opt.textContent = `${tec.nombre}${tec.usuario ? ' (@' + tec.usuario + ')' : ''}`;
+                    modalSelect.appendChild(opt);
+                });
+                if ([...modalSelect.options].some(o => o.value === valorModalPrevio)) {
+                    modalSelect.value = valorModalPrevio;
+                } else if (valorModalPrevio && valorModalPrevio !== 'Sin asignar' && !valorModalPrevio.toLowerCase().includes('rony')) {
+                    const optExtra = document.createElement('option');
+                    optExtra.value = valorModalPrevio;
+                    optExtra.textContent = valorModalPrevio;
+                    modalSelect.appendChild(optExtra);
+                    modalSelect.value = valorModalPrevio;
+                }
+            }
+        }
+
+        // VERIFICAR SI UN TICKET ESTÁ ASIGNADO AL TÉCNICO LOGUEADO
+        function esTicketAsignadoAMi(ticket) {
+            if (!ticket) return false;
+            if (esAdminTI) return true; // Steven Gonzales tiene acceso total
+
+            const asig = (ticket.tecnicoAsignado || '').toLowerCase().trim();
+            if (!asig || asig === 'sin asignar' || asig.includes('rony')) return false;
+
+            // Comparar por UID o nombre de usuario si el ticket los tiene guardados
+            if (ticket.tecnicoUid && usuarioActual.uid && ticket.tecnicoUid === usuarioActual.uid) return true;
+            if (ticket.tecnicoUsuario && usuarioActual.usuario && ticket.tecnicoUsuario.toLowerCase() === usuarioActual.usuario.toLowerCase()) return true;
+
+            const miNombre = (usuarioActual.nombre || '').toLowerCase().trim();
+            const miUsuario = (usuarioActual.usuario || '').toLowerCase().trim();
+
+            if (miNombre && (asig === miNombre || asig.includes(miNombre) || miNombre.includes(asig))) return true;
+            if (miUsuario && asig === miUsuario) return true;
+
+            return false;
+        }
+
+        // OBTENER LISTA DE TICKETS VISIBLES SEGÚN EL ROL DEL USUARIO
+        function obtenerTicketsVisibles() {
+            // Limpiar cualquier referencia residual a Rony Oseguera
+            ticketsData.forEach(t => {
+                if (t.tecnicoAsignado && t.tecnicoAsignado.toLowerCase().includes('rony')) {
+                    t.tecnicoAsignado = 'Sin asignar';
+                }
+            });
+
+            if (esAdminTI) {
+                return ticketsData;
+            }
+            return ticketsData.filter(t => esTicketAsignadoAMi(t));
+        }
+
+        // 1. CONEXIÓN A FIRESTORE CON ESCUCHA EN TIEMPO REAL
+        function conectarFirebaseTickets() {
+            if (typeof dbFirestore === 'undefined' || !dbFirestore) {
+                console.warn("Firestore no disponible en este momento. Operando en modo local.");
+                actualizarIndicadorSync(false);
+                return;
+            }
+
+            try {
+                if (unsubscribeFirestore) unsubscribeFirestore();
+                // Escuchar cambios en la colección tickets_soporte
+                unsubscribeFirestore = dbFirestore.collection('tickets_soporte')
+                    .orderBy('fechaCreacion', 'desc')
+                    .onSnapshot((snapshot) => {
+                        const lista = [];
+                        snapshot.forEach((doc) => {
+                            const data = doc.data();
+                            if (data.tecnicoAsignado && data.tecnicoAsignado.toLowerCase().includes('rony')) {
+                                data.tecnicoAsignado = 'Sin asignar';
+                            }
+                            lista.push({ id: doc.id, ...data });
+                        });
+                        ticketsData = lista;
+                        guardarEnLocalStorage(lista);
+                        renderizarTodo();
+                        actualizarIndicadorSync(true);
+                    }, (error) => {
+                        console.error("Error al escuchar tickets de Firestore:", error);
+                        actualizarIndicadorSync(false);
+                        renderizarTodo();
+                    });
+            } catch (err) {
+                console.error("Excepción al conectar con Firestore:", err);
+                actualizarIndicadorSync(false);
+            }
+        }
+
+        function actualizarIndicadorSync(online) {
+            const el = document.getElementById('syncIndicator');
+            if (!el) return;
+            if (online) {
+                el.innerHTML = "🟢 En línea (Firestore en tiempo real)";
+                el.style.color = "#166534";
+            } else {
+                el.innerHTML = "🟡 Modo Local / Desconectado";
+                el.style.color = "#b45309";
+            }
+        }
+
+        // 2. PERSISTENCIA EN LOCALSTORAGE (CACHE & FALLBACK)
+        function guardarEnLocalStorage(lista) {
+            try {
+                localStorage.setItem('enag_tickets_soporte_cache', JSON.stringify(lista));
+            } catch (e) {
+                console.warn("No se pudo guardar en localStorage", e);
+            }
+        }
+
+        function cargarTicketsLocalStorage() {
+            try {
+                const guardado = localStorage.getItem('enag_tickets_soporte_cache');
+                if (guardado) {
+                    ticketsData = JSON.parse(guardado);
+                    renderizarTodo();
+                }
+            } catch (e) {
+                console.warn("Error cargando tickets de localStorage", e);
+            }
+        }
+
+        // 3. GENERACIÓN DE CORRELATIVO (TICK-2026-001)
+        function sugerirSiguienteCodigoTicket() {
+            const anioActual = new Date().getFullYear();
+            let maxNum = 0;
+
+            ticketsData.forEach(t => {
+                if (t.codigo) {
+                    const match = t.codigo.match(/TICK-(\d{4})-(\d+)/);
+                    if (match && parseInt(match[1], 10) === anioActual) {
+                        const n = parseInt(match[2], 10);
+                        if (n > maxNum) maxNum = n;
+                    }
+                }
+            });
+
+            const siguiente = `TICK-${anioActual}-${String(maxNum + 1).padStart(3, '0')}`;
+            const lbl = document.getElementById('lblCorrelativoSiguiente');
+            if (lbl) lbl.textContent = siguiente;
+            return siguiente;
+        }
+
+        // 4. GUARDAR NUEVO TICKET (DESDE EL FORMULARIO)
+        async function guardarNuevoTicket(e) {
+            e.preventDefault();
+
+            const codigo = sugerirSiguienteCodigoTicket();
+            const solicitante = document.getElementById('inputSolicitanteNombre').value.trim();
+            const departamento = document.getElementById('selectSolicitanteDepto').value;
+            const ubicacion = document.getElementById('inputUbicacion').value.trim();
+            const categoria = document.getElementById('selectCategoria').value;
+            const prioridad = document.getElementById('selectPrioridad').value;
+            const equipoReferencia = document.getElementById('inputEquipoReferencia').value.trim();
+            const asunto = document.getElementById('inputAsunto').value.trim();
+            const descripcion = document.getElementById('textareaDescripcion').value.trim();
+
+            if (!solicitante || !departamento || !asunto || !descripcion) {
+                showToast("Por favor complete los campos obligatorios.", "error");
+                return;
+            }
+
+            const ahora = new Date();
+            const nuevoTicket = {
+                codigo: codigo,
+                fechaCreacion: ahora.toISOString(),
+                fechaCreacionTexto: ahora.toLocaleDateString('es-HN') + ' ' + ahora.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' }),
+                solicitante: solicitante,
+                departamento: departamento,
+                ubicacion: ubicacion,
+                categoria: categoria,
+                prioridad: prioridad,
+                equipoReferencia: equipoReferencia || 'No especificado',
+                asunto: asunto,
+                descripcion: descripcion,
+                estado: 'Nuevo',
+                tecnicoAsignado: 'Sin asignar',
+                diagnostico: '',
+                solucion: '',
+                bitacora: [
+                    {
+                        fecha: ahora.toLocaleString('es-HN'),
+                        autor: solicitante,
+                        accion: 'Ticket Creado',
+                        nota: 'Solicitud enviada a la Mesa de Ayuda de Informática.'
+                    }
+                ]
+            };
+
+            // Guardar en Firestore si está disponible
+            let guardadoEnNube = false;
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const docRef = await dbFirestore.collection('tickets_soporte').add(nuevoTicket);
+                    nuevoTicket.id = docRef.id;
+                    guardadoEnNube = true;
+                    if (window.registrarBitacora) {
+                        window.registrarBitacora('Mesa de Ayuda', 'Crear Ticket', `Ticket ${codigo} creado por ${solicitante} (${departamento})`);
+                    }
+                } catch (err) {
+                    console.warn("Fallo guardado en Firestore, guardando en cache:", err);
+                }
+            }
+
+            if (!guardadoEnNube) {
+                nuevoTicket.id = 'local_' + Date.now();
+                ticketsData.unshift(nuevoTicket);
+                guardarEnLocalStorage(ticketsData);
+                renderizarTodo();
+            }
+
+            showToast(`✅ Ticket ${codigo} registrado exitosamente.`, "success");
+            document.getElementById('formNuevoTicket').reset();
+            sugerirSiguienteCodigoTicket();
+            filtrarTicketsSolicitante();
+        }
+
+        // 5. RENDERIZAR TODAS LAS VISTAS
+        function renderizarTodo() {
+            actualizarMetricasKPI();
+            renderizarTablaBandeja();
+            renderizarKanban();
+            renderizarMisTickets();
+            renderizarMetricasDetalladas();
+            sugerirSiguienteCodigoTicket();
+        }
+
+        // 6. ACTUALIZACIÓN DE MÉTRICAS KPI (SEGÚN VISIBILIDAD DEL ROL)
+        function actualizarMetricasKPI() {
+            const visibles = obtenerTicketsVisibles();
+            const total = visibles.length;
+            const nuevos = visibles.filter(t => t.estado === 'Nuevo' || !t.tecnicoAsignado || t.tecnicoAsignado === 'Sin asignar').length;
+            const asignados = visibles.filter(t => t.estado === 'Asignado').length;
+            const enProceso = visibles.filter(t => t.estado === 'En Proceso' || t.estado === 'En Espera').length;
+            const resueltos = visibles.filter(t => t.estado === 'Resuelto' || t.estado === 'Cerrado').length;
+
+            document.getElementById('kpiTotal').textContent = total;
+            document.getElementById('kpiNuevos').textContent = nuevos;
+            document.getElementById('kpiAsignados').textContent = asignados;
+            document.getElementById('kpiEnProceso').textContent = enProceso;
+            document.getElementById('kpiResueltos').textContent = resueltos;
+        }
+
+        // 7. RENDERIZAR TABLA DE BANDEJA TI
+        function renderizarTablaBandeja() {
+            const tbody = document.getElementById('tbodyTickets');
+            const msgVacio = document.getElementById('sinTicketsMsg');
+            if (!tbody) return;
+
+            const visibles = obtenerTicketsVisibles();
+
+            const filtroTexto = (document.getElementById('inputFiltroTexto') ? document.getElementById('inputFiltroTexto').value.toLowerCase().trim() : '');
+            const filtroEst = (document.getElementById('filtroEstado') ? document.getElementById('filtroEstado').value : 'TODOS');
+            const filtroPrio = (document.getElementById('filtroPrioridad') ? document.getElementById('filtroPrioridad').value : 'TODAS');
+            const filtroTec = (document.getElementById('filtroTecnico') ? document.getElementById('filtroTecnico').value : 'TODOS');
+
+            const filtrados = visibles.filter(t => {
+                if (filtroEst !== 'TODOS' && t.estado !== filtroEst) return false;
+                if (filtroPrio !== 'TODAS' && t.prioridad !== filtroPrio) return false;
+                if (esAdminTI && filtroTec !== 'TODOS' && (t.tecnicoAsignado || 'Sin asignar') !== filtroTec) return false;
+                if (filtroTexto) {
+                    const str = `${t.codigo} ${t.solicitante} ${t.departamento} ${t.asunto} ${t.equipoReferencia}`.toLowerCase();
+                    if (!str.includes(filtroTexto)) return false;
+                }
+                return true;
+            });
+
+            tbody.innerHTML = '';
+            if (filtrados.length === 0) {
+                if (msgVacio) {
+                    msgVacio.style.display = 'block';
+                    msgVacio.innerHTML = esAdminTI
+                        ? `<div style="font-size: 3em; margin-bottom: 8px;">📂</div><div style="font-weight: 600; font-size: 1.1em;">No se encontraron tickets registrados con los filtros seleccionados.</div>`
+                        : `<div style="font-size: 3em; margin-bottom: 8px;">👨‍💻</div><div style="font-weight: 600; font-size: 1.1em;">No tiene tickets asignados a su usuario en este momento.</div><div style="font-size: 0.88em; margin-top: 4px;">Cuando el Administrador de TI le asigne un ticket, aparecerá automáticamente aquí.</div>`;
+                }
+                return;
+            }
+            if (msgVacio) msgVacio.style.display = 'none';
+
+            filtrados.forEach(t => {
+                const tr = document.createElement('tr');
+                const tecActual = t.tecnicoAsignado || 'Sin asignar';
+
+                // Solo el Administrador de TI (steven.gonzales) puede asignar técnicos directamente desde la tabla
+                let celdaTecnicoHTML = '';
+                if (esAdminTI) {
+                    let opcionesHTML = `<option value="Sin asignar" ${tecActual === 'Sin asignar' ? 'selected' : ''}>⚠️ Sin asignar</option>`;
+                    let encontrado = (tecActual === 'Sin asignar');
+                    tecnicosDisponibles.forEach(tec => {
+                        const sel = (tec.nombre === tecActual) ? 'selected' : '';
+                        if (sel) encontrado = true;
+                        opcionesHTML += `<option value="${tec.nombre}" ${sel}>👨‍💻 ${tec.nombre}</option>`;
+                    });
+                    if (!encontrado && tecActual && !tecActual.toLowerCase().includes('rony')) {
+                        opcionesHTML += `<option value="${tecActual}" selected>👨‍💻 ${tecActual}</option>`;
+                    }
+                    celdaTecnicoHTML = `
+                        <select class="form-control" style="padding: 5px 8px; font-size: 0.82em; font-weight: 600; min-width: 165px; border-color: ${tecActual === 'Sin asignar' ? '#f59e0b' : '#cbd5e1'}; background: ${tecActual === 'Sin asignar' ? '#fffbeb' : '#ffffff'};"
+                            onchange="asignarTecnicoRapido('${t.id || t.codigo}', this.value)" title="Asignar Técnico Responsable">
+                            ${opcionesHTML}
+                        </select>
+                    `;
+                } else {
+                    celdaTecnicoHTML = `<span style="font-size:0.88em; font-weight:600; color:#0f172a;">👨‍💻 ${tecActual}</span>`;
+                }
+
+                tr.innerHTML = `
+                    <td><span class="ticket-code">${t.codigo}</span></td>
+                    <td style="color:var(--text-muted); font-size:0.85em;">${t.fechaCreacionTexto || t.fechaCreacion || '-'}</td>
+                    <td>
+                        <strong>${t.solicitante}</strong>
+                        <div style="font-size:0.8em; color:var(--text-muted);">${t.departamento}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight:600;">${t.asunto}</div>
+                        <div style="font-size:0.8em; color:var(--text-muted);">${t.categoria}</div>
+                    </td>
+                    <td><span class="badge-priority priority-${t.prioridad ? t.prioridad.toLowerCase() : 'media'}">${t.prioridad}</span></td>
+                    <td>${celdaTecnicoHTML}</td>
+                    <td><span class="badge-status status-${t.estado ? t.estado.toLowerCase().replace(' ', '_') : 'nuevo'}">${t.estado}</span></td>
+                    <td style="text-align: right; white-space: nowrap;">
+                        <button type="button" class="btn-action btn-secondary" onclick="abrirModalGestion('${t.id || t.codigo}')" style="padding: 6px 10px; font-size:0.8em;" title="Gestionar Ticket">
+                            <span>👁️</span> ${esAdminTI ? 'Gestionar / Asignar' : 'Atender Ticket'}
+                        </button>
+                    </td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // ASIGNACIÓN RÁPIDA DE TÉCNICO DESDE LA TABLA (EXCLUSIVO SUPER ADMIN TI)
+        async function asignarTecnicoRapido(idOrCodigo, nuevoTecnico) {
+            if (!esAdminTI) {
+                showToast("⛔ Solo el Administrador de TI puede asignar técnicos.", "error");
+                renderizarTablaBandeja();
+                return;
+            }
+
+            const ticket = ticketsData.find(t => (t.id && t.id === idOrCodigo) || t.codigo === idOrCodigo);
+            if (!ticket) return;
+
+            const tecAnterior = ticket.tecnicoAsignado || 'Sin asignar';
+            const infoTec = tecnicosDisponibles.find(u => u.nombre === nuevoTecnico);
+
+            ticket.tecnicoAsignado = nuevoTecnico;
+            ticket.tecnicoUid = infoTec ? infoTec.uid : '';
+            ticket.tecnicoUsuario = infoTec ? infoTec.usuario : '';
+
+            if (nuevoTecnico !== 'Sin asignar' && (!ticket.estado || ticket.estado === 'Nuevo')) {
+                ticket.estado = 'Asignado';
+            } else if (nuevoTecnico === 'Sin asignar' && ticket.estado === 'Asignado') {
+                ticket.estado = 'Nuevo';
+            }
+
+            if (!ticket.bitacora) ticket.bitacora = [];
+            ticket.bitacora.push({
+                fecha: new Date().toLocaleString('es-HN'),
+                autor: usuarioActual.nombre || 'Administrador TI',
+                accion: 'Asignación de Técnico',
+                nota: nuevoTecnico === 'Sin asignar'
+                    ? `Ticket dejado sin asignar (anterior: ${tecAnterior}).`
+                    : `Ticket asignado al técnico ${nuevoTecnico} por ${usuarioActual.nombre}.`
+            });
+
+            if (typeof dbFirestore !== 'undefined' && dbFirestore && ticket.id && !ticket.id.startsWith('local_')) {
+                try {
+                    await dbFirestore.collection('tickets_soporte').doc(ticket.id).set(ticket, { merge: true });
+                    if (window.registrarBitacora) {
+                        window.registrarBitacora('Mesa de Ayuda', 'Asignar Técnico', `Ticket ${ticket.codigo} asignado a ${nuevoTecnico}`);
+                    }
+                } catch (err) {
+                    console.warn("Error guardando asignación en Firestore:", err);
+                }
+            }
+
+            guardarEnLocalStorage(ticketsData);
+            renderizarTodo();
+            showToast(`✅ Ticket ${ticket.codigo} asignado a: ${nuevoTecnico}`, "success");
+        }
+
+        function aplicarFiltrosTabla() {
+            renderizarTablaBandeja();
+        }
+
+        // 8. RENDERIZAR TABLERO KANBAN ESTILO GLPI
+        function renderizarKanban() {
+            const containers = {
+                'Nuevo': document.getElementById('cardsNuevo'),
+                'Asignado': document.getElementById('cardsAsignado'),
+                'En Proceso': document.getElementById('cardsProceso'),
+                'En Espera': document.getElementById('cardsEspera'),
+                'Resuelto': document.getElementById('cardsResuelto')
+            };
+
+            const counts = {
+                'Nuevo': 0,
+                'Asignado': 0,
+                'En Proceso': 0,
+                'En Espera': 0,
+                'Resuelto': 0
+            };
+
+            Object.values(containers).forEach(c => { if (c) c.innerHTML = ''; });
+
+            const visibles = obtenerTicketsVisibles();
+
+            visibles.forEach(t => {
+                let colKey = t.estado || 'Nuevo';
+                if (colKey === 'Cerrado') colKey = 'Resuelto'; // Agrupar cerrados con resueltos en el tablero
+                if (!esAdminTI && colKey === 'Nuevo') colKey = 'Asignado';
+
+                if (containers[colKey]) {
+                    counts[colKey]++;
+                    const card = document.createElement('div');
+                    card.className = 'kanban-card';
+                    card.onclick = () => abrirModalGestion(t.id || t.codigo);
+
+                    let borderColor = '#002147';
+                    if (t.prioridad === 'Urgente') borderColor = '#ef4444';
+                    else if (t.prioridad === 'Alta') borderColor = '#f97316';
+                    else if (t.prioridad === 'Media') borderColor = '#eab308';
+                    card.style.borderLeftColor = borderColor;
+
+                    card.innerHTML = `
+                        <div class="kanban-card-header">
+                            <span class="ticket-code" style="font-size:0.9em;">${t.codigo}</span>
+                            <span class="badge-priority priority-${t.prioridad ? t.prioridad.toLowerCase() : 'media'}">${t.prioridad}</span>
+                        </div>
+                        <div class="kanban-card-title">${t.asunto}</div>
+                        <div style="font-size:0.8em; color:var(--text-muted);">${t.solicitante} — ${t.departamento}</div>
+                        <div class="kanban-card-meta">
+                            <span>👨‍💻 ${t.tecnicoAsignado || 'Sin asignar'}</span>
+                            <span style="font-size:0.95em;">➡️</span>
+                        </div>
+                    `;
+                    containers[colKey].appendChild(card);
+                }
+            });
+
+            if (document.getElementById('countKanbanNuevo')) document.getElementById('countKanbanNuevo').textContent = counts['Nuevo'];
+            if (document.getElementById('countKanbanAsignado')) document.getElementById('countKanbanAsignado').textContent = counts['Asignado'];
+            if (document.getElementById('countKanbanProceso')) document.getElementById('countKanbanProceso').textContent = counts['En Proceso'];
+            if (document.getElementById('countKanbanEspera')) document.getElementById('countKanbanEspera').textContent = counts['En Espera'];
+            if (document.getElementById('countKanbanResuelto')) document.getElementById('countKanbanResuelto').textContent = counts['Resuelto'];
+        }
+
+        // 9. RENDERIZAR "MIS TICKETS" (PORTAL DEL SOLICITANTE)
+        function renderizarMisTickets() {
+            filtrarTicketsSolicitante();
+        }
+
+        function filtrarTicketsSolicitante() {
+            const container = document.getElementById('listaMisTickets');
+            if (!container) return;
+            const q = (document.getElementById('inputBuscarMiTicket') ? document.getElementById('inputBuscarMiTicket').value.toLowerCase().trim() : '');
+
+            const visibles = obtenerTicketsVisibles();
+            const lista = visibles.filter(t => {
+                if (!q) return true;
+                return `${t.codigo} ${t.solicitante} ${t.asunto}`.toLowerCase().includes(q);
+            }).slice(0, 8);
+
+            container.innerHTML = '';
+            if (lista.length === 0) {
+                container.innerHTML = '<div style="font-size:0.86em; color:var(--text-muted); text-align:center; padding:20px;">No hay tickets que coincidan con la búsqueda.</div>';
+                return;
+            }
+
+            lista.forEach(t => {
+                const item = document.createElement('div');
+                item.style.cssText = 'background:white; border:1px solid #cbd5e1; border-radius:8px; padding:12px; cursor:pointer; transition:all 0.2s;';
+                item.onmouseenter = () => item.style.boxShadow = '0 2px 8px rgba(0,0,0,0.08)';
+                item.onmouseleave = () => item.style.boxShadow = 'none';
+                item.onclick = () => abrirModalGestion(t.id || t.codigo);
+
+                item.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
+                        <span class="ticket-code" style="font-size:0.92em;">${t.codigo}</span>
+                        <span class="badge-status status-${t.estado ? t.estado.toLowerCase().replace(' ', '_') : 'nuevo'}">${t.estado}</span>
+                    </div>
+                    <div style="font-weight:600; font-size:0.88em; color:var(--text-color);">${t.asunto}</div>
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-top:6px; font-size:0.78em; color:var(--text-muted);">
+                        <span>📅 ${t.fechaCreacionTexto || t.fechaCreacion || '-'}</span>
+                        <span>👨‍💻 ${t.tecnicoAsignado || 'En espera de asignación'}</span>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        // 10. RENDERIZAR MÉTRICAS Y GRÁFICAS ESTILO GLPI
+        function renderizarMetricasDetalladas() {
+            const visibles = obtenerTicketsVisibles();
+
+            // Por Departamento
+            const boxDepto = document.getElementById('metricasPorDepto');
+            if (boxDepto) {
+                const deptos = {};
+                visibles.forEach(t => {
+                    const d = t.departamento || 'Otros';
+                    deptos[d] = (deptos[d] || 0) + 1;
+                });
+                boxDepto.innerHTML = Object.entries(deptos).sort((a, b) => b[1] - a[1]).slice(0, 6).map(([dep, count]) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88em; padding:6px 0; border-bottom:1px dashed #e2e8f0;">
+                        <span>🏢 ${dep}</span>
+                        <strong>${count} tickets</strong>
+                    </div>
+                `).join('') || '<div style="color:var(--text-muted); font-size:0.86em;">Sin datos suficientes.</div>';
+            }
+
+            // Por Categoría
+            const boxCat = document.getElementById('metricasPorCategoria');
+            if (boxCat) {
+                const cats = {};
+                visibles.forEach(t => {
+                    const c = t.categoria || 'General';
+                    cats[c] = (cats[c] || 0) + 1;
+                });
+                boxCat.innerHTML = Object.entries(cats).sort((a, b) => b[1] - a[1]).map(([cat, count]) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88em; padding:6px 0; border-bottom:1px dashed #e2e8f0;">
+                        <span>🏷️ ${cat}</span>
+                        <strong>${count}</strong>
+                    </div>
+                `).join('') || '<div style="color:var(--text-muted); font-size:0.86em;">Sin datos suficientes.</div>';
+            }
+
+            // Por Técnico
+            const boxTec = document.getElementById('metricasPorTecnico');
+            if (boxTec) {
+                const tecs = {};
+                visibles.forEach(t => {
+                    const tec = t.tecnicoAsignado || 'Sin asignar';
+                    tecs[tec] = (tecs[tec] || 0) + 1;
+                });
+                boxTec.innerHTML = Object.entries(tecs).map(([tec, count]) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88em; padding:6px 0; border-bottom:1px dashed #e2e8f0;">
+                        <span>👨‍💻 ${tec}</span>
+                        <strong>${count} atendidos</strong>
+                    </div>
+                `).join('') || '<div style="color:var(--text-muted); font-size:0.86em;">Sin datos suficientes.</div>';
+            }
+
+            // Por Prioridad
+            const boxPrio = document.getElementById('metricasPorPrioridad');
+            if (boxPrio) {
+                const prios = { 'Urgente': 0, 'Alta': 0, 'Media': 0, 'Baja': 0 };
+                visibles.forEach(t => {
+                    if (prios[t.prioridad] !== undefined) prios[t.prioridad]++;
+                });
+                boxPrio.innerHTML = Object.entries(prios).map(([prio, count]) => `
+                    <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.88em; padding:6px 0; border-bottom:1px dashed #e2e8f0;">
+                        <span class="badge-priority priority-${prio.toLowerCase()}">${prio}</span>
+                        <strong>${count}</strong>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // 11. CAMBIAR PESTAÑAS DE VISTA
+        function cambiarVistaTab(tabId) {
+            if (!esAdminTI && (tabId === 'portal' || tabId === 'metricas')) {
+                tabId = 'bandeja';
+            }
+
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+
+            if (tabId === 'portal') {
+                document.getElementById('tabBtnSolicitante').classList.add('active');
+                document.getElementById('tabContentPortal').classList.add('active');
+            } else if (tabId === 'bandeja') {
+                document.getElementById('tabBtnBandeja').classList.add('active');
+                document.getElementById('tabContentBandeja').classList.add('active');
+                renderizarTablaBandeja();
+            } else if (tabId === 'kanban') {
+                document.getElementById('tabBtnKanban').classList.add('active');
+                document.getElementById('tabContentKanban').classList.add('active');
+                renderizarKanban();
+            } else if (tabId === 'metricas') {
+                document.getElementById('tabBtnMetricas').classList.add('active');
+                document.getElementById('tabContentMetricas').classList.add('active');
+                renderizarMetricasDetalladas();
+            }
+        }
+
+        function abrirNuevoTicketModal() {
+            if (!esAdminTI) {
+                showToast("⛔ Solo el Administrador de TI puede registrar nuevos tickets desde la consola.", "warning");
+                return;
+            }
+            cambiarVistaTab('portal');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            const inp = document.getElementById('inputSolicitanteNombre');
+            if (inp) inp.focus();
+        }
+
+        // 12. MODAL DE GESTIÓN INTEGRAL DEL TICKET
+        function abrirModalGestion(idOrCodigo) {
+            const ticket = ticketsData.find(t => (t.id && t.id === idOrCodigo) || t.codigo === idOrCodigo);
+            if (!ticket) return;
+
+            // Verificar permiso estricto: los técnicos regulares solo pueden abrir tickets asignados a ellos
+            if (!esAdminTI && !esTicketAsignadoAMi(ticket)) {
+                showToast("⛔ Acceso restringido: Solo tiene acceso a los tickets asignados a su usuario.", "error");
+                return;
+            }
+
+            ticketSeleccionado = ticket;
+            actualizarSelectoresTecnicos();
+
+            document.getElementById('modalTicketCodigo').innerHTML = `<span>🎫</span> ${ticket.codigo} &nbsp; <span class="badge-status status-${ticket.estado ? ticket.estado.toLowerCase().replace(' ', '_') : 'nuevo'}">${ticket.estado}</span>`;
+            document.getElementById('modalTicketMeta').textContent = `Apertura: ${ticket.fechaCreacionTexto || ticket.fechaCreacion || '-'} | Prioridad: ${ticket.prioridad}`;
+
+            document.getElementById('dtlSolicitante').textContent = ticket.solicitante;
+            document.getElementById('dtlDepto').textContent = ticket.departamento;
+            document.getElementById('dtlUbicacion').textContent = ticket.ubicacion || 'No especificada';
+            document.getElementById('dtlCategoria').textContent = ticket.categoria;
+            document.getElementById('dtlEquipo').textContent = ticket.equipoReferencia || 'No especificado';
+            document.getElementById('dtlAsunto').textContent = ticket.asunto;
+            document.getElementById('dtlDescripcion').textContent = ticket.descripcion;
+
+            const selectTecModal = document.getElementById('modalSelectTecnico');
+            if (selectTecModal) {
+                selectTecModal.value = ticket.tecnicoAsignado || 'Sin asignar';
+                selectTecModal.disabled = !esAdminTI;
+            }
+
+            const selectPrioModal = document.getElementById('modalSelectPrioridad');
+            if (selectPrioModal) {
+                selectPrioModal.value = ticket.prioridad || 'Media';
+                selectPrioModal.disabled = !esAdminTI;
+            }
+
+            document.getElementById('modalSelectEstado').value = ticket.estado || 'Asignado';
+            document.getElementById('modalDiagnostico').value = ticket.diagnostico || '';
+            document.getElementById('modalSolucion').value = ticket.solucion || '';
+
+            renderizarTimelineModal();
+
+            const modal = document.getElementById('modalGestionTicket');
+            if (modal) modal.style.display = 'flex';
+        }
+
+        function cerrarModalGestion() {
+            const modal = document.getElementById('modalGestionTicket');
+            if (modal) modal.style.display = 'none';
+            ticketSeleccionado = null;
+        }
+
+        function renderizarTimelineModal() {
+            const container = document.getElementById('modalTimelineNotas');
+            if (!container || !ticketSeleccionado) return;
+
+            const bitacora = ticketSeleccionado.bitacora || [];
+            container.innerHTML = '';
+
+            if (bitacora.length === 0) {
+                container.innerHTML = '<div style="font-size:0.82em; color:var(--text-muted);">Sin notas registradas.</div>';
+                return;
+            }
+
+            bitacora.forEach(b => {
+                const item = document.createElement('div');
+                item.className = 'timeline-item';
+                item.innerHTML = `
+                    <div style="flex:1;">
+                        <div style="display:flex; justify-content:space-between; font-weight:700; margin-bottom:2px;">
+                            <span>${b.autor || 'Informática'}</span>
+                            <span style="font-size:0.85em; color:var(--text-muted); font-weight:normal;">${b.fecha || ''}</span>
+                        </div>
+                        <div>${b.nota || b.accion || ''}</div>
+                    </div>
+                `;
+                container.appendChild(item);
+            });
+        }
+
+        function agregarNotaSeguimiento() {
+            const inp = document.getElementById('modalInputNuevaNota');
+            if (!inp || !inp.value.trim() || !ticketSeleccionado) return;
+
+            const nota = inp.value.trim();
+            const ahora = new Date();
+            const autor = usuarioActual.nombre || (document.getElementById('modalSelectTecnico').value !== 'Sin asignar' ? document.getElementById('modalSelectTecnico').value : 'Departamento de Informática');
+
+            if (!ticketSeleccionado.bitacora) ticketSeleccionado.bitacora = [];
+            ticketSeleccionado.bitacora.push({
+                fecha: ahora.toLocaleString('es-HN'),
+                autor: autor,
+                accion: 'Seguimiento Técnico',
+                nota: nota
+            });
+
+            inp.value = '';
+            renderizarTimelineModal();
+            showToast("Nota agregada al seguimiento.", "info");
+        }
+
+        // 13. GUARDAR CAMBIOS DE GESTIÓN DEL TICKET
+        async function guardarCambiosGestionTicket() {
+            if (!ticketSeleccionado) return;
+
+            if (!esAdminTI && !esTicketAsignadoAMi(ticketSeleccionado)) {
+                showToast("⛔ No tiene permiso para modificar este ticket.", "error");
+                return;
+            }
+
+            const tecnicoAnterior = ticketSeleccionado.tecnicoAsignado || 'Sin asignar';
+            const estadoAnterior = ticketSeleccionado.estado;
+
+            let nuevoTecnico = tecnicoAnterior;
+            let nuevaPrioridad = ticketSeleccionado.prioridad || 'Media';
+            let nuevoEstado = document.getElementById('modalSelectEstado').value;
+
+            // Solo el Super Admin TI (steven.gonzales) puede asignar o cambiar técnico y prioridad
+            if (esAdminTI) {
+                nuevoTecnico = document.getElementById('modalSelectTecnico').value;
+                nuevaPrioridad = document.getElementById('modalSelectPrioridad').value;
+                const infoTec = tecnicosDisponibles.find(u => u.nombre === nuevoTecnico);
+                ticketSeleccionado.tecnicoAsignado = nuevoTecnico;
+                ticketSeleccionado.tecnicoUid = infoTec ? infoTec.uid : '';
+                ticketSeleccionado.tecnicoUsuario = infoTec ? infoTec.usuario : '';
+                ticketSeleccionado.prioridad = nuevaPrioridad;
+
+                // Si se acaba de asignar un técnico a un ticket "Nuevo", pasar automáticamente a "Asignado"
+                if (nuevoTecnico !== 'Sin asignar' && estadoAnterior === 'Nuevo' && nuevoEstado === 'Nuevo') {
+                    nuevoEstado = 'Asignado';
+                }
+            }
+
+            const diagnostico = document.getElementById('modalDiagnostico').value.trim();
+            const solucion = document.getElementById('modalSolucion').value.trim();
+
+            ticketSeleccionado.estado = nuevoEstado;
+            ticketSeleccionado.diagnostico = diagnostico;
+            ticketSeleccionado.solucion = solucion;
+
+            if (!ticketSeleccionado.bitacora) ticketSeleccionado.bitacora = [];
+
+            if (esAdminTI && tecnicoAnterior !== nuevoTecnico) {
+                ticketSeleccionado.bitacora.push({
+                    fecha: new Date().toLocaleString('es-HN'),
+                    autor: usuarioActual.nombre || 'Administrador TI',
+                    accion: 'Asignación de Técnico',
+                    nota: `Técnico responsable actualizado de "${tecnicoAnterior}" a "${nuevoTecnico}".`
+                });
+            }
+
+            if (estadoAnterior !== nuevoEstado) {
+                ticketSeleccionado.bitacora.push({
+                    fecha: new Date().toLocaleString('es-HN'),
+                    autor: usuarioActual.nombre || (nuevoTecnico !== 'Sin asignar' ? nuevoTecnico : 'Sistema'),
+                    accion: 'Cambio de Estado',
+                    nota: `Estado actualizado de "${estadoAnterior}" a "${nuevoEstado}".`
+                });
+            }
+
+            const codigoGuardado = ticketSeleccionado.codigo;
+
+            // Sincronizar en Firestore
+            if (typeof dbFirestore !== 'undefined' && dbFirestore && ticketSeleccionado.id && !ticketSeleccionado.id.startsWith('local_')) {
+                try {
+                    await dbFirestore.collection('tickets_soporte').doc(ticketSeleccionado.id).set(ticketSeleccionado, { merge: true });
+                    if (window.registrarBitacora) {
+                        window.registrarBitacora('Mesa de Ayuda', 'Actualizar Ticket', `Ticket ${ticketSeleccionado.codigo} actualizado (Estado: ${nuevoEstado}, Técnico: ${ticketSeleccionado.tecnicoAsignado})`);
+                    }
+                } catch (err) {
+                    console.warn("Error actualizando en Firestore:", err);
+                }
+            }
+
+            guardarEnLocalStorage(ticketsData);
+            renderizarTodo();
+            cerrarModalGestion();
+            showToast(`✅ Cambios del ticket ${codigoGuardado} guardados.`, "success");
+        }
+
+        // 14. TRANSFERIR A REPORTE TÉCNICO (RT)
+        function derivarAReporteTecnico() {
+            if (!ticketSeleccionado) return;
+
+            const datosParaRT = {
+                origen: 'mesa_ayuda',
+                codigoTicket: ticketSeleccionado.codigo,
+                responsableBien: ticketSeleccionado.solicitante,
+                departamento: ticketSeleccionado.departamento,
+                descripcionEquipo: ticketSeleccionado.equipoReferencia || '',
+                problemaReportado: ticketSeleccionado.asunto + (ticketSeleccionado.descripcion ? ' — ' + ticketSeleccionado.descripcion : ''),
+                diagnostico: ticketSeleccionado.diagnostico || (ticketSeleccionado.solucion ? 'Solución: ' + ticketSeleccionado.solucion : ''),
+                elaboradoPor: ticketSeleccionado.tecnicoAsignado !== 'Sin asignar' ? ticketSeleccionado.tecnicoAsignado : (usuarioActual.nombre || 'Wilson Tinoco')
+            };
+
+            sessionStorage.setItem('enag_ticket_a_reporte_tecnico', JSON.stringify(datosParaRT));
+            showToast("Transfiriendo datos al Reporte Técnico Oficial...", "info");
+
+            setTimeout(() => {
+                window.location.href = 'reporte_tecnico.html?ref=ticket_' + ticketSeleccionado.codigo;
+            }, 500);
+        }
+
+        // 15. IMPRIMIR BOLETA DE SERVICIO DE SOPORTE TÉCNICO
+        function imprimirBoletaSoporte() {
+            if (!ticketSeleccionado) return;
+            const t = ticketSeleccionado;
+
+            if (typeof window.jspdf === 'undefined') {
+                showToast("Biblioteca de PDF cargando, intente nuevamente...", "warning");
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF('p', 'mm', 'letter');
+
+            // Encabezado
+            doc.setFillColor(0, 33, 71);
+            doc.rect(0, 0, 216, 26, 'F');
+
+            doc.setFont('times', 'bold');
+            doc.setTextColor(255, 255, 255);
+            doc.setFontSize(14);
+            doc.text("EMPRESA NACIONAL DE ARTES GRÁFICAS (E.N.A.G.)", 108, 12, { align: "center" });
+            doc.setFontSize(11);
+            doc.setFont('times', 'italic');
+            doc.text("DEPARTAMENTO DE INFORMÁTICA — BOLETA DE SOPORTE TÉCNICO", 108, 19, { align: "center" });
+
+            // Cuadro de código y estado
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 33, 71);
+            doc.setFontSize(13);
+            doc.text(`TICKET NO.: ${t.codigo}`, 16, 36);
+
+            doc.setFontSize(10);
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(100, 116, 139);
+            doc.text(`Fecha y Hora: ${t.fechaCreacionTexto || t.fechaCreacion || '-'}`, 130, 36);
+
+            // Línea separadora
+            doc.setDrawColor(212, 175, 55);
+            doc.setLineWidth(1);
+            doc.line(16, 40, 200, 40);
+
+            // Información General
+            let y = 48;
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(10);
+            doc.setTextColor(0, 33, 71);
+            doc.text("1. DATOS DEL SOLICITANTE Y ÁREA", 16, y);
+
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Solicitante: ${t.solicitante}`, 16, y);
+            doc.text(`Departamento: ${t.departamento}`, 110, y);
+
+            y += 6;
+            doc.text(`Ubicación / Ext.: ${t.ubicacion || 'N/A'}`, 16, y);
+            doc.text(`Categoría: ${t.categoria}`, 110, y);
+
+            y += 6;
+            doc.text(`Equipo Afectado: ${t.equipoReferencia || 'N/A'}`, 16, y);
+            doc.text(`Prioridad: ${t.prioridad}`, 110, y);
+
+            // Problema
+            y += 12;
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 33, 71);
+            doc.text("2. DETALLE DE LA FALLA REPORTADA", 16, y);
+
+            y += 6;
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Asunto: ${t.asunto}`, 16, y);
+
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            const descLines = doc.splitTextToSize(`Descripción: ${t.descripcion}`, 184);
+            doc.text(descLines, 16, y);
+            y += (descLines.length * 5) + 6;
+
+            // Trabajo Realizado
+            doc.setFont('helvetica', 'bold');
+            doc.setTextColor(0, 33, 71);
+            doc.text("3. ATENCIÓN Y PROCEDIMIENTO TÉCNICO", 16, y);
+
+            y += 6;
+            doc.setFont('helvetica', 'normal');
+            doc.setTextColor(0, 0, 0);
+            doc.text(`Técnico Responsable: ${t.tecnicoAsignado || 'Sin asignar'}`, 16, y);
+            doc.text(`Estado del Ticket: ${t.estado}`, 110, y);
+
+            y += 6;
+            const diagLines = doc.splitTextToSize(`Diagnóstico Técnico: ${t.diagnostico || 'En proceso de evaluación.'}`, 184);
+            doc.text(diagLines, 16, y);
+            y += (diagLines.length * 5) + 4;
+
+            const solLines = doc.splitTextToSize(`Solución / Trabajo Realizado: ${t.solucion || 'Pendiente de cierre o en pruebas.'}`, 184);
+            doc.text(solLines, 16, y);
+            y += (solLines.length * 5) + 20;
+
+            // Firmas de Conformidad
+            doc.setDrawColor(0, 0, 0);
+            doc.setLineWidth(0.5);
+
+            doc.line(26, y, 90, y);
+            doc.line(126, y, 190, y);
+
+            doc.setFontSize(9);
+            doc.setFont('helvetica', 'bold');
+            doc.text("Firma del Técnico de Informática", 58, y + 5, { align: "center" });
+            doc.text("Firma del Solicitante Conforme", 158, y + 5, { align: "center" });
+
+            doc.save(`Boleta_Soporte_${t.codigo}.pdf`);
+            showToast(`Boleta de soporte ${t.codigo} descargada en PDF.`, "success");
+        }
+
+        // 16. EXPORTAR A CSV
+        function exportarTicketsCSV() {
+            const visibles = obtenerTicketsVisibles();
+            if (visibles.length === 0) {
+                showToast("No hay tickets para exportar.", "warning");
+                return;
+            }
+
+            let csv = "Código,Fecha,Solicitante,Departamento,Categoría,Prioridad,Estado,Técnico,Asunto\n";
+            visibles.forEach(t => {
+                csv += `"${t.codigo}","${t.fechaCreacionTexto || t.fechaCreacion || ''}","${t.solicitante}","${t.departamento}","${t.categoria}","${t.prioridad}","${t.estado}","${t.tecnicoAsignado || ''}","${(t.asunto || '').replace(/"/g, '""')}"\n`;
+            });
+
+            const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            link.setAttribute("href", url);
+            link.setAttribute("download", `Tickets_Helpdesk_ENAG_${new Date().toISOString().slice(0, 10)}.csv`);
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            showToast("Reporte exportado exitosamente en formato CSV.", "success");
+        }
+
+        function recargarTickets() {
+            if (unsubscribeFirestore) {
+                conectarFirebaseTickets();
+            } else {
+                cargarTicketsLocalStorage();
+            }
+            showToast("Tickets sincronizados.", "info");
+        }
+
+        // 17. TOAST FEEDBACK
+        function showToast(msg, tipo = "info") {
+            const cont = document.getElementById('toastContainer');
+            if (!cont) return;
+            const t = document.createElement('div');
+            t.className = `toast-msg toast-${tipo}`;
+            t.textContent = msg;
+            cont.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transition = 'opacity 0.3s';
+                setTimeout(() => t.remove(), 300);
+            }, 3500);
+        }
+    </script>
+    <script src="../js/portal-header.js"></script>
+</body>
+
+</html>

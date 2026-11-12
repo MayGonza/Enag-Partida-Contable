@@ -635,6 +635,24 @@
                 <p>Control de inventario estatal, fichas por usuario y emisión de etiquetas con QR y Códigos de Barra.</p>
             </div>
 
+            <div class="card area-card" onclick="window.location.href='views/memorandums.html?v=1'" style="border-top: 4px solid #0284c7;">
+                <div class="icon">📑</div>
+                <h2>Memorándums Oficiales</h2>
+                <p>Generación institucional con correlativo automático por departamento y formato oficial en PDF.</p>
+            </div>
+
+            <div class="card area-card" onclick="window.location.href='views/reporte_tecnico.html?v=1'" style="border-top: 4px solid #002147;">
+                <div class="icon">🛠️</div>
+                <h2>Reportes Técnicos</h2>
+                <p>Departamento de Informática: emisión oficial de dictámenes técnicos, diagnóstico y descargo en PDF oficial.</p>
+            </div>
+
+            <div class="card area-card" id="cardMesaAyudaMain" onclick="window.location.href='views/mesa_ayuda.html?v=1'" style="border-top: 4px solid #10b981; display: none;">
+                <div class="icon">🎧</div>
+                <h2>Mesa de Ayuda (Helpdesk)</h2>
+                <p>Gestión de tickets, atención de incidencias, tablero Kanban y seguimiento de soporte técnico institucional.</p>
+            </div>
+
             <div class="card area-card" id="cardTI" onclick="solicitarAcceso('ti')" style="display:none;">
                 <div class="icon">💻</div>
                 <h2>Tecnología (TI)</h2>
@@ -786,12 +804,27 @@
         </div>
 
         <div id="menuTI" class="grid-container sub-menu" style="display: none;">
-            <a href="views/bitacora.html?v=5" class="card">
+            <a href="views/mesa_ayuda.html?v=2" id="cardMesaAyudaTI" class="card" style="border-left: 5px solid #10b981;">
+                <div class="icon">🎧</div>
+                <h2>Mesa de Ayuda (Helpdesk)</h2>
+                <p id="descMesaAyudaTI">Gestión de tickets, atención de incidencias, tablero Kanban ITIL y seguimiento de soporte técnico.</p>
+            </a>
+            <a href="views/reporte_tecnico.html?v=2" id="cardReporteTecnicoTI" class="card" style="border-left: 5px solid #002147;">
+                <div class="icon">🛠️</div>
+                <h2>Reportes Técnicos</h2>
+                <p>Emisión oficial de reportes técnicos de soporte, diagnóstico y descargo de bienes de cómputo.</p>
+            </a>
+            <a href="views/memorandums.html?v=2" id="cardMemorandumsTI" class="card" style="border-left: 5px solid #0284c7;">
+                <div class="icon">📑</div>
+                <h2>Emisión de Memorándums</h2>
+                <p>Generación institucional de memorandos con correlativo automático por departamento y PDF oficial.</p>
+            </a>
+            <a href="views/bitacora.html?v=5" id="cardBitacoraTI" class="card">
                 <div class="icon">📝</div>
                 <h2>Bitácora Global del Sistema</h2>
                 <p>Auditoría y registro de todas las acciones del sistema.</p>
             </a>
-            <a href="views/parametros.html?v=1" class="card">
+            <a href="views/parametros.html?v=1" id="cardParametrosTI" class="card">
                 <div class="icon">⚙️</div>
                 <h2>Parámetros del Sistema</h2>
                 <p>Configuración de tiempos de sesión y otras variables del sistema.</p>
@@ -1323,11 +1356,45 @@
                             return;
                         }
                         
-                        if (dep === 'direccion') {
-                            // Tienen acceso a todo el panel
+                        const emailLower = (user.email || '').toLowerCase();
+                        const userLower = (data.usuario || '').toLowerCase();
+                        const esSuperAdminTI = (
+                            emailLower === 'maygonza.cs@gmail.com' ||
+                            userLower === 'steven.gonzales' ||
+                            user.uid === 'GQKNVr7eh2R2AdoyKwgp8q7Mkhx2'
+                        );
+
+                        if (esSuperAdminTI) {
+                            // Usuario Administrador Principal de TI: Acceso total a todas las funciones y módulos
                             document.getElementById('areasContainer').style.display = 'grid';
                             const cardTI = document.getElementById('cardTI');
-                            if (cardTI) cardTI.style.display = 'block';
+                            if (cardTI) cardTI.style.display = 'flex';
+                            const cardMesaMain = document.getElementById('cardMesaAyudaMain');
+                            if (cardMesaMain) cardMesaMain.style.display = 'flex';
+                            const cardBitacora = document.getElementById('cardBitacoraTI');
+                            if (cardBitacora) cardBitacora.style.display = 'flex';
+                            const cardParametros = document.getElementById('cardParametrosTI');
+                            if (cardParametros) cardParametros.style.display = 'flex';
+                        } else if (dep === 'ti') {
+                            // Resto de técnicos de TI: Solo acceso a Memorándums, Reportes Técnicos y sus Tickets Asignados en Mesa de Ayuda
+                            const cardBitacora = document.getElementById('cardBitacoraTI');
+                            if (cardBitacora) cardBitacora.style.display = 'none';
+                            const cardParametros = document.getElementById('cardParametrosTI');
+                            if (cardParametros) cardParametros.style.display = 'none';
+                            const descMesa = document.getElementById('descMesaAyudaTI');
+                            if (descMesa) descMesa.textContent = 'Atención y seguimiento exclusivo de los tickets de soporte asignados a su usuario.';
+
+                            mostrarSubmenu('ti');
+
+                            const backBtn = document.getElementById('backButtonContainer');
+                            if (backBtn) {
+                                backBtn.style.display = 'none';
+                            }
+                        } else if (dep === 'direccion') {
+                            // Dirección: acceso a áreas administrativas (Mesa de Ayuda es exclusivo de TI)
+                            document.getElementById('areasContainer').style.display = 'grid';
+                            const cardMesaMain = document.getElementById('cardMesaAyudaMain');
+                            if (cardMesaMain) cardMesaMain.style.display = 'none';
                         } else {
                             // Mostrar exclusivamente su departamento
                             mostrarSubmenu(dep);

@@ -253,13 +253,20 @@
                     const doc = await dbFirestore.collection('usuarios').doc(user.uid).get();
                     if (doc.exists) {
                         const userData = doc.data();
-                        if (userData.departamento !== 'ti' && userData.departamento !== 'direccion') {
+                        const emailLower = (user.email || '').toLowerCase();
+                        const userLower = (userData.usuario || '').toLowerCase();
+                        const esSuperAdminTI = (
+                            emailLower === 'maygonza.cs@gmail.com' ||
+                            userLower === 'steven.gonzales' ||
+                            user.uid === 'GQKNVr7eh2R2AdoyKwgp8q7Mkhx2'
+                        );
+                        if (!esSuperAdminTI) {
                             if (typeof Swal !== 'undefined') {
-                                Swal.fire({title: 'Acceso denegado', text: 'Solo el departamento de TI puede ver esta configuración.', icon: 'error'}).then(() => {
+                                Swal.fire({title: 'Acceso Restringido', text: 'Solo el Administrador General de TI puede acceder a los Parámetros del Sistema.', icon: 'error'}).then(() => {
                                     window.location.href = '../index.html';
                                 });
                             } else {
-                                alert("Acceso denegado: Solo el departamento de TI puede ver esta configuración.");
+                                alert("Acceso Restringido: Solo el Administrador General de TI puede acceder a los Parámetros del Sistema.");
                                 window.location.href = '../index.html';
                             }
                             return;

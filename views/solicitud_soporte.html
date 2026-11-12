@@ -1,0 +1,896 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" href="../assets/logo.ico" type="image/x-icon">
+    <title>Solicitud de Soporte Técnico — Mesa de Ayuda ENAG</title>
+    <meta name="description"
+        content="Portal institucional para que el personal de la ENAG solicite asistencia y soporte técnico al Departamento de Informática.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Outfit:wght@500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <style>
+        :root {
+            --primary: #002147;
+            --primary-light: #003470;
+            --accent: #d4af37;
+            --accent-hover: #b89628;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --bg-body: #f1f5f9;
+            --card-bg: #ffffff;
+            --border-color: #cbd5e1;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            --info: #0284c7;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 30px 16px;
+            background-color: var(--bg-body);
+            min-height: 100vh;
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+        }
+
+        /* Marca de agua institucional difuminada */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('../assets/logo.jpeg') no-repeat center center;
+            background-size: 32%;
+            filter: blur(14px) opacity(0.08);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        .portal-card {
+            width: 100%;
+            max-width: 820px;
+            background: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 15px 40px rgba(0, 33, 71, 0.12);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* HEADER DEL FORMULARIO PÚBLICO */
+        .portal-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 28px 32px 22px;
+            border-bottom: 4px solid var(--accent);
+            text-align: center;
+            position: relative;
+        }
+
+        .header-logo {
+            width: 72px;
+            height: 72px;
+            object-fit: contain;
+            background: white;
+            border-radius: 50%;
+            padding: 5px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+            margin-bottom: 12px;
+        }
+
+        .portal-header h1 {
+            font-family: 'Outfit', sans-serif;
+            margin: 0;
+            font-size: 1.55em;
+            font-weight: 700;
+            letter-spacing: 0.3px;
+        }
+
+        .portal-header p {
+            margin: 6px 0 0;
+            font-size: 0.9em;
+            color: #e2e8f0;
+            opacity: 0.95;
+        }
+
+        .header-sub-badge {
+            display: inline-block;
+            background: rgba(212, 175, 55, 0.25);
+            color: #fef08a;
+            border: 1px solid rgba(212, 175, 55, 0.5);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.76em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 10px;
+        }
+
+        /* NAVEGACIÓN ENTRE CREAR Y CONSULTAR */
+        .portal-nav {
+            display: flex;
+            background: #f8fafc;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-btn {
+            flex: 1;
+            padding: 14px 20px;
+            border: none;
+            background: transparent;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.94em;
+            font-weight: 600;
+            color: var(--text-muted);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            transition: all 0.2s;
+            position: relative;
+        }
+
+        .nav-btn:hover {
+            color: var(--primary);
+            background: rgba(0, 33, 71, 0.03);
+        }
+
+        .nav-btn.active {
+            color: var(--primary);
+            background: white;
+            font-weight: 700;
+        }
+
+        .nav-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -1px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--primary);
+        }
+
+        /* CUERPO DEL CONTENIDO */
+        .portal-body {
+            padding: 30px 32px;
+        }
+
+        .tab-section {
+            display: none;
+        }
+
+        .tab-section.active {
+            display: block;
+            animation: fadeIn 0.25s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(6px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* FORMULARIO */
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 18px;
+            margin-bottom: 18px;
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-group label {
+            font-size: 0.86em;
+            font-weight: 600;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .form-control {
+            padding: 11px 14px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 0.92em;
+            transition: all 0.2s;
+            outline: none;
+            background: white;
+            font-family: inherit;
+        }
+
+        .form-control:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(0, 33, 71, 0.12);
+        }
+
+        textarea.form-control {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* BOTONES */
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            border: none;
+            padding: 14px 28px;
+            border-radius: 10px;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.05em;
+            font-weight: 700;
+            cursor: pointer;
+            width: 100%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            box-shadow: 0 4px 14px rgba(0, 33, 71, 0.25);
+            transition: all 0.2s;
+            margin-top: 10px;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 18px rgba(0, 33, 71, 0.35);
+        }
+
+        /* PANTALLA DE ÉXITO */
+        .success-box {
+            display: none;
+            background: #f0fdf4;
+            border: 2px solid #86efac;
+            border-radius: 14px;
+            padding: 30px 24px;
+            text-align: center;
+            margin-top: 10px;
+        }
+
+        .ticket-highlight {
+            font-family: monospace;
+            font-size: 2em;
+            font-weight: 800;
+            color: var(--primary);
+            background: white;
+            padding: 8px 18px;
+            border-radius: 10px;
+            border: 2px dashed var(--accent);
+            display: inline-block;
+            margin: 14px 0;
+            letter-spacing: 1px;
+        }
+
+        /* BADGES */
+        .badge-status {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.76em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.4px;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .status-nuevo {
+            background: #dbeafe;
+            color: #1e40af;
+            border: 1px solid #bfdbfe;
+        }
+
+        .status-asignado {
+            background: #ede9fe;
+            color: #6b21a8;
+            border: 1px solid #ddd6fe;
+        }
+
+        .status-en_proceso {
+            background: #e0f2fe;
+            color: #0369a1;
+            border: 1px solid #bae6fd;
+        }
+
+        .status-en_espera {
+            background: #fef3c7;
+            color: #92400e;
+            border: 1px solid #fde68a;
+        }
+
+        .status-resuelto {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #bbf7d0;
+        }
+
+        .status-cerrado {
+            background: #f1f5f9;
+            color: #475569;
+            border: 1px solid #cbd5e1;
+        }
+
+        /* BUSCADOR DE TICKETS */
+        .search-box-wrap {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 12px 16px 12px 42px;
+            border: 1.5px solid var(--border-color);
+            border-radius: 10px;
+            font-size: 0.96em;
+            outline: none;
+        }
+
+        .search-box-wrap::before {
+            content: "🔍";
+            position: absolute;
+            left: 14px;
+            top: 50%;
+            transform: translateY(-50%);
+            font-size: 1.1em;
+            opacity: 0.6;
+        }
+
+        .ticket-result-card {
+            background: white;
+            border: 1.5px solid var(--border-color);
+            border-radius: 12px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.04);
+            margin-bottom: 12px;
+        }
+
+        /* FOOTER */
+        .portal-footer {
+            padding: 16px 24px;
+            background: #f8fafc;
+            border-top: 1px solid var(--border-color);
+            text-align: center;
+            font-size: 0.82em;
+            color: var(--text-muted);
+        }
+
+        /* TOAST */
+        #toastContainer {
+            position: fixed;
+            bottom: 24px;
+            right: 24px;
+            z-index: 100000;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .toast-msg {
+            padding: 12px 18px;
+            border-radius: 8px;
+            color: white;
+            font-size: 0.9em;
+            font-weight: 600;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            animation: slideInToast 0.3s ease;
+        }
+
+        .toast-success {
+            background: #10b981;
+        }
+
+        .toast-error {
+            background: #ef4444;
+        }
+
+        .toast-info {
+            background: #0284c7;
+        }
+
+        @keyframes slideInToast {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .portal-header {
+                padding: 20px 16px;
+            }
+
+            .portal-body {
+                padding: 20px 16px;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="portal-card">
+
+        <!-- HEADER INSTITUCIONAL -->
+        <header class="portal-header">
+            <img src="../assets/logo.png" alt="Logo ENAG" class="header-logo" onerror="this.src='../assets/logo.jpeg'">
+            <h1>Solicitud de Soporte Técnico</h1>
+            <p>Empresa Nacional de Artes Gráficas | Departamento de Informática</p>
+            <span class="header-sub-badge">Mesa de Ayuda Institucional</span>
+        </header>
+
+        <!-- NAVEGACIÓN -->
+        <nav class="portal-nav">
+            <button type="button" class="nav-btn active" id="btnTabNuevo" onclick="cambiarTab('nuevo')">
+                <span>📝</span> Enviar Solicitud
+            </button>
+            <button type="button" class="nav-btn" id="btnTabConsultar" onclick="cambiarTab('consultar')">
+                <span>🔍</span> Consultar Mi Ticket
+            </button>
+        </nav>
+
+        <div class="portal-body">
+
+            <!-- TAB 1: FORMULARIO DE NUEVA SOLICITUD -->
+            <div id="tabNuevo" class="tab-section active">
+
+                <div id="formContainer">
+                    <p style="margin: 0 0 20px; font-size: 0.92em; color: var(--text-muted); line-height: 1.5;">
+                        Complete el siguiente formulario para notificar un problema o solicitar asistencia al equipo de
+                        Informática. Se le asignará un <strong>número de ticket</strong> con el que podrá dar
+                        seguimiento a su caso.
+                    </p>
+
+                    <form id="formSolicitudSoporte" onsubmit="enviarTicketSoporte(event)">
+
+                        <!-- 1. IDENTIFICACIÓN DEL SOLICITANTE -->
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="inpNombre">👤 Nombre y Apellido *</label>
+                                <input type="text" id="inpNombre" class="form-control" placeholder="Ej. Juan Pérez"
+                                    required>
+                            </div>
+                            <div class="form-group">
+                                <label for="selDepto">🏢 Departamento / Área *</label>
+                                <select id="selDepto" class="form-control" required>
+                                    <option value="" disabled selected>Seleccione su departamento...</option>
+                                    <option value="Dirección General">Dirección General</option>
+                                    <option value="Sub-Gerencia Administrativa">Sub-Gerencia Administrativa</option>
+                                    <option value="Recursos Humanos">Recursos Humanos</option>
+                                    <option value="Contabilidad">Contabilidad</option>
+                                    <option value="Presupuesto">Presupuesto</option>
+                                    <option value="Tesorería">Tesorería</option>
+                                    <option value="Compras y Suministros">Compras y Suministros</option>
+                                    <option value="Comercialización y Ventas">Comercialización y Ventas</option>
+                                    <option value="Bienes Nacionales">Bienes Nacionales</option>
+                                    <option value="Informática / TI">Informática / TI</option>
+                                    <option value="Producción / Talleres">Producción / Talleres Gráficos</option>
+                                    <option value="Pre-Prensa y Diseño">Pre-Prensa y Diseño</option>
+                                    <option value="Prensa Plana / Rotativas">Prensa Plana / Rotativas</option>
+                                    <option value="Encuadernación">Encuadernación</option>
+                                    <option value="Almacén General">Almacén General</option>
+                                    <option value="Archivo y Gaceta">Archivo y Gaceta</option>
+                                    <option value="Auditoría Interna">Auditoría Interna</option>
+                                    <option value="Asesoría Legal">Asesoría Legal</option>
+                                    <option value="Secretaría General">Secretaría General</option>
+                                    <option value="Transporte y Mantenimiento">Transporte y Mantenimiento</option>
+                                    <option value="Otro">Otro Departamento / Área</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 2. UBICACIÓN Y CATEGORÍA -->
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="inpUbicacion">📍 Ubicación / Extensión Telefónica</label>
+                                <input type="text" id="inpUbicacion" class="form-control"
+                                    placeholder="Ej. 2do Piso, Oficina 12, Ext. 104">
+                            </div>
+                            <div class="form-group">
+                                <label for="selCategoria">🏷️ Tipo de Requerimiento *</label>
+                                <select id="selCategoria" class="form-control" required>
+                                    <option value="Hardware / Computadoras">💻 Computadora o Equipo (No enciende,
+                                        monitor, teclado)</option>
+                                    <option value="Conectividad y Redes">🌐 Red e Internet (Sin conexión, Wi-Fi lento)
+                                    </option>
+                                    <option value="Impresoras y Escáneres">🖨️ Impresoras / Escáner (Tóner, atasco, no
+                                        imprime)</option>
+                                    <option value="Software y Sistemas">⚙️ Software / Sistemas (Partida contable,
+                                        correo, Office)</option>
+                                    <option value="Talleres de Producción">🏭 Equipos de Artes Gráficas (RIP, CTP,
+                                        Prensa)</option>
+                                    <option value="Cuentas y Accesos">🔐 Usuarios, Contraseñas y Accesos</option>
+                                    <option value="Asistencia General">💡 Asistencia Técnica General</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <!-- 3. PRIORIDAD Y EQUIPO -->
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="selPrioridad">⚡ Nivel de Urgencia *</label>
+                                <select id="selPrioridad" class="form-control" required>
+                                    <option value="Baja">🟢 Baja (Puedo seguir trabajando con normalidad)</option>
+                                    <option value="Media" selected>🟡 Media (Afecta parte de mi trabajo)</option>
+                                    <option value="Alta">🟠 Alta (No puedo realizar mi trabajo)</option>
+                                    <option value="Urgente">🔴 Urgente (Área o servicio crítico paralizado)</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="inpEquipo">🖥️ Dispositivo Afectado (Opcional)</label>
+                                <input type="text" id="inpEquipo" class="form-control"
+                                    placeholder="Ej. PC HP ProDesk, Impresora Brother, Laptop Dell">
+                            </div>
+                        </div>
+
+                        <!-- 4. ASUNTO Y DESCRIPCIÓN -->
+                        <div class="form-group" style="margin-bottom: 18px;">
+                            <label for="inpAsunto">📌 Asunto Breve de la Falla *</label>
+                            <input type="text" id="inpAsunto" class="form-control"
+                                placeholder="Ej. Impresora no responde desde esta mañana" required>
+                        </div>
+
+                        <div class="form-group" style="margin-bottom: 24px;">
+                            <label for="txtDescripcion">📝 Descripción Detallada del Problema *</label>
+                            <textarea id="txtDescripcion" class="form-control" rows="4"
+                                placeholder="Explique con el mayor detalle posible lo que ocurre..."
+                                required></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-submit" id="btnEnviar">
+                            <span>🚀</span> Enviar Solicitud a Informática
+                        </button>
+                    </form>
+                </div>
+
+                <!-- PANTALLA DE CONFIRMACIÓN TRAS ENVIAR -->
+                <div id="boxExito" class="success-box">
+                    <div style="font-size: 3.5em; line-height: 1; margin-bottom: 10px;">✅</div>
+                    <h2 style="font-family:'Outfit',sans-serif; color:#166534; margin:0 0 6px;">¡Solicitud Enviada con
+                        Éxito!</h2>
+                    <p style="color:#15803d; font-size:0.95em; margin:0 0 16px;">
+                        El Departamento de Informática ha recibido su requerimiento y será atendido a la brevedad.
+                    </p>
+
+                    <div>
+                        <span
+                            style="font-size:0.86em; color:var(--text-muted); font-weight:600; text-transform:uppercase;">Número
+                            de Ticket Asignado:</span><br>
+                        <span class="ticket-highlight" id="lblCodigoGenerado">TICK-2026-000</span>
+                    </div>
+
+                    <p style="font-size:0.88em; color:var(--text-muted); max-width:480px; margin:0 auto 20px;">
+                        Guarde este código para consultar el avance o recibir notificaciones sobre su atención.
+                    </p>
+
+                    <div style="display:flex; justify-content:center; gap:10px; flex-wrap:wrap;">
+                        <button type="button" class="btn-submit" onclick="copiarCodigoTicket()"
+                            style="width:auto; padding:10px 20px; font-size:0.9em; background:#0284c7;">
+                            <span>📋</span> Copiar Código
+                        </button>
+                        <button type="button" class="btn-submit" onclick="consultarTicketReciente()"
+                            style="width:auto; padding:10px 20px; font-size:0.9em; background:var(--primary);">
+                            <span>🔍</span> Ver Estado en Vivo
+                        </button>
+                        <button type="button" class="btn-submit" onclick="enviarOtraSolicitud()"
+                            style="width:auto; padding:10px 20px; font-size:0.9em; background:#475569;">
+                            <span>➕</span> Enviar Otra Solicitud
+                        </button>
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- TAB 2: CONSULTAR MI TICKET -->
+            <div id="tabConsultar" class="tab-section">
+                <p style="margin: 0 0 16px; font-size: 0.92em; color: var(--text-muted);">
+                    Ingrese el <strong>código de su ticket</strong> (ej. <code>TICK-2026-001</code>) o su
+                    <strong>nombre</strong> para consultar el progreso y las notas de respuesta del técnico.
+                </p>
+
+                <div class="search-box-wrap">
+                    <input type="text" id="inpBuscarTicket" class="search-input"
+                        placeholder="Buscar por código de ticket o su nombre..." oninput="buscarTicketUsuario()">
+                </div>
+
+                <div id="contenedorResultados">
+                    <!-- Se llena dinámicamente -->
+                </div>
+            </div>
+
+        </div>
+
+        <footer class="portal-footer">
+            EMPRESA NACIONAL DE ARTES GRÁFICAS — ENAG 2026<br>
+            Departamento de Informática | Mesa de Ayuda Institucional
+        </footer>
+
+    </div>
+
+    <div id="toastContainer"></div>
+
+    <!-- SCRIPTS FIREBASE -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+    <script src="../js/firebase-config.js"></script>
+
+    <script>
+        let ultimoCodigoTicket = '';
+        let listaTicketsCache = [];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            cargarCacheLocal();
+            conectarFirebaseYConsultar();
+        });
+
+        function cambiarTab(tab) {
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-section').forEach(s => s.classList.remove('active'));
+
+            if (tab === 'nuevo') {
+                document.getElementById('btnTabNuevo').classList.add('active');
+                document.getElementById('tabNuevo').classList.add('active');
+            } else {
+                document.getElementById('btnTabConsultar').classList.add('active');
+                document.getElementById('tabConsultar').classList.add('active');
+                buscarTicketUsuario();
+            }
+        }
+
+        function conectarFirebaseYConsultar() {
+            if (typeof dbFirestore === 'undefined' || !dbFirestore) return;
+
+            dbFirestore.collection('tickets_soporte')
+                .orderBy('fechaCreacion', 'desc')
+                .limit(50)
+                .onSnapshot((snapshot) => {
+                    const arr = [];
+                    snapshot.forEach(doc => {
+                        arr.push({ id: doc.id, ...doc.data() });
+                    });
+                    listaTicketsCache = arr;
+                    localStorage.setItem('enag_tickets_public_cache', JSON.stringify(arr));
+                    buscarTicketUsuario();
+                }, (err) => {
+                    console.warn("Lectura offline:", err);
+                });
+        }
+
+        function cargarCacheLocal() {
+            try {
+                const raw = localStorage.getItem('enag_tickets_public_cache');
+                if (raw) listaTicketsCache = JSON.parse(raw);
+            } catch (e) { }
+        }
+
+        // GENERAR CORRELATIVO
+        function generarCodigoTicketSiguiente() {
+            const anioActual = new Date().getFullYear();
+            let maxNum = 0;
+
+            listaTicketsCache.forEach(t => {
+                if (t.codigo) {
+                    const match = t.codigo.match(/TICK-(\d{4})-(\d+)/);
+                    if (match && parseInt(match[1], 10) === anioActual) {
+                        const n = parseInt(match[2], 10);
+                        if (n > maxNum) maxNum = n;
+                    }
+                }
+            });
+
+            return `TICK-${anioActual}-${String(maxNum + 1).padStart(3, '0')}`;
+        }
+
+        // ENVIAR FORMULARIO
+        async function enviarTicketSoporte(e) {
+            e.preventDefault();
+
+            const btn = document.getElementById('btnEnviar');
+            btn.disabled = true;
+            btn.innerHTML = '<span>⏳</span> Enviando Solicitud...';
+
+            const nombre = document.getElementById('inpNombre').value.trim();
+            const depto = document.getElementById('selDepto').value;
+            const ubicacion = document.getElementById('inpUbicacion').value.trim();
+            const categoria = document.getElementById('selCategoria').value;
+            const prioridad = document.getElementById('selPrioridad').value;
+            const equipo = document.getElementById('inpEquipo').value.trim();
+            const asunto = document.getElementById('inpAsunto').value.trim();
+            const descripcion = document.getElementById('txtDescripcion').value.trim();
+
+            const codigo = generarCodigoTicketSiguiente();
+            ultimoCodigoTicket = codigo;
+
+            const ahora = new Date();
+            const nuevoTicket = {
+                codigo: codigo,
+                fechaCreacion: ahora.toISOString(),
+                fechaCreacionTexto: ahora.toLocaleDateString('es-HN') + ' ' + ahora.toLocaleTimeString('es-HN', { hour: '2-digit', minute: '2-digit' }),
+                solicitante: nombre,
+                departamento: depto,
+                ubicacion: ubicacion || 'No especificada',
+                categoria: categoria,
+                prioridad: prioridad,
+                equipoReferencia: equipo || 'No especificado',
+                asunto: asunto,
+                descripcion: descripcion,
+                estado: 'Nuevo',
+                tecnicoAsignado: 'Sin asignar',
+                diagnostico: '',
+                solucion: '',
+                bitacora: [
+                    {
+                        fecha: ahora.toLocaleString('es-HN'),
+                        autor: nombre,
+                        accion: 'Ticket Creado',
+                        nota: 'Solicitud enviada a través del portal de Mesa de Ayuda.'
+                    }
+                ]
+            };
+
+            // Guardar en Firestore
+            let guardado = false;
+            if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+                try {
+                    const ref = await dbFirestore.collection('tickets_soporte').add(nuevoTicket);
+                    nuevoTicket.id = ref.id;
+                    guardado = true;
+                } catch (err) {
+                    console.warn("Fallo guardado en la nube:", err);
+                }
+            }
+
+            if (!guardado) {
+                nuevoTicket.id = 'local_' + Date.now();
+                listaTicketsCache.unshift(nuevoTicket);
+                localStorage.setItem('enag_tickets_public_cache', JSON.stringify(listaTicketsCache));
+            }
+
+            // Mostrar pantalla de confirmación
+            document.getElementById('lblCodigoGenerado').textContent = codigo;
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('boxExito').style.display = 'block';
+
+            showToast(`✅ Ticket ${codigo} registrado exitosamente.`, 'success');
+            btn.disabled = false;
+            btn.innerHTML = '<span>🚀</span> Enviar Solicitud a Informática';
+        }
+
+        function enviarOtraSolicitud() {
+            document.getElementById('formSolicitudSoporte').reset();
+            document.getElementById('boxExito').style.display = 'none';
+            document.getElementById('formContainer').style.display = 'block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copiarCodigoTicket() {
+            if (!ultimoCodigoTicket) return;
+            navigator.clipboard.writeText(ultimoCodigoTicket).then(() => {
+                showToast(`Código ${ultimoCodigoTicket} copiado al portapapeles.`, 'info');
+            }).catch(() => {
+                prompt("Copie su código de ticket:", ultimoCodigoTicket);
+            });
+        }
+
+        function consultarTicketReciente() {
+            cambiarTab('consultar');
+            const inp = document.getElementById('inpBuscarTicket');
+            if (inp) {
+                inp.value = ultimoCodigoTicket;
+                buscarTicketUsuario();
+            }
+        }
+
+        // BUSCADOR DE TICKETS PARA USUARIOS
+        function buscarTicketUsuario() {
+            const container = document.getElementById('contenedorResultados');
+            if (!container) return;
+
+            const q = (document.getElementById('inpBuscarTicket') ? document.getElementById('inpBuscarTicket').value.toLowerCase().trim() : '');
+
+            let resultados = listaTicketsCache;
+            if (q) {
+                resultados = listaTicketsCache.filter(t => {
+                    return `${t.codigo} ${t.solicitante} ${t.asunto}`.toLowerCase().includes(q);
+                });
+            } else {
+                resultados = listaTicketsCache.slice(0, 5); // Mostrar los más recientes
+            }
+
+            container.innerHTML = '';
+            if (resultados.length === 0) {
+                container.innerHTML = `
+                    <div style="text-align:center; padding:30px 10px; color:var(--text-muted);">
+                        <div style="font-size:2em; margin-bottom:6px;">🔍</div>
+                        <div>No se encontraron solicitudes con el criterio de búsqueda.</div>
+                    </div>
+                `;
+                return;
+            }
+
+            resultados.forEach(t => {
+                const card = document.createElement('div');
+                card.className = 'ticket-result-card';
+
+                const bitacora = t.bitacora || [];
+                const ultimaNota = bitacora.length > 0 ? bitacora[bitacora.length - 1] : null;
+
+                card.innerHTML = `
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:8px;">
+                        <span style="font-family:monospace; font-size:1.15em; font-weight:800; color:var(--primary);">${t.codigo}</span>
+                        <span class="badge-status status-${t.estado ? t.estado.toLowerCase().replace(' ', '_') : 'nuevo'}">${t.estado}</span>
+                    </div>
+
+                    <div style="font-weight:700; font-size:1em; color:var(--text-main); margin-bottom:4px;">${t.asunto}</div>
+                    <div style="font-size:0.86em; color:var(--text-muted); margin-bottom:10px;">
+                        Solicitante: <strong>${t.solicitante}</strong> (${t.departamento}) | 📅 ${t.fechaCreacionTexto || t.fechaCreacion || '-'}
+                    </div>
+
+                    <div style="background:#f8fafc; border-left:3px solid var(--primary); padding:10px 14px; border-radius:0 8px 8px 0; font-size:0.86em; margin-top:8px;">
+                        <div><strong>👨‍💻 Técnico Asignado:</strong> ${t.tecnicoAsignado || 'En espera de asignación'}</div>
+                        ${t.solucion ? `<div style="margin-top:4px; color:#166534;"><strong>✅ Solución:</strong> ${t.solucion}</div>` : ''}
+                        ${ultimaNota ? `<div style="margin-top:4px; color:var(--text-muted); font-size:0.92em;"><em>Última actualización: "${ultimaNota.nota || ultimaNota.accion}"</em></div>` : ''}
+                    </div>
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // TOAST
+        function showToast(msg, tipo = 'info') {
+            const cont = document.getElementById('toastContainer');
+            if (!cont) return;
+            const t = document.createElement('div');
+            t.className = `toast-msg toast-${tipo}`;
+            t.textContent = msg;
+            cont.appendChild(t);
+            setTimeout(() => {
+                t.style.opacity = '0';
+                t.style.transition = 'opacity 0.3s';
+                setTimeout(() => t.remove(), 300);
+            }, 3500);
+        }
+    </script>
+</body>
+
+</html>

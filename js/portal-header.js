@@ -171,17 +171,41 @@
                     let displayName = user.displayName;
                     let userDepto = '';
 
-                    // Si no tiene displayName directo, consultar el documento de usuario
-                    if (!displayName && typeof dbFirestore !== 'undefined' && dbFirestore) {
+                    // Consultar el documento de usuario para sincronizar rol y permisos de navegación
+                    if (typeof dbFirestore !== 'undefined' && dbFirestore) {
                         try {
                             const uDoc = await dbFirestore.collection('usuarios').doc(user.uid).get();
                             if (uDoc.exists) {
                                 const data = uDoc.data();
-                                displayName = data.nombre || data.usuario || user.email;
-                                userDepto = data.departamento || '';
+                                displayName = data.nombre || data.usuario || displayName || user.email;
+                                userDepto = (data.departamento || '').toLowerCase().trim();
+                                const uname = (data.usuario || '').toLowerCase().trim();
+                                const email = (user.email || data.correo || '').toLowerCase().trim();
+
                                 if (data.nombre) localStorage.setItem('enag_user_nombre', data.nombre);
                                 if (data.usuario) localStorage.setItem('enag_username', data.usuario);
                                 if (data.departamento) localStorage.setItem('enag_user_depto', data.departamento);
+
+                                const esSuperAdminTI = (
+                                    email === 'maygonza.cs@gmail.com' ||
+                                    uname === 'steven.gonzales' ||
+                                    user.uid === 'GQKNVr7eh2R2AdoyKwgp8q7Mkhx2'
+                                );
+                                const esPersonalTI = esSuperAdminTI || userDepto === 'ti';
+
+                                // Si NO es personal de TI, ocultar enlaces a Mesa de Ayuda y Reportes Técnicos TI
+                                if (!esPersonalTI) {
+                                    document.querySelectorAll('a[href*="mesa_ayuda.html"], a[href*="reporte_tecnico.html"]').forEach(el => {
+                                        el.style.display = 'none';
+                                    });
+                                }
+
+                                // Si es técnico de TI regular (no Super Admin), ocultar enlaces a otros departamentos (ej. Bienes Nacionales, Bitácora, Parámetros)
+                                if (esPersonalTI && !esSuperAdminTI) {
+                                    document.querySelectorAll('a[href*="bienes_nacionales.html"], a[href*="bitacora.html"], a[href*="parametros.html"]').forEach(el => {
+                                        el.style.display = 'none';
+                                    });
+                                }
                             }
                         } catch (e) {
                             console.warn("Error leyendo perfil de usuario:", e);

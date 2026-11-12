@@ -19,8 +19,12 @@ La plataforma digital integra y automatiza las operaciones de los siguientes dep
 2. **Comercialización:** Cotizaciones oficiales de publicaciones para el Diario Oficial *La Gaceta* y servicios gráficos industriales según el Acuerdo Ejecutivo N° 249-2010, con cálculo automatizado de ISV y descuentos legislados.
 3. **Recursos Humanos (RRHH):** Procesamiento masivo de nóminas para personal bajo régimen de Acuerdo y Contrato, generación automática de recibos de pago (vouchers), emisión de cuatro modalidades de constancias de trabajo con firma y código QR, cálculo de reintegros de incapacidades del IHSS, gestión de vacaciones y permisos laborales.
 4. **Talleres de Producción Gráfica:** Registro de especificaciones de tiraje, sustratos y tintas; tablero Kanban/Grid de control de fases industriales (Pre-prensa, Prensa, Post-prensa, Listo y Entregado).
-5. **Auditoría y Bitácora:** Registro inmutable de eventos institucionales con trazabilidad por usuario, módulo, timestamp y dirección IP/sesión.
-6. **Administración y TI:** Configuración dinámica de parámetros (porcentaje de ISV, timeouts de sesión, control de concurrencia) y canal de soporte técnico.
+5. **Bienes Nacionales:** Inventario patrimonial de activos fijos del Estado, actas de resguardo y descargo, y generación masiva de etiquetas adhesivas con Códigos QR y Códigos de Barras (Code 128) con escaneo público in situ (`consulta_bien.html`).
+6. **Emisión de Memorándums Oficiales:** Redacción formal normada con numeración correlativa departamental automática (`INFO`, `ADMON`, `PROD`, `CONT`, etc.), selector de tipografía para salvaguarda de membrete institucional completo y exportación a PDF oficial.
+7. **Reportes Técnicos del Departamento de Informática:** Dictámenes periciales oficiales de soporte y descargo de bienes, correlativo anual (`RT YYYY-NN` ej. `RT 2026-11`), búsqueda y autocompletado desde Bienes Nacionales, cuadrante de 4 firmas de responsabilidad y copias de distribución.
+8. **Detector de Espacio y Tarifas de La Gaceta:** Detección automática de espacio editorial en páginas tabloide (fracciones 1/8 a plana entera) para avisos legales, ajuste de fuente tipográfica y cotización enlazada.
+9. **Auditoría y Bitácora:** Registro inmutable de eventos institucionales con trazabilidad por usuario, módulo, timestamp y dirección IP/sesión.
+10. **Administración y TI:** Configuración dinámica de parámetros (porcentaje de ISV, timeouts de sesión, control de concurrencia) y canal de soporte técnico.
 
 ---
 
@@ -143,11 +147,13 @@ Enag-Partida-Contable/
 │   ├── login.html                # Autenticación, control de sesiones y recuperación
 │   ├── manual.html               # Manual de usuario interactivo y exportador PDF
 │   ├── manual_tecnico.html       # Manual técnico interactivo del sistema
+│   ├── memorandums.html          # Emisión de memorándums con correlativo institucional
 │   ├── orden_produccion.html     # Órdenes de producción y flujo de fases de taller
 │   ├── parametros.html           # Configuración dinámica de variables del sistema
 │   ├── partidas.html             # Partidas contables de diario con balanceo
 │   ├── partidas_credito.html     # Partidas contables al crédito (BCH)
 │   ├── registro.html             # Registro de usuarios y solicitud de cuenta
+│   ├── reporte_tecnico.html      # Reportes técnicos del Departamento de Informática
 │   ├── rrhh_permisos.html        # Control y emisión de permisos laborales
 │   ├── solicitud_personal.html   # Requisición oficial de plazas de personal
 │   ├── vacaciones.html           # Control y constancia de vacaciones acumuladas
@@ -251,6 +257,64 @@ Parámetros globales dinámicos del sistema editables desde `views/parametros.ht
 | `techoIhss` | number | `11903.13` | Techo de cotización vigente del IHSS |
 | `prefijoCotizacion` | string | `"COT-"` | Prefijo para folios de cotización |
 
+### 5.6. Colección `bienes_nacionales`
+Catálogo maestro de bienes patrimoniales y activos fijos del Estado.
+- **Ruta:** `/bienes_nacionales/{codigoInventario}`
+- **Identificador de Documento:** Código de inventario en string (ej. `"4004004"`).
+
+| Campo | Tipo | Requerido | Descripción |
+| :--- | :--- | :--- | :--- |
+| `codigo` | string | Sí | Número de inventario único del bien |
+| `categoria` | string | Sí | Categoría patrimonial (Cómputo, Mobiliario, Maquinaria, etc.) |
+| `denominacion` | string | Sí | Nombre o descripción general del activo |
+| `marca`, `modelo`, `serie`, `color` | string | No | Especificaciones físicas de fábrica |
+| `valor` | number | Sí | Costo de adquisición o tasación en Lempiras |
+| `custodio`, `custodioCargo` | string | Sí | Colaborador responsable de la tenencia del bien |
+| `departamento`, `ubicacion` | string | Sí | Área institucional y ubicación física en planta |
+| `estado` | string | Sí | Condición operativa: `Excelente`, `Bueno`, `Regular`, `Malo`, `Para Descargo` |
+| `fecha` | string | Sí | Fecha de alta institucional en formato `YYYY-MM-DD` |
+
+### 5.7. Colección `memorandums`
+Comunicaciones formales internas emitidas por los departamentos.
+- **Ruta:** `/memorandums/{docId}`
+- **Identificador de Documento:** `MEMO-{prefijo}-{numero}-{sufijo}` (ej. `"INFO-59-ENAG"`).
+
+| Campo | Tipo | Requerido | Descripción |
+| :--- | :--- | :--- | :--- |
+| `codigo` | string | Sí | Código de memorando formal (ej. `"MEMORANDO INFO-59-ENAG"`) |
+| `prefijo` | string | Sí | Prefijo de departamento emisor (`INFO`, `ADMON`, `PROD`, `CONT`, etc.) |
+| `numero` | number | Sí | Número correlativo secuencial consecutivo |
+| `sufijo` | string | Sí | `"ENAG"` |
+| `para` | map | Sí | Objeto `{ nombre, cargo }` del destinatario |
+| `de` | map | Sí | Objeto `{ nombre, cargo }` del remitente |
+| `fecha` | string | Sí | Fecha redactada en español formal (ej. `"Miércoles 11 de Noviembre de 2026"`) |
+| `asunto` | string | Sí | Título o motivo sintético de la comunicación |
+| `saludo`, `cuerpo`, `despedida` | string | Sí | Texto estructurado del memorándum |
+| `copias` | map | No | Objeto `{ original, copia1, copia2 }` de distribución |
+| `elaboradoPor` | string | Sí | Usuario autenticado que emitió el documento |
+| `timestamp` | timestamp | Sí | Fecha y hora registrada en el servidor Firestore |
+
+### 5.8. Colección `reportes_tecnicos`
+Dictámenes periciales y de soporte emitidos por el Departamento de Informática.
+- **Ruta:** `/reportes_tecnicos/{docId}`
+- **Identificador de Documento:** `RT-{numero}` (ej. `"RT-2026-11"`).
+
+| Campo | Tipo | Requerido | Descripción |
+| :--- | :--- | :--- | :--- |
+| `numero` | string | Sí | Número correlativo anual (`"RT 2026-11"` o `"2026-11"`) |
+| `fecha` | string | Sí | Fecha de evaluación pericial |
+| `elaboradoPor` | string | Sí | Técnico perito evaluador de Informática |
+| `responsable` | string | Sí | Custodio oficial del bien evaluado |
+| `departamento` | string | Sí | Departamento al que pertenece el equipo |
+| `descripcion` | string | Sí | Ficha técnica resumida del equipo |
+| `serie`, `inventario` | string | No | Números de fábrica e inventario estatal |
+| `problema` | string | Sí | Falla o anomalía reportada inicialmente |
+| `diagnostico` | string | Sí | Evaluación técnica detallada y dictamen |
+| `ultimaLinea` | string | Sí | Texto de cierre inmutable de seguridad |
+| `firmas` | map | Sí | Objeto con las 4 firmas: `{ f1, f2, f3, f4 }` |
+| `copias` | map | Sí | Objeto de archivo: `{ c1, c2, c3 }` |
+| `timestamp` | timestamp | Sí | Registro de tiempo en servidor |
+
 ---
 
 ## 6. POLÍTICAS DE SEGURIDAD Y REGLAS DE FIRESTORE
@@ -259,50 +323,51 @@ Las reglas definidas en `firestore.rules` garantizan que ningún usuario no aute
 
 ```javascript
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    
-    // Función auxiliar: verifica que el usuario esté autenticado con correo verificado
-    function isAuth() {
-      return request.auth != null && request.auth.token.email_verified == true;
-    }
-    
-    // Reglas para la colección de usuarios
+    // Consulta pública de usuarios para búsqueda por username durante login
     match /usuarios/{userId} {
-      allow read: if isAuth();
-      allow write: if isAuth() && (request.auth.uid == userId || request.auth.token.admin == true);
+      allow read: if true;
+      allow write: if request.auth != null;
     }
     
-    // Reglas para cotizaciones y órdenes de producción
-    match /cotizaciones/{document=**} {
-      allow read, create, update: if isAuth();
-      allow delete: if isAuth();
+    // Solicitudes de personal (creación pública, lectura/edición autenticada)
+    match /solicitudes_personal/{solicitudId} {
+      allow create: if true;
+      allow read, update, delete: if request.auth != null;
+
+      match /adjuntos/{adjuntoId} {
+        allow create: if request.resource.data.tipo in ['application/pdf', 'image/jpeg']
+                      && request.resource.data.data.size() < 1000000;
+        allow read, update, delete: if request.auth != null;
+      }
+    }
+
+    // Consulta pública de comprobantes QR (solo get individual, no list)
+    match /consulta_solicitudes/{solicitudId} {
+      allow get: if true;
+      allow list, update, delete: if request.auth != null;
     }
     
-    match /ordenes_produccion/{document=**} {
-      allow read, create, update, delete: if isAuth();
+    // Consulta pública de Bienes Nacionales (para escaneo QR in situ)
+    match /bienes_nacionales/{bienId} {
+      allow get: if true;
+      allow list, create, update, delete: if request.auth != null;
+    }
+
+    // Memorándums y Reportes Técnicos: lectura para auditoría y persistencia institucional
+    match /memorandums/{memoId} {
+      allow read, write: if true;
+    }
+
+    match /reportes_tecnicos/{reporteId} {
+      allow read, write: if true;
     }
     
-    // Reglas para la bitácora: lectura general, inserción permitida, PROHIBIDO eliminar o modificar
-    match /bitacora/{logId} {
-      allow read, create: if isAuth();
-      allow update, delete: if false; // Inmutabilidad garantizada
-    }
-    
-    // Parámetros del sistema: lectura para todos los autenticados, escritura solo administradores
-    match /parametros/{paramId} {
-      allow read: if isAuth();
-      allow write: if isAuth();
-    }
-    
-    // Avisos y tickets de soporte
-    match /avisos_rh/{avisoId} {
-      allow read, write: if isAuth();
-    }
-    
-    match /tickets/{ticketId} {
-      allow read, create, update: if isAuth();
-      allow delete: if isAuth();
+    // Colecciones generales (cotizaciones, bitacora_global, etc.)
+    match /{document=**} {
+      allow read, write: if request.auth != null;
     }
   }
 }
@@ -378,6 +443,43 @@ Permite predecir de forma automatizada y exacta la fracción física que ocupar�
    | $> 100\%$ | **Multi-Página** ($\lceil \% / 100 \rceil$ páginas) | L. 3,200.00 $\times$ Páginas |
 
 4. **Integración con Cotizaciones:** Mediante `sessionStorage` (`enag_item_transferido`), el operador puede transferir el concepto detectado, la cantidad de páginas calculadas, el precio base y los descuentos legislados con un solo clic hacia `views/cotizaciones.html`.
+
+### 7.5. Generación Vectorial de Píldoras y Cajas en jsPDF (`views/reporte_tecnico.html`)
+Para reproducir con fidelidad milimétrica los campos redondeados del Reporte Técnico y evitar artefactos visuales:
+```javascript
+// Trazado vectorial de cajas redondeadas y textos centrados en mm
+doc.setDrawColor(70, 70, 70);
+doc.setLineWidth(0.3);
+doc.setFillColor(255, 255, 255);
+doc.roundedRect(x, y, w, h, rx, ry, 'FD'); // Fill and Draw vectorial
+```
+
+### 7.6. Conversión Robusta de Imágenes Base64 y Anti-CORS (`views/memorandums.html` y `views/reporte_tecnico.html`)
+Para evitar fallos de *tainted canvas* al cargar fondos membretados pesados (ej. `Logo odoo.png`):
+```javascript
+const getBase64FromUrl = (url) => new Promise((resolve) => {
+    const img = new Image();
+    img.crossOrigin = "Anonymous"; // Obligatorio junto a Access-Control-Allow-Origin: * en firebase.json
+    img.onload = () => {
+        const canvas = document.createElement("canvas");
+        canvas.width = img.width; canvas.height = img.height;
+        canvas.getContext("2d").drawImage(img, 0, 0);
+        resolve(canvas.toDataURL("image/png"));
+    };
+    img.onerror = () => resolve(null);
+    img.src = url;
+});
+```
+
+### 7.7. Algoritmo de Correlativos Dinámicos Autoincrementales
+Consulta en memoria y Firestore los documentos del año fiscal corriente para determinar la siguiente secuencia consecutiva sin colisiones:
+```javascript
+// Extracción de secuencia numérica ignorando prefijos variables ('RT ', 'INFO-')
+const clean = str.replace(/^(RT\s*[-]?\s*|[A-Z]+-)/i, '');
+const parts = clean.split('-');
+const sec = parseInt(parts[1] || parts[0], 10);
+const sig = maxSecuencia >= BASE_INICIAL ? (maxSecuencia + 1) : BASE_INICIAL;
+```
 
 ---
 

@@ -10,6 +10,7 @@
       "**/.*",
       "**/.*/**",
       "**/node_modules/**",
+      "scratch/**",
       ".git/**",
       "*.xls",
       "*.pdf",
@@ -22,6 +23,24 @@
           {
             "key": "Cache-Control",
             "value": "no-cache, no-store, must-revalidate"
+          }
+        ]
+      },
+      {
+        "source": "assets/**",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
+          }
+        ]
+      },
+      {
+        "source": "js/**",
+        "headers": [
+          {
+            "key": "Access-Control-Allow-Origin",
+            "value": "*"
           }
         ]
       }

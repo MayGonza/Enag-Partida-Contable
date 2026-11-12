@@ -268,6 +268,41 @@
         localTickets.push(fallbackTicket);
         localStorage.setItem('soporte_tickets_local', JSON.stringify(localTickets));
 
+        // Sincronizar también en Firestore (tickets_soporte) para que aparezca en la Mesa de Ayuda TI
+        if (typeof dbFirestore !== 'undefined' && dbFirestore) {
+            try {
+                const ahora = new Date();
+                const anioActual = ahora.getFullYear();
+                const codigoMesa = `TICK-${anioActual}-${numeroTicket}`;
+                const asuntoResumen = datos.descripcion.length > 65 ? datos.descripcion.slice(0, 62) + '...' : datos.descripcion;
+                await dbFirestore.collection('tickets_soporte').add({
+                    codigo: codigoMesa,
+                    fechaCreacion: ahora.toISOString(),
+                    fechaCreacionTexto: datos.fechaHora || ahora.toLocaleString('es-HN'),
+                    solicitante: datos.nombre,
+                    departamento: datos.departamento,
+                    ubicacion: 'Reportado desde widget del sistema',
+                    categoria: 'Asistencia General',
+                    prioridad: 'Media',
+                    equipoReferencia: 'No especificado',
+                    asunto: asuntoResumen,
+                    descripcion: datos.descripcion,
+                    estado: 'Nuevo',
+                    tecnicoAsignado: 'Sin asignar',
+                    diagnostico: '',
+                    solucion: '',
+                    bitacora: [{
+                        fecha: datos.fechaHora || ahora.toLocaleString('es-HN'),
+                        autor: datos.nombre,
+                        accion: 'Ticket Creado (Widget Soporte)',
+                        nota: 'Solicitud registrada desde el botón de Soporte Técnico del sistema.'
+                    }]
+                });
+            } catch (errFs) {
+                console.warn("No se pudo sincronizar el ticket en Firestore:", errFs);
+            }
+        }
+
         const mailtoSubject = encodeURIComponent(`[TICKET #${numeroTicket}] Solicitud de Soporte - ${datos.departamento}`);
         const mailtoBody = encodeURIComponent(
             `Número de Ticket: #${numeroTicket}\n` +
