@@ -16,6 +16,18 @@
       "*.pdf",
       "*.log"
     ],
+    "redirects": [
+      {
+        "source": "/soporte",
+        "destination": "/views/solicitud_soporte.html",
+        "type": 302
+      },
+      {
+        "source": "/solicitud",
+        "destination": "/views/solicitud_soporte.html",
+        "type": 302
+      }
+    ],
     "headers": [
       {
         "source": "**/*.html",
