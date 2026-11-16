@@ -291,6 +291,8 @@ Comunicaciones formales internas emitidas por los departamentos.
 | `asunto` | string | Sí | Título o motivo sintético de la comunicación |
 | `saludo`, `cuerpo`, `despedida` | string | Sí | Texto estructurado del memorándum |
 | `copias` | map | No | Objeto `{ original, copia1, copia2 }` de distribución |
+| `estado` | string | No | `'Activo'` (vigente) o `'Anulado'` (libera el correlativo para reasignación) |
+| `motivoAnulacion`, `anuladoPor`, `fechaAnulacion` | string | No | Trazabilidad de anulación cuando `estado === 'Anulado'` |
 | `elaboradoPor` | string | Sí | Usuario autenticado que emitió el documento |
 | `timestamp` | timestamp | Sí | Fecha y hora registrada en el servidor Firestore |
 

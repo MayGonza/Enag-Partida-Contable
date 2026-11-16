@@ -527,6 +527,8 @@ Enag-Partida-Contable/
                     <li><code>de</code> (map): <code>{ nombre, cargo }</code>.</li>
                     <li><code>fecha</code>, <code>asunto</code>, <code>saludo</code>, <code>cuerpo</code>, <code>despedida</code> (strings).</li>
                     <li><code>copias</code> (map): <code>{ original, copia1, copia2 }</code>.</li>
+                    <li><code>estado</code> (string): <code>'Activo'</code> (por defecto / vigente) o <code>'Anulado'</code>.</li>
+                    <li><code>motivoAnulacion</code>, <code>anuladoPor</code>, <code>fechaAnulacion</code> (strings): Metadatos de auditoría cuando el memorándum es anulado y su correlativo queda disponible para reasignación.</li>
                     <li><code>elaboradoPor</code> (string): Nombre de usuario o correo emisor.</li>
                     <li><code>timestamp</code> (timestamp): Marca temporal del servidor.</li>
                 </ul>

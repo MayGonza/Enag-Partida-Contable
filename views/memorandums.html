@@ -834,6 +834,191 @@
             background: #fca5a5;
         }
 
+        .btn-hist-void {
+            background: #ffedd5;
+            color: #9a3412;
+        }
+
+        .btn-hist-void:hover {
+            background: #fed7aa;
+        }
+
+        .btn-void-action {
+            background: linear-gradient(135deg, #ea580c 0%, #c2410c 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(234, 88, 12, 0.22);
+        }
+
+        .btn-void-action:hover {
+            background: linear-gradient(135deg, #c2410c 0%, #9a3412 100%);
+            transform: translateY(-1px);
+        }
+
+        .row-memo-anulado {
+            background: #fff5f5 !important;
+        }
+
+        .row-memo-anulado:hover {
+            background: #fee2e2 !important;
+        }
+
+        .badge-memo-anulado {
+            background: #fee2e2;
+            color: #991b1b;
+            border-color: #fecaca;
+            text-decoration: line-through;
+        }
+
+        .estado-pill {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            padding: 3px 9px;
+            border-radius: 12px;
+            font-size: 0.78em;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .estado-activo {
+            background: #dcfce7;
+            color: #166534;
+            border: 1px solid #86efac;
+        }
+
+        .estado-anulado {
+            background: #fee2e2;
+            color: #991b1b;
+            border: 1px solid #fca5a5;
+        }
+
+        .panel-correlativos-disponibles {
+            margin-top: 12px;
+            padding: 10px 12px;
+            background: #ecfdf5;
+            border: 1px solid #6ee7b7;
+            border-radius: 8px;
+            font-size: 0.84em;
+        }
+
+        .chips-correlativos-wrap {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 6px;
+        }
+
+        .chip-num-disponible {
+            background: #ffffff;
+            color: #065f46;
+            border: 1.5px solid #10b981;
+            border-radius: 999px;
+            padding: 4px 11px;
+            font-size: 0.9em;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: inherit;
+        }
+
+        .chip-num-disponible:hover {
+            background: #d1fae5;
+            transform: translateY(-1px);
+        }
+
+        .chip-num-disponible.active {
+            background: #059669;
+            color: #ffffff;
+            border-color: #047857;
+        }
+
+        .btn-chip-reusar-tabla {
+            margin-top: 4px;
+            background: #ecfdf5;
+            color: #047857;
+            border: 1px solid #6ee7b7;
+            border-radius: 6px;
+            padding: 2px 8px;
+            font-size: 0.76em;
+            font-weight: 700;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-family: inherit;
+        }
+
+        .btn-chip-reusar-tabla:hover {
+            background: #d1fae5;
+            border-color: #10b981;
+        }
+
+        .banner-estado-memo {
+            border-radius: 10px;
+            padding: 12px 16px;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+            font-size: 0.88em;
+        }
+
+        .banner-memo-anulado {
+            background: #fef2f2;
+            border: 1.5px solid #f87171;
+            color: #7f1d1d;
+        }
+
+        .banner-memo-edicion {
+            background: #eff6ff;
+            border: 1.5px solid #60a5fa;
+            color: #1e3a8a;
+        }
+
+        .preview-anulado-stamp {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-32deg);
+            font-family: Arial, Helvetica, sans-serif;
+            font-size: 4.4em;
+            font-weight: 900;
+            color: rgba(220, 38, 38, 0.22);
+            border: 6px solid rgba(220, 38, 38, 0.25);
+            padding: 8px 26px;
+            border-radius: 12px;
+            letter-spacing: 6px;
+            text-transform: uppercase;
+            pointer-events: none;
+            z-index: 10;
+            user-select: none;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .reason-chip {
+            background: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+            border-radius: 999px;
+            padding: 4px 10px;
+            font-size: 0.8em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+
+        .reason-chip:hover {
+            background: #e2e8f0;
+            border-color: #94a3b8;
+        }
+
         /* Notificaciones Toast */
         .toast-notification {
             position: fixed;
@@ -1026,8 +1211,36 @@
                     style="position: fixed; top: -1000px; left: -1000px; opacity: 0; width: 1px; height: 1px; pointer-events: none;"
                     onchange="procesarArchivoSubidoMemo(this)">
 
+                <!-- AVISOS DE ESTADO DE EDICIÓN / ANULACIÓN -->
+                <div id="bannerMemoAnulado" class="banner-estado-memo banner-memo-anulado" style="display:none;">
+                    <div>
+                        <strong style="display:block; font-size:1.02em;">🚫 Memorándum Anulado</strong>
+                        <span id="textoDetalleMemoAnulado" style="font-size:0.9em;"></span>
+                    </div>
+                    <div style="display:flex; gap:8px; flex-wrap:wrap;">
+                        <button type="button" id="btnReutilizarMismoNumero" class="btn-tool"
+                            onclick="reutilizarMemoAnulado(true)"
+                            style="background:#059669; color:white; border-color:#047857;">
+                            🔓 Reutilizar con N°
+                        </button>
+                        <button type="button" class="btn-tool" onclick="reutilizarMemoAnulado(false)"
+                            style="background:#0284c7; color:white; border-color:#0369a1;">
+                            📝 Usar Contenido como Nuevo
+                        </button>
+                    </div>
+                </div>
+
+                <div id="bannerMemoEdicion" class="banner-estado-memo banner-memo-edicion" style="display:none;">
+                    <div>
+                        <strong id="textoBannerEdicion">✏️ Editando memorándum guardado</strong>
+                    </div>
+                    <button type="button" class="btn-tool" onclick="limpiarFormularioNuevo()">
+                        🧹 Salir de edición (Nuevo)
+                    </button>
+                </div>
+
                 <!-- 1. CORRELATIVO AUTOMÁTICO -->
-                <div class="correlativo-box">
+                <div class="correlativo-box" id="correlativoBox">
                     <div class="correlativo-header">
                         <div style="display:flex; align-items:center; gap:8px;">
                             <span style="font-size:1.2em;">⚙️</span>
@@ -1059,13 +1272,13 @@
                         <div class="form-group" id="groupPrefijoPersonalizado" style="display:none;">
                             <label for="inputPrefijoPersonalizado">Siglas Prefijo <span class="req">*</span></label>
                             <input type="text" id="inputPrefijoPersonalizado" class="form-control"
-                                placeholder="Ej: LOGIS" maxlength="10" oninput="actualizarCodigoCompleto()">
+                                placeholder="Ej: LOGIS" maxlength="10" oninput="onPrefijoPersonalizadoInput()">
                         </div>
 
                         <div class="form-group">
                             <label for="inputNumeroCorrelativo">Número Secuencial <span class="req">*</span></label>
                             <input type="number" id="inputNumeroCorrelativo" class="form-control" min="1" value="51"
-                                oninput="validarNumeroCorrelativoManual()">
+                                oninput="onNumeroCorrelativoManualInput()">
                         </div>
 
                         <div class="form-group">
@@ -1075,11 +1288,19 @@
                         </div>
 
                         <div class="form-group" style="justify-content: flex-end;">
-                            <button type="button" class="btn-tool" onclick="sugerirSiguienteCorrelativo()"
+                            <button type="button" class="btn-tool" onclick="sugerirSiguienteCorrelativo(true)"
                                 title="Recalcular automáticamente el siguiente número correlativo">
                                 🔄 Sugerir
                             </button>
                         </div>
+                    </div>
+
+                    <div id="panelCorrelativosDisponibles" class="panel-correlativos-disponibles" style="display:none;">
+                        <div style="font-weight:700; color:#065f46; display:flex; align-items:center; gap:6px;">
+                            <span>🔓</span>
+                            <span>Números liberados por anulación disponibles (clic para usar):</span>
+                        </div>
+                        <div id="chipsCorrelativosDisponibles" class="chips-correlativos-wrap"></div>
                     </div>
 
                     <div
@@ -1280,6 +1501,11 @@
                         id="btnGuardarMemo">
                         <span>💾</span> Guardar Memorándum
                     </button>
+                    <button type="button" class="btn-action btn-void-action" onclick="abrirModalAnularDesdeFormulario()"
+                        id="btnAnularMemoForm" style="display:none;"
+                        title="Anular este memorándum y dejar su número correlativo disponible">
+                        <span>🚫</span> Anular Memorándum
+                    </button>
                     <button type="button" class="btn-action btn-outline-action" onclick="imprimirVistaPreviaDirecta()">
                         <span>🖨️</span> Imprimir
                     </button>
@@ -1299,6 +1525,8 @@
 
                 <!-- HOJA CARTA DE PAPEL OFICIAL -->
                 <div class="paper-preview" id="paperPreviewElement">
+                    <!-- Sello de Anulado (visible únicamente cuando el documento está anulado) -->
+                    <div id="previewAnuladoStamp" class="preview-anulado-stamp" style="display:none;">ANULADO</div>
                     <!-- Marca de agua de fondo (Escudo Nacional de Honduras) -->
                     <img src="../assets/logo.png" alt="Marca de Agua" class="paper-watermark">
 
@@ -1408,6 +1636,13 @@
                         <option value="COM">COM — Comercialización</option>
                         <option value="BN">BN — Bienes Nacionales</option>
                         <option value="CONT">CONT — Contabilidad</option>
+                        <option value="DG">DG — Dirección General</option>
+                        <option value="AUD">AUD — Auditoría Interna</option>
+                    </select>
+                    <select id="filtroEstadoHistorial" class="filter-select" onchange="filtrarHistorialMemorandums()">
+                        <option value="TODOS">Todos los Estados</option>
+                        <option value="ACTIVOS">🟢 Solo Vigentes</option>
+                        <option value="ANULADOS">🚫 Solo Anulados</option>
                     </select>
                     <button type="button" class="btn-tool" onclick="exportarHistorialExcel()"
                         title="Descargar reporte en formato Excel">
@@ -1430,12 +1665,13 @@
                             <th>Remitente (DE)</th>
                             <th>Asunto</th>
                             <th>Elaborado Por</th>
+                            <th>Estado</th>
                             <th style="text-align:center;">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tbodyHistorialMemos">
                         <tr>
-                            <td colspan="7" style="text-align:center; padding: 25px; color:var(--text-muted);">
+                            <td colspan="8" style="text-align:center; padding: 25px; color:var(--text-muted);">
                                 ⏳ Cargando historial de memorándums...
                             </td>
                         </tr>
@@ -1476,6 +1712,54 @@
         </div>
     </div>
 
+    <!-- MODAL: ANULAR MEMORÁNDUM Y LIBERAR CORRELATIVO -->
+    <div id="modalAnularMemorando" class="modal-overlay">
+        <div class="modal-box" style="max-width: 560px; border-top-color: #ea580c;">
+            <div
+                style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 12px; margin-bottom: 14px;">
+                <h3 style="margin: 0; color: #9a3412; font-size: 1.18em; display: flex; align-items: center; gap: 8px;">
+                    <span>🚫</span> Anular Memorándum Oficial
+                </h3>
+                <button type="button" onclick="cerrarModalAnularMemorando()"
+                    style="background: none; border: none; font-size: 1.6em; color: #94a3b8; cursor: pointer; line-height: 1;">&times;</button>
+            </div>
+
+            <div style="background: #fff7ed; border: 1px solid #fed7aa; border-radius: 8px; padding: 12px 14px; margin-bottom: 14px;">
+                <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-bottom: 6px;">
+                    <span class="badge-memo" id="anularModalCodigo">MEMORANDO</span>
+                    <span style="font-size: 0.85em; color: #64748b;" id="anularModalPara"></span>
+                </div>
+                <div style="font-weight: 700; color: #1e293b; font-size: 0.95em;" id="anularModalAsunto"></div>
+                <div id="anularModalNumeroInfo"
+                    style="margin-top: 8px; padding-top: 8px; border-top: 1px dashed #fdba74; font-size: 0.86em; color: #065f46; font-weight: 600;">
+                </div>
+            </div>
+
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="font-size: 0.8em; color: #475569; margin-bottom: 4px;">Motivos frecuentes (clic para completar):</label>
+                <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                    <button type="button" class="reason-chip" onclick="seleccionarMotivoRapido('Error de redacción o datos incorrectos')">Error de redacción / datos</button>
+                    <button type="button" class="reason-chip" onclick="seleccionarMotivoRapido('Solicitud cancelada por el área')">Solicitud cancelada</button>
+                    <button type="button" class="reason-chip" onclick="seleccionarMotivoRapido('Corrección de destinatario o asunto')">Corrección de destinatario</button>
+                    <button type="button" class="reason-chip" onclick="seleccionarMotivoRapido('Correlativo emitido por error')">Emitido por error</button>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label for="inputMotivoAnulacion">Motivo de Anulación <span class="req">*</span></label>
+                <textarea id="inputMotivoAnulacion" class="form-control" style="min-height: 84px;"
+                    placeholder="Describa brevemente por qué se anula este memorándum..."></textarea>
+            </div>
+
+            <div style="margin-top: 16px; display: flex; justify-content: flex-end; gap: 10px; border-top: 1px solid #f1f5f9; padding-top: 12px;">
+                <button type="button" onclick="cerrarModalAnularMemorando()"
+                    style="background: #e2e8f0; color: #475569; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">Cancelar</button>
+                <button type="button" id="btnConfirmarAnulacion" onclick="confirmarAnulacionMemorando()"
+                    style="background: #dc2626; color: white; border: none; padding: 9px 18px; border-radius: 6px; font-weight: bold; cursor: pointer;">🚫 Confirmar Anulación</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK Compat v10 -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -1487,8 +1771,67 @@
         // Estado Global del Módulo
         let memorandumsGlobal = [];
         let memorandoEnEdicionId = null;
+        let memorandoCargadoAnulado = null;
+        let memoParaAnularId = null;
+        let numeroSeleccionadoManualmente = false;
+        let guardadoEnProgreso = false;
         // Usar la instancia de Firestore del firebase-config.js global (no redeclarar)
         let _memoDb = null;
+
+        function escapeHTML(str) {
+            return String(str ?? '')
+                .replace(/&/g, '&amp;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;')
+                .replace(/'/g, '&#39;');
+        }
+
+        function escapeJSAttr(str) {
+            return escapeHTML(String(str ?? '').replace(/\\/g, '\\\\').replace(/'/g, "\\'"));
+        }
+
+        function normalizarPrefijo(prefijo) {
+            return (prefijo || '').toString().trim().toUpperCase();
+        }
+
+        function esMemorandoAnulado(memo) {
+            return Boolean(memo && typeof memo.estado === 'string' && memo.estado.trim().toLowerCase() === 'anulado');
+        }
+
+        function obtenerUsuarioActualSistema() {
+            let usuarioActivo = '';
+            try {
+                usuarioActivo = localStorage.getItem('usuarioNombre') ||
+                    localStorage.getItem('usuarioLogueado') ||
+                    localStorage.getItem('enag_username') || '';
+            } catch (e) { }
+            if (!usuarioActivo && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
+                usuarioActivo = firebase.auth().currentUser.displayName || firebase.auth().currentUser.email || '';
+            }
+            return usuarioActivo || 'Usuario del Sistema';
+        }
+
+        function formatearFechaCortaISO(isoStr) {
+            if (!isoStr) return '';
+            const d = new Date(isoStr);
+            if (isNaN(d.getTime())) return String(isoStr);
+            try {
+                return d.toLocaleString('es-HN', {
+                    year: 'numeric', month: '2-digit', day: '2-digit',
+                    hour: '2-digit', minute: '2-digit'
+                });
+            } catch (e) {
+                return d.toISOString().slice(0, 16).replace('T', ' ');
+            }
+        }
+
+        async function confirmarAccion(mensaje) {
+            if (typeof window !== 'undefined' && typeof window.enagConfirm === 'function') {
+                return await window.enagConfirm(mensaje);
+            }
+            return confirm(mensaje);
+        }
 
         // Función para resolver el constructor jsPDF de forma universal
         function obtenerConstructorJsPDF() {
@@ -1574,7 +1917,49 @@
             return sel;
         }
 
+        function obtenerResumenCorrelativos(prefijo) {
+            const prefijoNorm = normalizarPrefijo(prefijo);
+            const numerosActivos = new Set();
+            const liberadosMap = new Map();
+            let maxActivo = 0;
+
+            memorandumsGlobal.forEach(m => {
+                if (normalizarPrefijo(m.prefijo) !== prefijoNorm) return;
+                const num = parseInt(m.numero, 10);
+                if (!Number.isInteger(num) || num < 1) return;
+
+                if (esMemorandoAnulado(m)) {
+                    if (!liberadosMap.has(num)) {
+                        liberadosMap.set(num, m);
+                    }
+                } else {
+                    numerosActivos.add(num);
+                    if (num > maxActivo) maxActivo = num;
+                }
+            });
+
+            // Solo quedan liberados los números anulados que aún no han sido reasignados a un memo vigente
+            for (const num of Array.from(liberadosMap.keys())) {
+                if (numerosActivos.has(num)) {
+                    liberadosMap.delete(num);
+                }
+            }
+
+            const numerosLiberados = Array.from(liberadosMap.keys()).sort((a, b) => a - b);
+            const siguienteSecuencial = maxActivo > 0 ? maxActivo + 1 : (prefijoNorm === 'INFO' ? 59 : 1);
+
+            return {
+                prefijo: prefijoNorm,
+                numerosActivos,
+                liberadosMap,
+                numerosLiberados,
+                maxActivo,
+                siguienteSecuencial
+            };
+        }
+
         function cambiarDepartamentoEmisor(val) {
+            numeroSeleccionadoManualmente = false;
             const groupOtro = document.getElementById('groupPrefijoPersonalizado');
             if (groupOtro) {
                 if (val === 'OTRO') {
@@ -1585,7 +1970,18 @@
                     groupOtro.style.display = 'none';
                 }
             }
-            sugerirSiguienteCorrelativo();
+            sugerirSiguienteCorrelativo(false);
+        }
+
+        function onPrefijoPersonalizadoInput() {
+            actualizarCodigoCompleto();
+            renderizarChipsCorrelativosDisponibles();
+        }
+
+        function onNumeroCorrelativoManualInput() {
+            numeroSeleccionadoManualmente = true;
+            actualizarCodigoCompleto();
+            renderizarChipsCorrelativosDisponibles();
         }
 
         function construirCodigoCompleto() {
@@ -1603,24 +1999,24 @@
             if (dispElem) dispElem.textContent = codigo;
             const prevElem = document.getElementById('prevTituloMemorando');
             if (prevElem) prevElem.textContent = codigo;
+            if (memorandoEnEdicionId && !memorandoCargadoAnulado) {
+                const txtEd = document.getElementById('textoBannerEdicion');
+                if (txtEd) txtEd.textContent = `✏️ Editando memorándum guardado: ${codigo}`;
+            }
             validarNumeroCorrelativoManual();
         }
 
-        function sugerirSiguienteCorrelativo() {
+        function sugerirSiguienteCorrelativo(desdeBoton = false) {
+            if (desdeBoton) {
+                numeroSeleccionadoManualmente = false;
+            }
             const prefijo = obtenerPrefijoActual();
-            let maxNum = 0;
-
-            memorandumsGlobal.forEach(m => {
-                if (m.prefijo === prefijo && typeof m.numero === 'number') {
-                    if (m.numero > maxNum) maxNum = m.numero;
-                }
-            });
-
-            let siguiente = maxNum > 0 ? maxNum + 1 : (prefijo === 'INFO' ? 59 : 1);
+            const resumen = obtenerResumenCorrelativos(prefijo);
 
             const numInput = document.getElementById('inputNumeroCorrelativo');
-            if (numInput) numInput.value = siguiente;
+            if (numInput) numInput.value = resumen.siguienteSecuencial;
             actualizarCodigoCompleto();
+            renderizarChipsCorrelativosDisponibles();
         }
 
         function validarNumeroCorrelativoManual() {
@@ -1630,15 +2026,106 @@
             const statusElem = document.getElementById('statusCorrelativo');
             if (!statusElem) return;
 
-            const existe = memorandumsGlobal.find(m => m.prefijo === prefijo && m.numero === num && m.id !== memorandoEnEdicionId);
-
-            if (existe) {
-                statusElem.textContent = `⚠️ Ya usado el ${existe.fecha || 'anteriormente'}`;
+            if (!Number.isInteger(num) || num < 1) {
+                statusElem.textContent = '⚠️ Número inválido (mín. 1)';
                 statusElem.className = 'correlativo-status status-warn';
+                return;
+            }
+
+            const existeActivo = memorandumsGlobal.find(m =>
+                normalizarPrefijo(m.prefijo) === normalizarPrefijo(prefijo) &&
+                parseInt(m.numero, 10) === num &&
+                m.id !== memorandoEnEdicionId &&
+                !esMemorandoAnulado(m)
+            );
+
+            if (existeActivo) {
+                statusElem.textContent = `⚠️ Ya usado el ${existeActivo.fecha || 'anteriormente'}`;
+                statusElem.className = 'correlativo-status status-warn';
+                return;
+            }
+
+            const resumen = obtenerResumenCorrelativos(prefijo);
+            if (resumen.liberadosMap.has(num)) {
+                statusElem.textContent = '🟢 Disponible (Liberado por anulación)';
+                statusElem.className = 'correlativo-status status-ok';
             } else {
                 statusElem.textContent = '🟢 Correlativo Disponible';
                 statusElem.className = 'correlativo-status status-ok';
             }
+        }
+
+        function renderizarChipsCorrelativosDisponibles() {
+            const panel = document.getElementById('panelCorrelativosDisponibles');
+            const chipsCont = document.getElementById('chipsCorrelativosDisponibles');
+            if (!panel || !chipsCont) return;
+
+            const prefijo = obtenerPrefijoActual();
+            const resumen = obtenerResumenCorrelativos(prefijo);
+            const numActual = parseInt(document.getElementById('inputNumeroCorrelativo')?.value, 10);
+
+            if (resumen.numerosLiberados.length === 0) {
+                panel.style.display = 'none';
+                chipsCont.innerHTML = '';
+                return;
+            }
+
+            panel.style.display = 'block';
+            chipsCont.innerHTML = '';
+
+            resumen.numerosLiberados.forEach(num => {
+                const memoAnulado = resumen.liberadosMap.get(num);
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                const estaSeleccionado = (numActual === num);
+                btn.className = `chip-num-disponible${estaSeleccionado ? ' active' : ''}`;
+                const detalleMotivo = memoAnulado && memoAnulado.motivoAnulacion ? ` | Motivo: ${memoAnulado.motivoAnulacion}` : '';
+                btn.title = `Número liberado al anular ${memoAnulado ? (memoAnulado.codigo || '') : ''}${detalleMotivo}`;
+                btn.textContent = estaSeleccionado ? `✓ #${num} seleccionado` : `🔓 Usar #${num}`;
+                btn.onclick = () => usarNumeroLiberado(prefijo, num);
+                chipsCont.appendChild(btn);
+            });
+        }
+
+        function usarNumeroLiberado(prefijo, numero) {
+            const numVal = parseInt(numero, 10);
+            if (!Number.isInteger(numVal) || numVal < 1) return;
+
+            if (memorandoCargadoAnulado) {
+                memorandoEnEdicionId = null;
+                memorandoCargadoAnulado = null;
+            }
+
+            const prefijoNorm = normalizarPrefijo(prefijo);
+            const selectDepto = document.getElementById('selectDepartamento');
+            if (selectDepto) {
+                const existeOption = Array.from(selectDepto.options).some(o => o.value === prefijoNorm);
+                const groupOtro = document.getElementById('groupPrefijoPersonalizado');
+                if (existeOption) {
+                    selectDepto.value = prefijoNorm;
+                    if (groupOtro) groupOtro.style.display = 'none';
+                } else {
+                    selectDepto.value = 'OTRO';
+                    if (groupOtro) groupOtro.style.display = 'flex';
+                    const inpOtro = document.getElementById('inputPrefijoPersonalizado');
+                    if (inpOtro) inpOtro.value = prefijoNorm;
+                }
+            }
+
+            numeroSeleccionadoManualmente = true;
+            const numInput = document.getElementById('inputNumeroCorrelativo');
+            if (numInput) numInput.value = numVal;
+
+            actualizarEstadoEdicionUI();
+            actualizarCodigoCompleto();
+            actualizarVistaPrevia();
+            renderizarChipsCorrelativosDisponibles();
+
+            const box = document.getElementById('correlativoBox');
+            if (box && typeof box.scrollIntoView === 'function') {
+                box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            showToast(`🔓 Número disponible ${prefijoNorm}-${numVal} asignado al formulario.`, "success");
         }
 
         // 3. Cargar Perfil del Remitente de la Sesión
@@ -1730,8 +2217,17 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             document.getElementById('textareaCuerpo').value = textoCuerpo;
             actualizarCodigoCompleto();
+            renderizarChipsCorrelativosDisponibles();
             actualizarVistaPrevia();
             showToast("Plantilla de Mantenimiento cargada.", "info");
+        }
+
+        function aplicarTamanoLetra(tamano) {
+            const sel = document.getElementById('selectTamanoLetra');
+            if (sel && ['pequeno', 'muy_pequeno', 'mediano'].includes(tamano)) {
+                sel.value = tamano;
+            }
+            actualizarVistaPrevia();
         }
 
         function generarSaludoAutomatico() {
@@ -1905,6 +2401,11 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     ccContainer.appendChild(d);
                 }
             }
+
+            const anuladoStamp = document.getElementById('previewAnuladoStamp');
+            if (anuladoStamp) {
+                anuladoStamp.style.display = memorandoCargadoAnulado ? 'flex' : 'none';
+            }
         }
 
         // 6. Conversión de imagen a Base64 — idéntica a vouchers_contrato.html (producción)
@@ -1923,7 +2424,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         });
 
         // 7. CONSTRUCTOR CENTRAL DEL DOCUMENTO PDF
-        async function construirDocumentoPDF() {
+        async function construirDocumentoPDF(opciones = {}) {
             const jsPDFClass = obtenerConstructorJsPDF();
             if (!jsPDFClass) {
                 throw new Error("La librería jsPDF no está disponible en este momento. Por favor recargue la página.");
@@ -2156,6 +2657,27 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 doc.text(c2, margenIzq, yCC + ccOffset);
             }
 
+            if (opciones && opciones.esAnulado) {
+                try {
+                    const usaGState = (typeof doc.saveGraphicsState === 'function' && typeof doc.GState === 'function');
+                    if (usaGState) {
+                        doc.saveGraphicsState();
+                        doc.setGState(new doc.GState({ opacity: 0.22 }));
+                        doc.setTextColor(220, 38, 38);
+                    } else {
+                        doc.setTextColor(235, 175, 175);
+                    }
+                    doc.setFont('helvetica', 'bold');
+                    doc.setFontSize(58);
+                    doc.text('ANULADO', pageWidth / 2, pageHeight / 2 + 12, { align: 'center', angle: 35 });
+                    if (usaGState && typeof doc.restoreGraphicsState === 'function') {
+                        doc.restoreGraphicsState();
+                    }
+                } catch (eStamp) {
+                    console.warn('No se pudo dibujar sello ANULADO en PDF:', eStamp);
+                }
+            }
+
             return doc;
         }
 
@@ -2166,15 +2688,19 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             if (btn) { btn.innerHTML = '<span>⏳</span> Generando PDF...'; btn.disabled = true; }
 
             try {
-                const doc = await construirDocumentoPDF();
+                const esAnulado = Boolean(memorandoCargadoAnulado);
+                const doc = await construirDocumentoPDF({ esAnulado });
                 const codigoCompleto = construirCodigoCompleto();
-                const fileName = `${codigoCompleto.replace(/\s+/g, '_')}.pdf`;
+                const sufijoAnulado = esAnulado ? '_ANULADO' : '';
+                const fileName = `${codigoCompleto.replace(/\s+/g, '_')}${sufijoAnulado}.pdf`;
 
                 // Descargar el documento PDF directamente
                 doc.save(fileName);
 
-                // Auto-guardar en Firestore en segundo plano
-                guardarMemorandoEnFirestore().catch(e => console.warn('Auto-guardado background:', e));
+                // Auto-guardar en Firestore en segundo plano solo si no es un memo anulado
+                if (!esAnulado) {
+                    guardarMemorandoEnFirestore({ silencioso: true }).catch(e => console.warn('Auto-guardado background:', e));
+                }
 
                 showToast(`✅ ¡Memorándum descargado: ${fileName}!`, "success");
             } catch (err) {
@@ -2190,7 +2716,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         async function imprimirVistaPreviaDirecta() {
             showToast("⏳ Preparando documento para impresión...", "info");
             try {
-                const doc = await construirDocumentoPDF();
+                const doc = await construirDocumentoPDF({ esAnulado: Boolean(memorandoCargadoAnulado) });
                 if (doc) {
                     doc.autoPrint();
                     const blobUrl = doc.output('bloburl');
@@ -2280,6 +2806,28 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             }
         }
 
+        function sincronizarListaMemorandums(lista) {
+            memorandumsGlobal = Array.isArray(lista) ? lista : [];
+            if (memorandoEnEdicionId) {
+                const actualizado = memorandumsGlobal.find(m => m.id === memorandoEnEdicionId);
+                if (actualizado) {
+                    memorandoCargadoAnulado = esMemorandoAnulado(actualizado) ? actualizado : null;
+                }
+            }
+            actualizarEstadoEdicionUI();
+            actualizarEstadisticasYTabla();
+            if (!memorandoEnEdicionId && !numeroSeleccionadoManualmente) {
+                sugerirSiguienteCorrelativo(false);
+            } else {
+                validarNumeroCorrelativoManual();
+                renderizarChipsCorrelativosDisponibles();
+            }
+            const modalGuardados = document.getElementById('modalDocumentosGuardadosMemo');
+            if (modalGuardados && modalGuardados.classList.contains('active')) {
+                filtrarListaModalMemo();
+            }
+        }
+
         function escucharMemorandumsFirestore(db) {
             if (!db) return;
             try {
@@ -2289,10 +2837,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                         snapshot.forEach((doc) => {
                             lista.push({ id: doc.id, ...doc.data() });
                         });
-                        memorandumsGlobal = lista;
-                        actualizarEstadisticasYTabla();
-                        // Sugerir siguiente correlativo con datos frescos
-                        sugerirSiguienteCorrelativo();
+                        sincronizarListaMemorandums(lista);
                     }, (err) => {
                         console.warn("Fallo lectura en tiempo real de Firestore:", err.code, err.message);
                         // Si es error de permisos, intentar con get() directo
@@ -2314,9 +2859,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 const snap = await db.collection('memorandums').orderBy('timestamp', 'desc').limit(200).get();
                 const lista = [];
                 snap.forEach(doc => lista.push({ id: doc.id, ...doc.data() }));
-                memorandumsGlobal = lista;
-                actualizarEstadisticasYTabla();
-                sugerirSiguienteCorrelativo();
+                sincronizarListaMemorandums(lista);
             } catch (e) {
                 console.warn("Fallo get() Firestore, usando localStorage:", e);
                 cargarHistorialLocalStorage();
@@ -2336,15 +2879,61 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             }
         }
 
-        async function guardarMemorandoEnFirestore() {
+        function upsertMemoriaYLocal(docId, data) {
+            const idx = memorandumsGlobal.findIndex(m => m.id === docId);
+            const registro = { id: docId, ...data };
+            if (idx >= 0) {
+                memorandumsGlobal[idx] = { ...memorandumsGlobal[idx], ...registro };
+            } else {
+                memorandumsGlobal.unshift(registro);
+            }
+            guardarRespaldoLocal(docId, memorandumsGlobal.find(m => m.id === docId) || data);
+        }
+
+        async function resolverDocIdParaNuevoMemorando(db, prefijo, num, sufijo) {
+            const baseId = `${prefijo}-${num}-${sufijo}`;
+            const existeEnMemoria = memorandumsGlobal.some(m => m.id === baseId);
+            if (!existeEnMemoria) {
+                if (!db) return { docId: baseId };
+                try {
+                    const snap = await db.collection('memorandums').doc(baseId).get();
+                    if (!snap.exists) return { docId: baseId };
+                    if (esMemorandoAnulado(snap.data())) {
+                        return { docId: `${baseId}-R${Date.now()}` };
+                    }
+                    return { conflictoActivo: { id: snap.id, ...snap.data() } };
+                } catch (e) {
+                    return { docId: baseId };
+                }
+            }
+            return { docId: `${baseId}-R${Date.now()}` };
+        }
+
+        async function guardarMemorandoEnFirestore(opciones = {}) {
+            if (guardadoEnProgreso) return;
+            const silencioso = Boolean(opciones && opciones.silencioso);
             const btn = document.getElementById('btnGuardarMemo');
+
+            if (memorandoCargadoAnulado) {
+                if (!silencioso) {
+                    showToast("⚠️ Este memorándum está ANULADO. Use 'Reutilizar' en el aviso superior para crear uno nuevo.", "warning");
+                }
+                return;
+            }
+
+            guardadoEnProgreso = true;
             if (btn) btn.disabled = true;
 
             try {
                 const codigo = construirCodigoCompleto();
                 const prefijo = obtenerPrefijoActual();
                 const num = parseInt(document.getElementById('inputNumeroCorrelativo').value, 10);
-                const sufijo = document.getElementById('inputSufijoInstitucional').value.trim().toUpperCase();
+                const sufijo = document.getElementById('inputSufijoInstitucional').value.trim().toUpperCase() || 'ENAG';
+
+                if (!Number.isInteger(num) || num < 1) {
+                    if (!silencioso) showToast("⚠️ El número correlativo debe ser un entero mayor o igual a 1.", "warning");
+                    return;
+                }
 
                 const paraNombre = document.getElementById('inputParaNombre').value.trim();
                 const paraCargo = document.getElementById('inputParaCargo').value.trim();
@@ -2360,27 +2949,64 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 const copia2 = document.getElementById('inputCopia2').value.trim();
 
                 if (!paraNombre || !deNombre || !asunto || !cuerpo.trim()) {
-                    showToast("Por favor complete los campos obligatorios (Destinatario, Remitente, Asunto y Cuerpo).", "warning");
-                    if (btn) btn.disabled = false;
+                    if (!silencioso) {
+                        showToast("Por favor complete los campos obligatorios (Destinatario, Remitente, Asunto y Cuerpo).", "warning");
+                    }
                     return;
                 }
 
-                guardarPerfilRemitente();
+                const db = obtenerDB();
+                let docId = memorandoEnEdicionId;
 
-                let usuarioActivo = 'Usuario del Sistema';
-                try {
-                    usuarioActivo = localStorage.getItem('usuarioNombre') || localStorage.getItem('usuarioLogueado') || localStorage.getItem('enag_username');
-                } catch (e) { }
-                if (!usuarioActivo && typeof firebase !== 'undefined' && firebase.auth && firebase.auth().currentUser) {
-                    usuarioActivo = firebase.auth().currentUser.email;
+                const existeActivo = memorandumsGlobal.find(m =>
+                    normalizarPrefijo(m.prefijo) === normalizarPrefijo(prefijo) &&
+                    parseInt(m.numero, 10) === num &&
+                    m.id !== docId &&
+                    !esMemorandoAnulado(m)
+                );
+
+                if (existeActivo) {
+                    if (silencioso) {
+                        showToast(`⚠️ PDF descargado. No se sobrescribió el N° ${num} (${prefijo}) porque pertenece a un memorándum vigente.`, "warning");
+                        return;
+                    }
+                    const confirmarSobrescritura = await confirmarAccion(
+                        `El correlativo ${codigo} ya está asignado a un memorándum vigente ("${existeActivo.asunto || 'Sin asunto'}").\n\nPara liberar este número y crear un nuevo memorándum debe anular el anterior primero.\n\n¿Desea actualizar el memorándum existente (${existeActivo.codigo || existeActivo.id}) de todas formas?`
+                    );
+                    if (!confirmarSobrescritura) {
+                        document.getElementById('inputNumeroCorrelativo')?.focus();
+                        return;
+                    }
+                    docId = existeActivo.id;
+                } else if (!docId) {
+                    const resDoc = await resolverDocIdParaNuevoMemorando(db, prefijo, num, sufijo);
+                    if (resDoc.conflictoActivo) {
+                        if (silencioso) {
+                            showToast(`⚠️ PDF descargado. El N° ${num} (${prefijo}) ya existe como memorándum vigente en la base de datos.`, "warning");
+                            return;
+                        }
+                        const confirmarRemoto = await confirmarAccion(
+                            `El correlativo ${codigo} ya existe como memorándum vigente en Firestore.\n\n¿Desea actualizar el registro existente?`
+                        );
+                        if (!confirmarRemoto) {
+                            document.getElementById('inputNumeroCorrelativo')?.focus();
+                            return;
+                        }
+                        docId = resDoc.conflictoActivo.id;
+                    } else {
+                        docId = resDoc.docId;
+                    }
                 }
-                if (!usuarioActivo) usuarioActivo = "Usuario del Sistema";
+
+                guardarPerfilRemitente();
+                const usuarioActivo = obtenerUsuarioActualSistema();
 
                 const memoData = {
                     codigo,
                     prefijo,
                     numero: num,
                     sufijo,
+                    estado: 'Activo',
                     para: { nombre: paraNombre, cargo: paraCargo },
                     de: { nombre: deNombre, cargo: deCargo },
                     fecha,
@@ -2393,31 +3019,36 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     fechaActualizacion: new Date().toISOString()
                 };
 
-                const docId = memorandoEnEdicionId || `${prefijo}-${num}-${sufijo}`;
-                const db = obtenerDB();
-
                 if (db) {
-                    await db.collection('memorandums').doc(docId).set({
-                        ...memoData,
-                        timestamp: firebase.firestore.FieldValue.serverTimestamp()
-                    }, { merge: true });
+                    const payload = { ...memoData };
+                    const existente = memorandumsGlobal.find(m => m.id === docId);
+                    if (!existente || !existente.timestamp) {
+                        payload.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+                    await db.collection('memorandums').doc(docId).set(payload, { merge: true });
                     showToast(`✅ ¡Memorándum ${codigo} guardado en Firestore!`, "success");
                 } else {
                     showToast("⚠️ Sin Firestore. Guardado solo localmente.", "warning");
                 }
 
-                guardarRespaldoLocal(docId, memoData);
+                upsertMemoriaYLocal(docId, memoData);
 
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Administración', 'Guardar Memorando', `Se registró/actualizó el ${codigo} con asunto: "${asunto}" para ${paraNombre}`);
                 }
 
                 memorandoEnEdicionId = docId;
+                memorandoCargadoAnulado = null;
+                numeroSeleccionadoManualmente = false;
+                actualizarEstadoEdicionUI();
                 actualizarEstadisticasYTabla();
+                validarNumeroCorrelativoManual();
+                renderizarChipsCorrelativosDisponibles();
             } catch (error) {
                 console.error("Error guardando memorándum:", error);
                 showToast("❌ Error al guardar: " + error.message, "error");
             } finally {
+                guardadoEnProgreso = false;
                 if (btn) btn.disabled = false;
             }
         }
@@ -2427,7 +3058,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 if (window.registrarBitacora) {
                     window.registrarBitacora('Administración', 'Emisión de Memorándum', `Se emitió y descargó el ${codigo} para ${para} (Asunto: ${asunto})`);
                 }
-                guardarMemorandoEnFirestore();
+                guardarMemorandoEnFirestore({ silencioso: true });
             } catch (e) {
                 console.error("Error registrando en bitácora:", e);
             }
@@ -2451,8 +3082,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
         function cargarHistorialLocalStorage() {
             try {
                 const local = JSON.parse(localStorage.getItem('enag_memorandums_local') || '[]');
-                memorandumsGlobal = local;
-                actualizarEstadisticasYTabla();
+                sincronizarListaMemorandums(local);
             } catch (e) {
                 console.warn("Error leyendo historial local:", e);
             }
@@ -2460,13 +3090,20 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         // 11. Renderizado y Filtros de la Tabla de Historial
         function actualizarEstadisticasYTabla() {
+            const activos = memorandumsGlobal.filter(m => !esMemorandoAnulado(m));
+            const anulados = memorandumsGlobal.filter(m => esMemorandoAnulado(m));
+
             const badgeTotal = document.getElementById('badgeTotalMemos');
-            if (badgeTotal) badgeTotal.textContent = `📁 ${memorandumsGlobal.length} Memorándums`;
+            if (badgeTotal) {
+                badgeTotal.textContent = anulados.length > 0
+                    ? `📁 ${activos.length} Vigentes • ${anulados.length} Anulados`
+                    : `📁 ${activos.length} Memorándums`;
+            }
 
             const badgeUltimo = document.getElementById('badgeUltimoCorrelativo');
             if (badgeUltimo) {
-                if (memorandumsGlobal.length > 0) {
-                    const ultimo = memorandumsGlobal[0];
+                if (activos.length > 0) {
+                    const ultimo = activos[0];
                     badgeUltimo.textContent = `🔢 Último: ${ultimo.codigo || (ultimo.prefijo + '-' + ultimo.numero)}`;
                 } else {
                     badgeUltimo.textContent = `🔢 Último: N/A`;
@@ -2481,13 +3118,19 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             const query = inputBusq ? inputBusq.value.toLowerCase().trim() : '';
             const deptoSel = document.getElementById('filtroDeptoHistorial');
             const depto = deptoSel ? deptoSel.value : 'TODOS';
+            const estadoSel = document.getElementById('filtroEstadoHistorial');
+            const estadoFiltro = estadoSel ? estadoSel.value : 'TODOS';
 
             const filtrados = memorandumsGlobal.filter(m => {
-                const matchDepto = (depto === 'TODOS' || m.prefijo === depto);
+                const matchDepto = (depto === 'TODOS' || normalizarPrefijo(m.prefijo) === depto);
                 if (!matchDepto) return false;
 
+                const anulado = esMemorandoAnulado(m);
+                if (estadoFiltro === 'ACTIVOS' && anulado) return false;
+                if (estadoFiltro === 'ANULADOS' && !anulado) return false;
+
                 if (!query) return true;
-                const textoCompleto = `${m.codigo || ''} ${m.asunto || ''} ${m.para ? m.para.nombre : ''} ${m.de ? m.de.nombre : ''} ${m.elaboradoPor || ''}`.toLowerCase();
+                const textoCompleto = `${m.codigo || ''} ${m.asunto || ''} ${m.para ? m.para.nombre : ''} ${m.de ? m.de.nombre : ''} ${m.elaboradoPor || ''} ${m.motivoAnulacion || ''} ${m.anuladoPor || ''}`.toLowerCase();
                 return textoCompleto.includes(query);
             });
 
@@ -2502,7 +3145,7 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             if (lista.length === 0) {
                 tbody.innerHTML = `
                     <tr>
-                        <td colspan="7" style="text-align:center; padding: 24px; color:var(--text-muted);">
+                        <td colspan="8" style="text-align:center; padding: 24px; color:var(--text-muted);">
                             No se encontraron memorándums registrados.
                         </td>
                     </tr>
@@ -2510,27 +3153,72 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 return;
             }
 
+            const activosPorPrefijo = {};
+            const obtenerActivosPrefijo = (pref) => {
+                const p = normalizarPrefijo(pref);
+                if (!activosPorPrefijo[p]) {
+                    activosPorPrefijo[p] = obtenerResumenCorrelativos(p).numerosActivos;
+                }
+                return activosPorPrefijo[p];
+            };
+
             lista.forEach(m => {
                 const tr = document.createElement('tr');
+                const anulado = esMemorandoAnulado(m);
+                if (anulado) tr.className = 'row-memo-anulado';
+
                 const cod = m.codigo || `${m.prefijo}-${m.numero}-${m.sufijo || 'ENAG'}`;
-                const paraStr = m.para ? `<strong>${m.para.nombre}</strong><br><small style="color:#64748b;">${m.para.cargo || ''}</small>` : 'N/A';
-                const deStr = m.de ? `<strong>${m.de.nombre}</strong><br><small style="color:#64748b;">${m.de.cargo || ''}</small>` : 'N/A';
+                const paraStr = m.para
+                    ? `<strong>${escapeHTML(m.para.nombre)}</strong><br><small style="color:#64748b;">${escapeHTML(m.para.cargo || '')}</small>`
+                    : 'N/A';
+                const deStr = m.de
+                    ? `<strong>${escapeHTML(m.de.nombre)}</strong><br><small style="color:#64748b;">${escapeHTML(m.de.cargo || '')}</small>`
+                    : 'N/A';
+
+                let estadoHtml = '<span class="estado-pill estado-activo">🟢 Vigente</span>';
+                if (anulado) {
+                    const numMemo = parseInt(m.numero, 10);
+                    const prefNorm = normalizarPrefijo(m.prefijo);
+                    const numDisponible = Number.isInteger(numMemo) && !obtenerActivosPrefijo(prefNorm).has(numMemo);
+                    const fechaAnul = formatearFechaCortaISO(m.fechaAnulacion);
+                    const detalleAnul = [
+                        m.motivoAnulacion ? escapeHTML(m.motivoAnulacion) : '',
+                        m.anuladoPor ? `Por: ${escapeHTML(m.anuladoPor)}` : '',
+                        fechaAnul ? escapeHTML(fechaAnul) : ''
+                    ].filter(Boolean).join(' • ');
+
+                    const botonReusar = numDisponible
+                        ? `<button type="button" class="btn-chip-reusar-tabla" onclick="usarNumeroLiberado('${escapeJSAttr(prefNorm)}', ${numMemo})" title="Asignar este número disponible al formulario">🔓 N° ${numMemo} disponible</button>`
+                        : `<small style="display:block; color:#64748b; margin-top:3px;">N° ${Number.isInteger(numMemo) ? numMemo : ''} ya reasignado</small>`;
+
+                    estadoHtml = `
+                        <span class="estado-pill estado-anulado" title="${detalleAnul}">🚫 Anulado</span>
+                        ${m.motivoAnulacion ? `<div style="font-size:0.78em; color:#7f1d1d; margin-top:3px; max-width:200px;">${escapeHTML(m.motivoAnulacion)}</div>` : ''}
+                        ${botonReusar}
+                    `;
+                }
+
+                const botonAnular = anulado
+                    ? ''
+                    : `<button type="button" class="btn-hist-action btn-hist-void" onclick="abrirModalAnularMemorando('${escapeJSAttr(m.id)}')" title="Anular memorándum y dejar número disponible">🚫 Anular</button>`;
 
                 tr.innerHTML = `
-                    <td><span class="badge-memo">${cod}</span></td>
-                    <td style="white-space:nowrap;">${m.fecha || ''}</td>
+                    <td><span class="badge-memo ${anulado ? 'badge-memo-anulado' : ''}">${escapeHTML(cod)}</span></td>
+                    <td style="white-space:nowrap;">${escapeHTML(m.fecha || '')}</td>
                     <td>${paraStr}</td>
                     <td>${deStr}</td>
-                    <td style="max-width:260px;"><strong>${m.asunto || ''}</strong></td>
-                    <td style="white-space:nowrap; font-size:0.88em; color:#475569;">${m.elaboradoPor || 'Sistema'}</td>
+                    <td style="max-width:240px;"><strong>${escapeHTML(m.asunto || '')}</strong></td>
+                    <td style="white-space:nowrap; font-size:0.88em; color:#475569;">${escapeHTML(m.elaboradoPor || 'Sistema')}</td>
+                    <td>${estadoHtml}</td>
                     <td style="text-align:center; white-space:nowrap;">
-                        <button type="button" class="btn-hist-action btn-hist-load" onclick="cargarMemorandoAlFormulario('${m.id}')" title="Cargar y editar memorándum">
-                            👁️ Cargar
+                        <button type="button" class="btn-hist-action btn-hist-load" onclick="cargarMemorandoAlFormulario('${escapeJSAttr(m.id)}')" title="${anulado ? 'Ver memorándum anulado' : 'Cargar y editar memorándum'}">
+                            👁️ ${anulado ? 'Ver' : 'Cargar'}
                         </button>
-                        <button type="button" class="btn-hist-action btn-hist-pdf" onclick="descargarPDFDesdeHistorial('${m.id}')" title="Descargar PDF oficial">
+                        <button type="button" class="btn-hist-action btn-hist-pdf" onclick="descargarPDFDesdeHistorial('${escapeJSAttr(m.id)}')" title="${anulado ? 'Descargar PDF con sello ANULADO' : 'Descargar PDF oficial'}">
                             📄 PDF
                         </button>
-                        <button type="button" class="btn-hist-action btn-hist-delete" onclick="eliminarMemorando('${m.id}')" title="Eliminar memorándum">
+                        ${botonAnular}
+                        <button type="button" class="btn-hist-action btn-hist-delete" onclick="eliminarMemorando('${escapeJSAttr(m.id)}')" title="Eliminar permanentemente">
                             🗑️
                         </button>
                     </td>
@@ -2539,22 +3227,97 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
             });
         }
 
-        // 12. Acciones del Historial (Cargar, Re-emitir PDF, Eliminar)
+        function actualizarEstadoEdicionUI() {
+            const bannerAnulado = document.getElementById('bannerMemoAnulado');
+            const bannerEdicion = document.getElementById('bannerMemoEdicion');
+            const btnAnularForm = document.getElementById('btnAnularMemoForm');
+            const btnGuardar = document.getElementById('btnGuardarMemo');
+
+            if (memorandoCargadoAnulado) {
+                if (bannerAnulado) {
+                    bannerAnulado.style.display = 'flex';
+                    const detalle = document.getElementById('textoDetalleMemoAnulado');
+                    if (detalle) {
+                        const fechaFmt = formatearFechaCortaISO(memorandoCargadoAnulado.fechaAnulacion);
+                        const partes = [
+                            memorandoCargadoAnulado.motivoAnulacion ? `Motivo: "${memorandoCargadoAnulado.motivoAnulacion}"` : '',
+                            memorandoCargadoAnulado.anuladoPor ? `Por: ${memorandoCargadoAnulado.anuladoPor}` : '',
+                            fechaFmt ? `Fecha: ${fechaFmt}` : ''
+                        ].filter(Boolean);
+                        detalle.textContent = partes.join(' • ') || 'Este memorándum fue anulado y su número quedó liberado.';
+                    }
+                    const btnMismo = document.getElementById('btnReutilizarMismoNumero');
+                    if (btnMismo) {
+                        const resumen = obtenerResumenCorrelativos(memorandoCargadoAnulado.prefijo);
+                        const numMemo = parseInt(memorandoCargadoAnulado.numero, 10);
+                        const sigueDisponible = Number.isInteger(numMemo) && !resumen.numerosActivos.has(numMemo);
+                        btnMismo.style.display = sigueDisponible ? 'inline-flex' : 'none';
+                        btnMismo.textContent = `🔓 Reutilizar con N° #${numMemo}`;
+                    }
+                }
+                if (bannerEdicion) bannerEdicion.style.display = 'none';
+                if (btnAnularForm) btnAnularForm.style.display = 'none';
+                if (btnGuardar) btnGuardar.title = 'Un memorándum anulado no puede modificarse directamente';
+            } else if (memorandoEnEdicionId) {
+                if (bannerAnulado) bannerAnulado.style.display = 'none';
+                if (bannerEdicion) {
+                    bannerEdicion.style.display = 'flex';
+                    const txtEd = document.getElementById('textoBannerEdicion');
+                    if (txtEd) txtEd.textContent = `✏️ Editando memorándum guardado: ${construirCodigoCompleto()}`;
+                }
+                if (btnAnularForm) btnAnularForm.style.display = 'inline-flex';
+                if (btnGuardar) btnGuardar.title = '';
+            } else {
+                if (bannerAnulado) bannerAnulado.style.display = 'none';
+                if (bannerEdicion) bannerEdicion.style.display = 'none';
+                if (btnAnularForm) btnAnularForm.style.display = 'none';
+                if (btnGuardar) btnGuardar.title = '';
+            }
+        }
+
+        function reutilizarMemoAnulado(usarMismoNumero) {
+            if (!memorandoCargadoAnulado) return;
+            const numAnulado = parseInt(memorandoCargadoAnulado.numero, 10);
+            memorandoEnEdicionId = null;
+            memorandoCargadoAnulado = null;
+
+            if (usarMismoNumero && Number.isInteger(numAnulado) && numAnulado >= 1) {
+                numeroSeleccionadoManualmente = true;
+                const numInput = document.getElementById('inputNumeroCorrelativo');
+                if (numInput) numInput.value = numAnulado;
+                actualizarEstadoEdicionUI();
+                actualizarCodigoCompleto();
+                renderizarChipsCorrelativosDisponibles();
+                actualizarVistaPrevia();
+                showToast(`🔓 Contenido listo para emitir nuevo memorándum con el N° ${numAnulado}.`, "success");
+            } else {
+                numeroSeleccionadoManualmente = false;
+                actualizarEstadoEdicionUI();
+                sugerirSiguienteCorrelativo(false);
+                actualizarVistaPrevia();
+                showToast("📝 Contenido copiado a un nuevo memorándum con el siguiente correlativo.", "info");
+            }
+        }
+
+        // 12. Acciones del Historial (Cargar, Re-emitir PDF, Anular, Eliminar)
         function cargarMemorandoAlFormulario(id) {
             const m = memorandumsGlobal.find(item => item.id === id);
             if (!m) return;
 
             memorandoEnEdicionId = m.id;
+            memorandoCargadoAnulado = esMemorandoAnulado(m) ? m : null;
+            numeroSeleccionadoManualmente = true;
 
             const selectDepto = document.getElementById('selectDepartamento');
-            const existeOption = Array.from(selectDepto.options).some(o => o.value === m.prefijo);
+            const prefijoNorm = normalizarPrefijo(m.prefijo);
+            const existeOption = Array.from(selectDepto.options).some(o => o.value === prefijoNorm);
             if (existeOption) {
-                selectDepto.value = m.prefijo;
+                selectDepto.value = prefijoNorm;
                 document.getElementById('groupPrefijoPersonalizado').style.display = 'none';
             } else {
                 selectDepto.value = 'OTRO';
                 document.getElementById('groupPrefijoPersonalizado').style.display = 'flex';
-                document.getElementById('inputPrefijoPersonalizado').value = m.prefijo || '';
+                document.getElementById('inputPrefijoPersonalizado').value = prefijoNorm;
             }
 
             document.getElementById('inputNumeroCorrelativo').value = m.numero || 1;
@@ -2577,10 +3340,156 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 document.getElementById('inputCopia2').value = m.copias.copia2 || '';
             }
 
+            actualizarEstadoEdicionUI();
             actualizarCodigoCompleto();
+            renderizarChipsCorrelativosDisponibles();
             actualizarVistaPrevia();
             window.scrollTo({ top: 0, behavior: 'smooth' });
-            showToast(`Memorándum ${m.codigo || id} cargado al formulario.`, "info");
+            showToast(
+                memorandoCargadoAnulado
+                    ? `🚫 Memorándum anulado ${m.codigo || id} cargado para consulta.`
+                    : `Memorándum ${m.codigo || id} cargado al formulario.`,
+                memorandoCargadoAnulado ? "warning" : "info"
+            );
+        }
+
+        function abrirModalAnularDesdeFormulario() {
+            if (!memorandoEnEdicionId || memorandoCargadoAnulado) {
+                showToast("Seleccione un memorándum vigente guardado para anular.", "warning");
+                return;
+            }
+            abrirModalAnularMemorando(memorandoEnEdicionId);
+        }
+
+        function abrirModalAnularMemorando(id) {
+            const m = memorandumsGlobal.find(item => item.id === id);
+            if (!m) {
+                showToast("No se encontró el memorándum seleccionado.", "error");
+                return;
+            }
+            if (esMemorandoAnulado(m)) {
+                showToast("Este memorándum ya fue anulado anteriormente.", "info");
+                return;
+            }
+
+            memoParaAnularId = m.id;
+            const cod = m.codigo || `${m.prefijo}-${m.numero}-${m.sufijo || 'ENAG'}`;
+            const elCod = document.getElementById('anularModalCodigo');
+            const elPara = document.getElementById('anularModalPara');
+            const elAsunto = document.getElementById('anularModalAsunto');
+            const elNumInfo = document.getElementById('anularModalNumeroInfo');
+            const elMotivo = document.getElementById('inputMotivoAnulacion');
+
+            if (elCod) elCod.textContent = cod;
+            if (elPara) elPara.textContent = m.para ? `Para: ${m.para.nombre}` : '';
+            if (elAsunto) elAsunto.textContent = m.asunto || 'Sin asunto';
+            if (elNumInfo) {
+                elNumInfo.textContent = `🔓 Al anularlo, el número secuencial #${m.numero} (${normalizarPrefijo(m.prefijo)}) quedará disponible para asignarse a un nuevo memorándum.`;
+            }
+            if (elMotivo) elMotivo.value = '';
+
+            const modal = document.getElementById('modalAnularMemorando');
+            if (modal) modal.classList.add('active');
+            setTimeout(() => elMotivo?.focus(), 60);
+        }
+
+        function cerrarModalAnularMemorando() {
+            memoParaAnularId = null;
+            const modal = document.getElementById('modalAnularMemorando');
+            if (modal) modal.classList.remove('active');
+        }
+
+        function seleccionarMotivoRapido(texto) {
+            const input = document.getElementById('inputMotivoAnulacion');
+            if (input) {
+                input.value = texto;
+                input.focus();
+            }
+        }
+
+        async function confirmarAnulacionMemorando() {
+            const id = memoParaAnularId;
+            if (!id) return;
+
+            const m = memorandumsGlobal.find(item => item.id === id);
+            if (!m) {
+                cerrarModalAnularMemorando();
+                return;
+            }
+
+            const inputMotivo = document.getElementById('inputMotivoAnulacion');
+            const motivo = inputMotivo ? inputMotivo.value.trim() : '';
+            if (!motivo) {
+                showToast("⚠️ Por favor indique el motivo de anulación.", "warning");
+                inputMotivo?.focus();
+                return;
+            }
+
+            const btnConfirm = document.getElementById('btnConfirmarAnulacion');
+            if (btnConfirm) btnConfirm.disabled = true;
+
+            try {
+                const usuarioAnula = obtenerUsuarioActualSistema();
+                const ahoraIso = new Date().toISOString();
+                const cod = m.codigo || `${m.prefijo}-${m.numero}-${m.sufijo || 'ENAG'}`;
+
+                const datosAnulacion = {
+                    estado: 'Anulado',
+                    motivoAnulacion: motivo,
+                    anuladoPor: usuarioAnula,
+                    fechaAnulacion: ahoraIso,
+                    fechaActualizacion: ahoraIso
+                };
+
+                const db = obtenerDB();
+                if (db) {
+                    const { id: _ignoredId, ...restoMemo } = m;
+                    const payload = { ...restoMemo, ...datosAnulacion };
+                    if (!payload.timestamp) {
+                        payload.timestamp = firebase.firestore.FieldValue.serverTimestamp();
+                    }
+                    await db.collection('memorandums').doc(id).set(payload, { merge: true });
+                }
+
+                upsertMemoriaYLocal(id, { ...m, ...datosAnulacion });
+
+                if (window.registrarBitacora) {
+                    window.registrarBitacora(
+                        'Administración',
+                        'Anular Memorando',
+                        `Se anuló el ${cod} (Motivo: ${motivo}). El número ${m.numero} (${m.prefijo}) quedó disponible.`
+                    );
+                }
+
+                cerrarModalAnularMemorando();
+
+                if (memorandoEnEdicionId === id) {
+                    memorandoEnEdicionId = null;
+                    memorandoCargadoAnulado = null;
+                    numeroSeleccionadoManualmente = false;
+                    actualizarEstadoEdicionUI();
+                    sugerirSiguienteCorrelativo(false);
+                    actualizarVistaPrevia();
+                } else if (!memorandoEnEdicionId && !numeroSeleccionadoManualmente) {
+                    sugerirSiguienteCorrelativo(false);
+                } else {
+                    validarNumeroCorrelativoManual();
+                    renderizarChipsCorrelativosDisponibles();
+                }
+
+                actualizarEstadisticasYTabla();
+                const modalGuardados = document.getElementById('modalDocumentosGuardadosMemo');
+                if (modalGuardados && modalGuardados.classList.contains('active')) {
+                    filtrarListaModalMemo();
+                }
+
+                showToast(`🚫 ${cod} anulado. El número ${m.numero} (${normalizarPrefijo(m.prefijo)}) quedó disponible.`, "success");
+            } catch (err) {
+                console.error("Error al anular memorándum:", err);
+                showToast("❌ Error al anular memorándum: " + err.message, "error");
+            } finally {
+                if (btnConfirm) btnConfirm.disabled = false;
+            }
         }
 
         async function descargarPDFDesdeHistorial(id) {
@@ -2613,8 +3522,22 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                     window.registrarBitacora('Administración', 'Eliminar Memorando', `Se eliminó el memorándum ${cod}`);
                 }
 
+                if (memorandoEnEdicionId === id) {
+                    memorandoEnEdicionId = null;
+                    memorandoCargadoAnulado = null;
+                    numeroSeleccionadoManualmente = false;
+                    actualizarEstadoEdicionUI();
+                    actualizarVistaPrevia();
+                }
+
                 showToast(`Memorándum ${cod} eliminado con éxito.`, "success");
                 actualizarEstadisticasYTabla();
+                if (!memorandoEnEdicionId && !numeroSeleccionadoManualmente) {
+                    sugerirSiguienteCorrelativo(false);
+                } else {
+                    validarNumeroCorrelativoManual();
+                    renderizarChipsCorrelativosDisponibles();
+                }
             } catch (err) {
                 console.error("Error al eliminar memorándum:", err);
                 showToast("Error al eliminar: " + err.message, "error");
@@ -2623,14 +3546,51 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         function limpiarFormularioNuevo() {
             memorandoEnEdicionId = null;
+            memorandoCargadoAnulado = null;
+            numeroSeleccionadoManualmente = false;
             document.getElementById('inputAsunto').value = '';
             document.getElementById('textareaCuerpo').value = '';
             inicializarFechaHoy();
             cargarPerfilRemitenteGuardado();
-            sugerirSiguienteCorrelativo();
+            actualizarEstadoEdicionUI();
+            sugerirSiguienteCorrelativo(false);
             generarSaludoAutomatico();
             actualizarVistaPrevia();
             showToast("Formulario listo para redactar un nuevo memorándum.", "info");
+        }
+
+        function exportarHistorialExcel() {
+            if (memorandumsGlobal.length === 0) {
+                showToast("No hay memorándums registrados para exportar a Excel.", "warning");
+                return;
+            }
+            if (typeof XLSX === 'undefined') {
+                showToast("La librería XLSX no está disponible en este momento.", "error");
+                return;
+            }
+
+            const dataExport = memorandumsGlobal.map(m => ({
+                "Correlativo": m.codigo || `${m.prefijo}-${m.numero}-${m.sufijo || 'ENAG'}`,
+                "Departamento": m.prefijo || '',
+                "Número": m.numero || '',
+                "Estado": esMemorandoAnulado(m) ? 'Anulado' : 'Vigente',
+                "Fecha": m.fecha || '',
+                "Destinatario (PARA)": m.para ? m.para.nombre : '',
+                "Cargo PARA": m.para ? m.para.cargo : '',
+                "Remitente (DE)": m.de ? m.de.nombre : '',
+                "Cargo DE": m.de ? m.de.cargo : '',
+                "Asunto": m.asunto || '',
+                "Elaborado Por": m.elaboradoPor || '',
+                "Motivo Anulación": m.motivoAnulacion || '',
+                "Anulado Por": m.anuladoPor || '',
+                "Fecha Anulación": formatearFechaCortaISO(m.fechaAnulacion)
+            }));
+
+            const ws = XLSX.utils.json_to_sheet(dataExport);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, "Memorandums_ENAG");
+            XLSX.writeFile(wb, `Memorandums_ENAG_${new Date().toISOString().slice(0, 10)}.xlsx`);
+            showToast("📊 Reporte Excel de memorándums generado correctamente.", "success");
         }
 
         // ==============================================================
@@ -2731,9 +3691,19 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
                 aplicarTamanoLetra(data.tamanoLetra);
             }
             if (data.id) {
+                const coincidente = memorandumsGlobal.find(m => m.id === data.id);
                 memorandoEnEdicionId = data.id;
+                memorandoCargadoAnulado = (coincidente && esMemorandoAnulado(coincidente)) ? coincidente : null;
+            } else {
+                memorandoEnEdicionId = null;
+                memorandoCargadoAnulado = null;
             }
+            if (data.numero) {
+                numeroSeleccionadoManualmente = true;
+            }
+            actualizarEstadoEdicionUI();
             actualizarCodigoCompleto();
+            renderizarChipsCorrelativosDisponibles();
             actualizarVistaPrevia();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
@@ -2883,21 +3853,29 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
             filtrados.forEach(m => {
                 const card = document.createElement('div');
-                card.style.cssText = "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
+                const anulado = esMemorandoAnulado(m);
+                card.style.cssText = anulado
+                    ? "background: #fff5f5; border: 1px solid #fecaca; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;"
+                    : "background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 12px 14px; display: flex; justify-content: space-between; align-items: center; gap: 12px;";
                 const cod = m.codigo || `${m.prefijo}-${m.numero}`;
+                const estadoPill = anulado
+                    ? `<span class="estado-pill estado-anulado">🚫 Anulado</span>`
+                    : `<span class="estado-pill estado-activo">🟢 Vigente</span>`;
                 card.innerHTML = `
                     <div style="flex-grow: 1;">
-                        <div style="display: flex; align-items: center; gap: 8px;">
-                            <span class="badge-memo">${cod}</span>
-                            <span style="font-size: 0.82em; color: #64748b;">${m.fecha || ''}</span>
+                        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                            <span class="badge-memo ${anulado ? 'badge-memo-anulado' : ''}">${escapeHTML(cod)}</span>
+                            ${estadoPill}
+                            <span style="font-size: 0.82em; color: #64748b;">${escapeHTML(m.fecha || '')}</span>
                         </div>
-                        <div style="font-size: 0.94em; font-weight: bold; color: #002147; margin: 4px 0;">${m.asunto || 'Sin asunto'}</div>
+                        <div style="font-size: 0.94em; font-weight: bold; color: #002147; margin: 4px 0;">${escapeHTML(m.asunto || 'Sin asunto')}</div>
                         <div style="font-size: 0.82em; color: #475569;">
-                            Para: <strong>${m.para ? m.para.nombre : 'N/A'}</strong> | De: <strong>${m.de ? m.de.nombre : 'N/A'}</strong>
+                            Para: <strong>${escapeHTML(m.para ? m.para.nombre : 'N/A')}</strong> | De: <strong>${escapeHTML(m.de ? m.de.nombre : 'N/A')}</strong>
                         </div>
+                        ${anulado && m.motivoAnulacion ? `<div style="font-size: 0.78em; color: #991b1b; margin-top: 3px;">Motivo: ${escapeHTML(m.motivoAnulacion)}</div>` : ''}
                     </div>
-                    <button type="button" onclick="cargarMemorandoDesdeModal('${m.id}')" style="background: #0284c7; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.84em; cursor: pointer; white-space: nowrap;">
-                        ✏️ Modificar
+                    <button type="button" onclick="cargarMemorandoDesdeModal('${escapeJSAttr(m.id)}')" style="background: ${anulado ? '#64748b' : '#0284c7'}; color: white; border: none; padding: 8px 14px; border-radius: 6px; font-weight: bold; font-size: 0.84em; cursor: pointer; white-space: nowrap;">
+                        ${anulado ? '👁️ Consultar' : '✏️ Modificar'}
                     </button>
                 `;
                 cont.appendChild(card);
@@ -2906,11 +3884,23 @@ Agradecemos coordinar con su personal el acceso a las áreas correspondientes.`;
 
         function cargarMemorandoDesdeModal(id) {
             cerrarModalDocumentosGuardadosMemo();
+            const m = memorandumsGlobal.find(item => item.id === id);
             cargarMemorandoAlFormulario(id);
-            showToast("✅ Memorándum cargado para modificación. Realice sus cambios y guarde o descargue el PDF.", "success");
+            if (m && esMemorandoAnulado(m)) {
+                showToast("ℹ️ Memorándum anulado cargado para consulta. Puede reutilizar su contenido o número desde el aviso superior.", "warning");
+            } else {
+                showToast("✅ Memorándum cargado para modificación. Realice sus cambios y guarde o descargue el PDF.", "success");
+            }
         }
 
-        // 14. Toast Notifications
+        // 14. Toast Notifications y Atajos de Modales
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                cerrarModalAnularMemorando();
+                cerrarModalDocumentosGuardadosMemo();
+            }
+        });
+
         function showToast(mensaje, tipo = "info") {
             const toast = document.getElementById('toastNotification');
             if (!toast) return;
