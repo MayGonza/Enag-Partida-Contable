@@ -2271,6 +2271,9 @@
         function limpiarSaltosDeLinea(texto) {
             if (!texto) return '';
             let res = texto
+                // Elimina caracteres invisibles y normaliza espacios especiales de Word/PDF
+                .replace(/[\u200B-\u200D\uFEFF]/g, '')
+                .replace(/[\u00A0\u2000-\u200A\u202F\u205F\u3000]/g, ' ')
                 // Reúne palabras cortadas con guión al borde de línea sin romper acentos ni eñes
                 .replace(/([\p{L}]+)-\s*[\r\n]+\s*([\p{L}]+)/gu, '$1$2')
                 .replace(/\r\n/g, '\n')
@@ -2341,7 +2344,7 @@
                     // Garantizar capacidad oficial exacta inamovible: 580 palabras por página tabloide
                     calibracion.palabrasPorPagina = 580;
                     calibracion.columnas = calibracion.columnas || 2;
-                    calibracion.charsPorLinea = 46;
+                    calibracion.charsPorLinea = calibracion.columnas === 3 ? 32 : (calibracion.columnas === 1 ? 75 : 46);
                     calibracion.interlineado = 1.0;
                     calibracion.margenSeguridad = 0; // 0% holgura por defecto para cotización de espacio exacto
                     calibracion.tamanoLetra = 14;
@@ -2677,6 +2680,7 @@
                 calibracion.tamanoMaqueta = 'tabloide';
             }
             localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
+            actualizarMaquetaGaceta();
         }
 
         function abrirModalTabloide() {
@@ -2713,7 +2717,8 @@
             const marginBottom = (8 * factorInter).toFixed(1);
             const tamanoBase = parseFloat(calibracion.tamanoLetra) || 14;
             const fontSizeModal = Math.max(9, (13.5 * (tamanoBase / 14))).toFixed(1);
-            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: ${fontSizeModal}px; font-family: 'Times New Roman', Times, serif; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
+            const alignModal = calibracion.justificado !== false ? 'justify' : 'left';
+            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeight}; margin-bottom: ${marginBottom}px; font-size: ${fontSizeModal}px; font-family: 'Times New Roman', Times, serif; text-align: ${alignModal}; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
             const esUltimaModal = (pagNum === totalPaginasPrevia);
             const modoColModal = esUltimaModal ? (calibracion.modoDistribucion || 'balanceado') : 'secuencial';
@@ -2910,7 +2915,7 @@
             actualizarSelectTamanoLetraUI(valor);
             aplicarEstilosVisualesEditor();
             localStorage.setItem('enag_calibracion_publicaciones', JSON.stringify(calibracion));
-            actualizarMaquetaGaceta();
+            analizarTexto();
         }
 
         function actualizarSelectTamanoLetraUI(valor) {
@@ -3187,19 +3192,19 @@
 
             let res = texto;
             // 1. CONSIDERANDO:
-            res = res.replace(/(?:\s*|\A)(CONSIDERANDO:)/gi, '\n\n$1');
+            res = res.replace(/(?:^|\s+)(CONSIDERANDO:)/gi, '\n\n$1');
 
             // 2. POR TANTO: o POR TANTO;
-            res = res.replace(/(?:\s*|\A)(POR\s+TANTO[;:]?)/gi, '\n\n$1\n');
+            res = res.replace(/(?:^|\s+)(POR\s+TANTO[;:]?)/gi, '\n\n$1\n');
 
             // 3. DECRETA: / ACUERDA: / RESUELVE:
-            res = res.replace(/(?:\s*|\A)(DECRETA:|ACUERDA:|RESUELVE:)/gi, '\n\n$1\n\n');
+            res = res.replace(/(?:^|\s+)(DECRETA:|ACUERDA:|RESUELVE:)/gi, '\n\n$1\n\n');
 
             // 4. Encabezados de artículos: ARTÍCULO 1.- o ARTICULO 1: (evitar 'el Artículo 1', 'del Artículo 31', etc.)
             res = res.replace(/(?<=[.:;\n]|\bDECRETA:|\bACUERDA:|\bRESUELVE:)\s*(ART[IÍ]CULO\s+\d+[\.\-\:]+)/gi, '\n\n$1');
 
             // 5. Cierres oficiales
-            res = res.replace(/(?:\s*|\A)(COMUN[IÍ]QUESE\s+Y\s+PUBL[IÍ]QUESE[\.\-:]*|DADO\s+EN\b)/gi, '\n\n$1');
+            res = res.replace(/(?:^|\s+)(COMUN[IÍ]QUESE\s+Y\s+PUBL[IÍ]QUESE[\.\-:]*|DADO\s+EN\b)/gi, '\n\n$1');
 
             // Limpieza de saltos y espacios redundantes
             res = res.replace(/\n{3,}/g, '\n\n').trim();
@@ -3294,229 +3299,301 @@
 
         // =========================================================================
         // MOTOR EDITORIAL DE COTIZACIÓN DE ESPACIO (DIARIO OFICIAL LA GACETA)
-        // Regla: 100% de espacio útil en cada página sin membrete para detección
-        // exacta de tarifas. Si sobrepasa 1 página (100%), desborda a la siguiente
-        // página completa (también limpia sin encabezado).
+        // Regla: Llena cada página al 100% de su espacio útil (palabras y líneas
+        // físicas de columna) antes de pasar a la siguiente página, respetando la
+        // integridad de palabras y priorizando cortes en párrafos, oraciones y cláusulas.
         // =========================================================================
-        // Micro-segmentación editorial: divide párrafos en oraciones y cláusulas manejables
-        // para que el texto aproveche TODO el espacio de la hoja sin saltar antes de tiempo
-        // ni dejar huecos en blanco al final de la plana.
-        function extraerMicroUnidadesEditorial(parrafos) {
-            const unidades = [];
-            parrafos.forEach((parr, idxParr) => {
-                const words = parr.trim().split(/\s+/);
-                if (words.length <= 25) {
-                    unidades.push({
-                        texto: parr,
-                        palabras: words.length,
-                        esInicioParrafo: true,
-                        idxParrafo: idxParr
-                    });
-                    return;
-                }
+        function evaluarCargaBloques(parrafosArr, calib) {
+            if (!parrafosArr || parrafosArr.length === 0) {
+                return {
+                    palabras: 0,
+                    lineasEstimadas: 0,
+                    lineasEfectivas: 0,
+                    porcentajePalabras: 0,
+                    porcentajeLineas: 0,
+                    porcentajeOcupacion: 0
+                };
+            }
 
-                // Subdividir por oraciones con punto
-                const oraciones = parr.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                let primerTrozo = true;
+            const sangriaEfectiva = Math.max(0, parseInt(calib.sangria, 10) || 0);
+            const charsPorLinea = Math.max(15, parseInt(calib.charsPorLinea, 10) || 46);
+            const factorInterlineado = parseFloat(calib.interlineado) || 1.0;
+            const factorSeguridad = 1 + ((parseFloat(calib.margenSeguridad) || 0) / 100);
+            const palabrasBase = Math.max(80, parseInt(calib.palabrasPorPagina, 10) || (calib.tipoPapel === 'carta' ? 350 : 580));
+            const lineasPorColumna = calib.tipoPapel === 'carta' ? 30 : 46;
+            const lineasTotalesPagina = Math.max(1, (parseInt(calib.columnas, 10) || 2) * lineasPorColumna);
 
-                oraciones.forEach(or => {
-                    const orWords = or.split(/\s+/);
-                    if (orWords.length <= 25) {
-                        unidades.push({
-                            texto: or,
-                            palabras: orWords.length,
-                            esInicioParrafo: primerTrozo,
-                            idxParrafo: idxParr
-                        });
-                        primerTrozo = false;
+            let palabras = 0;
+            let lineasEstimadas = 0;
+            let parrafosNoVacios = 0;
+
+            for (let i = 0; i < parrafosArr.length; i++) {
+                const p = (parrafosArr[i] || '').trim();
+                if (!p) continue;
+                parrafosNoVacios++;
+                palabras += (p.match(/\S+/g) || []).length;
+                lineasEstimadas += Math.max(1, Math.ceil((p.length + sangriaEfectiva) / charsPorLinea));
+            }
+            if (parrafosNoVacios > 1) {
+                lineasEstimadas += (parrafosNoVacios - 1);
+            }
+
+            const lineasEfectivas = Math.ceil(lineasEstimadas * factorInterlineado);
+            const palabrasEfectivas = palabras * factorSeguridad * factorInterlineado;
+            const porcentajePalabras = (palabrasEfectivas / palabrasBase) * 100;
+            const porcentajeLineas = (lineasEfectivas / lineasTotalesPagina) * 100;
+            const porcentajeOcupacion = Math.max(porcentajePalabras, porcentajeLineas);
+
+            return {
+                palabras,
+                lineasEstimadas,
+                lineasEfectivas,
+                porcentajePalabras,
+                porcentajeLineas,
+                porcentajeOcupacion
+            };
+        }
+
+        function dividirBloqueSimpleParaCapacidad(bufferActual, bloque, calib, limitePct, permitirCortePalabras) {
+            const evaluar = (arr) => evaluarCargaBloques(arr, calib).porcentajeOcupacion;
+            const clausulas = bloque.split(/(?<=[;:,])\s+/g).map(s => s.trim()).filter(Boolean);
+            let tomados = [];
+            let sobraUnidad = bloque;
+            let restoTrasUnidad = '';
+
+            if (clausulas.length > 1) {
+                let idx = 0;
+                for (; idx < clausulas.length; idx++) {
+                    const cand = [...tomados, clausulas[idx]].join(' ');
+                    if (evaluar([...bufferActual, cand]) <= limitePct) {
+                        tomados.push(clausulas[idx]);
                     } else {
-                        // Subdividir por cláusulas (; : ,)
-                        const clausulas = or.split(/(?<=[;:,])\s+/g).map(s => s.trim()).filter(s => s.length > 0);
-                        if (clausulas.length > 1) {
-                            clausulas.forEach(cl => {
-                                const clWords = cl.split(/\s+/);
-                                if (clWords.length <= 25) {
-                                    unidades.push({
-                                        texto: cl,
-                                        palabras: clWords.length,
-                                        esInicioParrafo: primerTrozo,
-                                        idxParrafo: idxParr
-                                    });
-                                    primerTrozo = false;
-                                } else {
-                                    for (let w = 0; w < clWords.length; w += 20) {
-                                        const chunk = clWords.slice(w, w + 20).join(' ');
-                                        unidades.push({
-                                            texto: chunk,
-                                            palabras: clWords.slice(w, w + 20).length,
-                                            esInicioParrafo: primerTrozo && w === 0,
-                                            idxParrafo: idxParr
-                                        });
-                                        primerTrozo = false;
-                                    }
-                                }
-                            });
+                        break;
+                    }
+                }
+                if (idx < clausulas.length) {
+                    sobraUnidad = clausulas[idx];
+                    restoTrasUnidad = clausulas.slice(idx + 1).join(' ');
+                } else {
+                    return { cabe: tomados.join(' '), sobra: '' };
+                }
+            }
+
+            const baseConTomados = tomados.length > 0 ? [...bufferActual, tomados.join(' ')] : bufferActual;
+            const pctConTomados = evaluar(baseConTomados);
+
+            if (permitirCortePalabras && sobraUnidad && (pctConTomados < 95.0 || baseConTomados.length === 0)) {
+                const palabras = sobraUnidad.split(/\s+/).filter(Boolean);
+                if (palabras.length > 1) {
+                    let lo = 0;
+                    let hi = palabras.length;
+                    while (lo < hi) {
+                        const mid = Math.ceil((lo + hi) / 2);
+                        const candParcial = [...tomados, palabras.slice(0, mid).join(' ')].join(' ').trim();
+                        if (evaluar([...bufferActual, candParcial]) <= limitePct) {
+                            lo = mid;
                         } else {
-                            for (let w = 0; w < orWords.length; w += 20) {
-                                const chunk = orWords.slice(w, w + 20).join(' ');
-                                unidades.push({
-                                    texto: chunk,
-                                    palabras: orWords.slice(w, w + 20).length,
-                                    esInicioParrafo: primerTrozo && w === 0,
-                                    idxParrafo: idxParr
-                                });
-                                primerTrozo = false;
-                            }
+                            hi = mid - 1;
                         }
                     }
-                });
-            });
-            return unidades;
-        }
-
-        function ensamblarMicroUnidades(unidades) {
-            if (!unidades || unidades.length === 0) return '';
-            let res = '';
-            let lastParr = -1;
-            for (let i = 0; i < unidades.length; i++) {
-                const u = unidades[i];
-                if (i === 0) {
-                    res += u.texto;
-                } else if (u.esInicioParrafo && u.idxParrafo !== lastParr) {
-                    res += '\n\n' + u.texto;
-                } else {
-                    if (/^[.,;:!?]/.test(u.texto)) {
-                        res += u.texto;
-                    } else {
-                        res += ' ' + u.texto;
+                    if (lo > 0) {
+                        const cabePal = [...tomados, palabras.slice(0, lo).join(' ')].join(' ').trim();
+                        const sobraPal = [palabras.slice(lo).join(' '), restoTrasUnidad].filter(Boolean).join(' ').trim();
+                        return { cabe: cabePal, sobra: sobraPal };
                     }
                 }
-                lastParr = u.idxParrafo;
             }
-            return res;
+
+            return {
+                cabe: tomados.join(' ').trim(),
+                sobra: [sobraUnidad, restoTrasUnidad].filter(Boolean).join(' ').trim()
+            };
         }
 
-        // MOTOR EDITORIAL DE PAGINACIÓN: "JUGAR CON LOS ESPACIOS"
-        // 1. Si un texto se pasa por poco de 1 plana (hasta 10% de tolerancia = ~638 palabras en tabloide),
-        //    el diagramador ajusta el interlineado y los espacios para que QUEPA EN 1 SOLA PLANA (L. 3,200.00).
-        // 2. Si realmente sobrepasa la tolerancia (multi-página): llena la Página 1 al 100% DE SU ESPACIO REAL
-        //    aprovechando ambas columnas hasta el pie de plana sin dejar huecos en blanco.
+        function dividirTextoParaCapacidad(bufferActual, textoParrafo, calib, limitePct, opcion = {}) {
+            const evaluar = (arr) => evaluarCargaBloques(arr, calib).porcentajeOcupacion;
+            const permitirCortePalabras = opcion.permitirCortePalabras !== false;
+
+            const oraciones = textoParrafo.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(Boolean);
+            let cabePartes = [];
+            let sobranteTexto = textoParrafo;
+
+            if (oraciones.length > 1) {
+                let tomadosOr = [];
+                let idxCorte = oraciones.length;
+                for (let i = 0; i < oraciones.length; i++) {
+                    const cand = [...tomadosOr, oraciones[i]].join(' ');
+                    if (evaluar([...bufferActual, cand]) <= limitePct) {
+                        tomadosOr.push(oraciones[i]);
+                    } else {
+                        idxCorte = i;
+                        break;
+                    }
+                }
+                if (tomadosOr.length > 0) {
+                    cabePartes.push(tomadosOr.join(' '));
+                }
+                if (idxCorte < oraciones.length) {
+                    const oracionDesbordante = oraciones[idxCorte];
+                    const colaTrasOracion = oraciones.slice(idxCorte + 1).join(' ');
+                    const baseParcial = [...bufferActual, ...(cabePartes.length ? [cabePartes.join(' ')] : [])];
+                    const pctParcial = evaluar(baseParcial);
+
+                    if (pctParcial < 95.0 || baseParcial.length === 0) {
+                        const sub = dividirBloqueSimpleParaCapacidad(
+                            baseParcial,
+                            oracionDesbordante,
+                            calib,
+                            limitePct,
+                            permitirCortePalabras
+                        );
+                        if (sub.cabe) {
+                            cabePartes.push(sub.cabe);
+                            sobranteTexto = [sub.sobra, colaTrasOracion].filter(Boolean).join(' ');
+                        } else {
+                            sobranteTexto = [oracionDesbordante, colaTrasOracion].filter(Boolean).join(' ');
+                        }
+                    } else {
+                        sobranteTexto = [oracionDesbordante, colaTrasOracion].filter(Boolean).join(' ');
+                    }
+                } else {
+                    sobranteTexto = '';
+                }
+            } else {
+                const sub = dividirBloqueSimpleParaCapacidad(bufferActual, textoParrafo, calib, limitePct, permitirCortePalabras);
+                if (sub.cabe) cabePartes.push(sub.cabe);
+                sobranteTexto = sub.sobra;
+            }
+
+            if (bufferActual.length === 0 && cabePartes.length === 0) {
+                const palabras = textoParrafo.split(/\s+/).filter(Boolean);
+                if (palabras.length > 1) {
+                    cabePartes.push(palabras[0]);
+                    sobranteTexto = palabras.slice(1).join(' ');
+                } else {
+                    cabePartes.push(textoParrafo);
+                    sobranteTexto = '';
+                }
+            }
+
+            return {
+                cabe: cabePartes.join(' ').trim(),
+                sobra: sobranteTexto.trim()
+            };
+        }
+
+        // MOTOR EDITORIAL DE PAGINACIÓN: "LLENAR PÁGINA PRIMERO + JUGAR CON LOS ESPACIOS"
+        // 1. Si el texto completo cabe dentro de 1 plana + 10% de tolerancia editorial de taller (<= 110%),
+        //    se mantiene en 1 sola plana completa (L. 3,200.00).
+        // 2. Si desborda a multi-página: llena la Página 1 (y cada página intermedia) hasta ~100% de su capacidad
+        //    real (tanto en palabras como en líneas físicas de columna) antes de crear la siguiente página.
         function paginarTextoEditorialGaceta(rawText, calib) {
+            const palabrasBase = Math.max(80, parseInt(calib.palabrasPorPagina, 10) || (calib.tipoPapel === 'carta' ? 350 : 580));
             if (!rawText || !rawText.trim()) {
                 return [{
                     numero: 1,
                     texto: '',
                     palabras: 0,
-                    limite: 580,
+                    lineas: 0,
+                    limite: palabrasBase,
                     porcentaje: 0
                 }];
             }
 
             const parrafos = segmentarTextoEnParrafos(rawText);
-            const totalPalabras = (rawText.trim().match(/\S+/g) || []).length;
-            const factorInter = parseFloat(calib.interlineado) || 1.0;
-            const factorSeg = 1 + ((calib.margenSeguridad || 0) / 100);
-            const factorEfectivo = factorInter * factorSeg;
-            const basePalabras = Math.round((calib.palabrasPorPagina || 580) / factorEfectivo);
+            const cargaTotal = evaluarCargaBloques(parrafos, calib);
 
-            // Tolerancia del Diagramador: Jugar con los espacios (hasta 10% = ~638 palabras) para caber en 1 sola plana completa
-            const toleranciaEditorialPagina1 = Math.round(basePalabras * 1.10);
-            if (totalPalabras <= toleranciaEditorialPagina1) {
+            // Tolerancia editorial de taller: hasta 110% cabe en 1 sola plana ajustando espacios
+            if (cargaTotal.porcentajeOcupacion <= 110.0) {
                 return [{
                     numero: 1,
                     texto: parrafos.join('\n\n'),
-                    palabras: totalPalabras,
-                    limite: basePalabras,
-                    porcentaje: Math.min(100, Math.round((totalPalabras / basePalabras) * 100)),
-                    ajusteEditorialAplicado: (totalPalabras > basePalabras)
+                    palabras: cargaTotal.palabras,
+                    lineas: cargaTotal.lineasEfectivas,
+                    limite: palabrasBase,
+                    porcentaje: Math.min(100, Math.round(cargaTotal.porcentajeOcupacion)),
+                    porcentajeReal: cargaTotal.porcentajeOcupacion,
+                    ajusteEditorialAplicado: (cargaTotal.porcentajeOcupacion > 100.0)
                 }];
             }
 
-            // Paginación por párrafos completos e íntegros (NUNCA CORTA PALABRAS NI ORACIONES A MITAD)
             const paginas = [];
+            const cola = parrafos.slice();
             let buffer = [];
-            let palabrasEnPagina = 0;
+            const patronEncabezadoCorto = /^(?:CONSIDERANDO:?|POR\s+TANTO[;:]?|DECRETA:?|ACUERDA:?|RESUELVE:?|ART[IÍ]CULO\s+\d+[\.\-:]?)$/i;
 
-            for (let i = 0; i < parrafos.length; i++) {
-                const p = parrafos[i];
+            const cerrarPaginaConBuffer = () => {
+                if (buffer.length === 0) return;
+                const carga = evaluarCargaBloques(buffer, calib);
+                paginas.push({
+                    numero: paginas.length + 1,
+                    texto: buffer.join('\n\n'),
+                    palabras: carga.palabras,
+                    lineas: carga.lineasEfectivas,
+                    limite: palabrasBase,
+                    porcentaje: Math.min(100, Math.round(carga.porcentajeOcupacion)),
+                    porcentajeReal: carga.porcentajeOcupacion
+                });
+                buffer = [];
+            };
+
+            while (cola.length > 0) {
+                const p = (cola.shift() || '').trim();
+                if (!p) continue;
+
+                const cargaActual = evaluarCargaBloques(buffer, calib);
+                const cargaConP = evaluarCargaBloques([...buffer, p], calib);
+
+                // Evitar dejar un título/encabezado corto huérfano al pie de una página ya llena >= 97%
                 const pWords = (p.match(/\S+/g) || []).length;
+                if (buffer.length > 0 && cargaActual.porcentajeOcupacion >= 97.0 && pWords <= 5 && patronEncabezadoCorto.test(p)) {
+                    cerrarPaginaConBuffer();
+                    cola.unshift(p);
+                    continue;
+                }
 
-                // Si el párrafo actual sobrepasa el límite y la página ya tiene más del 70% de carga:
-                // Cierra la plana y deja el párrafo completo para la siguiente página sin trocearlo
-                if (palabrasEnPagina + pWords > basePalabras && palabrasEnPagina >= (basePalabras * 0.70)) {
-                    paginas.push({
-                        numero: paginas.length + 1,
-                        texto: buffer.join('\n\n'),
-                        palabras: palabrasEnPagina,
-                        limite: basePalabras,
-                        porcentaje: Math.min(100, Math.round((palabrasEnPagina / basePalabras) * 100))
-                    });
-                    buffer = [p];
-                    palabrasEnPagina = pWords;
-                } else if (pWords > (basePalabras * 0.75)) {
-                    // Párrafo individual excepcionalmente extenso (más de 400 palabras):
-                    // Se subdivide por oraciones completas con punto final, NUNCA a mitad de palabra
-                    const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                    let trozo1 = [], trozo2 = [];
-                    let wTrozo1 = 0;
-                    const metaTrozo = basePalabras - palabrasEnPagina;
-
-                    if (oraciones.length <= 1) {
-                        const palabrasArray = p.split(/\s+/);
-                        const trozoPalabras = Math.max(50, basePalabras - palabrasEnPagina);
-                        trozo1 = [palabrasArray.slice(0, trozoPalabras).join(' ')];
-                        trozo2 = [palabrasArray.slice(trozoPalabras).join(' ')];
-                        wTrozo1 = trozoPalabras;
-                    } else {
-                        for (let or of oraciones) {
-                            const wOr = (or.match(/\S+/g) || []).length;
-                            if (wTrozo1 + wOr <= metaTrozo || trozo1.length === 0) {
-                                trozo1.push(or);
-                                wTrozo1 += wOr;
-                            } else {
-                                trozo2.push(or);
-                            }
-                        }
-                    }
-
-                    if (trozo1.length > 0 && trozo2.length > 0) {
-                        buffer.push(trozo1.join(' '));
-                        palabrasEnPagina += wTrozo1;
-                        paginas.push({
-                            numero: paginas.length + 1,
-                            texto: buffer.join('\n\n'),
-                            palabras: palabrasEnPagina,
-                            limite: basePalabras,
-                            porcentaje: 100
-                        });
-                        buffer = [trozo2.join(' ')];
-                        palabrasEnPagina = (trozo2.join(' ').match(/\S+/g) || []).length;
-                    } else {
-                        buffer.push(p);
-                        palabrasEnPagina += pWords;
-                    }
-                } else {
+                if (cargaConP.porcentajeOcupacion <= 100.0) {
                     buffer.push(p);
-                    palabrasEnPagina += pWords;
+                    continue;
+                }
+
+                // Si la página ya alcanzó >= 99% de su capacidad real, pasa al siguiente pliego sin fraccionar innecesariamente
+                if (buffer.length > 0 && cargaActual.porcentajeOcupacion >= 99.0) {
+                    cerrarPaginaConBuffer();
+                    cola.unshift(p);
+                    continue;
+                }
+
+                // Llenar primero el espacio restante de la página actual antes de pasar a la siguiente
+                const split = dividirTextoParaCapacidad(buffer, p, calib, 100.0, { permitirCortePalabras: true });
+                if (split.cabe) {
+                    buffer.push(split.cabe);
+                }
+                cerrarPaginaConBuffer();
+                if (split.sobra) {
+                    cola.unshift(split.sobra);
                 }
             }
 
             if (buffer.length > 0) {
-                // Tolerancia editorial de remanente: si la última página tiene menos de 12% (~70 palabras), la anterior lo absorbe
-                if (paginas.length >= 1 && palabrasEnPagina <= (basePalabras * 0.12)) {
+                const cargaFinal = evaluarCargaBloques(buffer, calib);
+                // Tolerancia de remanente (<= 10%): evita abrir otra plana completa por unas pocas líneas finales
+                if (paginas.length >= 1 && cargaFinal.porcentajeOcupacion <= 10.0) {
                     const anterior = paginas[paginas.length - 1];
                     anterior.texto += '\n\n' + buffer.join('\n\n');
-                    anterior.palabras += palabrasEnPagina;
+                    anterior.palabras += cargaFinal.palabras;
+                    anterior.lineas = (anterior.lineas || 0) + cargaFinal.lineasEfectivas;
                     anterior.porcentaje = 100;
                     anterior.ajusteEditorialAplicado = true;
                 } else {
-                    const pctUlt = Math.min(100, Math.round((palabrasEnPagina / basePalabras) * 100));
                     paginas.push({
                         numero: paginas.length + 1,
                         texto: buffer.join('\n\n'),
-                        palabras: palabrasEnPagina,
-                        limite: basePalabras,
-                        porcentaje: pctUlt
+                        palabras: cargaFinal.palabras,
+                        lineas: cargaFinal.lineasEfectivas,
+                        limite: palabrasBase,
+                        porcentaje: Math.min(100, Math.round(cargaFinal.porcentajeOcupacion)),
+                        porcentajeReal: cargaFinal.porcentajeOcupacion
                     });
                 }
             }
@@ -3567,7 +3644,7 @@
             return `<p ${estiloP}>${trimmed}</p>`;
         }
 
-        function balancearTextoEnColumnas(texto, numCols = 2) {
+        function balancearTextoEnColumnas(texto, numCols = 2, modo = 'balanceado') {
             if (!texto || !texto.trim()) {
                 return { col1: [], col2: [], col3: [] };
             }
@@ -3580,22 +3657,76 @@
                 return { col1: parrafos, col2: [], col3: [] };
             }
 
-            // Si solo hay 1 párrafo: solo si es muy largo se divide por oración completa con punto
+            // Modo secuencial (llenar Columna 1 hasta el pie antes de pasar a Columna 2, etc.)
+            if (modo === 'secuencial' || modo === 'columna_unica') {
+                const palabrasBaseCol = Math.max(40, Math.round((parseInt(calibracion.palabrasPorPagina, 10) || 580) / numCols));
+                const calibCol = Object.assign({}, calibracion, {
+                    columnas: 1,
+                    palabrasPorPagina: palabrasBaseCol
+                });
+                const columnas = [[], [], []];
+                const colaCol = parrafos.slice();
+                let colIdx = 0;
+
+                while (colaCol.length > 0 && colIdx < numCols) {
+                    const p = (colaCol.shift() || '').trim();
+                    if (!p) continue;
+
+                    if (colIdx === numCols - 1) {
+                        columnas[colIdx].push(p);
+                        continue;
+                    }
+
+                    const cargaActual = evaluarCargaBloques(columnas[colIdx], calibCol);
+                    const cargaConP = evaluarCargaBloques([...columnas[colIdx], p], calibCol);
+
+                    if (cargaConP.porcentajeOcupacion <= 100.0) {
+                        columnas[colIdx].push(p);
+                    } else if (columnas[colIdx].length > 0 && cargaActual.porcentajeOcupacion >= 97.0) {
+                        colIdx++;
+                        colaCol.unshift(p);
+                    } else {
+                        const split = dividirTextoParaCapacidad(columnas[colIdx], p, calibCol, 100.0, { permitirCortePalabras: true });
+                        if (split.cabe) {
+                            columnas[colIdx].push(split.cabe);
+                        }
+                        colIdx++;
+                        if (split.sobra) {
+                            colaCol.unshift(split.sobra);
+                        }
+                    }
+                }
+                while (colaCol.length > 0) {
+                    columnas[numCols - 1].push(colaCol.shift());
+                }
+
+                return { col1: columnas[0], col2: columnas[1], col3: columnas[2] };
+            }
+
+            // Modo balanceado (distribuye equitativamente para avisos parciales o página final)
             if (parrafos.length === 1) {
-                const p = parrafos[0];
-                const oraciones = p.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(s => s.length > 0);
-                if (oraciones.length >= 2) {
-                    const mitad = Math.ceil(oraciones.length / 2);
+                const cargaUnica = evaluarCargaBloques(parrafos, calibracion);
+                if (numCols === 2) {
+                    const metaMitad = Math.max(10, cargaUnica.porcentajeOcupacion / 2);
+                    const split = dividirTextoParaCapacidad([], parrafos[0], calibracion, metaMitad, { permitirCortePalabras: true });
                     return {
-                        col1: [oraciones.slice(0, mitad).join(' ')],
-                        col2: [oraciones.slice(mitad).join(' ')],
+                        col1: split.cabe ? [split.cabe] : parrafos,
+                        col2: split.sobra ? [split.sobra] : [],
                         col3: []
                     };
                 }
-                return { col1: parrafos, col2: [], col3: [] };
+                const metaTercio = Math.max(8, cargaUnica.porcentajeOcupacion / 3);
+                const s1 = dividirTextoParaCapacidad([], parrafos[0], calibracion, metaTercio, { permitirCortePalabras: true });
+                const s2 = s1.sobra
+                    ? dividirTextoParaCapacidad([], s1.sobra, calibracion, metaTercio, { permitirCortePalabras: true })
+                    : { cabe: '', sobra: '' };
+                return {
+                    col1: s1.cabe ? [s1.cabe] : parrafos,
+                    col2: s2.cabe ? [s2.cabe] : [],
+                    col3: s2.sobra ? [s2.sobra] : []
+                };
             }
 
-            // 3 Columnas (Marcas y Patentes)
             if (numCols === 3) {
                 const totalChars = parrafos.reduce((a, b) => a + b.length, 0);
                 const tercio = totalChars / 3;
@@ -3616,9 +3747,6 @@
                 return { col1: c1, col2: c2, col3: c3 };
             }
 
-            // 2 Columnas (Estándar de La Gaceta):
-            // Distribuye PÁRRAFOS COMPLETOS respetando la integridad de las cláusulas legales.
-            // NUNCA divide un párrafo o una oración a mitad de palabra entre columnas.
             const totalChars = parrafos.reduce((a, b) => a + b.length, 0);
             const mitadMeta = totalChars / 2;
             let acum = 0;
@@ -3641,47 +3769,27 @@
             const len1 = col1.reduce((a, b) => a + b.length, 0);
             const len2 = col2.reduce((a, b) => a + b.length, 0);
 
-            // Si una columna queda notablemente desbalanceada (> 68% del total) y contiene un párrafo largo,
-            // se equilibra dividiendo ese párrafo por ORACIÓN COMPLETA con punto final (NUNCA a mitad de palabra ni de oración).
-            if (len1 > totalChars * 0.68 && col1.length >= 1) {
-                const pLargo = col1[col1.length - 1];
-                const oraciones = pLargo.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(Boolean);
-                if (oraciones.length >= 2) {
-                    const metaCol1 = mitadMeta - (len1 - pLargo.length);
-                    let o1 = [], o2 = [];
-                    let accO = 0;
-                    for (let or of oraciones) {
-                        if (accO + or.length <= metaCol1 || o1.length === 0) {
-                            o1.push(or);
-                            accO += or.length;
-                        } else {
-                            o2.push(or);
-                        }
-                    }
-                    if (o1.length > 0 && o2.length > 0) {
-                        col1[col1.length - 1] = o1.join(' ');
-                        col2.unshift(o2.join(' '));
-                    }
+            if (len1 > totalChars * 0.65 && col1.length >= 1) {
+                const pLargo = col1.pop();
+                const cargaBase = evaluarCargaBloques(col1, calibracion).porcentajeOcupacion;
+                const metaMitad = evaluarCargaBloques(parrafos, calibracion).porcentajeOcupacion / 2;
+                const split = dividirTextoParaCapacidad(col1, pLargo, calibracion, Math.max(cargaBase + 5, metaMitad), { permitirCortePalabras: true });
+                if (split.cabe && split.sobra) {
+                    col1.push(split.cabe);
+                    col2.unshift(split.sobra);
+                } else {
+                    col1.push(pLargo);
                 }
-            } else if (len2 > totalChars * 0.68 && col2.length >= 1) {
-                const pLargo = col2[0];
-                const oraciones = pLargo.split(/(?<=[.!?])\s+(?=[A-ZÁÉÍÓÚÑ"“])/g).map(s => s.trim()).filter(Boolean);
-                if (oraciones.length >= 2) {
-                    const metaCol1 = mitadMeta - len1;
-                    let o1 = [], o2 = [];
-                    let accO = 0;
-                    for (let or of oraciones) {
-                        if (accO + or.length <= metaCol1 || o1.length === 0) {
-                            o1.push(or);
-                            accO += or.length;
-                        } else {
-                            o2.push(or);
-                        }
-                    }
-                    if (o1.length > 0 && o2.length > 0) {
-                        col1.push(o1.join(' '));
-                        col2[0] = o2.join(' ');
-                    }
+            } else if (len2 > totalChars * 0.65 && col2.length >= 1) {
+                const pLargo = col2.shift();
+                const cargaBase = evaluarCargaBloques(col1, calibracion).porcentajeOcupacion;
+                const metaMitad = evaluarCargaBloques(parrafos, calibracion).porcentajeOcupacion / 2;
+                const split = dividirTextoParaCapacidad(col1, pLargo, calibracion, Math.max(cargaBase + 5, metaMitad), { permitirCortePalabras: true });
+                if (split.cabe && split.sobra) {
+                    col1.push(split.cabe);
+                    col2.unshift(split.sobra);
+                } else {
+                    col2.unshift(pLargo);
                 }
             }
 
@@ -3699,47 +3807,19 @@
                 return;
             }
 
-            // 1. Contar Palabras
-            const palabrasArray = rawText.trim().match(/\S+/g) || [];
-            const cantPalabras = palabrasArray.length;
-
-            // 2. Contar Párrafos y calcular líneas de columna
             const parrafosArray = segmentarTextoEnParrafos(rawText);
             const cantParrafos = parrafosArray.length;
-
-            // Estimación de líneas: la sangría consume caracteres de la primera línea de cada párrafo
-            let totalLineasEstimadas = 0;
-            const sangriaEfectiva = Math.max(0, parseInt(calibracion.sangria) || 0);
-            parrafosArray.forEach(p => {
-                const len = p.trim().length;
-                const lineasP = Math.max(1, Math.ceil((len + sangriaEfectiva) / calibracion.charsPorLinea));
-                totalLineasEstimadas += lineasP;
-            });
-            // Añadir separación visual entre párrafos
-            totalLineasEstimadas += Math.max(0, cantParrafos - 1);
-
-            // Factor de interlineado (alarga la altura vertical y líneas efectivas)
-            const factorInterlineado = parseFloat(calibracion.interlineado) || 1.0;
-            const totalLineasConInterlineado = Math.ceil(totalLineasEstimadas * factorInterlineado);
-
-            // 3. Cálculo de Ocupación con factor de seguridad e interlineado (Dual Metric: Palabras vs Líneas de Pliego)
-            const factorSeguridad = 1 + (calibracion.margenSeguridad / 100);
-            const palabrasEfectivas = cantPalabras * factorSeguridad * factorInterlineado;
-            const porcentajePalabras = (palabrasEfectivas / calibracion.palabrasPorPagina) * 100;
-
-            // 46 líneas por columna en Tabloide (92 líneas totales en 2 columnas = 1 página completa La Gaceta No. 37,260)
-            const lineasPorColumna = calibracion.tipoPapel === 'tabloide' ? 46 : 30;
-            const lineasTotalesPagina = (calibracion.columnas || 2) * lineasPorColumna;
-            const porcentajeLineas = (totalLineasConInterlineado / lineasTotalesPagina) * 100;
-
-            // La ocupación física real en el pliego de imprenta es el máximo entre la masa de palabras y las líneas verticales de columna
-            const porcentajeOcupacion = Math.max(porcentajePalabras, porcentajeLineas);
+            const cargaTotal = evaluarCargaBloques(parrafosArray, calibracion);
+            const cantPalabras = cargaTotal.palabras;
+            const totalLineasEstimadas = cargaTotal.lineasEstimadas;
+            const totalLineasConInterlineado = cargaTotal.lineasEfectivas;
+            const porcentajeOcupacion = cargaTotal.porcentajeOcupacion;
             const clampedPercent = Math.min(porcentajeOcupacion, 100);
 
-            // 4. Medidas Físicas Reales de Papel de Imprenta (La Gaceta)
+            // Medidas Físicas Reales de Papel de Imprenta (La Gaceta)
             const maxAlturaCajaCm = calibracion.tipoPapel === 'tabloide' ? 38.0 : 24.5;
-            let alturaPapelCalculada = ((clampedPercent / 100) * maxAlturaCajaCm).toFixed(1);
-            let alturaPapelStr = `${alturaPapelCalculada} cm`;
+            const alturaPapelCalculada = ((clampedPercent / 100) * maxAlturaCajaCm).toFixed(1);
+            const alturaPapelStr = `${alturaPapelCalculada} cm`;
 
             let anchoColStr = '11.5 cm';
             if (calibracion.tipoPapel === 'tabloide') {
@@ -3765,21 +3845,19 @@
             const progressBar = document.getElementById('progressBarFill');
             progressBar.style.width = `${clampedPercent}%`;
 
-            // 5. Clasificación según Tipo de Publicación (Acuerdo 249-2010 / Marcas / Juntas de Agua)
+            // Paginación Editorial Inteligente (llena cada página al 100% antes de crear la siguiente)
+            paginasCalculadas = paginarTextoEditorialGaceta(rawText, calibracion);
+            totalPaginasPrevia = paginasCalculadas.length;
+            if (paginaActualPrevia > totalPaginasPrevia) paginaActualPrevia = 1;
+            if (paginaActualPrevia < 1) paginaActualPrevia = 1;
+
+            // Clasificación según Tipo de Publicación (Acuerdo 249-2010 / Marcas / Juntas de Agua)
             let espacioRecomendado = null;
             let esMultiPagina = false;
             let numPaginasCompletas = 1;
-
-            // Tolerancia del Diagramador: Jugar con los espacios hasta 110% en 1 sola plana
-            if (porcentajeOcupacion > 110.0) {
-                esMultiPagina = true;
-                numPaginasCompletas = Math.ceil(porcentajeOcupacion / 100);
-            }
-
             const tipoPub = calibracion.tipoPublicacion || 'texto';
 
             if (tipoPub === 'junta_agua') {
-                // Beneficio social de exención por ley
                 espacioRecomendado = {
                     id: 'junta_agua',
                     desc: 'PUBLICACIÓN EXENTA - JUNTA DE AGUA (DECRETO LEGISLATIVO)',
@@ -3789,7 +3867,6 @@
                     alturaEstimadaCm: alturaPapelStr
                 };
             } else if (tipoPub === 'marcas') {
-                // Tarifas de Propiedad Intelectual: 3 Publicaciones de Ley en Sección B (cotizaciones.html)
                 if (porcentajeOcupacion <= 37.5) {
                     espacioRecomendado = TARIFAS_MARCAS_PATENTES['1/4'];
                 } else {
@@ -3802,38 +3879,7 @@
                         alturaEstimadaCm: '19.0 cm'
                     };
                 }
-            } else {
-                // Tarifa Estándar con Tolerancia Editorial de Taller de La Gaceta
-                // Basado en el Diario Oficial No. 37,260 (Edición Oficial Octubre 2026):
-                // 1/4 (25% nominal): hasta 28.0% (~145 palabras / ~24 líneas) -> L. 1,200.00
-                // 1/3 (33.3% nominal): hasta 38.0% (~200 palabras / ~33 líneas) -> L. 1,400.00
-                // 1/2 (50% nominal): hasta 55.0% (~290 palabras / ~48 líneas) -> L. 1,800.00
-                // 2/3 (66.7% nominal): hasta 73.0% (~385 palabras / ~64 líneas) -> L. 2,800.00
-                // 1 pág (100% nominal): hasta 110.0% (~638 palabras / ~101 líneas con ajuste de taller) -> L. 3,200.00
-                if (porcentajeOcupacion <= 28.0) {
-                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/4');
-                } else if (porcentajeOcupacion <= 38.0) {
-                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/3');
-                } else if (porcentajeOcupacion <= 55.0) {
-                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/2');
-                } else if (porcentajeOcupacion <= 73.0) {
-                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '2/3');
-                } else if (porcentajeOcupacion <= 110.0) {
-                    espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1');
-                } else {
-                    espacioRecomendado = {
-                        id: 'multi',
-                        desc: `${numPaginasCompletas} PÁGINAS TABLOIDE (PUBLICACIONES - TEXTO)`,
-                        precio: 3200.00 * numPaginasCompletas,
-                        fraccion: numPaginasCompletas,
-                        nombreCorto: `${numPaginasCompletas} Páginas Tabloide`,
-                        alturaEstimadaCm: `${(numPaginasCompletas * 38.0).toFixed(0)} cm (${numPaginasCompletas} págs)`
-                    };
-                }
-            }
-
-            // Aplicar selección manual del diagramador si está fijada
-            if (espacioForzadoManual && tipoPub === 'texto') {
+            } else if (espacioForzadoManual) {
                 const manualItem = ESPACIOS_DISPONIBLES.find(e => e.id === espacioForzadoManual);
                 if (manualItem) {
                     espacioRecomendado = Object.assign({}, manualItem, {
@@ -3841,16 +3887,7 @@
                         esFijadoManual: true
                     });
                 }
-            }
-
-            // Paginación Editorial Inteligente (Portada vs Páginas Interiores)
-            paginasCalculadas = paginarTextoEditorialGaceta(rawText, calibracion);
-            totalPaginasPrevia = paginasCalculadas.length;
-            if (paginaActualPrevia > totalPaginasPrevia) paginaActualPrevia = 1;
-            if (paginaActualPrevia < 1) paginaActualPrevia = 1;
-
-            // Sincronización estricta entre paginación y tarifa (Jugar con los espacios)
-            if (totalPaginasPrevia === 1 && tipoPub === 'texto' && !espacioForzadoManual) {
+            } else if (totalPaginasPrevia === 1) {
                 if (porcentajeOcupacion <= 28.0) {
                     espacioRecomendado = ESPACIOS_DISPONIBLES.find(e => e.id === '1/4');
                 } else if (porcentajeOcupacion <= 38.0) {
@@ -3864,7 +3901,7 @@
                 }
                 esMultiPagina = false;
                 numPaginasCompletas = 1;
-            } else if (totalPaginasPrevia > 1 && tipoPub === 'texto' && !espacioForzadoManual) {
+            } else {
                 esMultiPagina = true;
                 numPaginasCompletas = totalPaginasPrevia;
                 espacioRecomendado = {
@@ -3884,9 +3921,10 @@
             const feedbackElem = document.getElementById('capacityFeedback');
             const badgeEstado = document.getElementById('badgeEstadoEspacio');
 
-            if (totalPaginasPrevia > 1) {
+            if (totalPaginasPrevia > 1 && tipoPub === 'texto' && !espacioForzadoManual) {
+                const pag1Pct = paginasCalculadas[0] ? paginasCalculadas[0].porcentaje : 100;
                 const ultPagPct = paginasCalculadas[totalPaginasPrevia - 1].porcentaje;
-                feedbackElem.innerHTML = `📰 <strong style="color: #0369a1;">Extensión Multi-Página Tabloide:</strong> El texto consta de <strong>${cantPalabras.toLocaleString()} palabras</strong> y ocupa <strong>${totalPaginasPrevia} páginas tabloide completas</strong> (Pág. 1 al 100%, Pág. ${totalPaginasPrevia} al ${ultPagPct.toFixed(0)}%). Utilice las pestañas para verificar la distribución en cada pliego.`;
+                feedbackElem.innerHTML = `📰 <strong style="color: #0369a1;">Extensión Multi-Página Tabloide:</strong> El texto consta de <strong>${cantPalabras.toLocaleString()} palabras</strong> y ocupa <strong>${totalPaginasPrevia} páginas tabloide</strong> (Pág. 1 al ${pag1Pct.toFixed(0)}%, Pág. ${totalPaginasPrevia} al ${ultPagPct.toFixed(0)}%). Utilice las pestañas para verificar la distribución en cada pliego.`;
                 badgeEstado.textContent = `${totalPaginasPrevia} Páginas Tabloide`;
                 badgeEstado.style.background = '#0284c7';
             } else if (tipoPub === 'junta_agua') {
@@ -3902,8 +3940,8 @@
                     feedbackElem.innerHTML = `🔵 <strong style="color: #002147;">Ajuste Editorial Manual:</strong> Tarifa fijada por el diagramador en <strong>${espacioRecomendado.nombreCorto}</strong> (${pct.toFixed(1)}% real ocupado en la plana).`;
                     badgeEstado.textContent = `${espacioRecomendado.nombreCorto} (Fijado)`;
                     badgeEstado.style.background = '#002147';
-                } else if (espacioRecomendado.id === '1' && cantPalabras > 580) {
-                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Ajuste Editorial de Taller:</strong> El texto tiene <strong>${cantPalabras.toLocaleString()} palabras</strong> y se ajusta perfectamente en <strong>1 Página Completa (L. 3,200.00)</strong> jugando con los espacios e interlineado de taller, evitando el cobro de una 2da plana.`;
+                } else if (espacioRecomendado.id === '1' && porcentajeOcupacion > 100) {
+                    feedbackElem.innerHTML = `🟢 <strong style="color: #059669;">Ajuste Editorial de Taller:</strong> El texto tiene <strong>${cantPalabras.toLocaleString()} palabras</strong> (${totalLineasConInterlineado} líneas) y se ajusta perfectamente en <strong>1 Página Completa (L. 3,200.00)</strong> jugando con los espacios e interlineado de taller, evitando el cobro de una 2da plana.`;
                     badgeEstado.textContent = espacioRecomendado.nombreCorto;
                     badgeEstado.style.background = '#059669';
                 } else if (ratioEnFormato > 93) {
@@ -3920,7 +3958,7 @@
             // Guardar en el estado actual
             analisisActual.palabras = cantPalabras;
             analisisActual.caracteres = charCount;
-            analisisActual.lineasEstimadas = totalLineasEstimadas;
+            analisisActual.lineasEstimadas = totalLineasConInterlineado;
             analisisActual.parrafos = cantParrafos;
             analisisActual.porcentajePagina = porcentajeOcupacion;
             analisisActual.espacioSeleccionado = espacioRecomendado;
@@ -4087,23 +4125,20 @@ function actualizarCalculoFinanciero() {
 
             // Ajustar altura de la capa verde de ocupación en la página activa
             let pctPagina = 0;
-            if (totalPaginasPrevia > 1) {
-                if (paginaActualPrevia < totalPaginasPrevia) {
-                    pctPagina = 100; // Páginas intermedias están 100% llenas
-                } else {
-                    pctPagina = Math.min(100, Math.round(pagActual.porcentaje || 0)); // Última página refleja su porcentaje real
-                }
+            if (pagActual && typeof pagActual.porcentaje === 'number') {
+                pctPagina = Math.min(100, Math.round(pagActual.porcentaje));
             } else {
-                pctPagina = Math.min(100, Math.round(pagActual.porcentaje || clampedPercent || 0));
+                pctPagina = Math.min(100, Math.round(analisisActual.porcentajePagina || 0));
             }
             if (fillOverlay && fillBadge) {
                 fillOverlay.style.height = `${pctPagina}%`;
                 fillBadge.textContent = `${pctPagina}% ocupado (Pág. ${paginaActualPrevia} de ${totalPaginasPrevia})`;
             }
 
-            // Sangría, interlineado y tamaño de fuente en Times New Roman
+            // Sangría, interlineado y tamaño de fuente en Times New Roman ajustado al tamaño de la maqueta
             const tamanoBase = parseFloat(calibracion.tamanoLetra) || 14;
-            const fontMaquetaPx = Math.max(7.5, (10 * (tamanoBase / 14))).toFixed(1);
+            const factorMaqueta = calibracion.tamanoMaqueta === 'compacto' ? 0.72 : (calibracion.tamanoMaqueta === 'tall' ? 1.28 : 1.0);
+            const fontMaquetaPx = Math.max(7.5, (12.4 * factorMaqueta * (tamanoBase / 14))).toFixed(1);
             if (columnsContainer) {
                 columnsContainer.style.fontFamily = "'Times New Roman', Times, serif";
                 columnsContainer.style.fontSize = `${fontMaquetaPx}px`;
@@ -4111,10 +4146,11 @@ function actualizarCalculoFinanciero() {
 
             const sangriaPx = (calibracion.sangria || 0) * 2.2;
             const factorInter = parseFloat(calibracion.interlineado) || 1.0;
-            const lineHeightPx = (1.38 * factorInter).toFixed(2);
-            const marginBottomPx = (5 * factorInter).toFixed(1);
+            const lineHeightPx = (1.22 * factorInter).toFixed(2);
+            const marginBottomPx = (4 * factorInter).toFixed(1);
+            const alignMaqueta = calibracion.justificado !== false ? 'justify' : 'left';
 
-            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; font-family: 'Times New Roman', Times, serif; font-size: ${fontMaquetaPx}px; text-align: justify; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
+            const estiloP = `style="text-indent: ${sangriaPx}px; line-height: ${lineHeightPx}; margin-bottom: ${marginBottomPx}px; font-family: 'Times New Roman', Times, serif; font-size: ${fontMaquetaPx}px; text-align: ${alignMaqueta}; text-justify: inter-word; hyphens: auto; -webkit-hyphens: auto;"`;
 
             // Flujo editorial de imprenta: secuencial en páginas intermedias, balanceado en la última página
             const esUltimaPagina = (paginaActualPrevia === totalPaginasPrevia);
@@ -4266,12 +4302,18 @@ function actualizarCalculoFinanciero() {
                     '1/3': "1/3 PÁGINA (PUBLICACIONES- TEXTO)",
                     '1/2': "1/2 PÁGINA (PUBLICACIONES- TEXTO)",
                     '2/3': "2/3 PÁGINA (PUBLICACIONES- TEXTO)",
-                    '1': "1 PÁGINA (PUBLICACIONES - TEXTO)"
+                    '1': "1 PÁGINA (PUBLICACIONES - TEXTO)",
+                    'multi': "1 PÁGINA (PUBLICACIONES - TEXTO)"
                 };
                 if (mapPredef[analisisActual.espacioSeleccionado.id]) {
                     prodCatalogo = mapPredef[analisisActual.espacioSeleccionado.id];
                 }
             }
+
+            const cantidadTransfer = analisisActual.cantidadPaginas || 1;
+            const precioUnitarioTransfer = (analisisActual.espacioSeleccionado.id === 'multi')
+                ? 3200.00
+                : analisisActual.precioUnitario;
 
             // Preparar el ítem estandarizado para cotizaciones.html
             const papelStr = calibracion.tipoPapel === 'tabloide' ? 'Tabloide 11"×17"' : 'Carta 8.5"×11"';
@@ -4281,11 +4323,12 @@ function actualizarCalculoFinanciero() {
             const interlineadoDetalle = (calibracion.interlineado || 1.0) > 1.0 ? `, interlineado: ${calibracion.interlineado.toFixed(2)}x` : '';
             const alturaStr = analisisActual.alturaPapelCm ? `, altura papel: ${analisisActual.alturaPapelCm}` : '';
 
+            const resumenSeguro = (analisisActual.resumenTexto || '').replace(/"/g, "'");
             const itemParaTransferir = {
                 producto: prodCatalogo,
-                descripcion: `PUBLICACIÓN EN LA GACETA (${secStr} • ${papelStr} • ${colsStr}${alturaStr}): ${analisisActual.resumenTexto} (${analisisActual.palabras} palabras, ${analisisActual.lineasEstimadas} líneas est.${sangriaDetalle}${interlineadoDetalle})`,
-                cantidad: analisisActual.cantidadPaginas || 1,
-                precio: analisisActual.precioUnitario,
+                descripcion: `PUBLICACIÓN EN LA GACETA (${secStr} • ${papelStr} • ${colsStr}${alturaStr}): ${resumenSeguro} (${analisisActual.palabras} palabras, ${analisisActual.lineasEstimadas} líneas est.${sangriaDetalle}${interlineadoDetalle})`,
+                cantidad: cantidadTransfer,
+                precio: precioUnitarioTransfer,
                 impuesto: (calibracion.tipoPublicacion === 'junta_agua' || analisisActual.impuestoPorcentaje === 0) ? 'Exento' : 'ISV 15%',
                 tipoDescuento: document.getElementById('tipoDescuento').value,
                 porcentajeDescuento: analisisActual.descuentoPorcentaje
@@ -4486,6 +4529,8 @@ ${analisisActual.descuentoPorcentaje > 0 ? `🎁 *Descuento Aplicado (${analisis
 
         function limpiarTexto() {
             document.getElementById('textoPublicacion').value = '';
+            espacioForzadoManual = null;
+            actualizarBotonesEspacioPills();
             analizarTexto();
             showToast("Editor limpiado", "info");
         }
